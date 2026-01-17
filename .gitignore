@@ -1,41 +1,19 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
+﻿*.ipch
+*.suo
+*.db
 *.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
 *.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+*.ilk
+.vs
+.tmp
+*.tlog
+*.obj
+*.idb
+*.log
+*.exp
+*.iobj
+*.ipdb
+*.bak
+bin
+Debug
+Release
