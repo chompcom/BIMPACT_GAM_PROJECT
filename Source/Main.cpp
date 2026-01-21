@@ -18,8 +18,8 @@
 
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "Sprite.hpp"
-#include "Utils.hpp"
+#include "Sprite.h"
+#include "Utils.h"
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
