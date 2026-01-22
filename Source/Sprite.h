@@ -1,10 +1,6 @@
 #pragma once
 #include "AEEngine.h"
-
-struct Vector2D {
-	f32 x{};
-	f32 y{};
-};
+#include "Vector2.hpp"
 
 struct Color {
 	f32 r{};
@@ -17,11 +13,11 @@ class Sprite {
 	public:
 		AEGfxVertexList* mesh;
 		AEMtx33 transform;
-		Vector2D position;
-		Vector2D scale;
+		Vector2 position;
+		Vector2 scale;
 		Color color;
 
-		Sprite(AEGfxVertexList* spriteMesh, Vector2D spritePosition, Vector2D spriteScale, Color spriteColor);
+		Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor);
 
 		void UpdateTransform();
 

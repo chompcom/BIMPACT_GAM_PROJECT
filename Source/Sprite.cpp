@@ -1,7 +1,7 @@
 #include "AEEngine.h"
-#include "Sprite.hpp"
+#include "Sprite.h"
 
-Sprite::Sprite(AEGfxVertexList* spriteMesh, Vector2D spritePosition, Vector2D spriteScale, Color spriteColor) 
+Sprite::Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor) 
 	: mesh{ spriteMesh }, transform{ 0 }, position {spritePosition}, scale{ spriteScale }, color{ spriteColor } {
 		UpdateTransform();
 }
@@ -67,20 +67,20 @@ AEGfxVertexList* CreateCircleMesh() {
 			f32 next_x{ x + 0.0025f };
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
-				x, sqrt(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f + sqrt(0.5f * 0.5f - x * x),   // left end of triangle slice
-				next_x, sqrt(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f + sqrt(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				x, sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f + sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
+				next_x, sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f + sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
-				x, -sqrt(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f - sqrt(0.5f * 0.5f - x * x),   // left end of triangle slice
-				next_x, -sqrt(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f - sqrt(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				x, -sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f - sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
+				next_x, -sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f - sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
-				-x, sqrt(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f + sqrt(0.5f * 0.5f - x * x),   // left end of triangle slice
-				-next_x, sqrt(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f + sqrt(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				-x, sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f + sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
+				-next_x, sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f + sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
-				-x, -sqrt(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f - sqrt(0.5f * 0.5f - x * x),   // left end of triangle slice
-				-next_x, -sqrt(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f - sqrt(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				-x, -sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f - sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
+				-next_x, -sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f - sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
 		}
 
 		AEGfxVertexList* mesh = AEGfxMeshEnd();

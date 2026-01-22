@@ -11,13 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Source\Sprite.hpp" />
-    <ClInclude Include="..\Source\Utils.hpp" />
+    <ClInclude Include="..\Source\GameStateList.h" />
+    <ClInclude Include="..\Source\GameStateManager.h" />
+    <ClInclude Include="..\Source\Sprite.h" />
+    <ClInclude Include="..\Source\Utils.h" />
+    <ClInclude Include="..\Source\Vector2.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
