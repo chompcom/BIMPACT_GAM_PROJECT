@@ -12,7 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Source\GameStateManager.cpp" />
+    <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
+    <ClCompile Include="..\Source\Player.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Utils.cpp" />
   </ItemGroup>
