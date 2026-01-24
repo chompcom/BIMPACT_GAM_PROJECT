@@ -17,6 +17,7 @@ public:
 	bool throwState; //true is player is throwing a gift
 	Gift * heldGift; //points to the gift the player is holding
 	f32 throwForce; //amount of force that will be applied to the gift thrown
+	f32 pickUpCooldown; //counter for when the player can pick up a gift
 	
 	//constructor
 	Player(Sprite sprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
