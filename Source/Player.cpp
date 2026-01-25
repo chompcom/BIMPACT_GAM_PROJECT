@@ -14,7 +14,8 @@ Player::Player(Sprite sprite, f32 throwStrength, f32 speed, Vector2 position, Ve
 	pickUpState{ false },
 	throwState{ false },
 	heldGift{ nullptr },
-	throwForce{ 0.f }
+	throwForce{ 0.f },
+	pickUpCooldown{ 0.f }
 {
 }
 
@@ -22,6 +23,13 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 {
 	u8 w{ AEInputCheckCurr(AEVK_W) }, a{ AEInputCheckCurr(AEVK_A) },
 		s{ AEInputCheckCurr(AEVK_S) }, d{ AEInputCheckCurr(AEVK_D) };
+
+	//set the player's pick up to false if there is still time in the pickUpCooldown
+	if (player.pickUpCooldown > 0.f)
+	{
+		player.pickUpCooldown -= deltaTime;
+		if (player.pickUpCooldown < 0.f) player.pickUpState = false;
+	}
 
 	//let player move if they are not throwing
 	if (!player.throwState)
@@ -62,7 +70,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//put down the gift and give it a velocity depenedent 
 		//on how long the player has been charging up for
 		player.throwState = false;
-		player.pickUpState = false;
+		player.pickUpCooldown = 0.5f;
 		(*player.heldGift).pickUpState = false;
 		(*player.heldGift).velocity = (player.direction).Normalized() * player.throwForce;
 		player.heldGift = nullptr;
