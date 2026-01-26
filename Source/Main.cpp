@@ -74,9 +74,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     };
 
     Gift testGifts[2]{
-        Gift(testGiftsSprites[0], (testGiftsSprites[0]).position),
-        Gift(testGiftsSprites[1], (testGiftsSprites[1]).position)
+        Gift("Nugget",{"Cheap","Tasty"},testGiftsSprites[0], (testGiftsSprites[0]).position),
+        Gift("Candy",{"Sweet","Tasty"},testGiftsSprites[1], (testGiftsSprites[1]).position)
     };
+
 
     //Sprite healthBarBack(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 0.6f, 0.f, 0.f, 1.f });
     //Sprite healthBarFore(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 1.f, 0.f, 0.f, 1.f });
@@ -124,6 +125,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //    player.position.x += speed;
         //    player.UpdateTransform();
         //}
+        
 
         UpdatePlayer(player, current_Time);
         player.sprite.UpdateTransform();

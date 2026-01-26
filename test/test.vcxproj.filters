@@ -33,9 +33,6 @@
     <ClCompile Include="..\Source\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Enemy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Sprite.h">
@@ -53,7 +50,7 @@
     <ClInclude Include="..\Source\Vector2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Enemy.h">
+    <ClInclude Include="..\Source\Gift.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
