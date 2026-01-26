@@ -58,7 +58,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 
 	//if the player is holding an item and they press space, 
 	//let them charge their throw
-	if (player.pickUpState && AEInputCheckCurr(AEVK_SPACE))
+	if (player.pickUpState && AEInputCheckCurr(AEVK_SPACE) && player.pickUpCooldown <= 0.0f)
 	{
 		player.throwState = true;
 		player.throwForce += deltaTime * player.throwStrength;

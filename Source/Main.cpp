@@ -23,6 +23,7 @@
 #include "Utils.h"
 #include "Player.h"
 #include "Gift.h"
+#include "Enemy.h"
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -51,14 +52,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxVertexList* circleMesh = CreateCircleMesh();
 
-    AEGfxTexture* playerTexture = AEGfxTextureLoad("Assets/player.png");
+    AEGfxTexture* bearTexture = AEGfxTextureLoad("Assets/player.png");
+    AEGfxTexture* popRocksTexture = AEGfxTextureLoad("Assets/poprocks.png");
 
     //Sprite damageArea(circleMesh, Vector2{ 400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 1.f, 0.f, 0.f, 1.f });
     //Sprite healArea(circleMesh, Vector2{ -400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 0.f, 1.f, 0.f, 1.f });
 
     //Sprite player(circleMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
-    TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
+    //TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
+
+    std::array<std::string, MAX_NO_TRAITS> bearTraits{ "Cold", "Smart" };
+    std::array<std::string, MAX_NO_TRAITS> bearLikes{ "Cold", "Clean" };
+    std::array<std::string, MAX_NO_TRAITS> bearDislikes{ "Heaty", "Gross" };
+    EnemyType bear = EnemyType("bear", 40.f, 5.f, bearTraits, bearLikes, bearDislikes);
+    
+    Enemy bear1 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ -700.f, -100.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
+        ES_ANGRY);
+    Enemy bear2 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ 300.f, 400.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
+        ES_NEUTRAL);
+
+    std::array<std::string, MAX_NO_TRAITS> popRocksTraits{ "Sweet", "Explosive", "Heaty"};
+    std::array<std::string, MAX_NO_TRAITS> popRocksLikes{ "Heaty", "Sweet", "Fragrant"};
+    std::array<std::string, MAX_NO_TRAITS> popRocksDislikes{ "Boring", "Bitter", "Cold"};
+    EnemyType popRocks = EnemyType("poprocks", 20.f, 15.f, popRocksTraits, popRocksLikes, popRocksDislikes);
+
+    Enemy popRocks1 = Enemy(popRocks, TexturedSprite(squareMesh, popRocksTexture, Vector2{ 100.f, -250.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
+        ES_HAPPY);
 
     Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
@@ -74,9 +94,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     };
 
     Gift testGifts[2]{
-        Gift(testGiftsSprites[0], (testGiftsSprites[0]).position),
-        Gift(testGiftsSprites[1], (testGiftsSprites[1]).position)
+        Gift("Nugget",{"Cheap","Tasty"},testGiftsSprites[0], (testGiftsSprites[0]).position),
+        Gift("Candy",{"Sweet","Tasty"},testGiftsSprites[1], (testGiftsSprites[1]).position)
     };
+
 
     //Sprite healthBarBack(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 0.6f, 0.f, 0.f, 1.f });
     //Sprite healthBarFore(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 1.f, 0.f, 0.f, 1.f });
@@ -124,6 +145,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //    player.position.x += speed;
         //    player.UpdateTransform();
         //}
+        
 
         UpdatePlayer(player, current_Time);
         player.sprite.UpdateTransform();
@@ -137,6 +159,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             UpdateGift(testGifts[i], player, current_Time);
             (testGifts[i]).sprite.UpdateTransform();
         }
+
+        //std::cout << bear1.currentHealth << bear1.state << '\n';
+        //std::cout << bear1.type.name << bear2.type.name << popRocks1.type.name << '\n';
 
         //// Player in damage AOE
         //if (AreCirclesIntersecting(player.position, 40.f, damageArea.position, 200.0f))
@@ -169,7 +194,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         directionTest.RenderSprite();
 
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-        testSprite.RenderSprite();
+        bear1.sprite.RenderSprite();
+        bear2.sprite.RenderSprite();
+        popRocks1.sprite.RenderSprite();
+        //testSprite.RenderSprite();
 
         //healthBarBack.RenderSprite();
         //healthBarFore.RenderSprite();
@@ -189,7 +217,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxMeshFree(squareMesh);
     AEGfxMeshFree(circleMesh);
-    AEGfxTextureUnload(playerTexture);
+    //AEGfxTextureUnload(playerTexture);
+    AEGfxTextureUnload(bearTexture);
+    AEGfxTextureUnload(popRocksTexture);
     // free the system
     AESysExit();
 

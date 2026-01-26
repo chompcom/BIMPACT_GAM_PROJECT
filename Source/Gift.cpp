@@ -4,14 +4,28 @@
 #include "Utils.h"
 
 //simple contructor for gift class, for testing
-Gift::Gift(Sprite sprite, Vector2 position) :
+Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 position) :
 	//initialiser list
+	name{ n },
+	traits{ t },
 	sprite{ sprite },
 	position{ position },
 	velocity { Vector2 {0.f, 0.f}},
 	pickUpState{ false }
 {
 }
+
+Gift::Gift(Sprite sprite, Vector2 position) :
+	name{ "Unnamed Gift" },
+	traits{ },
+	sprite{ sprite },
+	position{ position },
+	velocity{ Vector2 {0.f, 0.f} },
+	pickUpState{ false }
+{	
+}
+
+
 
 //this is just to test throwing
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
@@ -43,3 +57,4 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 
 	return;
 }
+ 

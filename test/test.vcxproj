@@ -24,6 +24,7 @@
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
+    <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Utils.h" />
     <ClInclude Include="..\Source\Vector2.hpp" />
