@@ -101,6 +101,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             player.UpdateTransform();
         }
 
+        
         // Player in damage AOE
         if (AreCirclesIntersecting(player.position, 40.f, damageArea.position, 200.0f))
         {

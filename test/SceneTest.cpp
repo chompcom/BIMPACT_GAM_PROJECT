@@ -1,0 +1,7 @@
+
+void SceneTestInit() {
+
+}
+void SceneTestUpdate() {
+
+}

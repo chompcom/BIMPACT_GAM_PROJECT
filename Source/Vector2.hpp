@@ -83,6 +83,24 @@ public:
         return Vector2(magnitude * this->x, magnitude * this->y);
     }
 
+    const Vector2 operator*(double magnitude) const {
+        return Vector2(static_cast<float>(magnitude * this->x), static_cast<float>(magnitude * this->y));
+    }
+
+    const Vector2 operator*(int magnitude) const {
+        return Vector2(static_cast<float>(magnitude * this->x), static_cast<float>(magnitude * this->y));
+    }
+
+    const Vector2& operator*=(int magnitude) {
+        *this = *this * magnitude;
+        return *this;
+    }
+
+    const Vector2& operator*=(double magnitude) {
+        *this = *this * magnitude;
+        return *this;
+    }
+
     float Dot(const Vector2 &vector) const{
         return (this->x * vector.x)+(this->y*vector.y);
     }

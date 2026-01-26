@@ -15,6 +15,7 @@
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Utils.cpp" />
+    <ClCompile Include="SceneTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\GameStateList.h" />
