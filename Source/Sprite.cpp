@@ -32,8 +32,18 @@ void Sprite::UpdateTransform() {
 
 void Sprite::RenderSprite() {
 		AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
 		AEGfxSetTransform(transform.m);
 		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+}
+
+TexturedSprite::TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor)
+	: Sprite(spriteMesh, spritePosition, spriteScale, spriteColor), texture{ spriteTexture } {
+}
+
+void TexturedSprite::RenderSprite() {
+		AEGfxTextureSet(texture, 0.f, 0.f);
+		Sprite::RenderSprite();
 }
 
 AEGfxVertexList* CreateSquareMesh() {

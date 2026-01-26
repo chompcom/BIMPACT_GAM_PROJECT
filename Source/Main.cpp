@@ -51,10 +51,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxVertexList* circleMesh = CreateCircleMesh();
 
+    AEGfxTexture* playerTexture = AEGfxTextureLoad("Assets/player.png");
+
     //Sprite damageArea(circleMesh, Vector2{ 400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 1.f, 0.f, 0.f, 1.f });
     //Sprite healArea(circleMesh, Vector2{ -400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 0.f, 1.f, 0.f, 1.f });
 
     //Sprite player(circleMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
+
+    TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
+
     Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
     Player player(playerSprite, 25000.f, 600.f, Vector2{ 0.f, -50.f });
@@ -158,11 +163,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         //damageArea.RenderSprite();
         //healArea.RenderSprite();
-
         testGifts[0].sprite.RenderSprite();
         testGifts[1].sprite.RenderSprite();
         player.sprite.RenderSprite();
         directionTest.RenderSprite();
+
+        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+        testSprite.RenderSprite();
 
         //healthBarBack.RenderSprite();
         //healthBarFore.RenderSprite();
@@ -182,6 +189,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxMeshFree(squareMesh);
     AEGfxMeshFree(circleMesh);
+    AEGfxTextureUnload(playerTexture);
     // free the system
     AESysExit();
 
