@@ -2,7 +2,7 @@
 #include "Enemy.h"
 #include "Vector2.hpp"
 
-Enemy::Enemy(EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
+Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr } {
 		switch (initialState) {
 			case ES_HAPPY:
@@ -17,13 +17,13 @@ Enemy::Enemy(EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initi
 		}
 }
 
-EnemyType::EnemyType(std::string name, f32 health, f32 damage, std::array<std::string, MAX_NO_TRAITS> traits,
-	std::array<std::string, MAX_NO_TRAITS> likes, std::array<std::string, MAX_NO_TRAITS> dislikes)
+EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
+	const Labels& likes, const Labels& dislikes)
 	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes },
 		neutral{ nullptr }, happy{ nullptr }, angry{ nullptr } {
 }
 
-void WalkLeft(Enemy& me) {
-	me.sprite.position += Vector2(10, 0);
+void WalkLeft(Enemy& me, float dt) {
+	me.sprite.position += Vector2(10, 0) * dt;
 	me.sprite.UpdateTransform();
 }

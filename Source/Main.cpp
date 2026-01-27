@@ -25,6 +25,8 @@
 #include "Gift.h"
 #include "Enemy.h"
 
+#include <iostream>
+
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -62,9 +64,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     //TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
 
-    std::array<std::string, MAX_NO_TRAITS> bearTraits{ "Cold", "Smart" };
-    std::array<std::string, MAX_NO_TRAITS> bearLikes{ "Cold", "Clean" };
-    std::array<std::string, MAX_NO_TRAITS> bearDislikes{ "Heaty", "Gross" };
+    Labels bearTraits{ "Cold", "Smart" };
+    Labels bearLikes{ "Cold", "Clean" };
+    Labels bearDislikes{ "Heaty", "Gross" };
     EnemyType bear = EnemyType("bear", 40.f, 5.f, bearTraits, bearLikes, bearDislikes);
     
     Enemy bear1 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ -700.f, -100.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
@@ -72,9 +74,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     Enemy bear2 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ 300.f, 400.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
         ES_NEUTRAL);
 
-    std::array<std::string, MAX_NO_TRAITS> popRocksTraits{ "Sweet", "Explosive", "Heaty"};
-    std::array<std::string, MAX_NO_TRAITS> popRocksLikes{ "Heaty", "Sweet", "Fragrant"};
-    std::array<std::string, MAX_NO_TRAITS> popRocksDislikes{ "Boring", "Bitter", "Cold"};
+    Labels popRocksTraits{ "Sweet", "Explosive", "Heaty"};
+    Labels popRocksLikes{ "Heaty", "Sweet", "Fragrant"};
+    Labels popRocksDislikes{ "Boring", "Bitter", "Cold"};
     EnemyType popRocks = EnemyType("poprocks", 20.f, 15.f, popRocksTraits, popRocksLikes, popRocksDislikes);
 
     popRocks.neutral = WalkLeft;
@@ -128,24 +130,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         AESysFrameStart();
 
         f32 current_Time = (f32)AEFrameRateControllerGetFrameTime();
-        //f32 speed = 600.0f * current_Time;
-
-        //if (AEInputCheckCurr(AEVK_W)) {
-        //    player.position.y += speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_S)) {
-        //    player.position.y -= speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_A)) {
-        //    player.position.x -= speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_D)) {
-        //    player.position.x += speed;
-        //    player.UpdateTransform();
-        //}
+        
+        //super scuffed fps check
+        //std::cout << AEFrameRateControllerGetFrameRate() << std::endl;
         
 
         UpdatePlayer(player, current_Time);
@@ -161,34 +148,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             (testGifts[i]).sprite.UpdateTransform();
         }
 
-        //std::cout << bear1.currentHealth << bear1.state << '\n';
-        //std::cout << bear1.type.name << bear2.type.name << popRocks1.type.name << '\n';
-
-        //// Player in damage AOE
-        //if (AreCirclesIntersecting(player.position, 40.f, damageArea.position, 200.0f))
-        //{
-        //    playerHealth -= 15.f * current_Time;
-        //    if (playerHealth < 0.f) playerHealth = 0.f;
-        //}
-        //// Player in heal AOE
-        //else if (AreCirclesIntersecting(player.position, 40.f, healArea.position, 200.0f))
-        //{
-        //    playerHealth += 15.f * current_Time;
-        //    if (playerHealth > 100.f) playerHealth = 100.f;
-        //}
-        //
-        //healthBarFore.position = Vector2{ 0.f - (100.f - playerHealth)/100.f * 642.5f, 340.f };
-        //healthBarFore.scale = Vector2{ playerHealth/100.f * 1285.f, 45.f};
-        //healthBarFore.UpdateTransform();
-
         AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f);
 
         AEGfxSetRenderMode(AE_GFX_RM_COLOR);
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
 
-        //damageArea.RenderSprite();
-        //healArea.RenderSprite();
         testGifts[0].sprite.RenderSprite();
         testGifts[1].sprite.RenderSprite();
         player.sprite.RenderSprite();
@@ -197,19 +162,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         bear1.sprite.RenderSprite();
         bear2.sprite.RenderSprite();
-        popRocks1.currentBehavior(popRocks1);
-       // popRocks1.sprite.position += Vector2(10, 0);
-        //popRocks1.sprite.UpdateTransform();
+        popRocks1.currentBehavior(popRocks1, current_Time);
+
         popRocks1.sprite.RenderSprite();
-        //testSprite.RenderSprite();
 
-        //healthBarBack.RenderSprite();
-        //healthBarFore.RenderSprite();
-
-        //s32 n = playerHealth == 0.f ? -1 : playerHealth == 100.f ? 10 : (s32)playerHealth / 10 + 1;
-        //for (s32 i{}; i < n; i++) {
-        //    healthIcons[i].RenderSprite();
-        //}
 
         // Informing the system about the loop's end
         AESysFrameEnd();
