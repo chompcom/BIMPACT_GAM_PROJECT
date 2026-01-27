@@ -24,6 +24,15 @@ class Sprite {
 		void RenderSprite();
 };
 
+class TexturedSprite : Sprite {
+	public:
+		AEGfxTexture* texture;
+
+		TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor);
+
+		void RenderSprite();
+};
+
 AEGfxVertexList* CreateSquareMesh();
 
 AEGfxVertexList* CreateCircleMesh();
