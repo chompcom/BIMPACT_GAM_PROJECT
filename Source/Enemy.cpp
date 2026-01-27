@@ -1,5 +1,6 @@
 #include "AEEngine.h"
 #include "Enemy.h"
+#include "Vector2.hpp"
 
 Enemy::Enemy(EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr } {
@@ -20,4 +21,9 @@ EnemyType::EnemyType(std::string name, f32 health, f32 damage, std::array<std::s
 	std::array<std::string, MAX_NO_TRAITS> likes, std::array<std::string, MAX_NO_TRAITS> dislikes)
 	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes },
 		neutral{ nullptr }, happy{ nullptr }, angry{ nullptr } {
+}
+
+void WalkLeft(Enemy& me) {
+	me.sprite.position += Vector2(10, 0);
+	me.sprite.UpdateTransform();
 }

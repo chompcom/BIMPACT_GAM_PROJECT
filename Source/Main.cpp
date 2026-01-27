@@ -77,8 +77,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     std::array<std::string, MAX_NO_TRAITS> popRocksDislikes{ "Boring", "Bitter", "Cold"};
     EnemyType popRocks = EnemyType("poprocks", 20.f, 15.f, popRocksTraits, popRocksLikes, popRocksDislikes);
 
+    popRocks.neutral = WalkLeft;
     Enemy popRocks1 = Enemy(popRocks, TexturedSprite(squareMesh, popRocksTexture, Vector2{ 100.f, -250.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
-        ES_HAPPY);
+        ES_NEUTRAL);
 
     Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
@@ -196,6 +197,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         bear1.sprite.RenderSprite();
         bear2.sprite.RenderSprite();
+        popRocks1.currentBehavior(popRocks1);
+       // popRocks1.sprite.position += Vector2(10, 0);
+        //popRocks1.sprite.UpdateTransform();
         popRocks1.sprite.RenderSprite();
         //testSprite.RenderSprite();
 

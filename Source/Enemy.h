@@ -31,6 +31,9 @@ enum EnemyStates {
 };
 
 class EnemyType;
+class Enemy;
+typedef void Behaviour(Enemy&);
+typedef Behaviour* Command;
 
 class Enemy {
 	public:
@@ -39,25 +42,30 @@ class Enemy {
 		f32 currentHealth;
 		EnemyStates state;
 
-		void (*currentBehavior)(void);
+		Command currentBehavior;
 
 		Enemy(EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState);
 };
+#include <vector>
+
 
 class EnemyType {
-	public:
-		std::string name;
-		f32 health;
-		f32 damage;
+public:
+	std::string name;
+	f32 health;
+	f32 damage;
 
-		std::array<std::string,MAX_NO_TRAITS> traits;
-		std::array<std::string,MAX_NO_TRAITS> likes;
-		std::array<std::string,MAX_NO_TRAITS> dislikes;
+	std::array<std::string, MAX_NO_TRAITS> traits;
+	std::array<std::string, MAX_NO_TRAITS> likes;
+	std::array<std::string, MAX_NO_TRAITS> dislikes;
 
-		void (*neutral)(void);
-		void (*happy)(void);
-		void (*angry)(void);
+	Command neutral;
+	Command happy;
+	Command angry;
 
-		EnemyType(std::string name, f32 health, f32 damage, std::array<std::string, MAX_NO_TRAITS> traits, 
-			std::array<std::string, MAX_NO_TRAITS> likes, std::array<std::string, MAX_NO_TRAITS> dislikes);
+	EnemyType(std::string name, f32 health, f32 damage, std::array<std::string, MAX_NO_TRAITS> traits,
+		std::array<std::string, MAX_NO_TRAITS> likes, std::array<std::string, MAX_NO_TRAITS> dislikes);
 };
+
+
+void WalkLeft(Enemy& me);
