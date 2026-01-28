@@ -80,6 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     EnemyType popRocks = EnemyType("poprocks", 20.f, 15.f, popRocksTraits, popRocksLikes, popRocksDislikes);
 
     popRocks.neutral = WalkLeft;
+    popRocks.happy = WalkRight;
     Enemy popRocks1 = Enemy(popRocks, TexturedSprite(squareMesh, popRocksTexture, Vector2{ 100.f, -250.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
         ES_NEUTRAL);
 
@@ -102,25 +103,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     };
 
 
-    //Sprite healthBarBack(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 0.6f, 0.f, 0.f, 1.f });
-    //Sprite healthBarFore(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 1.f, 0.f, 0.f, 1.f });
-
-    ////Sprite healthIcon(squareMesh, Vector2{-607.5f,450.f}, Vector2{70.f, 45.f}, Color{ 1.f, 0.f, 0.f, 1.f });
-
-    //Sprite healthIcons[10]{
-    //    Sprite(squareMesh, Vector2{-607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-337.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-202.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-67.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{67.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{202.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{337.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //};
-
-    //f32 playerHealth = 100.0f;
 
     // Game Loop
     while (gGameRunning)
@@ -129,13 +111,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         // Informing the system about the loop's start
         AESysFrameStart();
 
-        f32 current_Time = (f32)AEFrameRateControllerGetFrameTime();
+        f32 deltaTime = (f32)AEFrameRateControllerGetFrameTime();
         
         //super scuffed fps check
         //std::cout << AEFrameRateControllerGetFrameRate() << std::endl;
         
 
-        UpdatePlayer(player, current_Time);
+        UpdatePlayer(player, deltaTime);
         player.sprite.UpdateTransform();
         //set the direction test to appear in front of the player
         directionTest.position = player.position + (player.direction * 100.0f);
@@ -144,7 +126,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //this is just to test throwing
         for (int i = 0; i < 2; i++)
         {
-            UpdateGift(testGifts[i], player, current_Time);
+            UpdateGift(testGifts[i], player, deltaTime);
             (testGifts[i]).sprite.UpdateTransform();
         }
 
@@ -162,8 +144,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
         bear1.sprite.RenderSprite();
         bear2.sprite.RenderSprite();
-        popRocks1.currentBehavior(popRocks1, current_Time);
-
+        if (AEInputCheckTriggered(AEVK_0)){
+            popRocks1.ChangeState(EnemyStates::ES_HAPPY);
+        }
+        popRocks1.Update(deltaTime);
         popRocks1.sprite.RenderSprite();
 
 

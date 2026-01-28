@@ -13,7 +13,9 @@ enum EnemyStates {
 
 class EnemyType;
 class Enemy;
-typedef void Behaviour(Enemy&, float dt);
+// forward declaration of room
+class Room;
+typedef void Behaviour(Enemy&,  float dt);
 typedef Behaviour* Command;
 
 class Enemy {
@@ -25,10 +27,14 @@ class Enemy {
 
 		Command currentBehavior;
 
-		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState);
+		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+
+		void Update(float dt);
+		void ChangeState(EnemyStates state);
 };
 
 using Labels = std::set<std::string>;
+
 class EnemyType {
 public:
 	std::string name;
@@ -49,3 +55,4 @@ public:
 
 
 void WalkLeft(Enemy& me, float dt);
+void WalkRight(Enemy& me, float dt);

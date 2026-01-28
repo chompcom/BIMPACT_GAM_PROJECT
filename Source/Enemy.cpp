@@ -4,17 +4,29 @@
 
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr } {
-		switch (initialState) {
-			case ES_HAPPY:
-				currentBehavior = enemyType.happy;
-				break;
-			case ES_NEUTRAL:
-				currentBehavior = enemyType.neutral;
-				break;
-			case ES_ANGRY:
-				currentBehavior = enemyType.angry;
-				break;
-		}
+		ChangeState(initialState);
+}
+
+void Enemy::ChangeState(EnemyStates state)
+{
+	const EnemyType &enemyType = this->type;
+	this->state = state;
+	switch (state)
+	{
+	case ES_HAPPY:
+		currentBehavior = enemyType.happy;
+		break;
+	case ES_NEUTRAL:
+		currentBehavior = enemyType.neutral;
+		break;
+	case ES_ANGRY:
+		currentBehavior = enemyType.angry;
+		break;
+	}
+}
+
+void Enemy::Update(float dt) {
+	this->currentBehavior(*this,dt);
 }
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
@@ -24,6 +36,11 @@ EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& tra
 }
 
 void WalkLeft(Enemy& me, float dt) {
-	me.sprite.position += Vector2(10, 0) * dt;
+	me.sprite.position += Vector2(-10, 0) * dt;
+	me.sprite.UpdateTransform();
+}
+
+void WalkRight(Enemy& me, float dt){
+	me.sprite.position += Vector2(10,0) * dt;
 	me.sprite.UpdateTransform();
 }
