@@ -147,6 +147,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (AEInputCheckTriggered(AEVK_0)){
             popRocks1.ChangeState(EnemyStates::ES_HAPPY);
         }
+        else if (AEInputCheckTriggered(AEVK_1)) {
+            popRocks1.ChangeState(ES_NEUTRAL);
+        }
+        else if (AEInputCheckTriggered(AEVK_9)) {
+            popRocks1.ChangeState(ES_ANGRY);
+        }
         popRocks1.Update(deltaTime);
         popRocks1.sprite.RenderSprite();
 
