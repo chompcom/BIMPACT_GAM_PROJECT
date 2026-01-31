@@ -3,10 +3,12 @@
 
 #include "GameStateManager.h"
 
+#include "Scenes/GameScene.h"
 
 int current = 0, previous = 0, next = 0;
 
-FP fpLoad = nullptr, fpInitialize = nullptr, fpUpdate = nullptr, fpDraw = nullptr, fpFree = nullptr, fpUnload = nullptr;
+FP fpLoad = nullptr, fpInitialize = nullptr, fpDraw = nullptr, fpFree = nullptr, fpUnload = nullptr;
+Update fpUpdate = nullptr;
 
 void GSM_Initialize(int startingState)
 {
@@ -24,6 +26,7 @@ void GSM_Update()
 	switch (current)
 	{
 	case GS_LEVEL1:
+		fpUpdate = GameSceneUpdate;
 		break;
 	case GS_LEVEL2:
 		break;
@@ -35,4 +38,9 @@ void GSM_Update()
 		break;
 	}
 
+}
+
+void ChangeState(GS_STATES thing)
+{
+	next = thing;
 }
