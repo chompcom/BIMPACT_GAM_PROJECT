@@ -49,8 +49,8 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	else
 	{
 		gift.position += gift.velocity * deltaTime;
-		gift.velocity.x /= 1.1f;
-		gift.velocity.y /= 1.1f;
+		gift.velocity.x /= 1.1;
+		gift.velocity.y /= 1.1;
 	}
 	//set the gift's sprite position to match its actual position
 	gift.sprite.position = gift.position;

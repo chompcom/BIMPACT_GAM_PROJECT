@@ -24,7 +24,7 @@ class Sprite {
 		void RenderSprite();
 };
 
-class TexturedSprite : public Sprite {
+class TexturedSprite : Sprite {
 	public:
 		AEGfxTexture* texture;
 
