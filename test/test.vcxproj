@@ -16,6 +16,7 @@
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Utils.cpp" />
   </ItemGroup>
@@ -26,6 +27,7 @@
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.hpp" />
+    <ClInclude Include="..\Source\Scenes\TestScene.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Utils.h" />
     <ClInclude Include="..\Source\Vector2.hpp" />

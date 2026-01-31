@@ -10,5 +10,5 @@ void TestFree();
 
 void TestUnload();
 
-void TestUpdate();
+void TestUpdate(float dt);
 

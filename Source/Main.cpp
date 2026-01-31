@@ -56,11 +56,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Game Loop
     while (gGameRunning)
     {
-
+       
         
         if (current != GS_RESTART) {
             GSM_Update();
-            
+            fpLoad();
         }
         else {
             next = previous;
@@ -74,6 +74,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             fpUpdate(AEFrameRateControllerGetFrameTime());
             fpDraw();
             AESysFrameEnd();
+            if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
+                gGameRunning = 0;
+                next = GS_QUIT;
+            }
         }
 
         fpFree();
@@ -90,19 +94,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         
 
-        // Informing the system about the loop's end
-        AESysFrameEnd();
-
         // check if forcing the application to quit
-        if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-            gGameRunning = 0;
+        
     }
 
-    AEGfxMeshFree(squareMesh);
-    AEGfxMeshFree(circleMesh);
-    //AEGfxTextureUnload(playerTexture);
-    AEGfxTextureUnload(bearTexture);
-    AEGfxTextureUnload(popRocksTexture);
     // free the system
     AESysExit();
 
