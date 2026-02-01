@@ -14,3 +14,7 @@ bool AreSquaresIntersecting(Vector2 square1_Center, float square1Length,
 	return ((fabs(square1_Center.x - square2_Center.x) < ((square1Length + square2Length) / 2.0f) &&
 		fabs(square1_Center.y - square2_Center.y) < ((square1Length + square2Length) / 2.0f))) ? true : false;
 }
+
+f32 ClampInt(f32 value, f32 low, f32 high) {
+	return AEClamp(value, low, high);
+}
