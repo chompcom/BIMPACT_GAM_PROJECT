@@ -24,6 +24,10 @@
 #include "Player.h"
 #include "Gift.h"
 #include "Enemy.h"
+#include "GameStateList.h"
+#include "GameStateManager.h"
+
+#include <iostream>
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -48,164 +52,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Changing the window title
     AESysSetWindowTitle("UI Demo!");
 
-    AEGfxVertexList* squareMesh = CreateSquareMesh();
-
-    AEGfxVertexList* circleMesh = CreateCircleMesh();
-
-    AEGfxTexture* bearTexture = AEGfxTextureLoad("Assets/player.png");
-    AEGfxTexture* popRocksTexture = AEGfxTextureLoad("Assets/poprocks.png");
-
-    //Sprite damageArea(circleMesh, Vector2{ 400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 1.f, 0.f, 0.f, 1.f });
-    //Sprite healArea(circleMesh, Vector2{ -400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 0.f, 1.f, 0.f, 1.f });
-
-    //Sprite player(circleMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
-
-    //TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
-
-    std::array<std::string, MAX_NO_TRAITS> bearTraits{ "Cold", "Smart" };
-    std::array<std::string, MAX_NO_TRAITS> bearLikes{ "Cold", "Clean" };
-    std::array<std::string, MAX_NO_TRAITS> bearDislikes{ "Heaty", "Gross" };
-    EnemyType bear = EnemyType("bear", 40.f, 5.f, bearTraits, bearLikes, bearDislikes);
-    
-    Enemy bear1 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ -700.f, -100.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
-        ES_ANGRY);
-    Enemy bear2 = Enemy(bear, TexturedSprite(squareMesh, bearTexture, Vector2{ 300.f, 400.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
-        ES_NEUTRAL);
-
-    std::array<std::string, MAX_NO_TRAITS> popRocksTraits{ "Sweet", "Explosive", "Heaty"};
-    std::array<std::string, MAX_NO_TRAITS> popRocksLikes{ "Heaty", "Sweet", "Fragrant"};
-    std::array<std::string, MAX_NO_TRAITS> popRocksDislikes{ "Boring", "Bitter", "Cold"};
-    EnemyType popRocks = EnemyType("poprocks", 20.f, 15.f, popRocksTraits, popRocksLikes, popRocksDislikes);
-
-    Enemy popRocks1 = Enemy(popRocks, TexturedSprite(squareMesh, popRocksTexture, Vector2{ 100.f, -250.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
-        ES_HAPPY);
-
-    Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
-
-    Player player(playerSprite, 25000.f, 600.f, Vector2{ 0.f, -50.f });
-
-    //This is just to see what direction the player is facing
-    Sprite directionTest(circleMesh, player.direction, Vector2{ 20.f, 20.f }, Color{ 0.f, 0.f, 0.5f, 1.f });
-
-    //for gift throw testing
-    Sprite testGiftsSprites[2]{
-        Sprite(squareMesh, Vector2{ 100.f, 100.f }, Vector2{ 80.f, 80.f }, Color{ 0.75f, 0.f, 0.f, 1.f }),
-        Sprite(squareMesh, Vector2{ -100.f, -100.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.75f, 0.f, 1.f })
-    };
-
-    Gift testGifts[2]{
-        Gift("Nugget",{"Cheap","Tasty"},testGiftsSprites[0], (testGiftsSprites[0]).position),
-        Gift("Candy",{"Sweet","Tasty"},testGiftsSprites[1], (testGiftsSprites[1]).position)
-    };
-
-
-    //Sprite healthBarBack(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 0.6f, 0.f, 0.f, 1.f });
-    //Sprite healthBarFore(squareMesh, Vector2{ 0.f, 340.f }, Vector2{ 1285.f, 45.f }, Color{ 1.f, 0.f, 0.f, 1.f });
-
-    ////Sprite healthIcon(squareMesh, Vector2{-607.5f,450.f}, Vector2{70.f, 45.f}, Color{ 1.f, 0.f, 0.f, 1.f });
-
-    //Sprite healthIcons[10]{
-    //    Sprite(squareMesh, Vector2{-607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-337.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-202.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{-67.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{67.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{202.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{337.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //    Sprite(squareMesh, Vector2{607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
-    //};
-
-    //f32 playerHealth = 100.0f;
-
+    GSM_Initialize(GS_LEVEL1);
     // Game Loop
     while (gGameRunning)
     {
 
-        // Informing the system about the loop's start
-        AESysFrameStart();
-
-        f32 current_Time = (f32)AEFrameRateControllerGetFrameTime();
-        //f32 speed = 600.0f * current_Time;
-
-        //if (AEInputCheckCurr(AEVK_W)) {
-        //    player.position.y += speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_S)) {
-        //    player.position.y -= speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_A)) {
-        //    player.position.x -= speed;
-        //    player.UpdateTransform();
-        //}
-        //else if (AEInputCheckCurr(AEVK_D)) {
-        //    player.position.x += speed;
-        //    player.UpdateTransform();
-        //}
         
-
-        UpdatePlayer(player, current_Time);
-        player.sprite.UpdateTransform();
-        //set the direction test to appear in front of the player
-        directionTest.position = player.position + (player.direction * 100.0f);
-        directionTest.UpdateTransform();
-
-        //this is just to test throwing
-        for (int i = 0; i < 2; i++)
-        {
-            UpdateGift(testGifts[i], player, current_Time);
-            (testGifts[i]).sprite.UpdateTransform();
+        if (current != GS_RESTART) {
+            GSM_Update();
+            
+        }
+        else {
+            next = previous;
+            current = previous;
         }
 
-        //std::cout << bear1.currentHealth << bear1.state << '\n';
-        //std::cout << bear1.type.name << bear2.type.name << popRocks1.type.name << '\n';
+        fpInitialize();
 
-        //// Player in damage AOE
-        //if (AreCirclesIntersecting(player.position, 40.f, damageArea.position, 200.0f))
-        //{
-        //    playerHealth -= 15.f * current_Time;
-        //    if (playerHealth < 0.f) playerHealth = 0.f;
-        //}
-        //// Player in heal AOE
-        //else if (AreCirclesIntersecting(player.position, 40.f, healArea.position, 200.0f))
-        //{
-        //    playerHealth += 15.f * current_Time;
-        //    if (playerHealth > 100.f) playerHealth = 100.f;
-        //}
-        //
-        //healthBarFore.position = Vector2{ 0.f - (100.f - playerHealth)/100.f * 642.5f, 340.f };
-        //healthBarFore.scale = Vector2{ playerHealth/100.f * 1285.f, 45.f};
-        //healthBarFore.UpdateTransform();
+        while (next == current) {
+            AESysFrameStart();
+            fpUpdate(AEFrameRateControllerGetFrameTime());
+            fpDraw();
+            AESysFrameEnd();
+        }
 
-        AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f);
+        fpFree();
 
-        AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-        AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-        AEGfxSetTransparency(1.0f);
+        if (next != GS_RESTART) {
+            fpUnload();
+        }
+        previous = current;
+        current = next;
+        
+        //super scuffed fps check
+        //std::cout << AEFrameRateControllerGetFrameRate() << std::endl;
+        
 
-        //damageArea.RenderSprite();
-        //healArea.RenderSprite();
-        testGifts[0].sprite.RenderSprite();
-        testGifts[1].sprite.RenderSprite();
-        player.sprite.RenderSprite();
-        directionTest.RenderSprite();
-
-        AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-        bear1.sprite.RenderSprite();
-        bear2.sprite.RenderSprite();
-        popRocks1.sprite.RenderSprite();
-        //testSprite.RenderSprite();
-
-        //healthBarBack.RenderSprite();
-        //healthBarFore.RenderSprite();
-
-        //s32 n = playerHealth == 0.f ? -1 : playerHealth == 100.f ? 10 : (s32)playerHealth / 10 + 1;
-        //for (s32 i{}; i < n; i++) {
-        //    healthIcons[i].RenderSprite();
-        //}
+        
 
         // Informing the system about the loop's end
         AESysFrameEnd();

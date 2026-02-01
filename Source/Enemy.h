@@ -2,27 +2,8 @@
 #include "AEEngine.h"
 #include "Sprite.h"
 #include <string>
-#include <array>
 
-#define MAX_NO_TRAITS (10)
-
-/*class Enemy {
-	public:
-		std::string name;
-		Sprite sprite;
-		int health;
-
-		std::string[10] traits;
-		std::string[10] likes;
-		std::string[10] dislikes;
-
-		int state;
-		void (*neutral)(void);
-		void (*happy)(void);
-		void (*angry)(void);
-
-		Enemy
-};*/
+#include <set>
 
 enum EnemyStates {
 	ES_HAPPY,
@@ -31,33 +12,47 @@ enum EnemyStates {
 };
 
 class EnemyType;
+class Enemy;
+// forward declaration of room
+class Room;
+typedef void Behaviour(Enemy&,  float dt);
+typedef Behaviour* Command;
 
 class Enemy {
 	public:
-		EnemyType& type;
+		const EnemyType& type;
 		TexturedSprite sprite;
 		f32 currentHealth;
 		EnemyStates state;
 
-		void (*currentBehavior)(void);
+		Command currentBehavior;
 
-		Enemy(EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState);
+		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+
+		void Update(float dt);
+		void ChangeState(EnemyStates state);
 };
+
+using Labels = std::set<std::string>;
 
 class EnemyType {
-	public:
-		std::string name;
-		f32 health;
-		f32 damage;
+public:
+	std::string name;
+	f32 health;
+	f32 damage;
 
-		std::array<std::string,MAX_NO_TRAITS> traits;
-		std::array<std::string,MAX_NO_TRAITS> likes;
-		std::array<std::string,MAX_NO_TRAITS> dislikes;
+	Labels traits;
+	Labels likes;
+	Labels dislikes;
 
-		void (*neutral)(void);
-		void (*happy)(void);
-		void (*angry)(void);
+	Command neutral;
+	Command happy;
+	Command angry;
 
-		EnemyType(std::string name, f32 health, f32 damage, std::array<std::string, MAX_NO_TRAITS> traits, 
-			std::array<std::string, MAX_NO_TRAITS> likes, std::array<std::string, MAX_NO_TRAITS> dislikes);
+	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
+		const Labels& likes, const Labels& dislikes);
 };
+
+
+void WalkLeft(Enemy& me, float dt);
+void WalkRight(Enemy& me, float dt);

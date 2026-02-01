@@ -1,4 +1,6 @@
 ﻿*.ipch
+tags
+*.swp
 *.suo
 *.db
 *.pdb
