@@ -49,6 +49,8 @@ public:
 
     ~Vector2() {};
 
+    
+
     const Vector2 operator+(const Vector2 &rhs) const{
         return Vector2(this->x + rhs.x, this->y + rhs.y);
     }
@@ -57,6 +59,9 @@ public:
         this->x += rhs.x;
         this->y += rhs.y;
         return *this;
+    }
+    const Vector2 operator-() const {
+        return Vector2(-this->x, -this->y);
     }
 
     const Vector2 operator-(const Vector2 &rhs) const{

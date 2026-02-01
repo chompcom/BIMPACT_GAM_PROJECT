@@ -3,7 +3,7 @@
 
 #include "GameStateManager.h"
 
-#include "Scenes/GameScene.h"
+#include "Scenes/TestScene.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -26,7 +26,12 @@ void GSM_Update()
 	switch (current)
 	{
 	case GS_LEVEL1:
-		fpUpdate = GameSceneUpdate;
+		fpLoad = TestLoad;
+		fpUnload = TestUnload;
+		fpInitialize = TestInit;
+		fpFree = TestFree;
+		fpDraw = TestDraw;
+		fpUpdate = TestUpdate;
 		break;
 	case GS_LEVEL2:
 		break;

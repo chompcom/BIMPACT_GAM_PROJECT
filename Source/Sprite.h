@@ -1,6 +1,6 @@
 #pragma once
 #include "AEEngine.h"
-#include "Vector2.hpp"
+#include "Utils/Vector2.hpp"
 
 struct Color {
 	f32 r{};
@@ -17,6 +17,7 @@ class Sprite {
 		Vector2 scale;
 		Color color;
 
+		Sprite();
 		Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor);
 
 		void UpdateTransform();

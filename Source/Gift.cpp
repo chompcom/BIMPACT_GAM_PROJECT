@@ -1,8 +1,8 @@
 #include "Gift.h"
 #include "Sprite.h"
 #include "Player.h"
-#include "Utils.h"
 #include "BoundaryCollision.h"
+#include "Utils/Utils.h"
 
 //simple contructor for gift class, for testing
 Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 position) :

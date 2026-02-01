@@ -5,7 +5,7 @@
 #include "BoundaryCollision.h"
 
 //contructor for player class
-Player::Player(Sprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
 	//initialiser list
 	sprite{ sprite },
 	throwStrength{ throwStrength },

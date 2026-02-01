@@ -1,6 +1,6 @@
 #include "AEEngine.h"
 #include "Enemy.h"
-#include "Vector2.hpp"
+#include "Utils/Vector2.hpp"
 
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr } {
