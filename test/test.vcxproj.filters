@@ -21,9 +21,6 @@
     <ClCompile Include="..\Source\Sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\GameStateManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,21 +33,21 @@
     <ClCompile Include="..\Source\Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Scenes\TestScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Utils\Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\GameStateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\GameStateList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Vector2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Gift.h">
@@ -63,6 +60,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Behaviour\Behaviours.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Scenes\TestScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Utils\Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Utils\Vector2.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

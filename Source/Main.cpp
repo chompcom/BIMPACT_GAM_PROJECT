@@ -19,8 +19,8 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
 #include "Sprite.h"
-#include "Vector2.hpp"
-#include "Utils.h"
+#include "Utils/Vector2.hpp"
+#include "Utils/Utils.h"
 #include "Player.h"
 #include "Gift.h"
 #include "Enemy.h"
