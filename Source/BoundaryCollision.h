@@ -1,6 +1,6 @@
 #pragma once
 #include "AEEngine.h"
-#include "Vector2.hpp"
+#include "Utils/Vector2.hpp"
 //#include "Collision.h"
 
 bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight);
