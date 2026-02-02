@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include <string>
 #include "Traits.h"
+#include "RoomData.h"
 
 enum EnemyStates {
 	ES_HAPPY,
@@ -13,21 +14,25 @@ enum EnemyStates {
 class EnemyType;
 class Enemy;
 // forward declaration of room
-class Room;
 typedef void Behaviour(Enemy&,  float dt);
 typedef Behaviour* Command;
+
+//struct RoomData;
 
 class Enemy {
 	public:
 		const EnemyType& type;
+		AEGfxVertexList* mesh;
 		TexturedSprite sprite;
 		f32 currentHealth;
 		EnemyStates state;
 		Vector2 target;
+		//RoomData roomData;
 
 		Command currentBehavior;
 
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+		~Enemy();
 
 		void Update(float dt);
 		void AssessTraits(Labels labelsToCheck);
@@ -49,8 +54,16 @@ public:
 	Command happy;
 	Command angry;
 
-	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
-		const Labels& likes, const Labels& dislikes);
+	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits, const Labels& likes, const Labels& dislikes);
+
+	void AddNeutral(Command cmd);
+	void AddNeutral(std::vector<Command> bunch);
+
+	void AddHappy(Command cmd);
+	void AddHappy(std::vector<Command> bunch);
+
+	void AddAngry(Command cmd);
+	void AddAngry(std::vector<Command> bunch);
 };
 
 

@@ -52,8 +52,9 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//if player is trying to move, set their direction
 	if (w || a || s || d)
 	{
-		player.direction.y = (w - s);
-		player.direction.x = (d - a);
+		//player.direction.y = float(w - s);
+		//player.direction.x = float(d - a);
+		player.direction = Vector2{(d - a) ,(w - s)};
 
 		//If the player has no direction, set it to face down
 		if (player.direction == Vector2{ 0.f, 0.f }) player.direction = Vector2{ 0.f, -1.f };

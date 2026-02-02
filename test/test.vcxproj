@@ -18,6 +18,7 @@
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\RoomData.cpp" />
     <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Traits.cpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.hpp" />
+    <ClInclude Include="..\Source\RoomData.h" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />
     <ClInclude Include="..\Source\rooms.h" />
     <ClInclude Include="..\Source\Sprite.h" />

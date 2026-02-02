@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>	// Maybe?
 #include "Utils/Vector2.hpp"
+#include "RoomData.h"
 //#include "AEEngine.h"
 
 struct AEGfxTexture;
@@ -34,7 +35,8 @@ namespace mapRooms {
 	{
 	public:
 		Room(RoomType type = RoomType::Empty);	// Constructor For Room Object
-		
+		~Room();
+
 		// If they are nullptr, like left == nullptr, door to room does not exist. This is the essence of the concept
 		Room* left;
 		Room* right;
@@ -48,6 +50,14 @@ namespace mapRooms {
 		AEGfxTexture* roomTexture{ nullptr };
 		std::string   roomTexturePath{};          // For debug purposes
 
+		RoomData* toBeTransferred;
+		RoomData currentRoomData;
+		void Init() ; 
+		void Update(float dt) ;
+			
+
+			//handle collisions
+		
 
 		// Should we store player position? Idk if this is the best place. (Donnid)
 		

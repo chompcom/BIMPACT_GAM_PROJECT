@@ -4,10 +4,17 @@
 #include "Traits.h"
 #include <set>
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}{
+	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}
+	,mesh{nullptr}
+{
 		ChangeState(initialState);
+//		mesh = CreateSquareMesh();
+//		sprite.mesh = mesh;
 }
 
+Enemy::~Enemy() {
+	//AEGfxMeshFree(mesh);
+}
 void Enemy::ChangeState(EnemyStates newstate)
 {
 	const EnemyType &enemyType = this->type;
@@ -49,8 +56,28 @@ EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& tra
 	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes },
 		neutral{ nullptr }, happy{ nullptr }, angry{ nullptr } {
 }
+void EnemyType::AddNeutral(Command cmd){
+	//neutral.push_back(cmd);
+}
+void EnemyType::AddNeutral(std::vector<Command> bunch){
+	//for (Command thing : bunch)
+		//neutral.push_back(thing);
+}
+
+void EnemyType::AddHappy(Command cmd){
+	//happy.push_back(cmd);
+}
+void EnemyType::AddHappy(std::vector<Command> bunch){
+}
+
+void EnemyType::AddAngry(Command cmd){
+	//neutral.push_back(cmd);
+}
+void EnemyType::AddAngry(std::vector<Command> bunch){
+}
 
 void WalkLeft(Enemy& me, float dt) {
+
 	me.sprite.position += Vector2(-50, 0) * dt;
 	me.sprite.UpdateTransform();
 }

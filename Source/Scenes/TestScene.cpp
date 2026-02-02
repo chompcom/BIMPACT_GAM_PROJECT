@@ -24,6 +24,12 @@ Gift gift2{"bad", {"sad"}, Sprite()};
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
 mapRooms::Map gameMap;          // Init var for map
+/* PSUDEOCODE SONE
+
+RoomData tobetranfered{};
+vector<enemy*> enemyList
+vector<gift*> gift;
+*/
 
 void TestLoad()
 {
@@ -39,6 +45,7 @@ void TestLoad()
 
 	rock.sprite = *thing;
 
+
 	rocktype.neutral = WalkLeft;
 	rocktype.happy = WalkRight;
 	rocktype.angry = WalkToTarget; 
@@ -52,19 +59,22 @@ void TestInit()
 
 void TestDraw()
 {
+
     AEGfxSetBackgroundColor(1.0f, 1.0f, 1.0f);
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.0f);
 
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	gameMap.RenderCurrentRoom(sqmesh);
+
+
 	player.sprite.RenderSprite();
-	rock.sprite.RenderSprite();
+	//rock.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	gift.sprite.RenderSprite();
-	gift2.sprite.RenderSprite();
+	//gift.sprite.RenderSprite();
+	//gift2.sprite.RenderSprite();
 }
 
 void TestFree()
@@ -84,8 +94,7 @@ void TestUnload()
 
 void TestUpdate(float dt)
 {
-	UpdatePlayer(player, dt);
-	player.sprite.UpdateTransform();
+	/*
 	thing->position += Vector2(10,10) * dt;
 	thing->UpdateTransform();
 	UpdateGift(gift,player,dt);
@@ -94,9 +103,6 @@ void TestUpdate(float dt)
 	gift2.sprite.UpdateTransform();
 	rock.Update(dt);
 	rock.target = player.sprite.position;
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-
 
 	std::vector<Gift*> things{ &gift,&gift2 };
 
@@ -108,6 +114,31 @@ void TestUpdate(float dt)
 			}
 		}
 	}
+	*/
+	UpdatePlayer(player, dt);
+	player.sprite.UpdateTransform();
 
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+
+	gameMap.GetCurrentRoom()->Update(dt);
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+
+	/* PSUEDOCODE ZONE
+
+	Room {
+		roomdata* toBeTransfered;
+		roomdata currentRoomData;
+		
+	}	
 	
+	gameMap.currentRoom.
+
+	//takes player position and checks if its at a door?
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	//if its at a door, roomdata gets transferred
+
+
+
+
+	*/
 }

@@ -70,7 +70,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         while (next == current) {
             AESysFrameStart();
-            fpUpdate(AEFrameRateControllerGetFrameTime());
+            fpUpdate(static_cast<float>(AEFrameRateControllerGetFrameTime()));
             fpDraw();
             AESysFrameEnd();
             if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {

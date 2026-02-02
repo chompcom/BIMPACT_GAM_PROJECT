@@ -65,13 +65,47 @@ namespace Config {
 
 }
 
+#include "Enemy.h"
+
+EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
+
+AEGfxVertexList* somemesh = nullptr;
 
 namespace mapRooms
 {
     Room::Room(RoomType roomType) :
         left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
         rmType{ roomType }
+		,toBeTransferred{nullptr},currentRoomData{}
     {}
+	Room::~Room() {
+
+		for (Enemy* i : currentRoomData.enemyList){
+			delete i;
+			i = nullptr;
+		}
+		currentRoomData.enemyList.clear();
+	}
+
+	void Room::Init() {
+		rmType = RoomType::Normal;
+		somethingelse.neutral = WalkLeft;
+		somethingelse.happy = WalkToTarget;
+		somethingelse.angry = WalkRight;
+		currentRoomData.enemyList.push_back(new Enemy(somethingelse,TexturedSprite{somemesh,nullptr,Vector2(0,0),Vector2(100,100),Color{1,0,0,1}}));
+		for (Enemy* i : currentRoomData.enemyList){
+			i->ChangeState(EnemyStates::ES_NEUTRAL);
+		}
+	} 
+	void Room::Update(float dt) {
+		for (Enemy* i : currentRoomData.enemyList){
+			i->Update(dt);
+			
+		}
+
+	}
+
+
 
 	Map::Map() :
 		gridSize{ 0 },
@@ -87,6 +121,7 @@ namespace mapRooms
 
 	Map::~Map(){
 		DeleteMap();
+		AEGfxMeshFree(somemesh);
 	}
 
 	void Map::LoadRoomArtLists()
@@ -165,7 +200,7 @@ namespace mapRooms
 
 		rooms.clear();
 		rooms.resize(gridSize * gridSize);	// Grid generated
-
+		somemesh = CreateSquareMesh();
 		ResetRooms();						// Ensure rooms are nothing;
 		GenerateRooms();
 		// Probably generate other room types???
@@ -207,7 +242,7 @@ namespace mapRooms
 	//	// Perhaps testing for collision
 	//	
 
-	//	MoveTo(Direction::Left);	// If collide with door area, use MoveTo(Direction dirección)
+	//	MoveTo(Direction::Left);	// If collide with door area, use MoveTo(Direction direcciï¿½n)
 	//}
 
 	// DeleteMap()?
@@ -280,7 +315,7 @@ namespace mapRooms
 	//		if (nx == x - 1) { a->left = b; b->right = a; }
 	//		if (ny == y + 1) { a->down = b; b->up = a; }
 	//		if (ny == y - 1) { a->up = b; b->down = a; }
-	//		// Mark intermediate rooms as Normal (don’t overwrite Start/Boss)
+	//		// Mark intermediate rooms as Normal (donï¿½t overwrite Start/Boss)
 	//		if (b->rmType == RoomType::Normal)
 	//		{
 	//			// already normal; ok
@@ -411,7 +446,7 @@ namespace mapRooms
 
 			// Mark next room for exist
 			if (nextRoom != nullptr) {
-				nextRoom->rmType = RoomType::Normal;
+				nextRoom->Init();
 			}
 
 
@@ -479,6 +514,8 @@ namespace mapRooms
 		);
 
 		bg.RenderSprite();
+		for (Enemy* i : currentRoom->currentRoomData.enemyList)
+		i->sprite.RenderSprite();
 
 	}
 

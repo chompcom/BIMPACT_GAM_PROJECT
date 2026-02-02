@@ -51,12 +51,14 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	{
 		gift.position += gift.velocity * deltaTime;
 		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, 1600, 900)) {
-			gift.velocity.x /= -1.3;
-			gift.velocity.y /= -1.3;
+			//gift.velocity.x /= -1.3;
+			//gift.velocity.y /= -1.3;
+			gift.velocity /= -1.3;
 		}
 		else {
-			gift.velocity.x /= 1.1;
-			gift.velocity.y /= 1.1;
+			//gift.velocity.x /= 1.1;
+			//gift.velocity.y /= 1.1;
+			gift.velocity /= 1.1;
 		}
 	}
 	//set the gift's sprite position to match its actual position
