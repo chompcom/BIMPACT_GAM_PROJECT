@@ -3,8 +3,14 @@
 #include <array>		// std::array
 #include <vector>		// std::vector
 #include <iostream>
-//#include "Enemy.h"
- 
+#include <string>
+#include <unordered_map>	// Maybe?
+#include "Vector2.hpp"
+//#include "AEEngine.h"
+
+struct AEGfxTexture;
+struct AEGfxVertexList;
+
 namespace mapRooms {
 
 
@@ -15,7 +21,7 @@ namespace mapRooms {
 		Boss
 	};
 
-	// Idk when do i need this tbh
+
 	enum class Direction : unsigned char {
 		Left,
 		Right,
@@ -27,7 +33,7 @@ namespace mapRooms {
 	class Room 
 	{
 	public:
-		Room(RoomType type = RoomType::Normal);	// Constructor For Room Object
+		Room(RoomType type = RoomType::Empty);	// Constructor For Room Object
 		
 		// If they are nullptr, like left == nullptr, door to room does not exist. This is the essence of the concept
 		Room* left;
@@ -39,6 +45,10 @@ namespace mapRooms {
 
 		// Additional(s):
 		// Store Images of Rooms
+		AEGfxTexture* roomTexture{ nullptr };
+		std::string   roomTexturePath{};          // For debug purposes
+
+
 		// Should we store player position? Idk if this is the best place.
 		// Array of objects such as enemies, obstacles (they should have their own collision data / function ptr?)
 	};
@@ -59,7 +69,8 @@ namespace mapRooms {
 
 		// Level lifecycle
 		void	InitMap(unsigned int seed = 0xA341316Cu);	// Grid size and other spawns based on seed.
-		void	UpdateMap();								// Idk
+		//void	UpdateMap();								// Idk
+		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt);
 		void	DeleteMap();								// Reset this level stuff (tbh this kinda violates the game loop taught in GIT lol)
 
 		int		GetGridSize() const;
@@ -68,6 +79,12 @@ namespace mapRooms {
 
 		// Transition Scene for later ig???
 		bool	MoveTo(Direction dirección);
+
+		// Draw background of current room
+		void	RenderCurrentRoom(AEGfxVertexList* squareMesh) const; 
+
+		// Draw a simple minimap for debugging
+		void	RenderDebugMap(AEGfxVertexList* squareMesh) const;   
 
 	private:
 
@@ -91,10 +108,18 @@ namespace mapRooms {
 
 		void	ResetRooms();
 		void	GenerateRooms();							// Generate starting and boss room, generate path
+	
+	
+		// Room background loading ---
+		std::vector<std::string> normalRoomFiles{};                  
+		std::vector<std::string> bossRoomFiles{};                    
+		std::unordered_map<std::string, AEGfxTexture*> textureCache; 
+
+		void			LoadRoomArtLists();     
+		AEGfxTexture*	GetOrLoadTexture(std::string const& path);
+		void			AssignRoomArt();        
+
+		// Door trigger cooldown (prevents re-trigger)
+		float doorCooldown{ 0.0f };
 	};
 }
-
-
-
-
-

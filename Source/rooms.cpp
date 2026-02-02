@@ -3,9 +3,66 @@
 #include <cstdlib>
 #include "AEEngine.h"
 
+#include <algorithm>	// sort
+#include <cctype>		// tolower
+#include <Windows.h>	// Windows
+
+#include "Sprite.h"		// TexturedSpirte for rendering room bg
+
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
-	static const int minGrid = 5, maxGrid = 10;
+	static const int minGrid = 2, maxGrid = 5;
+
+	// Legacy File System Scanning
+	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)
+	{
+		outList.clear();	// Clear Lists
+
+		// Pattern Example: Assets\Rooms\Normal\*.png
+		std::string pattern = folder;
+		if (!pattern.empty() && pattern.back() != '\\' && pattern.back() != '/')
+			pattern += "\\";
+		pattern += "*.png";
+
+		// Idk how this works truly winapi stuff
+		WIN32_FIND_DATAA data{};
+		HANDLE hFind = FindFirstFileA(pattern.c_str(), &data);
+		if (hFind == INVALID_HANDLE_VALUE)
+			return;
+
+		do
+		{
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				continue;
+
+			// Full path to file
+			std::string fullPath = folder;
+			if (!fullPath.empty() && fullPath.back() != '\\' && fullPath.back() != '/')
+				fullPath += "\\";
+			fullPath += data.cFileName;
+
+			outList.push_back(fullPath);	// Accumulate Files
+		} while (FindNextFileA(hFind, &data));
+
+		FindClose(hFind);
+
+		std::sort(outList.begin(), outList.end());
+	}
+
+
+	// Absolute
+	static float AbsF(float v) { return (v < 0.0f) ? -v : v; }
+
+	// Overlap Algo rectangle
+	static bool OverlapAabb(Vector2 aCenter, Vector2 aHalf, Vector2 bCenter, Vector2 bHalf)
+	{
+		float dx = AbsF(aCenter.x - bCenter.x);
+		float dy = AbsF(aCenter.y - bCenter.y);
+		return (dx <= (aHalf.x + bHalf.x)) && (dy <= (aHalf.y + bHalf.y));
+	}
+
+
+
 }
 
 
@@ -31,6 +88,74 @@ namespace mapRooms
 	Map::~Map(){
 		DeleteMap();
 	}
+
+	void Map::LoadRoomArtLists()
+	{
+		normalRoomFiles.clear();
+		bossRoomFiles.clear();
+
+		std::string const normalDir = "Assets/Rooms/Normal";
+		std::string const bossDir = "Assets/Rooms/Boss";
+
+		Config::ScanPngFolderWin32(normalDir, normalRoomFiles);
+		Config::ScanPngFolderWin32(bossDir,   bossRoomFiles);
+
+
+	}
+
+	AEGfxTexture* Map::GetOrLoadTexture(std::string const& path)
+	{
+		// If already loaded, reuse it
+		auto it = textureCache.find(path);
+		if (it != textureCache.end()) return it->second;
+
+		// Load new texture if not found ig
+		AEGfxTexture* tex = AEGfxTextureLoad(path.c_str());
+		textureCache[path] = tex; // cache even if nullptr (prevents repeated attempts)
+		return tex;
+	}
+
+	// Asset Code was here
+	void Map::AssignRoomArt() {
+		bool haveNormal = !normalRoomFiles.empty();
+		bool haveBoss = !bossRoomFiles.empty();
+
+		for (int y = 0; y < gridSize; ++y)
+		{
+			for (int x = 0; x < gridSize; ++x)
+			{
+				Room* rm = GetRoom(x, y);
+				// Skip empty rooms lol
+				if (!rm || rm->rmType == RoomType::Empty)
+					continue;
+
+				std::string chosenPath;
+
+				if (rm->rmType == RoomType::Boss)
+				{
+					if (haveBoss) {
+						int pick = static_cast<int>(RandInt(0, static_cast<int>(bossRoomFiles.size()) - 1));
+						chosenPath = bossRoomFiles[pick];
+					}
+					else continue;
+				}
+				else if (rm->rmType == RoomType::Normal || rm->rmType == RoomType::Start) {
+					if (haveNormal) {
+						int pick = static_cast<int>(RandInt(0, static_cast<int>(bossRoomFiles.size()) - 1));
+						chosenPath = normalRoomFiles[pick];
+
+					}
+
+
+				}
+
+				rm->roomTexturePath = chosenPath;
+				rm->roomTexture = (chosenPath.empty() ? nullptr : GetOrLoadTexture(chosenPath));
+
+			}
+		}
+	}
+		
 	
 	//InitMap(): Allocate / Reset Maps (Rooms)
 	void Map::InitMap(unsigned int seed) {
@@ -45,8 +170,14 @@ namespace mapRooms
 		GenerateRooms();
 		// Probably generate other room types???
 
+		// Load available Pngs
+		LoadRoomArtLists();
+		AssignRoomArt();
+
 		// Somehow assign startX and startY into starting room coordinates value
 		currentRoom = GetRoom(startX, startY);
+
+		doorCooldown = 0.0f;
 	}
 
 	bool Map::InBounds(int x, int y) const
@@ -66,18 +197,18 @@ namespace mapRooms
 	}
 
 	unsigned int Map::RandInt(int low, int high) {
-		return (static_cast<unsigned int>(low + (std::rand() % (high - low - 1))));
+		return (static_cast<unsigned int>(low + (std::rand() % (high - low + 1))));
 	}
 
-	// UpdateMap()
-	void Map::UpdateMap(  )
-	{
-		// Input (Get x and y of player)
-		// Perhaps testing for collision
-		
+	//// UpdateMap()
+	//void Map::UpdateMap(  )
+	//{
+	//	// Input (Get x and y of player)
+	//	// Perhaps testing for collision
+	//	
 
-		MoveTo(Direction::Left);	// If collide with door area, use MoveTo(Direction dirección)
-	}
+	//	MoveTo(Direction::Left);	// If collide with door area, use MoveTo(Direction dirección)
+	//}
 
 	// DeleteMap()?
 	void Map::DeleteMap() 
@@ -85,6 +216,14 @@ namespace mapRooms
 		rooms.clear();			// Clear room information
 		gridSize = 0;			// Set gridsize to zero
 		currentRoom = nullptr;	// Deference room item
+		doorCooldown = 0.0f;	// Cooldown thingy
+
+		for (auto& kv : textureCache) {
+			if (kv.second) AEGfxTextureUnload(kv.second);
+		}
+		textureCache.clear();
+		normalRoomFiles.clear();
+		bossRoomFiles.clear();
 	}
 
 	void Map::LinkRooms(Room* a, Room* b, Direction dirFromAToB)
@@ -316,6 +455,79 @@ namespace mapRooms
 		return gridSize;
 	}
 
+	void Map::RenderCurrentRoom(AEGfxVertexList* squaremesh) const {
+		if (!currentRoom || !squaremesh || !currentRoom->roomTexture) return;	// possibly skip empty textures?
+
+		float minX = AEGfxGetWinMinX();
+		float maxX = AEGfxGetWinMaxX();
+		float minY = AEGfxGetWinMinY();
+		float maxY = AEGfxGetWinMaxY();
+
+		float winW = (maxX - minX);
+		float winH = (maxY - minY);
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		TexturedSprite bg(
+			squaremesh,
+			currentRoom->roomTexture,
+			Vector2{ 0.0f, 0.0f },                  // centered
+			Vector2{ winW, winH },                  // fill screen
+			Color{ 1.0f, 1.0f, 1.0f, 1.0f }          // no tint
+		);
+
+		bg.RenderSprite();
+
+	}
+
+	// FOR DEBUGGING PURPOSE
+	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
+	{
+		if (!squareMesh) return;
+		if (gridSize <= 0) return;
+
+		float minX = AEGfxGetWinMinX();
+		float maxY = AEGfxGetWinMaxY();
+
+		float cell = 18.0f;
+		float gap = 4.0f;
+
+		// Top-left corner anchor
+		float startXPix = minX + 30.0f;
+		float startYPix = maxY - 30.0f;
+
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		for (int y = 0; y < gridSize; ++y)
+		{
+			for (int x = 0; x < gridSize; ++x)
+			{
+				int idx = GetRoomIdx(x, y);
+				Room const& rm = rooms[idx];
+
+				if (rm.rmType == RoomType::Empty) continue;
+
+				Color c{ 0.6f, 0.6f, 0.6f, 0.85f }; // Normal
+
+				if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };
+				if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };
+
+				if (currentRoom == &rooms[idx])   c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
+
+				float px = startXPix + x * (cell + gap) + cell * 0.5f;
+				float py = startYPix - y * (cell + gap) - cell * 0.5f;
+
+				Sprite tile(squareMesh, Vector2{ px, py }, Vector2{ cell, cell }, c);
+				tile.RenderSprite();
+			}
+		}
+	}
+
+
 	Room* Map::GetRoom(int x, int y) {
 		size_t idx = static_cast<size_t>(GetRoomIdx(x, y));
 		return &(Map::rooms[idx]);
@@ -360,4 +572,82 @@ namespace mapRooms
 
 		return false;
 	}
+
+	// Update Loop
+	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt)
+	{
+		if (!currentRoom) return;
+
+		// Cooldown prevents immediate bounce-back after warp
+		if (doorCooldown > 0.0f) {
+			doorCooldown -= dt;
+			if (doorCooldown < 0.0f) doorCooldown = 0.0f;
+			return;
+		}
+
+		float minX = AEGfxGetWinMinX();
+		float maxX = AEGfxGetWinMaxX();
+		float minY = AEGfxGetWinMinY();
+		float maxY = AEGfxGetWinMaxY();
+
+		// --- Door trigger tuning knobs ---
+		// span: how "wide" the doorway is (along the wall)
+		// depth: how "thick" the trigger is (into the room)
+		// margin: how far inside the new room we spawn after switching
+		float doorSpan = 220.0f;	// Wide doorway
+		float doorDepth = 80.0f;	
+		float warpMargin = 120.0f;	// Distance padded when entering new room
+
+		// Trigger half-sizes
+		Vector2 halfLR{ doorDepth * 0.5f, doorSpan * 0.5f }; // left/right doors
+		Vector2 halfUD{ doorSpan * 0.5f, doorDepth * 0.5f }; // up/down doors
+
+		// Door trigger centers (middle of each wall)
+		Vector2 leftDoorC{ minX + doorDepth * 0.5f, 0.0f };
+		Vector2 rightDoorC{ maxX - doorDepth * 0.5f, 0.0f };
+		Vector2 topDoorC{ 0.0f, maxY - doorDepth * 0.5f };
+		Vector2 botDoorC{ 0.0f, minY + doorDepth * 0.5f };
+
+		// LEFT
+		if (currentRoom->left && Config::OverlapAabb(playerPos, playerHalfSize, leftDoorC, halfLR))
+		{
+			if (MoveTo(Direction::Left)) {
+				// appear at RIGHT side of the next room, inside boundary
+				playerPos.x = maxX - playerHalfSize.x - warpMargin;
+				doorCooldown = 0.20f;
+			}
+			return;
+		}
+
+		// RIGHT
+		if (currentRoom->right && Config::OverlapAabb(playerPos, playerHalfSize, rightDoorC, halfLR))
+		{
+			if (MoveTo(Direction::Right)) {
+				playerPos.x = minX + playerHalfSize.x + warpMargin;
+				doorCooldown = 0.20f;
+			}
+			return;
+		}
+
+		// UP
+		if (currentRoom->up && Config::OverlapAabb(playerPos, playerHalfSize, topDoorC, halfUD))
+		{
+			if (MoveTo(Direction::Up)) {
+				playerPos.y = minY + playerHalfSize.y + warpMargin;
+				doorCooldown = 0.20f;
+			}
+			return;
+		}
+
+		// DOWN
+		if (currentRoom->down && Config::OverlapAabb(playerPos, playerHalfSize, botDoorC, halfUD))
+		{
+			if (MoveTo(Direction::Down)) {
+				playerPos.y = maxY - playerHalfSize.y - warpMargin;
+				doorCooldown = 0.20f;
+			}
+			return;
+		}
+	}
+
 }
