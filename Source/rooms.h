@@ -49,7 +49,11 @@ namespace mapRooms {
 		std::string   roomTexturePath{};          // For debug purposes
 
 
-		// Should we store player position? Idk if this is the best place.
+		// Should we store player position? Idk if this is the best place. (Donnid)
+		
+		// Enemy 
+		// Enemy object, type, for sprite render
+		
 		// Array of objects such as enemies, obstacles (they should have their own collision data / function ptr?)
 	};
 
@@ -78,7 +82,7 @@ namespace mapRooms {
 		Room*	GetCurrentRoom();
 
 		// Transition Scene for later ig???
-		bool	MoveTo(Direction dirección);
+		bool	MoveTo(Direction direction);
 
 		// Draw background of current room
 		void	RenderCurrentRoom(AEGfxVertexList* squareMesh) const; 
