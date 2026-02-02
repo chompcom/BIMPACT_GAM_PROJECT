@@ -51,7 +51,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // Changing the window title
     AESysSetWindowTitle("UI Demo!");
-
     GSM_Initialize(GS_LEVEL1);
     // Game Loop
     while (gGameRunning)

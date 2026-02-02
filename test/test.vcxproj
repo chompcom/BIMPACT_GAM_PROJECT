@@ -22,6 +22,7 @@
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Traits.cpp" />
     <ClCompile Include="..\Source\Utils\Utils.cpp" />
+    <ClCompile Include="..\Source\rooms.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\BoundaryCollision.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.hpp" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />
+    <ClInclude Include="..\Source\rooms.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Traits.h" />
     <ClInclude Include="..\Source\Utils\Utils.h" />

@@ -7,6 +7,7 @@
 #include "Gift.h"
 #include "Utils/Utils.h"
 #include "Enemy.h"
+#include "rooms.h"
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
@@ -22,6 +23,7 @@ Gift gift2{"bad", {"sad"}, Sprite()};
 
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
+mapRooms::Map gameMap;          // Init var for map
 
 void TestLoad()
 {
@@ -41,6 +43,7 @@ void TestLoad()
 	rocktype.happy = WalkRight;
 	rocktype.angry = WalkToTarget; 
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
+	gameMap.InitMap(0xA341312Cu);   // Seeded Run
 }
 
 void TestInit()
@@ -53,8 +56,12 @@ void TestDraw()
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.0f);
+
+	gameMap.RenderCurrentRoom(sqmesh);
 	player.sprite.RenderSprite();
 	rock.sprite.RenderSprite();
+	gameMap.RenderDebugMap(sqmesh); // Debug Map
+
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	gift.sprite.RenderSprite();
 	gift2.sprite.RenderSprite();
@@ -87,6 +94,8 @@ void TestUpdate(float dt)
 	gift2.sprite.UpdateTransform();
 	rock.Update(dt);
 	rock.target = player.sprite.position;
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
 
 
 	std::vector<Gift*> things{ &gift,&gift2 };
