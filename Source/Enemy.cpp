@@ -1,9 +1,10 @@
 #include "AEEngine.h"
 #include "Enemy.h"
 #include "Utils/Vector2.hpp"
-
+#include "Traits.h"
+#include <set>
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr } {
+	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}{
 		ChangeState(initialState);
 }
 
@@ -30,6 +31,19 @@ void Enemy::Update(float dt) {
 	this->currentBehavior(*this,dt);
 }
 
+void Enemy::AssessTraits(Labels labels){
+	if (HasCommonTrait(labels,type.likes)){
+		ChangeState(ES_HAPPY);
+
+	} else if (HasCommonTrait(labels,type.dislikes))
+	{
+		/* code */
+		ChangeState(ES_ANGRY);
+	}
+	
+
+}
+
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
 	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes },
@@ -37,11 +51,16 @@ EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& tra
 }
 
 void WalkLeft(Enemy& me, float dt) {
-	me.sprite.position += Vector2(-100, 0) * dt;
+	me.sprite.position += Vector2(-50, 0) * dt;
 	me.sprite.UpdateTransform();
 }
 
 void WalkRight(Enemy& me, float dt){
-	me.sprite.position += Vector2(100,0) * dt;
+	me.sprite.position += Vector2(50,0) * dt;
 	me.sprite.UpdateTransform();
 }
+
+void WalkToTarget(Enemy& me, float dt) {
+	me.sprite.position += (me.target - me.sprite.position).Normalized() * 20 * dt;
+	me.sprite.UpdateTransform();
+} 

@@ -17,7 +17,11 @@ AEGfxTexture* playerpng = nullptr;
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 
 
-Gift gift{ "boat", {"happy","sad"}, Sprite()};
+Gift gift{ "boat", {"happy"}, Sprite()};
+Gift gift2{"bad", {"sad"}, Sprite()};
+
+EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
+Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
 
 void TestLoad()
 {
@@ -28,7 +32,15 @@ void TestLoad()
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
 );
-	gift.sprite = Sprite(sqmesh, Vector2(0, 0), Vector2(100, 100), Color{ 1,0,0,0 });
+	gift.sprite = Sprite(sqmesh, Vector2(200, 500), Vector2(100, 100), Color{1.f,0.f,0.f,1.f});
+	gift2.sprite = Sprite(sqmesh, Vector2(-200, 500), Vector2(100, 100), Color{1.f,1.f,0.f,1.f});
+
+	rock.sprite = *thing;
+
+	rocktype.neutral = WalkLeft;
+	rocktype.happy = WalkRight;
+	rocktype.angry = WalkToTarget; 
+	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 }
 
 void TestInit()
@@ -41,10 +53,11 @@ void TestDraw()
     AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
     AEGfxSetBlendMode(AE_GFX_BM_BLEND);
     AEGfxSetTransparency(1.0f);
-	thing->RenderSprite();
 	player.sprite.RenderSprite();
+	rock.sprite.RenderSprite();
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	gift.sprite.RenderSprite();
+	gift2.sprite.RenderSprite();
 }
 
 void TestFree()
@@ -70,9 +83,22 @@ void TestUpdate(float dt)
 	thing->UpdateTransform();
 	UpdateGift(gift,player,dt);
 	gift.sprite.UpdateTransform();
+	UpdateGift(gift2,player,dt);
+	gift2.sprite.UpdateTransform();
+	rock.Update(dt);
+	rock.target = player.sprite.position;
 
 
-	if (AreSquaresIntersecting(gift.sprite.position, gift.sprite.scale.x, thing->position, thing->scale.x) ){
-		gift.velocity = -gift.velocity;
+	std::vector<Gift*> things{ &gift,&gift2 };
+
+	for (Gift* gift : things) {
+		if (!(gift->velocity == Vector2())) {
+			if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+				gift->velocity = -gift->velocity;
+				rock.AssessTraits(gift->traits);
+			}
+		}
 	}
+
+	
 }

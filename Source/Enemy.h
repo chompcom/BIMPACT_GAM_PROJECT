@@ -2,8 +2,7 @@
 #include "AEEngine.h"
 #include "Sprite.h"
 #include <string>
-
-#include <set>
+#include "Traits.h"
 
 enum EnemyStates {
 	ES_HAPPY,
@@ -24,16 +23,17 @@ class Enemy {
 		TexturedSprite sprite;
 		f32 currentHealth;
 		EnemyStates state;
+		Vector2 target;
 
 		Command currentBehavior;
 
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 
 		void Update(float dt);
+		void AssessTraits(Labels labelsToCheck);
 		void ChangeState(EnemyStates state);
 };
 
-using Labels = std::set<std::string>;
 
 class EnemyType {
 public:
@@ -56,3 +56,4 @@ public:
 
 void WalkLeft(Enemy& me, float dt);
 void WalkRight(Enemy& me, float dt);
+void WalkToTarget(Enemy& me, float dt);

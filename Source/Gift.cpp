@@ -5,7 +5,7 @@
 #include "Utils/Utils.h"
 
 //simple contructor for gift class, for testing
-Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 position) :
+Gift::Gift(std::string n, Labels t ,Sprite sprite, Vector2 position) :
 	//initialiser list
 	name{ n },
 	traits{ t },
