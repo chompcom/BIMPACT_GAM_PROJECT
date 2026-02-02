@@ -537,8 +537,8 @@ namespace mapRooms
 		return currentRoom;
 	}
 
-	bool Map::MoveTo(Direction dirección) {
-		if (Direction::Left == dirección) {
+	bool Map::MoveTo(Direction direction) {
+		if (Direction::Left == direction) {
 			if (currentRoom->left != nullptr) {
 				currentRoom = currentRoom->left;
 				// Animation
@@ -546,7 +546,7 @@ namespace mapRooms
 			}
 		}
 
-		else if (Direction::Up == dirección) {
+		else if (Direction::Up == direction) {
 			if (currentRoom->up!= nullptr) {
 				currentRoom = currentRoom->up;
 				// Animation
@@ -554,7 +554,7 @@ namespace mapRooms
 			}
 		}
 
-		else if (Direction::Down == dirección) {
+		else if (Direction::Down == direction) {
 			if (currentRoom->down != nullptr) {
 				currentRoom = currentRoom->down;
 				// Animation
@@ -562,7 +562,7 @@ namespace mapRooms
 			}
 		}
 
-		else if (Direction::Right == dirección) {
+		else if (Direction::Right == direction) {
 			if (currentRoom->right != nullptr) {
 				currentRoom = currentRoom->right;
 				// Animation
