@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "Gift.h"
 #include "Enemy.h"
+#include "rooms.h"
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -54,6 +55,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxTexture* bearTexture = AEGfxTextureLoad("Assets/player.png");
     AEGfxTexture* popRocksTexture = AEGfxTextureLoad("Assets/poprocks.png");
+
+    mapRooms::Map gameMap;          // Init var for map
+    gameMap.InitMap(0xA341312Cu);   // Seeded Run
+
+    //gameMap.room
 
     //Sprite damageArea(circleMesh, Vector2{ 400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 1.f, 0.f, 0.f, 1.f });
     //Sprite healArea(circleMesh, Vector2{ -400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 0.f, 1.f, 0.f, 1.f });
@@ -119,6 +125,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     //f32 playerHealth = 100.0f;
 
+
+
     // Game Loop
     while (gGameRunning)
     {
@@ -145,7 +153,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //    player.position.x += speed;
         //    player.UpdateTransform();
         //}
-        
+        Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+        gameMap.UpdateMap(player.position, playerHalfSize, static_cast<float>(AEFrameRateControllerGetFrameTime()));
+        //player.sprite.UpdateTransform();
+
+
 
         UpdatePlayer(player, current_Time);
         player.sprite.UpdateTransform();
@@ -186,6 +198,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
         AEGfxSetTransparency(1.0f);
 
+        // Render Map
+        gameMap.RenderCurrentRoom(squareMesh);
+        gameMap.RenderDebugMap(squareMesh); // Debug Map
+        
         //damageArea.RenderSprite();
         //healArea.RenderSprite();
         testGifts[0].sprite.RenderSprite();
@@ -197,6 +213,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         bear1.sprite.RenderSprite();
         bear2.sprite.RenderSprite();
         popRocks1.sprite.RenderSprite();
+
+    
+
         //testSprite.RenderSprite();
 
         //healthBarBack.RenderSprite();

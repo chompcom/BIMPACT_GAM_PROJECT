@@ -2,6 +2,7 @@
 #include "Sprite.h"
 #include "Player.h"
 #include "Utils.h"
+#include "BoundaryCollision.h"
 
 //simple contructor for gift class, for testing
 Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 position) :
@@ -49,8 +50,14 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	else
 	{
 		gift.position += gift.velocity * deltaTime;
-		gift.velocity.x /= 1.1;
-		gift.velocity.y /= 1.1;
+		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, 1600, 900)) {
+			gift.velocity.x /= -1.3;
+			gift.velocity.y /= -1.3;
+		}
+		else {
+			gift.velocity.x /= 1.1;
+			gift.velocity.y /= 1.1;
+		}
 	}
 	//set the gift's sprite position to match its actual position
 	gift.sprite.position = gift.position;
