@@ -6,6 +6,10 @@ Sprite::Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spri
 		UpdateTransform();
 }
 
+Sprite::Sprite() : Sprite{nullptr,Vector2(),Vector2(1,1),Color{1.0,1.0,1.0,0.0}}
+{
+}
+
 void Sprite::UpdateTransform() {
 		// Create a scale matrix that scales by 500 x and y
 		AEMtx33 transformScale = { 0 };

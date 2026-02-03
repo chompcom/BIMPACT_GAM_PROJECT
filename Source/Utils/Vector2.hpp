@@ -49,6 +49,8 @@ public:
 
     ~Vector2() {};
 
+    
+
     const Vector2 operator+(const Vector2 &rhs) const{
         return Vector2(this->x + rhs.x, this->y + rhs.y);
     }
@@ -57,6 +59,9 @@ public:
         this->x += rhs.x;
         this->y += rhs.y;
         return *this;
+    }
+    const Vector2 operator-() const {
+        return Vector2(-this->x, -this->y);
     }
 
     const Vector2 operator-(const Vector2 &rhs) const{
@@ -81,6 +86,24 @@ public:
 
     const Vector2 operator*(float magnitude) const {
         return Vector2(magnitude * this->x, magnitude * this->y);
+    }
+
+    const Vector2 operator*(double magnitude) const {
+        return Vector2(static_cast<float>(magnitude * this->x), static_cast<float>(magnitude * this->y));
+    }
+
+    const Vector2 operator*(int magnitude) const {
+        return Vector2(static_cast<float>(magnitude * this->x), static_cast<float>(magnitude * this->y));
+    }
+
+    const Vector2& operator*=(int magnitude) {
+        *this = *this * magnitude;
+        return *this;
+    }
+
+    const Vector2& operator*=(double magnitude) {
+        *this = *this * magnitude;
+        return *this;
     }
 
     float Dot(const Vector2 &vector) const{

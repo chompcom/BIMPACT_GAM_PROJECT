@@ -2,9 +2,10 @@
 #include "Player.h"
 #include "Gift.h"
 #include "AEEngine.h"
+#include "BoundaryCollision.h"
 
 //contructor for player class
-Player::Player(Sprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
 	//initialiser list
 	sprite{ sprite },
 	throwStrength{ throwStrength },
@@ -41,6 +42,8 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 			(static_cast<float>(s) * adjustedSpeed);
 		player.position.x += (static_cast<float>(d) * adjustedSpeed) -
 			(static_cast<float>(a) * adjustedSpeed);
+
+		CollisionBoundary_Static(player.position, player.sprite.scale, 1600, 900);
 
 		//set the player's sprite position to match its actual position
 		player.sprite.position = player.position;
