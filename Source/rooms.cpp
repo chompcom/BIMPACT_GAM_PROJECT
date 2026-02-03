@@ -8,6 +8,8 @@
 #include <Windows.h>	// Windows
 
 #include "Sprite.h"		// TexturedSpirte for rendering room bg
+#include "Enemy.h"
+#include "Loaders/DataLoader.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -65,11 +67,9 @@ namespace Config {
 
 }
 
-#include "Enemy.h"
+
 
 EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
-
-AEGfxVertexList* somemesh = nullptr;
 
 namespace mapRooms
 {
@@ -92,7 +92,7 @@ namespace mapRooms
 		somethingelse.neutral = WalkLeft;
 		somethingelse.happy = WalkToTarget;
 		somethingelse.angry = WalkRight;
-		currentRoomData.enemyList.push_back(new Enemy(somethingelse,TexturedSprite{somemesh,nullptr,Vector2(0,0),Vector2(100,100),Color{1,0,0,1}}));
+		currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 		for (Enemy* i : currentRoomData.enemyList){
 			i->ChangeState(EnemyStates::ES_NEUTRAL);
 		}
@@ -100,7 +100,6 @@ namespace mapRooms
 	void Room::Update(float dt) {
 		for (Enemy* i : currentRoomData.enemyList){
 			i->Update(dt);
-			
 		}
 
 	}
@@ -121,7 +120,6 @@ namespace mapRooms
 
 	Map::~Map(){
 		DeleteMap();
-		AEGfxMeshFree(somemesh);
 	}
 
 	void Map::LoadRoomArtLists()
@@ -200,7 +198,7 @@ namespace mapRooms
 
 		rooms.clear();
 		rooms.resize(gridSize * gridSize);	// Grid generated
-		somemesh = CreateSquareMesh();
+		
 		ResetRooms();						// Ensure rooms are nothing;
 		GenerateRooms();
 		// Probably generate other room types???
@@ -515,7 +513,7 @@ namespace mapRooms
 
 		bg.RenderSprite();
 		for (Enemy* i : currentRoom->currentRoomData.enemyList)
-		i->sprite.RenderSprite();
+			i->sprite.RenderSprite();
 
 	}
 

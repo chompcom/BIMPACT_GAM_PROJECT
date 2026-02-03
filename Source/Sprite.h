@@ -29,7 +29,7 @@ class TexturedSprite : public Sprite {
 	public:
 		AEGfxTexture* texture;
 
-		TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor);
+		TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor = Color{ 1.0f,1.0f,1.0f,1.0f });
 
 		void RenderSprite();
 };

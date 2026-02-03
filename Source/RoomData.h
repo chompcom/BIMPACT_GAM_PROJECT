@@ -6,7 +6,7 @@
 #include "Gift.h"
 
 class Enemy;
-// this class contains data for what is going to go to the next room!
+// this class contains data for what is inside the room!
 struct RoomData {
     public: // for now
 

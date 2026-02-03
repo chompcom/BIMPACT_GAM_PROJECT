@@ -5,7 +5,7 @@
 #include "Utils/Utils.h"
 
 //simple contructor for gift class, for testing
-Gift::Gift(std::string n, Labels t ,Sprite sprite, Vector2 position) :
+Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
 	//initialiser list
 	name{ n },
 	traits{ t },
@@ -16,7 +16,7 @@ Gift::Gift(std::string n, Labels t ,Sprite sprite, Vector2 position) :
 {
 }
 
-Gift::Gift(Sprite sprite, Vector2 position) :
+Gift::Gift(TexturedSprite sprite, Vector2 position) :
 	name{ "Unnamed Gift" },
 	traits{ },
 	sprite{ sprite },
@@ -61,6 +61,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 			gift.velocity /= 1.1;
 		}
 	}
+	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
 	//set the gift's sprite position to match its actual position
 	gift.sprite.position = gift.position;
 

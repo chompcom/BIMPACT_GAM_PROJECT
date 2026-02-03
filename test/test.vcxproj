@@ -16,6 +16,7 @@
     <ClCompile Include="..\Source\Enemy.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
+    <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
     <ClCompile Include="..\Source\RoomData.cpp" />
@@ -33,7 +34,7 @@
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
-    <ClInclude Include="..\Source\Loaders\DataLoader.hpp" />
+    <ClInclude Include="..\Source\Loaders\DataLoader.h" />
     <ClInclude Include="..\Source\RoomData.h" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />
     <ClInclude Include="..\Source\rooms.h" />
