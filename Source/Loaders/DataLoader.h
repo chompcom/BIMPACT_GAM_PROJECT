@@ -2,9 +2,9 @@
 
 //#include "json/json.h"
 
-#include "Sprite.h"
+#include "../Sprite.h"
 
-#include "Enemy.h"
+#include "../Enemy.h"
 namespace DataLoader {
 	
 	void Load();
