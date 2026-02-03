@@ -50,11 +50,15 @@ namespace mapRooms {
 		AEGfxTexture* roomTexture{ nullptr };
 		std::string   roomTexturePath{};          // For debug purposes
 
-		RoomData* toBeTransferred;
 		RoomData currentRoomData;
-		void Init() ; 
+		RoomData* toBeTransferred;
+
+
+		void Init(RoomType rmType = RoomType::Normal);
 		void Update(float dt) ;
 			
+
+
 
 			//handle collisions
 		
@@ -82,7 +86,7 @@ namespace mapRooms {
 		Map& operator=(Map const&) = delete;	// Cannot use assign to copy
 
 		// Level lifecycle
-		void	InitMap(unsigned int seed = 0xA341316Cu);	// Grid size and other spawns based on seed.
+		void	InitMap(RoomData& globalSceneData, unsigned int seed);	// Grid size and other spawns based on seed.
 		//void	UpdateMap();								// Idk
 		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt);
 		void	DeleteMap();								// Reset this level stuff (tbh this kinda violates the game loop taught in GIT lol)
@@ -100,6 +104,7 @@ namespace mapRooms {
 		// Draw a simple minimap for debugging
 		void	RenderDebugMap(AEGfxVertexList* squareMesh) const;   
 
+		RoomData&	GetTransferData();
 	private:
 
 		// Storage
@@ -122,7 +127,9 @@ namespace mapRooms {
 
 		void	ResetRooms();
 		void	GenerateRooms();							// Generate starting and boss room, generate path
-	
+
+
+		RoomData* transferData;
 	
 		// Room background loading ---
 		std::vector<std::string> normalRoomFiles{};                  

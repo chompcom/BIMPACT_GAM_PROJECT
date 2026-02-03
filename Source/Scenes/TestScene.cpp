@@ -8,6 +8,8 @@
 #include "Utils/Utils.h"
 #include "Enemy.h"
 #include "rooms.h"
+#include "RoomData.h"
+
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
@@ -18,12 +20,13 @@ AEGfxTexture* playerpng = nullptr;
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 
 
-Gift gift{ "boat", {"happy"}, Sprite()};
-Gift gift2{"bad", {"sad"}, Sprite()};
+//Gift gift{ "boat", {"happy"}, Sprite()};
+//Gift gift2{"bad", {"sad"}, Sprite()};
 
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
 mapRooms::Map gameMap;          // Init var for map
+static RoomData globalTransferData{};
 /* PSUDEOCODE SONE
 
 RoomData tobetranfered{};
@@ -40,8 +43,8 @@ void TestLoad()
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
 );
-	gift.sprite = Sprite(sqmesh, Vector2(200, 500), Vector2(100, 100), Color{1.f,0.f,0.f,1.f});
-	gift2.sprite = Sprite(sqmesh, Vector2(-200, 500), Vector2(100, 100), Color{1.f,1.f,0.f,1.f});
+	//gift.sprite = Sprite(sqmesh, Vector2(200, 500), Vector2(100, 100), Color{1.f,0.f,0.f,1.f});
+	//gift2.sprite = Sprite(sqmesh, Vector2(-200, 500), Vector2(100, 100), Color{1.f,1.f,0.f,1.f});
 
 	rock.sprite = *thing;
 
@@ -50,7 +53,14 @@ void TestLoad()
 	rocktype.happy = WalkRight;
 	rocktype.angry = WalkToTarget; 
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
-	gameMap.InitMap(0xA341312Cu);   // Seeded Run
+
+	// Global Data Here
+	
+	globalTransferData.enemyList.clear();
+	globalTransferData.giftList.clear();
+	globalTransferData.player = &player;
+
+	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 }
 
 void TestInit()
@@ -66,12 +76,27 @@ void TestDraw()
     AEGfxSetTransparency(1.0f);
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	
+	
 	gameMap.RenderCurrentRoom(sqmesh);
 
+	// Draw objects: current-room objects + carried objects
+	if (mapRooms::Room* room = gameMap.GetCurrentRoom())
+	{
+		RoomData& roomData = room->currentRoomData;
+		RoomData& carryData = gameMap.GetTransferData();
+
+		for (Gift* g : roomData.giftList)   if (g) g->sprite.RenderSprite();
+		for (Enemy* e : roomData.enemyList) if (e) e->sprite.RenderSprite();
+
+		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
+		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
+	}
 
 	player.sprite.RenderSprite();
-	//rock.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
+
+	//rock.sprite.RenderSprite();
 
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
@@ -90,13 +115,138 @@ void TestUnload()
 	}
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
+
+	
+	
+	// Dellocate enemy and gift assets
+	for (Enemy *e: globalTransferData.enemyList) {
+		delete e;
+	}
+	globalTransferData.enemyList.clear();
+
+	for (Gift* g : globalTransferData.giftList) {
+		delete g;
+	}
+	globalTransferData.giftList.clear();
+	
+	globalTransferData.player = nullptr;
 }
 
 void TestUpdate(float dt)
 {
+
+	// Player update
+	UpdatePlayer(player, dt);
+	player.sprite.UpdateTransform();
+
+	//std::cout << player.position.x << player.position.y;
+
+	// Game map update
+	gameMap.GetCurrentRoom()->Update(dt);		
+
+
+	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+	// Do stuff here
+	RoomData& roomData = currentRoom->currentRoomData;
+	RoomData& carryData = gameMap.GetTransferData();
+
+	// Update Enemies (carryData version is only for "Friends")
+	for (Enemy* e : roomData.enemyList) {
+		if (e) {
+			e->target = player.sprite.position;
+			e->Update(dt);
+		}
+	}
+
+	// Update Gifts (Must update both sides)
+	for (Gift* g : roomData.giftList) {
+		if (g) {
+			UpdateGift(*g, player, dt);
+			g->sprite.UpdateTransform();
+		}
+	}
+	for (Gift* g : carryData.giftList) {
+		if (g) {
+			UpdateGift(*g, player, dt);
+			g->sprite.UpdateTransform();
+		}
+	}
+
+
+	//std::vector<Gift*> things{ &gift,&gift2 };
+
+
+	// TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
+	//for (Gift* gift : roomData.giftList) {
+	//	if (!(gift->velocity == Vector2())) {
+	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+	//			gift->velocity = -gift->velocity;
+	//			rock.AssessTraits(gift->traits);
+	//		}
+	//	}
+	//}
+
+	// Gifts and Enemy Check
+	for (Gift* gift : currentRoom->currentRoomData.giftList) {
+		if (!(gift->velocity == Vector2())) {
+			for (Enemy* e : currentRoom->currentRoomData.enemyList) {
+				if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x)) {
+					gift->velocity = -gift->velocity;
+					e->AssessTraits(gift->traits);
+				}
+			}
+		}
+	}
+
+
+	// 4) Transfer enemies to our carrylist if they are essentially happy
+	for (size_t i = 0; i < roomData.enemyList.size(); )
+	{
+		Enemy* e = roomData.enemyList[i];
+		if (e && e->state == EnemyStates::ES_HAPPY)	// This is the happy check ig?
+		{
+			carryData.enemyList.push_back(e);
+			roomData.enemyList.erase(roomData.enemyList.begin() + static_cast<long>(i));
+			continue;
+		}
+		++i;
+	}
+
+	// Idk how to check which gifts to pick up
+	for (size_t i = 0; i < roomData.giftList.size(); )
+	{
+		Gift* g = roomData.giftList[i];
+		if (g && g->pickUpState)	// If currently picked up, need to check pickupstate = false and remove such????
+		{
+			carryData.giftList.push_back(g);	// Transfer to carryData list (active list essentially)
+			roomData.giftList.erase(roomData.giftList.begin() + static_cast<long>(i));	// Remove from current roomData
+			break;
+		}
+		++i;
+	}
+
+	// Check if gifts are indeed pickedup
+	// Idk how to check which gifts to pick up
+	for (size_t i = 0; i < carryData.giftList.size(); )
+	{
+		Gift* g = carryData.giftList[i];
+		if (g && g->pickUpState==false)	// If currently picked up, need to check pickupstate = false and remove such????
+		{
+			roomData.giftList.push_back(g);
+			carryData.giftList.erase(carryData.giftList.begin() + static_cast<long>(i));	// Remove from current carryData
+			continue;
+		}
+		++i;
+	}
+
+	// Update game map
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+
+
+	//thing->position += Vector2(10,10) * dt;
+	//thing->UpdateTransform();
 	/*
-	thing->position += Vector2(10,10) * dt;
-	thing->UpdateTransform();
 	UpdateGift(gift,player,dt);
 	gift.sprite.UpdateTransform();
 	UpdateGift(gift2,player,dt);
@@ -104,24 +254,7 @@ void TestUpdate(float dt)
 	rock.Update(dt);
 	rock.target = player.sprite.position;
 
-	std::vector<Gift*> things{ &gift,&gift2 };
-
-	for (Gift* gift : things) {
-		if (!(gift->velocity == Vector2())) {
-			if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-				gift->velocity = -gift->velocity;
-				rock.AssessTraits(gift->traits);
-			}
-		}
-	}
 	*/
-	UpdatePlayer(player, dt);
-	player.sprite.UpdateTransform();
-
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-
-	gameMap.GetCurrentRoom()->Update(dt);
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
 
 	/* PSUEDOCODE ZONE
 

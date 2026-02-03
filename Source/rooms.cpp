@@ -9,6 +9,8 @@
 
 #include "Sprite.h"		// TexturedSpirte for rendering room bg
 
+#include "RoomData.h"
+
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
 	static const int minGrid = 2, maxGrid = 5;
@@ -66,17 +68,21 @@ namespace Config {
 }
 
 #include "Enemy.h"
+#include "Gift.h"
 
 EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
+Gift gift{ "boat", {"happy"}, Sprite() };
 
 AEGfxVertexList* somemesh = nullptr;
+//AEGfxVertexList* somemesh2 = nullptr;
 
 namespace mapRooms
 {
     Room::Room(RoomType roomType) :
         left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
         rmType{ roomType }
-		,toBeTransferred{nullptr},currentRoomData{}
+		,toBeTransferred{nullptr},
+		currentRoomData{}
     {}
 	Room::~Room() {
 
@@ -85,10 +91,22 @@ namespace mapRooms
 			i = nullptr;
 		}
 		currentRoomData.enemyList.clear();
+
+		for (Gift* g : currentRoomData.giftList) {
+			delete g;
+			g = nullptr;
+		}
+		currentRoomData.giftList.clear();
 	}
 
-	void Room::Init() {
-		rmType = RoomType::Normal;
+	void Room::Init(RoomType rmType) {
+
+		//rmType = RoomType::Normal;
+
+		if (this->rmType == RoomType::Empty) {
+			this->rmType = rmType;
+		}
+
 		somethingelse.neutral = WalkLeft;
 		somethingelse.happy = WalkToTarget;
 		somethingelse.angry = WalkRight;
@@ -96,12 +114,30 @@ namespace mapRooms
 		for (Enemy* i : currentRoomData.enemyList){
 			i->ChangeState(EnemyStates::ES_NEUTRAL);
 		}
+
+		// Gifts here (1 Gift per room for now)
+		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
+		Vector2 giftPos{ 200.0f, 450.0f };
+		Sprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+		currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, giftSprite, giftPos));		
+		
 	} 
 	void Room::Update(float dt) {
-		for (Enemy* i : currentRoomData.enemyList){
+		for (Enemy* i : currentRoomData.enemyList) {
 			i->Update(dt);
-			
 		}
+
+
+
+		//// TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???)
+		//for (Gift* gift : things) {
+		//	if (!(gift->velocity == Vector2())) {
+		//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+		//			gift->velocity = -gift->velocity;
+		//			rock.AssessTraits(gift->traits);
+		//		}
+		//	}
+		//}
 
 	}
 
@@ -111,7 +147,8 @@ namespace mapRooms
 		gridSize{ 0 },
 		rooms{},
 		currentRoom{ nullptr },
-		rngState{ 0xA341316Cu }	// Some random seed
+		rngState{ 0xA341316Cu },
+		transferData{nullptr}	// Some random seed
 	{
 		//Room x[2]{};
 		//for (Room y : x) {
@@ -176,7 +213,7 @@ namespace mapRooms
 				}
 				else if (rm->rmType == RoomType::Normal || rm->rmType == RoomType::Start) {
 					if (haveNormal) {
-						int pick = static_cast<int>(RandInt(0, static_cast<int>(bossRoomFiles.size()) - 1));
+						int pick = static_cast<int>(RandInt(0, static_cast<int>(normalRoomFiles.size()) - 1));
 						chosenPath = normalRoomFiles[pick];
 
 					}
@@ -193,13 +230,17 @@ namespace mapRooms
 		
 	
 	//InitMap(): Allocate / Reset Maps (Rooms)
-	void Map::InitMap(unsigned int seed) {
+	void Map::InitMap(RoomData &globalSceneData, unsigned int seed) {
 		rngState = seed;
 		srand(rngState);
 		gridSize = RandInt(Config::minGrid, Config::maxGrid);
 
+
 		rooms.clear();
 		rooms.resize(gridSize * gridSize);	// Grid generated
+
+		transferData = &globalSceneData;
+
 		somemesh = CreateSquareMesh();
 		ResetRooms();						// Ensure rooms are nothing;
 		GenerateRooms();
@@ -212,7 +253,14 @@ namespace mapRooms
 		// Somehow assign startX and startY into starting room coordinates value
 		currentRoom = GetRoom(startX, startY);
 
+		if (currentRoom!=nullptr) {
+			currentRoom->toBeTransferred = transferData;
+			currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;
+		}
+
 		doorCooldown = 0.0f;
+
+
 	}
 
 	bool Map::InBounds(int x, int y) const
@@ -259,6 +307,11 @@ namespace mapRooms
 		textureCache.clear();
 		normalRoomFiles.clear();
 		bossRoomFiles.clear();
+
+
+		// Help clear globaldata
+		// Actually don't we need it between different state levels
+		// Perhaps before unload, we serialize this and save it in some save file before loading in a new level. It will be only erased if user fails the level.
 	}
 
 	void Map::LinkRooms(Room* a, Room* b, Direction dirFromAToB)
@@ -520,18 +573,106 @@ namespace mapRooms
 	}
 
 	// FOR DEBUGGING PURPOSE
+	//void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
+	//{
+	//	if (!squareMesh) return;
+	//	if (gridSize <= 0) return;
+
+	//	float minX = AEGfxGetWinMinX();
+	//	float maxY = AEGfxGetWinMaxY();
+
+	//	float cell = 18.0f;
+	//	float gap = 4.0f;
+
+	//	// Top-left corner anchor
+	//	float startXPix = minX + 30.0f;
+	//	float startYPix = maxY - 30.0f;
+
+	//	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	//	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+	//	AEGfxSetTransparency(1.0f);
+
+	//	for (int y = 0; y < gridSize; ++y)
+	//	{
+	//		for (int x = 0; x < gridSize; ++x)
+	//		{
+	//			int idx = GetRoomIdx(x, y);
+	//			Room const& rm = rooms[idx];
+
+	//			if (rm.rmType == RoomType::Empty) continue;	// Ignore Empty rooms
+
+	//			Color c{ 0.6f, 0.6f, 0.6f, 0.85f }; // Normal
+
+	//			if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };
+	//			if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };
+
+	//			if (currentRoom == &rooms[idx])   c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
+
+	//			float px = startXPix + x * (cell + gap) + cell * 0.5f;
+	//			float py = startYPix - y * (cell + gap) - cell * 0.5f;
+
+	//			Sprite tile(squareMesh, Vector2{ px, py }, Vector2{ cell, cell }, c);
+	//			tile.RenderSprite();
+	//		}
+	//	}
+	//}
+	// Render map was done using AI cuz implementation details are quite cmi. Will analyze it and do my own function of it.
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
 	{
 		if (!squareMesh) return;
 		if (gridSize <= 0) return;
 
+		// ---------- 1) Build reachable set via BFS over pointer-links ----------
+		std::vector<bool> reachable(static_cast<size_t>(gridSize * gridSize), false);
+
+		if (currentRoom)
+		{
+			// Find currentRoom index by pointer difference (works because rooms is a contiguous vector)
+			int startIdx = static_cast<int>(currentRoom - &rooms[0]);
+			if (startIdx >= 0 && startIdx < gridSize * gridSize)
+			{
+				std::vector<int> queue;
+				queue.push_back(startIdx);
+				reachable[static_cast<size_t>(startIdx)] = true;
+
+				// Simple BFS
+				for (size_t qi = 0; qi < queue.size(); ++qi)
+				{
+					int idx = queue[qi];
+					Room const& r = rooms[static_cast<size_t>(idx)];
+
+					auto pushIfValid = [&](Room const* nextPtr)
+						{
+							if (!nextPtr) return;
+
+							int nextIdx = static_cast<int>(nextPtr - &rooms[0]);
+							if (nextIdx < 0 || nextIdx >= gridSize * gridSize) return;
+
+							size_t ni = static_cast<size_t>(nextIdx);
+							if (reachable[ni]) return;
+
+							// Only treat non-empty rooms as real nodes
+							if (rooms[ni].rmType == RoomType::Empty) return;
+
+							reachable[ni] = true;
+							queue.push_back(nextIdx);
+						};
+
+					pushIfValid(r.left);
+					pushIfValid(r.right);
+					pushIfValid(r.up);
+					pushIfValid(r.down);
+				}
+			}
+		}
+
+		// ---------- 2) Render minimap with "unreachable darken" ----------
 		float minX = AEGfxGetWinMinX();
 		float maxY = AEGfxGetWinMaxY();
 
 		float cell = 18.0f;
 		float gap = 4.0f;
 
-		// Top-left corner anchor
 		float startXPix = minX + 30.0f;
 		float startYPix = maxY - 30.0f;
 
@@ -544,16 +685,27 @@ namespace mapRooms
 			for (int x = 0; x < gridSize; ++x)
 			{
 				int idx = GetRoomIdx(x, y);
-				Room const& rm = rooms[idx];
+				Room const& rm = rooms[static_cast<size_t>(idx)];
 
+				// Skip empty / non-generated rooms
 				if (rm.rmType == RoomType::Empty) continue;
 
-				Color c{ 0.6f, 0.6f, 0.6f, 0.85f }; // Normal
-
+				// Base color
+				Color c{ 0.6f, 0.6f, 0.6f, 0.85f };                    // Normal
 				if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };
 				if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };
 
-				if (currentRoom == &rooms[idx])   c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
+				// Current room highlight always wins
+				bool isCurrent = (currentRoom == &rooms[static_cast<size_t>(idx)]);
+				if (isCurrent) c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
+
+				// Darken if NOT reachable from current room (but don't darken current room)
+				bool isReachable = reachable[static_cast<size_t>(idx)];
+				if (!isCurrent && !isReachable)
+				{
+					// Dark + a bit transparent so it looks "inactive"
+					c = Color{ c.r * 0.25f, c.g * 0.25f, c.b * 0.25f, 0.55f };
+				}
 
 				float px = startXPix + x * (cell + gap) + cell * 0.5f;
 				float py = startYPix - y * (cell + gap) - cell * 0.5f;
@@ -563,6 +715,7 @@ namespace mapRooms
 			}
 		}
 	}
+
 
 
 	Room* Map::GetRoom(int x, int y) {
@@ -575,39 +728,28 @@ namespace mapRooms
 	}
 
 	bool Map::MoveTo(Direction direction) {
-		if (Direction::Left == direction) {
-			if (currentRoom->left != nullptr) {
-				currentRoom = currentRoom->left;
-				// Animation
-				return true;
-			}
+
+		if (!currentRoom) return false;	// should not happen just a function safeguard...
+
+		Room* previousRoom = currentRoom;
+		Room* target = nullptr;
+		switch (direction) {
+			case Direction::Left:  target = currentRoom->left;  break;
+			case Direction::Right: target = currentRoom->right; break;
+			case Direction::Up:    target = currentRoom->up;    break;
+			case Direction::Down:  target = currentRoom->down;  break;
+			default: break;
 		}
 
-		else if (Direction::Up == direction) {
-			if (currentRoom->up!= nullptr) {
-				currentRoom = currentRoom->up;
-				// Animation
-				return true;
-			}
-		}
+		if (!target) return false;	// again should not happen just a function safeguard
 
-		else if (Direction::Down == direction) {
-			if (currentRoom->down != nullptr) {
-				currentRoom = currentRoom->down;
-				// Animation
-				return true;
-			}
-		}
+		currentRoom = target; // Room changed
+		currentRoom->toBeTransferred = transferData;
+		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 
+		//currentRoom->toBeTransferred = previousRoom->toBeTransferred;	// Hopefully?
+		//currentRoom->toBeTransferred = &transferData;					// Maybe this works?
 
-		else if (Direction::Right == direction) {
-			if (currentRoom->right != nullptr) {
-				currentRoom = currentRoom->right;
-				// Animation
-				return true;
-			}
-		}
-
-		return false;
+		return true;
 	}
 
 	// Update Loop
@@ -687,4 +829,8 @@ namespace mapRooms
 		}
 	}
 
+	RoomData& Map::GetTransferData()
+	{
+		return *transferData;
+	}
 }
