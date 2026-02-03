@@ -33,8 +33,8 @@ Gift::Gift(TexturedSprite sprite, Vector2 position) :
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 {
 	//if player and gift are intersecting, pick up the gift
-	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale, player.position + player.sprite.scale },
-		AABB{ gift.position - gift.sprite.scale, gift.position + gift.sprite.scale }) && !player.pickUpState)
+	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
+		AABB{ gift.position - gift.sprite.scale / 2, gift.position + gift.sprite.scale / 2 }) && !player.pickUpState)
 	{
 		player.pickUpState = true;
 		player.heldGift = &gift;

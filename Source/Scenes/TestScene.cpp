@@ -1,16 +1,16 @@
 #include "TestScene.h"
 
 #include "AEEngine.h"
-#include "Sprite.h"
+#include "../Sprite.h"
 
-#include "Player.h"
-#include "Gift.h"
-#include "Utils/Utils.h"
-#include "Enemy.h"
-#include "rooms.h"
-#include "Loaders/DataLoader.h"
-#include "Collision.h"
-#include "RoomData.h"
+#include "../Player.h"
+#include "../Gift.h"
+#include "../Utils/Utils.h"
+#include "../Enemy.h"
+#include "../rooms.h"
+#include "../Loaders/DataLoader.h"
+#include "../Collision.h"
+#include "../RoomData.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
