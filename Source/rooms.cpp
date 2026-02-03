@@ -10,6 +10,7 @@
 #include "Sprite.h"		// TexturedSpirte for rendering room bg
 #include "Enemy.h"
 #include "Loaders/DataLoader.h"
+#include "Collision.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -630,7 +631,7 @@ namespace mapRooms
 		// depth: how "thick" the trigger is (into the room)
 		// margin: how far inside the new room we spawn after switching
 		float doorSpan = 220.0f;	// Wide doorway
-		float doorDepth = 80.0f;	
+		float doorDepth = 80.0f;
 		float warpMargin = 120.0f;	// Distance padded when entering new room
 
 		// Trigger half-sizes
@@ -644,7 +645,8 @@ namespace mapRooms
 		Vector2 botDoorC{ 0.0f, minY + doorDepth * 0.5f };
 
 		// LEFT
-		if (currentRoom->left && Config::OverlapAabb(playerPos, playerHalfSize, leftDoorC, halfLR))
+		if (currentRoom->left && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ leftDoorC - halfLR, leftDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Left)) {
 				// appear at RIGHT side of the next room, inside boundary
@@ -655,7 +657,8 @@ namespace mapRooms
 		}
 
 		// RIGHT
-		if (currentRoom->right && Config::OverlapAabb(playerPos, playerHalfSize, rightDoorC, halfLR))
+		if (currentRoom->right && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ rightDoorC - halfLR, rightDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Right)) {
 				playerPos.x = minX + playerHalfSize.x + warpMargin;
@@ -665,7 +668,8 @@ namespace mapRooms
 		}
 
 		// UP
-		if (currentRoom->up && Config::OverlapAabb(playerPos, playerHalfSize, topDoorC, halfUD))
+		if (currentRoom->up && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ topDoorC - halfUD, topDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Up)) {
 				playerPos.y = minY + playerHalfSize.y + warpMargin;
@@ -675,7 +679,8 @@ namespace mapRooms
 		}
 
 		// DOWN
-		if (currentRoom->down && Config::OverlapAabb(playerPos, playerHalfSize, botDoorC, halfUD))
+		if (currentRoom->down && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ botDoorC - halfUD, botDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Down)) {
 				playerPos.y = maxY - playerHalfSize.y - warpMargin;

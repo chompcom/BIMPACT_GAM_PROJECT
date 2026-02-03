@@ -9,6 +9,7 @@
 #include "Enemy.h"
 #include "rooms.h"
 #include "Loaders/DataLoader.h"
+#include "Collision.h"
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
@@ -122,8 +123,9 @@ void TestUpdate(float dt)
 	for (Gift* gift : things) {
 		if (gift->velocity != Vector2(0,0)) {
 			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, enemy->sprite.position, enemy->sprite.scale.x)) {
-					gift->velocity = -gift->velocity;
+				if (CollisionIntersection_RectRect_Static(AABB{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
+					gift->velocity = Vector2(0, 0);
 					enemy->AssessTraits(gift->traits);
 				}
 

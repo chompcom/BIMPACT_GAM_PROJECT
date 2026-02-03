@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "BoundaryCollision.h"
 #include "Utils/Utils.h"
+#include "Collision.h"
 
 //simple contructor for gift class, for testing
 Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
@@ -32,8 +33,8 @@ Gift::Gift(TexturedSprite sprite, Vector2 position) :
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 {
 	//if player and gift are intersecting, pick up the gift
-	if (AreSquaresIntersecting(player.position, player.sprite.scale.x,
-		gift.position, gift.sprite.scale.x) && !player.pickUpState)
+	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale, player.position - player.sprite.scale },
+		AABB{ gift.position - gift.sprite.scale, gift.position + gift.sprite.scale }) && !player.pickUpState)
 	{
 		player.pickUpState = true;
 		player.heldGift = &gift;
