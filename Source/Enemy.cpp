@@ -78,19 +78,26 @@ void EnemyType::AddAngry(std::vector<Command> bunch){
 
 void WalkLeft(Enemy& me, float dt) {
 	me.sprite.position += Vector2(-50, 0) * dt;
-	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
+	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
+		me.currentBehavior = WalkRight;
 	me.sprite.UpdateTransform();
 }
 
 void WalkRight(Enemy& me, float dt){
 	me.sprite.position += Vector2(50,0) * dt;
-	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
+	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900) ? me.currentBehavior = WalkLeft : 0;
 	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
 }
 
 void WalkToTarget(Enemy& me, float dt) {
-	me.sprite.position += (me.target - me.sprite.position).Normalized() * 20 * dt;
+	Vector2 direction{ (me.target - me.sprite.position) };
+	if ( me.sprite.position.Distance(me.target) <= 160.f) {
+		Vector2 newTarget = me.target + (me.sprite.position - me.target).Normalized() * 160.f;
+		me.sprite.position += (newTarget-me.sprite.position)* 10 *dt;
+	}
+	else 
+	me.sprite.position += direction.Normalized() * 50 * dt;
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.color = Color{ 0.0f,1.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();

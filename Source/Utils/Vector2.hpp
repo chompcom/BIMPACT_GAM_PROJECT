@@ -147,7 +147,7 @@ public:
     }
 
     float Length() const {
-        return sqrtf(this->x * this->x + this->y * this->y);
+        return sqrtf((this->x * this->x) + (this->y * this->y));
     }
 
     float LengthSq() const {

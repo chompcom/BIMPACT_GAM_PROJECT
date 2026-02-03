@@ -167,6 +167,13 @@ void TestUpdate(float dt)
 		}
 	}
 
+	for (Enemy* e : carryData.enemyList) {
+		if (e) {
+			e->target = player.sprite.position;
+			e->Update(dt);
+		}
+	}
+
 	// Update Gifts (Must update both sides)
 	for (Gift* g : roomData.giftList) {
 		if (g) {
@@ -238,7 +245,13 @@ void TestUpdate(float dt)
 
 	// Update game map
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	Vector2 positionResetTest = player.position;
 	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	if (player.position != positionResetTest) {
+		for (Enemy* e : carryData.enemyList) {
+			e->sprite.position = player.position;
+		}
+	}
 	
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {
