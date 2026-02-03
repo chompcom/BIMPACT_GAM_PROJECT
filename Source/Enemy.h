@@ -17,17 +17,17 @@ class Enemy;
 typedef void Behaviour(Enemy&,  float dt);
 typedef Behaviour* Command;
 
-//struct RoomData;
+struct RoomData;
 
 class Enemy {
 	public:
 		const EnemyType& type;
-		AEGfxVertexList* mesh;
 		TexturedSprite sprite;
 		f32 currentHealth;
 		EnemyStates state;
 		Vector2 target;
-		//RoomData roomData;
+		//points to the room it should be inside, so that it knows whats going on inside!
+		const RoomData* roomData;
 
 		Command currentBehavior;
 

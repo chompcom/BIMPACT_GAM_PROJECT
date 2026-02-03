@@ -3,6 +3,7 @@
 #include "Gift.h"
 #include "AEEngine.h"
 #include "BoundaryCollision.h"
+#include "Collision.h"
 
 //contructor for player class
 Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :

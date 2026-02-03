@@ -28,9 +28,6 @@ public:
     Vector2(int x, float y) : x{ static_cast<float>(x) }, y{ y } {}
 
     Vector2(float x, int y) : x{ (x) }, y{ static_cast<float>(y) } {}
-
-    ~Vector2() {};
-
     // ADDITION
 
     const Vector2 operator+(const Vector2 &rhs) const{

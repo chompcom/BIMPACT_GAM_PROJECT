@@ -8,6 +8,8 @@
 #include "Utils/Utils.h"
 #include "Enemy.h"
 #include "rooms.h"
+#include "Loaders/DataLoader.h"
+#include "Collision.h"
 #include "RoomData.h"
 
 AEGfxVertexList* sqmesh = nullptr;
@@ -22,6 +24,8 @@ Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1
 
 //Gift gift{ "boat", {"happy"}, Sprite()};
 //Gift gift2{"bad", {"sad"}, Sprite()};
+//Gift gift{ "boat", {"happy"}, TexturedSprite(sqmesh,nullptr, Vector2(), Vector2(), Color{1,1,1,1}) };
+//Gift gift2{"bad", {"sad"}, TexturedSprite(sqmesh, nullptr, Vector2(), Vector2())};
 
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
@@ -36,6 +40,7 @@ vector<gift*> gift;
 
 void TestLoad()
 {
+	DataLoader::Load();
 	sqmesh = CreateSquareMesh();
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
@@ -43,8 +48,8 @@ void TestLoad()
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
 );
-	//gift.sprite = Sprite(sqmesh, Vector2(200, 500), Vector2(100, 100), Color{1.f,0.f,0.f,1.f});
-	//gift2.sprite = Sprite(sqmesh, Vector2(-200, 500), Vector2(100, 100), Color{1.f,1.f,0.f,1.f});
+	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
+	//gift2.sprite = DataLoader::CreateTexture("Assets/pattyfish.png");
 
 	rock.sprite = *thing;
 
@@ -80,6 +85,7 @@ void TestDraw()
 	
 	gameMap.RenderCurrentRoom(sqmesh);
 
+	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 	// Draw objects: current-room objects + carried objects
 	if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 	{
@@ -94,6 +100,9 @@ void TestDraw()
 	}
 
 	player.sprite.RenderSprite();
+	//rock.sprite.RenderSprite();
+	//gift.sprite.RenderSprite();
+	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
 	//rock.sprite.RenderSprite();
@@ -130,6 +139,8 @@ void TestUnload()
 	globalTransferData.giftList.clear();
 	
 	globalTransferData.player = nullptr;
+
+	DataLoader::Unload();
 }
 
 void TestUpdate(float dt)
@@ -172,19 +183,6 @@ void TestUpdate(float dt)
 		}
 	}
 
-
-	//std::vector<Gift*> things{ &gift,&gift2 };
-
-
-	// TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
-	//for (Gift* gift : roomData.giftList) {
-	//	if (!(gift->velocity == Vector2())) {
-	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-	//			gift->velocity = -gift->velocity;
-	//			rock.AssessTraits(gift->traits);
-	//		}
-	//	}
-	//}
 
 	// Gifts and Enemy Check
 	for (Gift* gift : currentRoom->currentRoomData.giftList) {
@@ -239,9 +237,38 @@ void TestUpdate(float dt)
 		++i;
 	}
 
+
 	// Update game map
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	
+	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
+	//for (Gift* gift : roomData.giftList) {
+	//	if (!(gift->velocity == Vector2())) {
+	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+	//			gift->velocity = -gift->velocity;
+	//			rock.AssessTraits(gift->traits);
+	//		}
+	//	}
+	//}
+
+
+	//std::vector<Gift*> things{ &gift,&gift2 };
+
+	
+	//thing->position += Vector2(10,10) * dt;
+	//thing->UpdateTransform();
+	
+	//rock.Update(dt);
+	//rock.target = player.sprite.position;
+	
+	//UpdatePlayer(player, dt);
+	//player.sprite.UpdateTransform();
+	//UpdateGift(gift, player, dt);
+	//gift.sprite.UpdateTransform();
+	//UpdateGift(gift2, player, dt);
+	//gift2.sprite.UpdateTransform();
+
 
 
 	//thing->position += Vector2(10,10) * dt;
@@ -254,7 +281,24 @@ void TestUpdate(float dt)
 	rock.Update(dt);
 	rock.target = player.sprite.position;
 
-	*/
+	gameMap.GetCurrentRoom()->Update(dt);
+
+	std::vector<Gift*> things{ &gift,&gift2 };
+
+	for (Gift* gift : things) {
+		if (gift->velocity != Vector2(0,0)) {
+			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+				if (CollisionIntersection_RectRect_Static(AABB{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
+					gift->velocity = Vector2(0, 0);
+					enemy->AssessTraits(gift->traits);
+				}
+
+			}
+				
+		}
+	}
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
 
 	/* PSUEDOCODE ZONE
 

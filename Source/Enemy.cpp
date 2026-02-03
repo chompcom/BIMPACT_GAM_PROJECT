@@ -2,10 +2,10 @@
 #include "Enemy.h"
 #include "Utils/Vector2.hpp"
 #include "Traits.h"
+#include "BoundaryCollision.h"
 #include <set>
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}
-	,mesh{nullptr}
 {
 		ChangeState(initialState);
 //		mesh = CreateSquareMesh();
@@ -77,17 +77,21 @@ void EnemyType::AddAngry(std::vector<Command> bunch){
 }
 
 void WalkLeft(Enemy& me, float dt) {
-
 	me.sprite.position += Vector2(-50, 0) * dt;
+	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
 }
 
 void WalkRight(Enemy& me, float dt){
 	me.sprite.position += Vector2(50,0) * dt;
+	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
+	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
 }
 
 void WalkToTarget(Enemy& me, float dt) {
 	me.sprite.position += (me.target - me.sprite.position).Normalized() * 20 * dt;
+	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
+	me.sprite.color = Color{ 0.0f,1.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
 } 

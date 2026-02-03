@@ -8,8 +8,12 @@
 #include <Windows.h>	// Windows
 
 #include "Sprite.h"		// TexturedSpirte for rendering room bg
+#include "Enemy.h"
+#include "Loaders/DataLoader.h"
+#include "Collision.h"
 
 #include "RoomData.h"
+#include "Gift.h"		// ????
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -68,10 +72,10 @@ namespace Config {
 }
 
 #include "Enemy.h"
-#include "Gift.h"
+
 
 EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
-Gift gift{ "boat", {"happy"}, Sprite() };
+//Gift gift{ "boat", {"happy"}, Sprite() };
 
 AEGfxVertexList* somemesh = nullptr;
 //AEGfxVertexList* somemesh2 = nullptr;
@@ -110,16 +114,19 @@ namespace mapRooms
 		somethingelse.neutral = WalkLeft;
 		somethingelse.happy = WalkToTarget;
 		somethingelse.angry = WalkRight;
-		currentRoomData.enemyList.push_back(new Enemy(somethingelse,TexturedSprite{somemesh,nullptr,Vector2(0,0),Vector2(100,100),Color{1,0,0,1}}));
+		currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 		for (Enemy* i : currentRoomData.enemyList){
 			i->ChangeState(EnemyStates::ES_NEUTRAL);
 		}
 
 		// Gifts here (1 Gift per room for now)
 		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-		Vector2 giftPos{ 200.0f, 450.0f };
-		Sprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-		currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, giftSprite, giftPos));		
+		//Vector2 giftPos{ 200.0f, 450.0f };
+		//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+		//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+
+		
+		currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
 		
 	} 
 	void Room::Update(float dt) {
@@ -158,7 +165,6 @@ namespace mapRooms
 
 	Map::~Map(){
 		DeleteMap();
-		AEGfxMeshFree(somemesh);
 	}
 
 	void Map::LoadRoomArtLists()
@@ -241,7 +247,7 @@ namespace mapRooms
 
 		transferData = &globalSceneData;
 
-		somemesh = CreateSquareMesh();
+		somemesh = CreateSquareMesh();		// Remember to unfuck this
 		ResetRooms();						// Ensure rooms are nothing;
 		GenerateRooms();
 		// Probably generate other room types???
@@ -568,7 +574,7 @@ namespace mapRooms
 
 		bg.RenderSprite();
 		for (Enemy* i : currentRoom->currentRoomData.enemyList)
-		i->sprite.RenderSprite();
+			i->sprite.RenderSprite();
 
 	}
 
@@ -774,7 +780,7 @@ namespace mapRooms
 		// depth: how "thick" the trigger is (into the room)
 		// margin: how far inside the new room we spawn after switching
 		float doorSpan = 220.0f;	// Wide doorway
-		float doorDepth = 80.0f;	
+		float doorDepth = 80.0f;
 		float warpMargin = 120.0f;	// Distance padded when entering new room
 
 		// Trigger half-sizes
@@ -788,7 +794,8 @@ namespace mapRooms
 		Vector2 botDoorC{ 0.0f, minY + doorDepth * 0.5f };
 
 		// LEFT
-		if (currentRoom->left && Config::OverlapAabb(playerPos, playerHalfSize, leftDoorC, halfLR))
+		if (currentRoom->left && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ leftDoorC - halfLR, leftDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Left)) {
 				// appear at RIGHT side of the next room, inside boundary
@@ -799,7 +806,8 @@ namespace mapRooms
 		}
 
 		// RIGHT
-		if (currentRoom->right && Config::OverlapAabb(playerPos, playerHalfSize, rightDoorC, halfLR))
+		if (currentRoom->right && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ rightDoorC - halfLR, rightDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Right)) {
 				playerPos.x = minX + playerHalfSize.x + warpMargin;
@@ -809,7 +817,8 @@ namespace mapRooms
 		}
 
 		// UP
-		if (currentRoom->up && Config::OverlapAabb(playerPos, playerHalfSize, topDoorC, halfUD))
+		if (currentRoom->up && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ topDoorC - halfUD, topDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Up)) {
 				playerPos.y = minY + playerHalfSize.y + warpMargin;
@@ -819,7 +828,8 @@ namespace mapRooms
 		}
 
 		// DOWN
-		if (currentRoom->down && Config::OverlapAabb(playerPos, playerHalfSize, botDoorC, halfUD))
+		if (currentRoom->down && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+			AABB{ botDoorC - halfUD, botDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Down)) {
 				playerPos.y = maxY - playerHalfSize.y - warpMargin;
