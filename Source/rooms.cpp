@@ -77,7 +77,7 @@ namespace Config {
 EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 //Gift gift{ "boat", {"happy"}, Sprite() };
 
-AEGfxVertexList* somemesh = nullptr;
+//AEGfxVertexList* somemesh = nullptr;
 //AEGfxVertexList* somemesh2 = nullptr;
 
 namespace mapRooms
@@ -247,7 +247,7 @@ namespace mapRooms
 
 		transferData = &globalSceneData;
 
-		somemesh = CreateSquareMesh();		// Remember to unfuck this
+		//somemesh = CreateSquareMesh();		// Remember to unfuck this
 		ResetRooms();						// Ensure rooms are nothing;
 		GenerateRooms();
 		// Probably generate other room types???

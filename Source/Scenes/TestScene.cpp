@@ -131,15 +131,13 @@ void TestUnload()
 	for (Enemy *e: globalTransferData.enemyList) {
 		delete e;
 	}
-	globalTransferData.enemyList.clear();
 
 	for (Gift* g : globalTransferData.giftList) {
 		delete g;
 	}
-	globalTransferData.giftList.clear();
 	
 	globalTransferData.player = nullptr;
-
+	gameMap.DeleteMap();
 	DataLoader::Unload();
 }
 
