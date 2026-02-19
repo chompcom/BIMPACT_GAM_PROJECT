@@ -92,10 +92,12 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 
 		(*player.heldGift).shakeState = true;
 
+		//Calculate the player's throwing force
 		player.throwState = true;
 		player.throwForce += deltaTime * player.throwStrength;
 		player.throwForce = AEClamp(player.throwForce, 2000.f, 10000.f);
 
+		//Shake the gift
 		Vector2 shakeVector{ (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 , 
 			(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 };
 
@@ -121,6 +123,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	}
 }
 
+//function for player to take damage
 void playerTakesDamage(Player& player)
 {
 	if (player.invulnerableTimer <= 0.f)

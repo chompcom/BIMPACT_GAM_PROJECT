@@ -55,7 +55,8 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 		gift.velocity.x /= 1.1f;
 		gift.velocity.y /= 1.1f;
 	}
-	//set the gift's sprite position to match its actual position
+	//set the gift's sprite position to match its actual position if not 
+	//getting shaken
 	if (!gift.shakeState) gift.sprite.position = gift.position;
 	//gift.sprite.position = gift.position;
 
