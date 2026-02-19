@@ -11,7 +11,8 @@ Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 pos
 	sprite{ sprite },
 	position{ position },
 	velocity { Vector2 {0.f, 0.f}},
-	pickUpState{ false }
+	pickUpState{ false },
+	shakeState{ false }
 {
 }
 
@@ -21,7 +22,8 @@ Gift::Gift(Sprite sprite, Vector2 position) :
 	sprite{ sprite },
 	position{ position },
 	velocity{ Vector2 {0.f, 0.f} },
-	pickUpState{ false }
+	pickUpState{ false },
+	shakeState{ false }
 {	
 }
 
@@ -48,12 +50,14 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	//if not, calculate its position based on its velocity
 	else
 	{
+		//gift.sprite.position = gift.position;
 		gift.position += gift.velocity * deltaTime;
-		gift.velocity.x /= 1.1;
-		gift.velocity.y /= 1.1;
+		gift.velocity.x /= 1.1f;
+		gift.velocity.y /= 1.1f;
 	}
 	//set the gift's sprite position to match its actual position
-	gift.sprite.position = gift.position;
+	if (!gift.shakeState) gift.sprite.position = gift.position;
+	//gift.sprite.position = gift.position;
 
 	return;
 }

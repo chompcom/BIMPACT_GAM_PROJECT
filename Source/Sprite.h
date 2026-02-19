@@ -21,7 +21,9 @@ class Sprite {
 
 		void UpdateTransform();
 
-		void RenderSprite();
+		//void RenderSprite();
+
+		void RenderSprite(bool changeAlpha = false);
 };
 
 class TexturedSprite : Sprite {

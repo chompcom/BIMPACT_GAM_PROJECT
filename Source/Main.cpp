@@ -24,6 +24,9 @@
 #include "Player.h"
 #include "Gift.h"
 #include "Enemy.h"
+#include "HUD.h"
+
+#include <iostream> //for testing
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -54,6 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     AEGfxTexture* bearTexture = AEGfxTextureLoad("Assets/player.png");
     AEGfxTexture* popRocksTexture = AEGfxTextureLoad("Assets/poprocks.png");
+    AEGfxTexture* heartTexture = AEGfxTextureLoad("Assets/heart.png");
 
     //Sprite damageArea(circleMesh, Vector2{ 400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 1.f, 0.f, 0.f, 1.f });
     //Sprite healArea(circleMesh, Vector2{ -400.f, -50.f }, Vector2{ 400.f, 400.f }, Color{ 0.f, 1.f, 0.f, 1.f });
@@ -61,6 +65,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //Sprite player(circleMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
     //TexturedSprite testSprite(squareMesh, playerTexture, Vector2{ 0.f, 0.f }, Vector2{ 200.f, 200.f }, Color{ 1.f, 1.f, 1.f, 1.f });
+
+    s8 font { AEGfxCreateFont("Assets/liberation-mono.ttf", 32) };
 
     std::array<std::string, MAX_NO_TRAITS> bearTraits{ "Cold", "Smart" };
     std::array<std::string, MAX_NO_TRAITS> bearLikes{ "Cold", "Clean" };
@@ -80,9 +86,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     Enemy popRocks1 = Enemy(popRocks, TexturedSprite(squareMesh, popRocksTexture, Vector2{ 100.f, -250.f }, Vector2{ 80.f, 80.f }, Color{ 1.f,1.f,1.f,1.f }),
         ES_HAPPY);
 
+    //Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
     Sprite playerSprite(squareMesh, Vector2{ 0.f, -50.f }, Vector2{ 80.f, 80.f }, Color{ 0.f, 0.f, 1.f, 1.f });
 
-    Player player(playerSprite, 25000.f, 600.f, Vector2{ 0.f, -50.f });
+    Player player(playerSprite, 17500.f, 600.f, 3, Vector2{ 0.f, -50.f });
 
     //This is just to see what direction the player is facing
     Sprite directionTest(circleMesh, player.direction, Vector2{ 20.f, 20.f }, Color{ 0.f, 0.f, 0.5f, 1.f });
@@ -104,6 +111,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     ////Sprite healthIcon(squareMesh, Vector2{-607.5f,450.f}, Vector2{70.f, 45.f}, Color{ 1.f, 0.f, 0.f, 1.f });
 
+    //Sprite healthIcon(squareMesh, Vector2{ -607.5f,450.f }, Vector2{ 70.f, 45.f }, Color{ 1.f, 0.f, 0.f, 1.f });
+
+    TexturedSprite healthIcons[3]{
+        TexturedSprite(squareMesh, heartTexture, Vector2{-600.5f,-350.f}, Vector2{64.f,64.f}, Color{1.f,1.f,1.f,1.f}),
+        TexturedSprite(squareMesh, heartTexture, Vector2{-500.5f,-350.f}, Vector2{64.f,64.f}, Color{1.f,1.f,1.f,1.f}),
+        TexturedSprite(squareMesh, heartTexture, Vector2{-400.5f,-350.f}, Vector2{64.f,64.f}, Color{1.f,1.f,1.f,1.f})
+    };
+
     //Sprite healthIcons[10]{
     //    Sprite(squareMesh, Vector2{-607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
     //    Sprite(squareMesh, Vector2{-472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
@@ -116,6 +131,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //    Sprite(squareMesh, Vector2{472.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
     //    Sprite(squareMesh, Vector2{607.5f,250.f}, Vector2{70.f,45.f}, Color{1.f,0.f,0.f,1.f}),
     //};
+
+    
 
     //f32 playerHealth = 100.0f;
 
@@ -145,7 +162,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //    player.position.x += speed;
         //    player.UpdateTransform();
         //}
-        
 
         UpdatePlayer(player, current_Time);
         player.sprite.UpdateTransform();
@@ -159,6 +175,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             UpdateGift(testGifts[i], player, current_Time);
             (testGifts[i]).sprite.UpdateTransform();
         }
+
+        //to test damage
+        if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
 
         //std::cout << bear1.currentHealth << bear1.state << '\n';
         //std::cout << bear1.type.name << bear2.type.name << popRocks1.type.name << '\n';
@@ -174,7 +193,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //{
         //    playerHealth += 15.f * current_Time;
         //    if (playerHealth > 100.f) playerHealth = 100.f;
-        //}
+        //} 
         //
         //healthBarFore.position = Vector2{ 0.f - (100.f - playerHealth)/100.f * 642.5f, 340.f };
         //healthBarFore.scale = Vector2{ playerHealth/100.f * 1285.f, 45.f};
@@ -184,13 +203,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         AEGfxSetRenderMode(AE_GFX_RM_COLOR);
         AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-        AEGfxSetTransparency(1.0f);
+        //AEGfxSetTransparency(1.0f);
+
+        
+        
+
+        //AEGfxPrint(font, "Lives:", 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f);
 
         //damageArea.RenderSprite();
         //healArea.RenderSprite();
         testGifts[0].sprite.RenderSprite();
         testGifts[1].sprite.RenderSprite();
-        player.sprite.RenderSprite();
+        player.sprite.RenderSprite(true);
         directionTest.RenderSprite();
 
         AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -198,6 +222,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         bear2.sprite.RenderSprite();
         popRocks1.sprite.RenderSprite();
         //testSprite.RenderSprite();
+
+        renderPlayerLives(player, healthIcons, font);
 
         //healthBarBack.RenderSprite();
         //healthBarFore.RenderSprite();
@@ -214,6 +240,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
             gGameRunning = 0;
     }
+
+    AEGfxDestroyFont(font);
 
     AEGfxMeshFree(squareMesh);
     AEGfxMeshFree(circleMesh);

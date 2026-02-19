@@ -30,11 +30,28 @@ void Sprite::UpdateTransform() {
 		AEMtx33Concat(&transform, &transformTranslate, &transform);
 }
 
-void Sprite::RenderSprite() {
-		AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
+//void Sprite::RenderSprite() {
+//		AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
+//		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
+//		AEGfxSetTransform(transform.m);
+//		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+//}
+
+//changed this slightly so that the sprite alpha can be changed if needed
+void Sprite::RenderSprite(bool changeAlpha) {
+	AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
+	
+	if (!changeAlpha)
+	{
 		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
-		AEGfxSetTransform(transform.m);
-		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
+	}
+	else 
+	{
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+	}
+	//AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
+	AEGfxSetTransform(transform.m);
+	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
 TexturedSprite::TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor)
