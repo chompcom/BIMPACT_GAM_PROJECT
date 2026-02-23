@@ -11,6 +11,7 @@
 #include "../Loaders/DataLoader.h"
 #include "../Collision.h"
 #include "../RoomData.h"
+#include "../HUD.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -18,6 +19,10 @@ TexturedSprite* thing = nullptr;
 
 AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
+AEGfxTexture* heartpng = nullptr;
+
+std::vector<TexturedSprite> healthIcons;
+s8 font = 0;
 
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 
@@ -44,6 +49,38 @@ void TestLoad()
 	sqmesh = CreateSquareMesh();
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
+	heartpng = AEGfxTextureLoad("Assets/heart.png");
+
+	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+
+	//healthIcons[0] = TexturedSprite(sqmesh, heartpng, Vector2{ -600.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[1] = TexturedSprite(sqmesh, heartpng, Vector2{ -500.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[2] = TexturedSprite(sqmesh, heartpng, Vector2{ -400.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+
+	//healthIcons[0] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[1] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[2] = DataLoader::CreateTexture("Assets/heart.png");
+
+	//healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	//healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	//healthIcons[2].position = Vector2{ -400.5f,-350.f };
+
+	//healthIcons[0].scale = Vector2{ 64.f,64.f };
+	//healthIcons[1].scale = Vector2{ 64.f,64.f };
+	//healthIcons[2].scale = Vector2{ 64.f,64.f };
+
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+
+	healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	healthIcons[2].position = Vector2{ -400.5f,-350.f };
+
+	healthIcons[0].scale = Vector2{ 64.f,64.f };
+	healthIcons[1].scale = Vector2{ 64.f,64.f };
+	healthIcons[2].scale = Vector2{ 64.f,64.f };
+
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
@@ -99,11 +136,13 @@ void TestDraw()
 		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
 	}
 
-	player.sprite.RenderSprite();
+	player.sprite.RenderSprite(true);
 	//rock.sprite.RenderSprite();
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
+
+	renderPlayerLives(player, healthIcons, font);
 
 	//rock.sprite.RenderSprite();
 
@@ -124,8 +163,9 @@ void TestUnload()
 	}
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
+	AEGfxTextureUnload(heartpng);
 
-	
+	AEGfxDestroyFont(font);
 	
 	// Dellocate enemy and gift assets
 	for (Enemy *e: globalTransferData.enemyList) {
@@ -147,6 +187,9 @@ void TestUpdate(float dt)
 	// Player update
 	UpdatePlayer(player, dt);
 	player.sprite.UpdateTransform();
+
+	//to test damage
+	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
 
 	//std::cout << player.position.x << player.position.y;
 

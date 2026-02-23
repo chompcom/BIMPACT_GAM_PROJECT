@@ -4,6 +4,7 @@
 #include "BoundaryCollision.h"
 #include "Utils/Utils.h"
 #include "Collision.h"
+#include <iostream>
 
 //simple contructor for gift class, for testing
 Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
@@ -43,7 +44,6 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 		gift.pickUpState = true;
 		gift.velocity = Vector2{ 0.f, 0.f };
 	}
-
 	//if the gift is picked up, put it on the player's head
 	if (gift.pickUpState)
 	{
@@ -63,11 +63,16 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 
 		//set the gift's sprite position to match its actual position if not 
 		//getting shaken
-		if (!gift.shakeState) gift.sprite.position = gift.position;
+		
+		
 	}
 	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
 	//set the gift's sprite position to match its actual position
-	gift.sprite.position = gift.position;
+	//gift.sprite.position = gift.position;
+
+	//set the gift's sprite position to match its actual position if not 
+	//getting shaken
+	if (!gift.shakeState) gift.sprite.position = gift.position;
 
 	return;
 }

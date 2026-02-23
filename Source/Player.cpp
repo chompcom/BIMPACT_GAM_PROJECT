@@ -4,6 +4,7 @@
 #include "AEEngine.h"
 #include "BoundaryCollision.h"
 #include "Collision.h"
+#include <iostream>
 
 //contructor for player class
 Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
@@ -11,7 +12,7 @@ Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 posi
 	sprite{ sprite },
 	throwStrength{ throwStrength },
 	speed{ speed }, 
-	health { health },
+	health { 3 },
 	position{ position },
 	direction{ direction },
 	pickUpState{ false },

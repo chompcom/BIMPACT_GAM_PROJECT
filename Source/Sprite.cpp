@@ -62,9 +62,9 @@ TexturedSprite::TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* sprite
 	: Sprite(spriteMesh, spritePosition, spriteScale, spriteColor), texture{ spriteTexture } {
 }
 
-void TexturedSprite::RenderSprite() {
+void TexturedSprite::RenderSprite(bool changeAlpha) {
 		AEGfxTextureSet(texture, 0.f, 0.f);
-		Sprite::RenderSprite();
+		Sprite::RenderSprite(changeAlpha);
 }
 
 AEGfxVertexList* CreateSquareMesh() {

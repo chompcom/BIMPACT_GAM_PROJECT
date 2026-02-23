@@ -2,13 +2,17 @@
 #include "Player.h"
 #include "Sprite.h"
 #include <iostream>
+#include <vector>
 
-void renderPlayerLives(Player const & player, TexturedSprite healthIcons[3], s8 font)
+void renderPlayerLives(Player const & player, std::vector<TexturedSprite> healthIcons, s8 font)
 {
-	AEGfxPrint(font, "Lives:", -0.95f, -0.8f, 1.f, 0.f, 0.f, 0.f, 1.f);
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	AEGfxPrint(font, "Lives:", -0.95f, -0.8f, 1.f, 1.f, 1.f, 1.f, 1.f);
 	if (player.health <= 0) return;
 	for (int i{ 0 }; i < player.health; ++i)
 	{
-		if (i < player.health) healthIcons[i].RenderSprite();
+		healthIcons[i].UpdateTransform();
+		healthIcons[i].RenderSprite();
 	}
 }
