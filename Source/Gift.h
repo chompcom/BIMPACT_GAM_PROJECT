@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include <string>
 #include <vector>
+#include "Traits.h"
 //forward declaration, needed as Player.h needs the Gift class, 
 //and Gift.h needs the player class
 class Player;
@@ -11,16 +12,16 @@ class Player;
 class Gift {
 public:
 	std::string name;
-	std::vector<std::string> traits;
-	Sprite sprite;
+	Labels traits;
+	TexturedSprite sprite;
 	Vector2 position;
 	Vector2 velocity;
 	bool pickUpState; //true if the gift is currently picked up
 	bool shakeState;
 
 	//constructor
-	Gift(std::string name, std::vector<std::string> traits, Sprite sprite, Vector2 position = Vector2{ 0.f, 0.f });
-	Gift(Sprite sprite, Vector2 position = Vector2{ 0.f, 0.f });
+	Gift(std::string name, Labels traits, TexturedSprite sprite, Vector2 position = Vector2{ 0.f, 0.f });
+	Gift(TexturedSprite sprite, Vector2 position = Vector2{ 0.f, 0.f });
 };
 
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime);

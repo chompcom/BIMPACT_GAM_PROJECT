@@ -2,9 +2,11 @@
 #include "Player.h"
 #include "Gift.h"
 #include "AEEngine.h"
+#include "BoundaryCollision.h"
+#include "Collision.h"
 
 //contructor for player class
-Player::Player(Sprite sprite, f32 throwStrength, f32 speed, s16 health, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
 	//initialiser list
 	sprite{ sprite },
 	throwStrength{ throwStrength },
@@ -68,6 +70,8 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.position.x += (static_cast<float>(d) * adjustedSpeed) -
 			(static_cast<float>(a) * adjustedSpeed);
 
+		CollisionBoundary_Static(player.position, player.sprite.scale, 1600, 900);
+
 		//set the player's sprite position to match its actual position
 		player.sprite.position = player.position;
 	}
@@ -75,8 +79,9 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//if player is trying to move, set their direction
 	if (w || a || s || d)
 	{
-		player.direction.y = (w - s);
-		player.direction.x = (d - a);
+		//player.direction.y = float(w - s);
+		//player.direction.x = float(d - a);
+		player.direction = Vector2{(d - a) ,(w - s)};
 
 		//If the player has no direction, set it to face down
 		if (player.direction == Vector2{ 0.f, 0.f }) player.direction = Vector2{ 0.f, -1.f };

@@ -11,25 +11,45 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\BoundaryCollision.cpp" />
+    <ClCompile Include="..\Source\Collision.cpp" />
     <ClCompile Include="..\Source\Enemy.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\HUD.cpp" />
+    <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
+    <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\RoomData.cpp" />
+    <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
-    <ClCompile Include="..\Source\Utils.cpp" />
+    <ClCompile Include="..\Source\Traits.cpp" />
+    <ClCompile Include="..\Source\Utils\Utils.cpp" />
+    <ClCompile Include="..\Source\rooms.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\BoundaryCollision.h" />
+    <ClInclude Include="..\Source\Collision.h" />
+    <ClInclude Include="..\Source\Behaviour\Behaviours.hpp" />
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\HUD.h" />
     <ClInclude Include="..\Source\Player.h" />
+    <ClInclude Include="..\Source\Loaders\DataLoader.h" />
+    <ClInclude Include="..\Source\RoomData.h" />
+    <ClInclude Include="..\Source\Grid.h" />
+    <ClInclude Include="..\Source\Scenes\TestScene.h" />
+    <ClInclude Include="..\Source\rooms.h" />
     <ClInclude Include="..\Source\Sprite.h" />
-    <ClInclude Include="..\Source\Utils.h" />
-    <ClInclude Include="..\Source\Vector2.hpp" />
+    <ClInclude Include="..\Source\Traits.h" />
+    <ClInclude Include="..\Source\Utils\Utils.h" />
+    <ClInclude Include="..\Source\Utils\Vector2.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -82,6 +102,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -118,5 +139,14 @@ xcopy "$(SolutionDir)Extern\AlphaEngine\lib\fmod.dll" "$(OutDir)" /s /r /y /q</C
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets" Condition="Exists('..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets')" />
+    <Import Project="..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets" Condition="Exists('..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets'))" />
+  </Target>
 </Project>

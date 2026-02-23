@@ -1,10 +1,12 @@
 #include "Gift.h"
 #include "Sprite.h"
 #include "Player.h"
-#include "Utils.h"
+#include "BoundaryCollision.h"
+#include "Utils/Utils.h"
+#include "Collision.h"
 
 //simple contructor for gift class, for testing
-Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 position) :
+Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
 	//initialiser list
 	name{ n },
 	traits{ t },
@@ -16,7 +18,7 @@ Gift::Gift(std::string n, std::vector<std::string> t ,Sprite sprite, Vector2 pos
 {
 }
 
-Gift::Gift(Sprite sprite, Vector2 position) :
+Gift::Gift(TexturedSprite sprite, Vector2 position) :
 	name{ "Unnamed Gift" },
 	traits{ },
 	sprite{ sprite },
@@ -33,8 +35,8 @@ Gift::Gift(Sprite sprite, Vector2 position) :
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 {
 	//if player and gift are intersecting, pick up the gift
-	if (AreSquaresIntersecting(player.position, player.sprite.scale.x,
-		gift.position, gift.sprite.scale.x) && !player.pickUpState)
+	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
+		AABB{ gift.position - gift.sprite.scale / 2, gift.position + gift.sprite.scale / 2 }) && !player.pickUpState)
 	{
 		player.pickUpState = true;
 		player.heldGift = &gift;
@@ -52,13 +54,20 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	{
 		//gift.sprite.position = gift.position;
 		gift.position += gift.velocity * deltaTime;
-		gift.velocity.x /= 1.1f;
-		gift.velocity.y /= 1.1f;
+		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, 1600, 900)) {
+			gift.velocity /= -1.3;
+		}
+		else {
+			gift.velocity /= 1.1;
+		}
+
+		//set the gift's sprite position to match its actual position if not 
+		//getting shaken
+		if (!gift.shakeState) gift.sprite.position = gift.position;
 	}
-	//set the gift's sprite position to match its actual position if not 
-	//getting shaken
-	if (!gift.shakeState) gift.sprite.position = gift.position;
-	//gift.sprite.position = gift.position;
+	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
+	//set the gift's sprite position to match its actual position
+	gift.sprite.position = gift.position;
 
 	return;
 }

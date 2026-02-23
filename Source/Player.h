@@ -8,7 +8,7 @@ class Gift;
 
 class Player {
 public:
-	Sprite sprite;
+	TexturedSprite sprite; 
 	f32 throwStrength; //throw strength modifier
 	f32 speed; //movement speed modifier
 	s16 health; 
@@ -22,7 +22,7 @@ public:
 	f32 invulnerableTimer;
 	
 	//constructor
-	Player(Sprite sprite, f32 throwStrength, f32 speed, s16 health, Vector2 position = Vector2{ 0.f, 0.f },
+	Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
 		Vector2 direction = Vector2 {0.f, -1.f});
 };
 
