@@ -65,6 +65,7 @@ void TestLoad()
 	globalTransferData.giftList.clear();
 	globalTransferData.player = &player;
 
+	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 }
 

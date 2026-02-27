@@ -70,3 +70,4 @@ public:
 void WalkLeft(Enemy& me, float dt);
 void WalkRight(Enemy& me, float dt);
 void WalkToTarget(Enemy& me, float dt);
+

@@ -34,7 +34,7 @@ public:
         return Vector2(this->x + rhs.x, this->y + rhs.y);
     }
 
-    const Vector2& operator+=(const Vector2& rhs) {
+    Vector2& operator+=(const Vector2& rhs) {
         this->x += rhs.x;
         this->y += rhs.y;
         return *this;
@@ -51,7 +51,7 @@ public:
         return Vector2(this->x - rhs.x, this->y - rhs.y);
     }
 
-    const Vector2& operator-=(const Vector2& rhs) {
+    Vector2& operator-=(const Vector2& rhs) {
         this->x -= rhs.x;
         this->y -= rhs.y;
         return *this;
@@ -69,7 +69,7 @@ public:
 
     // MULTIPLY BY MAGNITUDE
 
-    const Vector2& operator*=(float magnitude) {
+    Vector2& operator*=(float magnitude) {
         this->x *= magnitude;
         this->y *= magnitude;
         return *this;
@@ -87,12 +87,12 @@ public:
         return Vector2(static_cast<float>(magnitude * this->x), static_cast<float>(magnitude * this->y));
     }
 
-    const Vector2& operator*=(int magnitude) {
+    Vector2& operator*=(int magnitude) {
         *this = *this * static_cast<float>(magnitude);
         return *this;
     }
 
-    const Vector2& operator*=(double magnitude) {
+    Vector2& operator*=(double magnitude) {
         *this = *this * static_cast<float>(magnitude);
         return *this;
     }
@@ -117,17 +117,17 @@ public:
         return Vector2(this->x / static_cast<float>(magnitude), this->y / static_cast<float>(magnitude));
     }
 
-    const Vector2& operator/=(float magnitude) {
+    Vector2& operator/=(float magnitude) {
         *this = *this / magnitude;
         return *this;
     }
 
-    const Vector2& operator/=(int magnitude) {
+    Vector2& operator/=(int magnitude) {
         *this = *this / static_cast<float>(magnitude);
         return *this;
     }
 
-    const Vector2& operator/=(double magnitude) {
+    Vector2& operator/=(double magnitude) {
         *this = *this / static_cast<float>(magnitude);
         return *this;
     }
@@ -167,15 +167,21 @@ public:
     }
 
     //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(float length) {
-        return this->LengthSq() > length * length ? this->Normalized() * length : *this;
-    }
+    const Vector2& ClampLength(float length) const;
     //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(double length) {
-        return this->ClampLength(static_cast<float>(length));
-    }
+    const Vector2& ClampLength(double length) const;
     //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(int length) {
-        return this->ClampLength(static_cast<float>(length));
-    }
+    const Vector2& ClampLength(int length) const;
 };
+
+const Vector2& Vector2::ClampLength(float length) const{
+    return this->LengthSq() > length * length ? this->Normalized() * length : *this;
+}
+//Returns the vector with its length never exceeding the length provided
+const Vector2& Vector2::ClampLength(double length) const{
+    return this->ClampLength(static_cast<float>(length));
+}
+//Returns the vector with its length never exceeding the length provided
+const Vector2& Vector2::ClampLength(int length) const{
+    return this->ClampLength(static_cast<float>(length));
+}
