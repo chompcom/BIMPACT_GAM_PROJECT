@@ -4,6 +4,7 @@
 #include "BoundaryCollision.h"
 #include "Utils/Utils.h"
 #include "Collision.h"
+#include <iostream>
 
 //simple contructor for gift class, for testing
 Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
@@ -13,7 +14,8 @@ Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
 	sprite{ sprite },
 	position{ position },
 	velocity { Vector2 {0.f, 0.f}},
-	pickUpState{ false }
+	pickUpState{ false },
+	shakeState{ false }
 {
 }
 
@@ -23,7 +25,8 @@ Gift::Gift(TexturedSprite sprite, Vector2 position) :
 	sprite{ sprite },
 	position{ position },
 	velocity{ Vector2 {0.f, 0.f} },
-	pickUpState{ false }
+	pickUpState{ false },
+	shakeState{ false }
 {	
 }
 
@@ -41,7 +44,6 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 		gift.pickUpState = true;
 		gift.velocity = Vector2{ 0.f, 0.f };
 	}
-
 	//if the gift is picked up, put it on the player's head
 	if (gift.pickUpState)
 	{
@@ -50,21 +52,27 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	//if not, calculate its position based on its velocity
 	else
 	{
+		//gift.sprite.position = gift.position;
 		gift.position += gift.velocity * deltaTime;
 		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, 1600, 900)) {
-			//gift.velocity.x /= -1.3;
-			//gift.velocity.y /= -1.3;
 			gift.velocity /= -1.3;
 		}
 		else {
-			//gift.velocity.x /= 1.1;
-			//gift.velocity.y /= 1.1;
 			gift.velocity /= 1.1;
 		}
+
+		//set the gift's sprite position to match its actual position if not 
+		//getting shaken
+		
+		
 	}
 	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
 	//set the gift's sprite position to match its actual position
-	gift.sprite.position = gift.position;
+	//gift.sprite.position = gift.position;
+
+	//set the gift's sprite position to match its actual position if not 
+	//getting shaken
+	if (!gift.shakeState) gift.sprite.position = gift.position;
 
 	return;
 }

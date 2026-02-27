@@ -17,6 +17,7 @@ public:
 	Vector2 position;
 	Vector2 velocity;
 	bool pickUpState; //true if the gift is currently picked up
+	bool shakeState;
 
 	//constructor
 	Gift(std::string name, Labels traits, TexturedSprite sprite, Vector2 position = Vector2{ 0.f, 0.f });

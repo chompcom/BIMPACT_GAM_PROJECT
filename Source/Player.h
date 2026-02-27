@@ -11,6 +11,7 @@ public:
 	TexturedSprite sprite; 
 	f32 throwStrength; //throw strength modifier
 	f32 speed; //movement speed modifier
+	s16 health; 
 	Vector2 position;
 	Vector2 direction; //direction player is facing
 	bool pickUpState; //true if the player is holding a gift
@@ -18,6 +19,7 @@ public:
 	Gift * heldGift; //points to the gift the player is holding
 	f32 throwForce; //amount of force that will be applied to the gift thrown
 	f32 pickUpCooldown; //counter for when the player can pick up a gift
+	f32 invulnerableTimer;
 	
 	//constructor
 	Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
@@ -25,3 +27,5 @@ public:
 };
 
 void UpdatePlayer(Player & player, f32 deltaTime);
+
+void playerTakesDamage(Player & player);
