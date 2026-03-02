@@ -103,6 +103,10 @@ void TestLoad()
 	globalTransferData.player = &player;
 
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+
+	
+
+
 }
 
 void TestInit()
