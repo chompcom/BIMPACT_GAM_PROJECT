@@ -14,6 +14,7 @@
 
 #include "RoomData.h"
 #include "Gift.h"		// ????
+#include "Boss.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -103,30 +104,36 @@ namespace mapRooms
 		currentRoomData.giftList.clear();
 	}
 
-	void Room::Init(RoomType rmType) {
+	void Room::Init(RoomType roomType) {
 
 		//rmType = RoomType::Normal;
 
 		if (this->rmType == RoomType::Empty) {
-			this->rmType = rmType;
+			this->rmType = roomType;
 		}
+		if (rmType == RoomType::Normal) {
+			somethingelse.neutral = WalkLeft;
+			somethingelse.happy = WalkToTarget;
+			somethingelse.angry = WalkRight;
+			currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+			for (Enemy* i : currentRoomData.enemyList) {
+				i->ChangeState(EnemyStates::ES_NEUTRAL);
+			}
 
-		somethingelse.neutral = WalkLeft;
-		somethingelse.happy = WalkToTarget;
-		somethingelse.angry = WalkRight;
-		currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-		for (Enemy* i : currentRoomData.enemyList){
-			i->ChangeState(EnemyStates::ES_NEUTRAL);
+			// Gifts here (1 Gift per room for now)
+			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
+			//Vector2 giftPos{ 200.0f, 450.0f };
+			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+
+
+			currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
 		}
-
-		// Gifts here (1 Gift per room for now)
-		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-		//Vector2 giftPos{ 200.0f, 450.0f };
-		//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-		//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
-		
-		currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
+		if (rmType == RoomType::Boss) {
+			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 5.0f, 4.0f, 3.0f} };
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), currentRoomData, attackData);
+			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+		}
 		
 	} 
 	void Room::Update(float dt) {
@@ -505,7 +512,8 @@ namespace mapRooms
 
 			// Mark next room for exist
 			if (nextRoom != nullptr) {
-				nextRoom->Init();
+				//nextRoom->Init();
+				nextRoom->rmType = RoomType::Normal;
 			}
 
 
@@ -543,6 +551,10 @@ namespace mapRooms
 
 		// Mark Boss
 		GetRoom(bossIdx% gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
+
+		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
+			if (visited[idx]) GetRoom(idx % gridSize, idx / gridSize)->Init(GetRoom(idx % gridSize, idx / gridSize)->rmType);
+		}
 	}
 
 	int Map::GetGridSize() const {
