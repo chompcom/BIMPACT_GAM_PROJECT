@@ -14,6 +14,7 @@
 
 #include "RoomData.h"
 #include "Gift.h"		// ????
+#include "Boss.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -103,30 +104,37 @@ namespace mapRooms
 		currentRoomData.giftList.clear();
 	}
 
-	void Room::Init(RoomType rmType) {
+	void Room::Init(RoomType roomType) {
 
 		//rmType = RoomType::Normal;
 
+		std::cout << static_cast<int>(this->rmType) << '\n';
+
 		if (this->rmType == RoomType::Empty) {
-			this->rmType = rmType;
+			this->rmType = roomType;
 		}
+		if (rmType == RoomType::Normal) {
+			somethingelse.neutral = WalkLeft;
+			somethingelse.happy = WalkToTarget;
+			somethingelse.angry = WalkRight;
+			currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+			for (Enemy* i : currentRoomData.enemyList) {
+				i->ChangeState(EnemyStates::ES_NEUTRAL);
+			}
 
-		somethingelse.neutral = WalkLeft;
-		somethingelse.happy = WalkToTarget;
-		somethingelse.angry = WalkRight;
-		currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-		for (Enemy* i : currentRoomData.enemyList){
-			i->ChangeState(EnemyStates::ES_NEUTRAL);
+			// Gifts here (1 Gift per room for now)
+			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
+			//Vector2 giftPos{ 200.0f, 450.0f };
+			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+
+			currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
 		}
-
-		// Gifts here (1 Gift per room for now)
-		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-		//Vector2 giftPos{ 200.0f, 450.0f };
-		//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-		//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
-		
-		currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
+		if (rmType == RoomType::Boss) {
+			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 5.0f, 4.0f, 3.0f} };
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), currentRoomData, attackData);
+			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+		}
 		
 	} 
 	void Room::Update(float dt) {
@@ -243,14 +251,20 @@ namespace mapRooms
 
 
 		rooms.clear();
-		rooms.resize(gridSize * gridSize);	// Grid generated
+		rooms.resize(gridSize * gridSize);	// Grid generated, calls upon default constructor (no init rooms yet)
 
 		transferData = &globalSceneData;
 
 		//somemesh = CreateSquareMesh();		// Remember to unfuck this
-		ResetRooms();						// Ensure rooms are nothing;
-		GenerateRooms();
+		ResetRooms();							// Ensure rooms are nothing;
+		GenerateRooms();						// Generate, links and init rooms.
 		// Probably generate other room types???
+
+
+		//std::cout << rooms.size();
+		//for (Room& curRoom : rooms) {
+		//	std::cout << static_cast<int>(curRoom.rmType);
+		//}
 
 		// Load available Pngs
 		LoadRoomArtLists();
@@ -409,8 +423,9 @@ namespace mapRooms
 
 		// Random DFS until roomVisits reached or out of expansion
 		while (!stack.empty() && visitedCount < roomsVisit) {
-			int currentIdx = stack.back();
-			int curX = currentIdx % gridSize, curY = currentIdx / gridSize;
+			int currentIdx = stack.back();	// Get current Room
+			int curX = currentIdx % gridSize, curY = currentIdx / gridSize;	// Get x, y value of 2d room array
+			
 
 			int neighbourIdx[4]{}, neighbourX[4]{}, neighbourY[4]{}, neighCount{};
 
@@ -505,7 +520,8 @@ namespace mapRooms
 
 			// Mark next room for exist
 			if (nextRoom != nullptr) {
-				nextRoom->Init();
+				//nextRoom->Init(); // move this after everything? if room != empty
+				nextRoom->rmType = RoomType::Normal;
 			}
 
 
@@ -543,6 +559,18 @@ namespace mapRooms
 
 		// Mark Boss
 		GetRoom(bossIdx% gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
+
+		// Init all rooms now;
+		//for (Room curRoom : this->rooms) {
+		//	if (curRoom.rmType != RoomType::Empty) {
+		//		curRoom.Init(curRoom.rmType);	// init room here
+		//	}
+		//}
+
+		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
+			if (visited[idx]) GetRoom(idx % gridSize, idx / gridSize)->Init(GetRoom(idx % gridSize, idx / gridSize)->rmType);
+		}
+
 	}
 
 	int Map::GetGridSize() const {
@@ -579,49 +607,6 @@ namespace mapRooms
 	}
 
 	// FOR DEBUGGING PURPOSE
-	//void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
-	//{
-	//	if (!squareMesh) return;
-	//	if (gridSize <= 0) return;
-
-	//	float minX = AEGfxGetWinMinX();
-	//	float maxY = AEGfxGetWinMaxY();
-
-	//	float cell = 18.0f;
-	//	float gap = 4.0f;
-
-	//	// Top-left corner anchor
-	//	float startXPix = minX + 30.0f;
-	//	float startYPix = maxY - 30.0f;
-
-	//	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	//	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	//	AEGfxSetTransparency(1.0f);
-
-	//	for (int y = 0; y < gridSize; ++y)
-	//	{
-	//		for (int x = 0; x < gridSize; ++x)
-	//		{
-	//			int idx = GetRoomIdx(x, y);
-	//			Room const& rm = rooms[idx];
-
-	//			if (rm.rmType == RoomType::Empty) continue;	// Ignore Empty rooms
-
-	//			Color c{ 0.6f, 0.6f, 0.6f, 0.85f }; // Normal
-
-	//			if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };
-	//			if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };
-
-	//			if (currentRoom == &rooms[idx])   c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
-
-	//			float px = startXPix + x * (cell + gap) + cell * 0.5f;
-	//			float py = startYPix - y * (cell + gap) - cell * 0.5f;
-
-	//			Sprite tile(squareMesh, Vector2{ px, py }, Vector2{ cell, cell }, c);
-	//			tile.RenderSprite();
-	//		}
-	//	}
-	//}
 	// Render map was done using AI cuz implementation details are quite cmi. Will analyze it and do my own function of it.
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
 	{
@@ -631,6 +616,7 @@ namespace mapRooms
 		// ---------- 1) Build reachable set via BFS over pointer-links ----------
 		std::vector<bool> reachable(static_cast<size_t>(gridSize * gridSize), false);
 
+		// Questionable sequence
 		if (currentRoom)
 		{
 			// Find currentRoom index by pointer difference (works because rooms is a contiguous vector)
