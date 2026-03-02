@@ -3,7 +3,11 @@
 #include "AEEngine.h"
 
 #include <unordered_map>
+#include <iostream>
 
+#include "json/json.h"
+#include <fstream>
+#include <string>
 
 namespace DataLoader {
 
@@ -17,11 +21,38 @@ namespace DataLoader {
 	using EnemyPair = std::pair<std::string, EnemyType>;
 	static EnemyTypeList enemyTypes{};
 
+	static Json::Value theGuy;
+
 	void Load() {
 		squareMesh = CreateSquareMesh();
 		textures.reserve(5);
 		enemyTypes.reserve(5);
-		
+		std::ifstream ifs{"Assets/test.json"};
+
+		if (ifs.is_open()) {
+			std::cout << "ok there's something!" << std::endl;
+			ifs >> theGuy; //Take the value!
+
+			//std::cout << theGuy["enemies"][0]["name"];
+
+			enemyTypes.reserve(theGuy["enemies"].size());
+
+			for (Json::Value& name : theGuy["enemies"]) {
+
+				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
+	
+				enemyTypes.insert({
+					name["name"].asString(),
+					tmp
+					});
+
+				//std::cout << "name: " << name["name"] << std::endl;
+			}
+
+			for (EnemyPair const& type : enemyTypes) {
+				std::cout << type.first << std::endl;
+			}
+		}
 	}
 
 	TexturedSprite CreateTexture(std::string filename)
@@ -60,4 +91,4 @@ namespace DataLoader {
 		return squareMesh;
 	}
 
-}
+} //end DataLoader

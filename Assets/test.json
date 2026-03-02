@@ -1,0 +1,12 @@
+{
+	"enemies" :[
+		{
+			"name" : "Booger",
+			"likes": ["Dirty"]
+		},
+		{
+			"name" : "Snowman",
+			"likes": ["Cold"]
+		}
+	]
+}

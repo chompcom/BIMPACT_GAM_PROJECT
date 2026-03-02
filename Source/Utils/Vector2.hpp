@@ -166,22 +166,5 @@ public:
         return Vector2(myx, myy);
     }
 
-    //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(float length) const;
-    //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(double length) const;
-    //Returns the vector with its length never exceeding the length provided
-    const Vector2& ClampLength(int length) const;
 };
 
-const Vector2& Vector2::ClampLength(float length) const{
-    return this->LengthSq() > length * length ? this->Normalized() * length : *this;
-}
-//Returns the vector with its length never exceeding the length provided
-const Vector2& Vector2::ClampLength(double length) const{
-    return this->ClampLength(static_cast<float>(length));
-}
-//Returns the vector with its length never exceeding the length provided
-const Vector2& Vector2::ClampLength(int length) const{
-    return this->ClampLength(static_cast<float>(length));
-}
