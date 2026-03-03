@@ -4,7 +4,8 @@
 enum class GridType {
 	EMPTY,
 	WALL,
-	DOOR
+	DOOR,
+	NUM_TYPES
 
 };
 
@@ -24,5 +25,6 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 	bool IsValid(int x, int y) const;
+	bool IsDoor(int x, int y) const;
 };
 

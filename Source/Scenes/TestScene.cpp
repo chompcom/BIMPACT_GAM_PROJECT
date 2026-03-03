@@ -102,6 +102,7 @@ void TestLoad()
 	globalTransferData.giftList.clear();
 	globalTransferData.player = &player;
 
+	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 
 	
@@ -135,6 +136,7 @@ void TestDraw()
 
 		for (Gift* g : roomData.giftList)   if (g) g->sprite.RenderSprite();
 		for (Enemy* e : roomData.enemyList) if (e) e->sprite.RenderSprite();
+		if (roomData.boss) roomData.boss->sprite.RenderSprite();
 
 		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
 		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
@@ -235,6 +237,10 @@ void TestUpdate(float dt)
 		}
 	}
 
+	if (roomData.boss) {
+		roomData.boss->Update(player, dt);
+		roomData.boss->sprite.UpdateTransform();
+	}
 
 	// Gifts and Enemy Check
 	for (Gift* gift : currentRoom->currentRoomData.giftList) {
