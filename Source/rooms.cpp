@@ -135,7 +135,7 @@ namespace mapRooms
 	} 
 	void Room::Update(float dt) {
 		for (Enemy* i : currentRoomData.enemyList) {
-			i->Update(dt);
+			//i->Update(dt);
 		}
 
 
