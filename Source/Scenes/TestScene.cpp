@@ -19,12 +19,13 @@ TexturedSprite* thing = nullptr;
 
 AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
+AEGfxTexture* shadowpng = nullptr;
 AEGfxTexture* heartpng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
 s8 font = 0;
 
-Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
+Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 
 
 //Gift gift{ "boat", {"happy"}, Sprite()};
@@ -33,7 +34,7 @@ Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1
 //Gift gift2{"bad", {"sad"}, TexturedSprite(sqmesh, nullptr, Vector2(), Vector2())};
 
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
-Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1})};
+Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1}),TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1}) };
 mapRooms::Map gameMap;          // Init var for map
 static RoomData globalTransferData{};
 /* PSUDEOCODE SONE
@@ -49,6 +50,7 @@ void TestLoad()
 	sqmesh = CreateSquareMesh();
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
+	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
 
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
@@ -83,8 +85,9 @@ void TestLoad()
 
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
-	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
-);
+	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 });
+	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{ 1,1,1,0 });
+
 	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
 	//gift2.sprite = DataLoader::CreateTexture("Assets/pattyfish.png");
 
@@ -134,14 +137,29 @@ void TestDraw()
 		RoomData& carryData = gameMap.GetTransferData();
 
 		for (Gift* g : roomData.giftList)   if (g) g->sprite.RenderSprite();
-		for (Enemy* e : roomData.enemyList) if (e) e->sprite.RenderSprite();
-		if (roomData.boss) roomData.boss->sprite.RenderSprite();
+		for (Enemy* e : roomData.enemyList) {
+			if (e) {
+				e->shadow.RenderSprite();
+				e->sprite.RenderSprite();
+			}
+		}
+		if (roomData.boss) {
+			roomData.boss->shadow.RenderSprite();
+			roomData.boss->sprite.RenderSprite();
+
+		}
 
 		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
-		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
+		for (Enemy* e : carryData.enemyList) {
+			if (e) {
+				e->shadow.RenderSprite();
+				e->sprite.RenderSprite();
+			}
+		}
 	}
 
-	player.sprite.RenderSprite(true);
+	player.shadow.RenderSprite();
+	player.sprite.RenderSprite();
 	//rock.sprite.RenderSprite();
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
@@ -168,6 +186,7 @@ void TestUnload()
 	}
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
+	AEGfxTextureUnload(shadowpng);
 	AEGfxTextureUnload(heartpng);
 
 	AEGfxDestroyFont(font);
@@ -192,6 +211,7 @@ void TestUpdate(float dt)
 	// Player update
 	UpdatePlayer(player, dt);
 	player.sprite.UpdateTransform();
+	player.shadow.UpdateTransform();
 
 	//to test damage
 	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
@@ -239,6 +259,7 @@ void TestUpdate(float dt)
 	if (roomData.boss) {
 		roomData.boss->Update(player, dt);
 		roomData.boss->sprite.UpdateTransform();
+		roomData.boss->shadow.UpdateTransform();
 	}
 
 	// Gifts and Enemy Check

@@ -73,6 +73,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		}
 
 		boss->sprite.position += direction.Normalized() * 60 * dt;
+		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
 
 		interval += dt;
 		boss->sprite.UpdateTransform();
@@ -118,6 +119,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		interval += dt;
 		if (interval < 0.75f * jumpInterval) {
 			boss->sprite.position = Vector2{ target.x, target.y + 180 } + Vector2{ 0, -1 } * 60 * interval;
+			boss->shadow.position = Vector2{ target.x, target.y - 35 };
 		}
 		if (interval >= 0.75f * jumpInterval) {
 			if (CollisionIntersection_RectRect(target, boss->sprite.scale, Vector2{},

@@ -4,8 +4,9 @@
 #include "Traits.h"
 #include "BoundaryCollision.h"
 #include <set>
-Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}
+Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
+	: type{ enemyType }, sprite{ enemySprite }, shadow{ shadowSprite }, currentHealth { enemyType.health }, 
+	state{ initialState }, currentBehavior{ nullptr }, target{}
 {
 		ChangeState(initialState);
 //		mesh = CreateSquareMesh();
@@ -78,16 +79,20 @@ void EnemyType::AddAngry(std::vector<Command> bunch){
 
 void WalkLeft(Enemy& me, float dt) {
 	me.sprite.position += Vector2(-50, 0) * dt;
+	me.shadow.position += Vector2(-50, 0) * dt;
 	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
 		me.currentBehavior = WalkRight;
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 }
 
 void WalkRight(Enemy& me, float dt){
 	me.sprite.position += Vector2(50,0) * dt;
+	me.shadow.position += Vector2(50, 0) * dt;
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900) ? me.currentBehavior = WalkLeft : 0;
 	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 }
 
 void WalkToTarget(Enemy& me, float dt) {
@@ -95,10 +100,15 @@ void WalkToTarget(Enemy& me, float dt) {
 	if ( me.sprite.position.Distance(me.target) <= 160.f) {
 		Vector2 newTarget = me.target + (me.sprite.position - me.target).Normalized() * 160.f;
 		me.sprite.position += (newTarget-me.sprite.position)* 10 *dt;
+		me.shadow.position = Vector2{ me.sprite.position.x, me.sprite.position.y - 35 };
 	}
-	else 
-	me.sprite.position += direction.Normalized() * 50 * dt;
+	else {
+		me.sprite.position += direction.Normalized() * 50 * dt;
+		me.shadow.position += direction.Normalized() * 50 * dt;
+	}
+
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.color = Color{ 0.0f,1.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 } 

@@ -7,9 +7,10 @@
 #include <iostream>
 
 //contructor for player class
-Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
 	//initialiser list
-	sprite{ sprite },
+	sprite{ playerSprite },
+	shadow{ shadowSprite },
 	throwStrength{ throwStrength },
 	speed{ speed }, 
 	health { 3 },
@@ -75,6 +76,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 
 		//set the player's sprite position to match its actual position
 		player.sprite.position = player.position;
+		player.shadow.position = Vector2{ player.sprite.position.x, player.sprite.position.y - 45 };
 	}
 
 	//if player is trying to move, set their direction

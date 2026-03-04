@@ -102,6 +102,11 @@ namespace mapRooms
 			g = nullptr;
 		}
 		currentRoomData.giftList.clear();
+
+		if (currentRoomData.boss) {
+			delete currentRoomData.boss;
+			currentRoomData.boss = nullptr;
+		}
 	}
 
 	void Room::Init(RoomType roomType) {
@@ -117,8 +122,9 @@ namespace mapRooms
 			somethingelse.neutral = WalkLeft;
 			somethingelse.happy = WalkToTarget;
 			somethingelse.angry = WalkRight;
-			currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+			currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
+				i->shadow.position = Vector2{ 0.f, -35.f };
 				i->ChangeState(EnemyStates::ES_NEUTRAL);
 			}
 
@@ -132,8 +138,9 @@ namespace mapRooms
 		}
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 5.0f, 4.0f, 3.0f} };
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 		}
 		
 	} 

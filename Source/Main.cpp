@@ -54,6 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     AESysSetWindowTitle("UI Demo!");
     GSM_Initialize(GS_LEVEL1);
     // Game Loop
+    //_CrtSetBreakAlloc(551);
     while (gGameRunning)
     {
        
