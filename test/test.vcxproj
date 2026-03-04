@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Almanac.cpp" />
     <ClCompile Include="..\Source\BoundaryCollision.cpp" />
     <ClCompile Include="..\Source\Collision.cpp" />
     <ClCompile Include="..\Source\Enemy.cpp" />
@@ -29,6 +30,7 @@
     <ClCompile Include="..\Source\rooms.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Almanac.h" />
     <ClInclude Include="..\Source\BoundaryCollision.h" />
     <ClInclude Include="..\Source\Collision.h" />
     <ClInclude Include="..\Source\Behaviour\Behaviours.hpp" />
