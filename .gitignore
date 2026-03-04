@@ -19,3 +19,6 @@ tags
 bin
 Debug
 Release
+
+!packages/JsonCpp.Windows.1.9.2/build/native/x64/Debug
+!packages/JsonCpp.Windows.1.9.2/build/native/x64/Release
