@@ -16,3 +16,6 @@ int Grid::GetWidth() const {
 bool Grid::IsValid(int x, int y) const {
 	return  tiles.at(y).at(x).type ==  GridType::EMPTY; // if i use at it is slower but check bounds compared to Tiles[w][h], see performance first and change if needed 
 }
+bool Grid::IsDoor(int x, int y) const {
+	return  tiles.at(y).at(x).type == GridType::DOOR; // if i use at it is slower but check bounds compared to Tiles[w][h], see performance first and change if needed 
+}
