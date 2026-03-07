@@ -29,7 +29,7 @@ std::vector<TexturedSprite> healthIcons;
 TexturedSprite * almanacIcon = nullptr;
 
 //TexturedSprite* almanacPage = nullptr;
-Almanac almanac;
+Almanac almanac {};
 //std::vector<TexturedSprite> almanacPageSprites;
 
 s8 font = 0;
@@ -56,7 +56,7 @@ vector<gift*> gift;
 //almanac vector
 //std::vector<AlmanacEntry> almanacVector;
 //vector of all enemytypes for the almanac
-std::vector<EnemyType> enemyTypes;
+std::vector<std::string> enemyTypeNames {"Pop Rocks", "Bouncy Spikes", "Slimey"};
 
 void TestLoad()
 {
@@ -69,7 +69,7 @@ void TestLoad()
 
 	//almanacpagepng = AEGfxTextureLoad("Assets/AlmanacScreen/openAlmanacPlant.png");
 
-	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
@@ -83,11 +83,12 @@ void TestLoad()
 	healthIcons[1].scale = Vector2{ 64.f,64.f };
 	healthIcons[2].scale = Vector2{ 64.f,64.f };
 
-	enemyTypes.push_back(rocktype);
+	//enemyTypes.push_back(rocktype);
+
 
 	LoadAlmanacPages(almanac);
 	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
-	LoadAlmanacEntries(almanac, enemyTypes);
+	LoadAlmanacEntries(almanac, enemyTypeNames);
 
 	//almanacIcon = DataLoader::CreateTexture("Assets/almanac.png");
 
@@ -167,7 +168,7 @@ void TestDraw()
 	
 	renderPlayerLives(player, healthIcons, font);
 	(*almanacIcon).RenderSprite();
-	RenderAlmanacPages(almanac);
+	RenderAlmanacPages(almanac, font);
 
 	AlmanacInputs(almanac, sqmesh);
 

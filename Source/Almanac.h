@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "Enemy.h"
 #include "Almanac.h"
 
@@ -10,9 +11,11 @@ public:
 	std::string description;
 	std::string area;
 	TexturedSprite enemyEntrySprite;
+	Vector2 pictureScale;
 	bool unlocked;
 
-	AlmanacEntry(EnemyType enemyType, std::string description, std::string area, TexturedSprite enemyEntrySprite);
+	AlmanacEntry(EnemyType enemyType, std::string description, std::string area, 
+		TexturedSprite enemyEntrySprite, Vector2 pictureScale = Vector2(100,100));
 
 };
 
@@ -31,8 +34,9 @@ public:
 
 void LoadAlmanacPages(Almanac & almanac);
 
-void LoadAlmanacEntries(Almanac & almanac, std::vector<EnemyType> allEnemyTypes);
+//void LoadAlmanacEntries(Almanac & almanac, std::vector<EnemyType> allEnemyTypes);
+void LoadAlmanacEntries(Almanac& almanac, std::vector<std::string> allEnemyTypes);
 
-void RenderAlmanacPages(Almanac & almanac);
+void RenderAlmanacPages(Almanac & almanac, s8 font);
 
 void AlmanacInputs(Almanac& almanac, AEGfxVertexList* removeLater);

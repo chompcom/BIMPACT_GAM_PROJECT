@@ -1,0 +1,56 @@
+{
+	"enemyTypes": [
+		{
+			"name": "Pop Rocks",
+			"health": 2,
+			"damage": 1,
+			"traits": [ "Sweet", "Heaty" ],
+			"likes": [ "Sweet", "Heaty", "Fun" ],
+			"dislikes": [ "Boring", "Bitter", "Cold" ]
+		},
+		{
+			"name": "Bouncy Spikes",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Fun" ],
+			"likes": [ "Fun", "Friendly" ],
+			"dislikes": [ "Boring", "Hard" ]
+		},
+		{
+			"name": "Slimey",
+			"health": 3,
+			"damage": 0,
+			"traits": [ "Fluid", "Dirty" ],
+			"likes": [ "Fluid", "Dirty" ],
+			"dislikes": [ "Clean", "Cold", "Hard" ]
+		}
+	],
+
+	"almanacEntries": [
+		{
+			"name": "Pop Rocks",
+			"description": "Explodes when nearby",
+			"area": "normal",
+			"spritePath": "Assets/poprocks.png",
+			"xPictureScale": 100,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Bouncy Spikes",
+			"description": "AAAAAAAAA AAAAAA",
+			"area": "normal",
+			"spritePath": "Assets/pattyfish.png",
+			"xPictureScale": 150,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Slimey",
+			"description": "Very sticky",
+			"area": "plant",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 150,
+			"yPictureScale": 100
+		}
+	]
+
+}

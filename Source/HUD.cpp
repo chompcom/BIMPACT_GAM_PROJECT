@@ -24,7 +24,7 @@ void checkIfAlmanacClicked(TexturedSprite const& almanacSprite, Almanac & almana
 	s32 cursorPositionX, cursorPositionY;
 	AEInputGetCursorPosition(&cursorPositionX, &cursorPositionY);
 
-	if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
+	if (AEInputCheckReleased(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
 	{
 		//std::cout << "click!\n";
 		almanac.isOpen = true;
