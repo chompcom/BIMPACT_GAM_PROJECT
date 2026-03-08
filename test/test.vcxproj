@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp" />
     <ClCompile Include="..\Source\Boss.cpp" />
     <ClCompile Include="..\Source\BoundaryCollision.cpp" />
     <ClCompile Include="..\Source\Collision.cpp" />
@@ -34,7 +35,7 @@
     <ClInclude Include="..\Source\Boss.h" />
     <ClInclude Include="..\Source\BoundaryCollision.h" />
     <ClInclude Include="..\Source\Collision.h" />
-    <ClInclude Include="..\Source\Behaviour\Behaviours.hpp" />
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h" />
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\FSM.h" />
     <ClInclude Include="..\Source\GameStateList.h" />

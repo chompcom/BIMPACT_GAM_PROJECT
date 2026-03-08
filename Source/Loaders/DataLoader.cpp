@@ -9,6 +9,36 @@
 #include <fstream>
 #include <string>
 
+#include "Behaviour/Behaviours.h"
+
+
+//Helper function space!!
+namespace {
+
+	void AddBehaviours(EnemyType& tmp, Json::Value& source, std::string const& type) {
+
+		for (Json::Value& thing : source[type]) {
+			BundledBehaviour behavs{};
+			for (Json::Value commernd : thing["actions"]) {
+				std::cout << commernd.asString() << std::endl;
+				behavs.push_back(GetCommand(commernd.asString()));
+			}
+
+			if (type == "happy")
+				tmp.AddHappy(GetFlag(thing["context"].asString()), behavs);
+
+			if (type == "neutral")
+				tmp.AddNeutral(GetFlag(thing["context"].asString()), behavs);
+
+			if (type == "angry")
+				tmp.AddAngry(GetFlag(thing["context"].asString()), behavs);
+		}
+		
+	}
+
+}
+
+
 namespace DataLoader {
 
 	static AEGfxVertexList* squareMesh = nullptr;
@@ -28,6 +58,7 @@ namespace DataLoader {
 		textures.reserve(5);
 		enemyTypes.reserve(5);
 		std::ifstream ifs{"Assets/test.json"};
+		InitCommands();
 
 		if (ifs.is_open()) {
 			std::cout << "ok there's something!" << std::endl;
@@ -40,7 +71,24 @@ namespace DataLoader {
 			for (Json::Value& name : theGuy["enemies"]) {
 
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
+
+				//std::vector<Json::Value> names 
+
+				AddBehaviours(tmp, name, "happy");
+				AddBehaviours(tmp, name, "angry");
+				AddBehaviours(tmp, name, "neutral");
+
+				tmp.health = name["health"].asFloat();
+				tmp.damage = name["damage"].asFloat();
+				tmp.speed = name["speed"].asFloat();
+				tmp.detectionRadius = name["detectionRadius"].asFloat();
+				tmp.safeRadius = name["safeRadius"].asFloat();
+
+				for (Json::Value& thing : name["likes"]){
+					tmp.likes.insert(thing.asString());
+				}
 	
+
 				enemyTypes.insert({
 					name["name"].asString(),
 					tmp
@@ -68,11 +116,11 @@ namespace DataLoader {
 
 	
 
-	EnemyType GetEnemyType(std::string name)
+	EnemyType const& GetEnemyType(std::string name)
 	{
 		EnemyTypeList::const_iterator finder = enemyTypes.find(name); 
 		if (finder == enemyTypes.end()) {
-			return EnemyType{"default",100,0,{},{},{}};
+			return enemyTypes.find("Default")->second;
 		}
 		return finder->second;
 	}

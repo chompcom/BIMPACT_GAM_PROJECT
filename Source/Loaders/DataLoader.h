@@ -16,6 +16,6 @@ namespace DataLoader {
 
 	//returns a copy of an existing data type.
 	//returns the default type if not existent!
-	EnemyType GetEnemyType(std::string name);
+	EnemyType const& GetEnemyType(std::string name);
 
 };

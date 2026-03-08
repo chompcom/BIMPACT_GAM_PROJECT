@@ -4,6 +4,8 @@
 #include <string>
 #include "Traits.h"
 #include "RoomData.h"
+#include <map>
+#include "Player.h"
 
 enum EnemyStates {
 	ES_HAPPY,
@@ -17,6 +19,15 @@ class Enemy;
 typedef void Behaviour(Enemy&,  float dt);
 typedef Behaviour* Command;
 
+//it's for checking flags and stuff
+//i don't think i need delta time? i really doubt it.
+typedef bool FlagCheckItself(Enemy&);
+typedef FlagCheckItself* FlagCheck;
+
+using BundledBehaviour = std::vector<Command>;
+
+using FSM = std::vector<std::pair<FlagCheck, BundledBehaviour>>;
+
 struct RoomData;
 
 class Enemy {
@@ -25,11 +36,32 @@ class Enemy {
 		TexturedSprite sprite;
 		f32 currentHealth;
 		EnemyStates state;
-		Vector2 target;
+//		Vector2 target;
+
+		//Target contains information about the target so you can do things to it
+		struct Target {
+			Vector2* position; //!< Points to target location
+			
+			//Well there's only players and enemies as entities you see..
+			bool isPlayer;
+
+			//Sometimes the target is already dead. We don't care about them.
+			bool isActive;
+
+			Target();
+			~Target();
+
+			//So i can just set the target to the guy
+			Target& operator=(Enemy& them);
+			Target& operator=(Player& them);
+
+
+		} target;
+
 		//points to the room it should be inside, so that it knows whats going on inside!
 		const RoomData* roomData;
 
-		Command currentBehavior;
+		FSM currentBehavior;
 
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
@@ -45,29 +77,36 @@ public:
 	std::string name;
 	f32 health;
 	f32 damage;
+	f32 speed;
+	
+	//! Radius used for "Target___InDetectionRadius"
+	f32 detectionRadius;
+
+	//! Radius used for "FollowingPlayer" or anything related to friendly range
+	f32 safeRadius;
+
+	//! 
+
 
 	Labels traits;
 	Labels likes;
 	Labels dislikes;
 
-	Command neutral;
-	Command happy;
-	Command angry;
+	FSM happy;
+	FSM angry;
+	FSM neutral;
+
+
 
 	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits, const Labels& likes, const Labels& dislikes);
 
-	void AddNeutral(Command cmd);
-	void AddNeutral(std::vector<Command> bunch);
+	void AddNeutral(FlagCheck const& checker, BundledBehaviour const& behaviours);
 
-	void AddHappy(Command cmd);
-	void AddHappy(std::vector<Command> bunch);
+	void AddAngry(FlagCheck const& checker, BundledBehaviour const& behaviours);
 
-	void AddAngry(Command cmd);
-	void AddAngry(std::vector<Command> bunch);
+	void AddHappy(FlagCheck const&checker, BundledBehaviour const&behaviours);
+
 };
 
 
-void WalkLeft(Enemy& me, float dt);
-void WalkRight(Enemy& me, float dt);
-void WalkToTarget(Enemy& me, float dt);
 

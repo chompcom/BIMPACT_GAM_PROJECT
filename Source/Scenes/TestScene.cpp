@@ -91,9 +91,9 @@ void TestLoad()
 	rock.sprite = *thing;
 
 
-	rocktype.neutral = WalkLeft;
-	rocktype.happy = WalkRight;
-	rocktype.angry = WalkToTarget; 
+	//rocktype.neutral = WalkLeft;
+	//rocktype.happy = WalkRight;
+	//rocktype.angry = WalkToTarget; 
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 
 	// Global Data Here
@@ -211,14 +211,14 @@ void TestUpdate(float dt)
 	// Update Enemies (carryData version is only for "Friends")
 	for (Enemy* e : roomData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
 
 	for (Enemy* e : carryData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
@@ -303,6 +303,7 @@ void TestUpdate(float dt)
 	if (player.position != positionResetTest) {
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
+			e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
 		}
 	}
 	
