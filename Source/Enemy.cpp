@@ -5,8 +5,8 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
-Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
+Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
+	: type{ enemyType }, sprite{ enemySprite }, shadow{ shadowSprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 {
 		ChangeState(initialState);
 }
