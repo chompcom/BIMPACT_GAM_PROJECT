@@ -20,6 +20,7 @@ class Boss {
 		f32 health;
 		f32 damage;
 		TexturedSprite sprite;
+		TexturedSprite shadow;
 		f32 currentHealth;
 		
 		std::unique_ptr<Boss_FSM> bossStateMachine;
@@ -27,8 +28,8 @@ class Boss {
 		//points to the room it should be inside, so that it knows whats going on inside!
 		const RoomData& roomData;
 
-		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, const RoomData& currentRoom, 
-			std::vector<AttackData> attackData);
+		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
+			const RoomData& currentRoom, std::vector<AttackData> attackData);
 		~Boss();
 
 		void Update(Player& player, f32 dt);

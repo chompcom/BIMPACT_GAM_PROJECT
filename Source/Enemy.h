@@ -34,6 +34,7 @@ class Enemy {
 	public:
 		const EnemyType& type;
 		TexturedSprite sprite;
+		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
 //		Vector2 target;
@@ -63,7 +64,7 @@ class Enemy {
 
 		FSM currentBehavior;
 
-		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
 
 		void Update(float dt);

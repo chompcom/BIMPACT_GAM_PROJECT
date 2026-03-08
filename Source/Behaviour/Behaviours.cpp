@@ -52,21 +52,27 @@ bool IsNotFollowingPlayer(Enemy& me) {
 
 void WalkLeft(Enemy& me, float dt) {
 	me.sprite.position += Vector2(-50, 0) * dt;
+	me.shadow.position = me.sprite.position - Vector2{ 0, 35 };
 	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 }
 
 void WalkRight(Enemy& me, float dt){
 	me.sprite.position += Vector2(50,0) * dt;
+	me.shadow.position = me.sprite.position - Vector2{ 0, 35 };
 	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 }
 
 void MoveToTarget(Enemy& me, float dt) {
 	Vector2 direction{ (*me.target.position - me.sprite.position) };
 	me.sprite.position += direction.Normalized() * me.type.speed * dt;
+	me.shadow.position = me.sprite.position - Vector2{ 0, 35 };
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
 } 
 
 void ApplySlowToTarget(Enemy& me, float dt) {
@@ -82,8 +88,11 @@ void CircleMove(Enemy& me, float dt) {
 	direction = Vector2{direction.y, -direction.x}; //the perpendicular
 
 	me.sprite.position += direction.Normalized() * me.type.speed * dt;
+	me.shadow.position = me.sprite.position - Vector2{ 0, 35 };
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
+	me.shadow.UpdateTransform();
+
 
 }
 
