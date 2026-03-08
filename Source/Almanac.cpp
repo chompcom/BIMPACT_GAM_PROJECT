@@ -81,12 +81,14 @@ void LoadAlmanacEntries(Almanac& almanac)
 {
 	almanac.entries.clear();
 	almanac.entries = DataLoader::GetAlmanacVector();
+	std::cout << "Size of Almanac after loading" << almanac.entries.size() << "\n";
 }
 
 //Only called in RenderAlmanacPages, renders the appropriate items ON the current page
 void RenderCurrentPage(Almanac & almanac, s8 font)
 {
 	float r {105.f / 255.f}, g {87.f / 255.f}, b{61.f / 255.f};
+	std::cout << almanac.currentPageNumber << " " << almanac.entries.size() << std::endl;
 	almanac.currentArea = (almanac.currentPageNumber) ? almanac.entries[almanac.currentPageNumber - 1].area : "main";
 	//entries
 	if (almanac.currentPageNumber <= almanac.maxPages && almanac.currentPageNumber > 0)
@@ -206,7 +208,8 @@ void RenderAlmanacPages(Almanac & almanac, s8 font)
 			case (0):
 				almanac.arrowSprites[0].RenderSprite();
 				//display lit up next when hovering mouse over it
-				if (IsCursorInRect(Vector2(583, -352), 74, 85)) almanac.arrowSprites[4].RenderSprite();
+				if (IsCursorInRect(Vector2(583, -352), 74, 85))
+					almanac.arrowSprites[4].RenderSprite();
 				break;
 			//last page
 			case (15):
