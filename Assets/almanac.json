@@ -1,0 +1,248 @@
+{
+	"enemyTypes": [
+		{
+			"name": "Pop Rocks",
+			"health": 2,
+			"damage": 1,
+			"traits": [ "Sweet", "Heaty" ],
+			"likes": [ "Sweet", "Heaty", "Fun" ],
+			"dislikes": [ "Boring", "Bitter", "Cold" ]
+		},
+		{
+			"name": "Bouncy Spikes",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Boring", "Idiotic" ],
+			"likes": [ "Boring" ],
+			"dislikes": [ "Fun", "Hard" ]
+		},
+		{
+			"name": "Goblin Knight",
+			"health": 3,
+			"damage": 2,
+			"traits": [ "Tempered", "Boring" ],
+			"likes": [ "Tempered", "Expensive" ],
+			"dislikes": [ "Cheap" ]
+		},
+		{
+			"name": "Tom",
+			"health": 1,
+			"damage": 0,
+			"traits": [ "Friendly" ],
+			"likes": [ "Friendly" ],
+			"dislikes": [ "Boring" ]
+		},
+		{
+			"name": "Slimey",
+			"health": 3,
+			"damage": 0,
+			"traits": [ "Fluid", "Dirty" ],
+			"likes": [ "Fluid", "Dirty" ],
+			"dislikes": [ "Clean", "Cold", "Hard" ]
+		},
+		{
+			"name": "Flytrap",
+			"health": 3,
+			"damage": 0,
+			"traits": [ "Idiotic" ],
+			"likes": [ "Idiotic", "Fluid", "Sweet" ],
+			"dislikes": [ "Heaty", "Bitter" ]
+		},
+		{
+			"name": "Chameleon",
+			"health": 3,
+			"damage": 0,
+			"traits": [ "Smart" ],
+			"likes": [ "Smart" ],
+			"dislikes": [ "Bitter", "Idiotic" ]
+		},
+		{
+			"name": "Soap",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Clean", "Hard" ],
+			"likes": [ "Clean" ],
+			"dislikes": [ "Dirty" ]
+		},
+		{
+			"name": "Sponge",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Clean" ],
+			"likes": [ "Clean", "Fluid" ],
+			"dislikes": [ "Dirty" ]
+		},
+		{
+			"name": "Crab Chef",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Smart", "Expensive" ],
+			"likes": [ "Sweet" ],
+			"dislikes": [ "Dirty" ]
+		},
+		{
+			"name": "Ice",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Cold", "Hard" ],
+			"likes": [ "Cold", "Fluid", "Clean" ],
+			"dislikes": [ "Heaty" ]
+		},
+		{
+			"name": "Snowman",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Cold", "Friendly", "Fun" ],
+			"likes": [ "Cold", "Fun" ],
+			"dislikes": [ "Heaty", "Sad" ]
+		},
+		{
+			"name": "Campfire",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Heaty", "Friendly" ],
+			"likes": [ "Heaty", "Friendly" ],
+			"dislikes": [ "Fluid", "Cold", "Hard" ]
+		},
+		{
+			"name": "THE OVEN",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Heaty", "Expensive", "Hard" ],
+			"likes": [ "Heaty", "Sweet", "Bitter" ],
+			"dislikes": [ "Fluid", "Cold", "Dirty" ]
+		},
+		{
+			"name": "Teensy Tiny Dragon",
+			"health": 3,
+			"damage": 1,
+			"traits": [ "Heaty", "Friendly", "Tempered" ],
+			"likes": [ "Heaty", "Friendly", "Fun", "Expensive" ],
+			"dislikes": [ "Fluid", "Cold", "Cheap" ]
+		}
+	],
+
+	"almanacEntries": [
+		{
+			"name": "Pop Rocks",
+			"description": "Explodes when nearby",
+			"area": "normal",
+			"spritePath": "Assets/poprocks.png",
+			"xPictureScale": 100,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Bouncy Spikes",
+			"description": "Pointy and Bouncy!",
+			"area": "normal",
+			"spritePath": "Assets/pattyfish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Goblin Knight",
+			"description": "Don't bother them!",
+			"area": "normal",
+			"spritePath": "Assets/pattyfish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Tom",
+			"description": "A chill guy",
+			"area": "normal",
+			"spritePath": "Assets/pattyfish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Slimey",
+			"description": "Very sticky",
+			"area": "plant",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Flytrap",
+			"description": "Very hungry",
+			"area": "plant",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Chameleon",
+			"description": "Hard to spot",
+			"area": "plant",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Soap",
+			"description": "Slows with its bubbles",
+			"area": "ocean",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Sponge",
+			"description": "Absorbant",
+			"area": "ocean",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Crab Chef",
+			"description": "Its pincers hurt",
+			"area": "ocean",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Ice",
+			"description": "Immbolises a single enemy",
+			"area": "cold",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Snowman",
+			"description": "Watch out for its snowballs!",
+			"area": "cold",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Campfire",
+			"description": "Warms anyone nearby",
+			"area": "hot",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "THE OVEN",
+			"description": "Bakes warm pastries",
+			"area": "hot",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		},
+		{
+			"name": "Teensy Tiny Dragon",
+			"description": "Awww! How cute!",
+			"area": "hot",
+			"spritePath": "Assets/veggiefish.png",
+			"xPictureScale": 110,
+			"yPictureScale": 100
+		}
+	]
+
+}
