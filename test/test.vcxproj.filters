@@ -63,10 +63,17 @@
     <ClCompile Include="..\Source\RoomData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Projectile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ProjectileManager.cpp">
     <ClCompile Include="..\Source\Boss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\FSM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -101,7 +108,7 @@
     <ClInclude Include="..\Source\BoundaryCollision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Behaviour\Behaviours.hpp">
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Scenes\TestScene.h">
@@ -125,6 +132,10 @@
     <ClInclude Include="..\Source\RoomData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Projectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ProjectileManager.h">
     <ClInclude Include="..\Source\Boss.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -1,12 +1,74 @@
 {
-	"enemies" :[
-		{
-			"name" : "Booger",
-			"likes": ["Dirty"]
+    "enemies":
+    [
+		{	"name": "Default",
+			"sprite": "Assets/poprocks.png",
+			"color": [255,255,255,255],
+			"damage": 0,
+			"speed" : 0,
+			"traits": [],
+			"likes" : [],
+			"dislikes": [],
+			"happy": {},
+			"neutral": {},
+			"angry": {}
 		},
-		{
-			"name" : "Snowman",
-			"likes": ["Cold"]
+		{	"name": "Booger",
+			"sprite": "Assets/booger.png",
+			"color": [255,255,255,255],
+			"damage": 0,
+			"speed" : 60,
+			"detectionRadius" : 40,
+			"safeRadius" : 300,
+			"likes" : ["Gross"],
+			"dislikes": ["Clean"],
+			"happy": [
+				{ "context": "IsTouchingTarget",
+					"actions": [
+					"ApplySlowToTarget",
+					"MoveToTarget"
+				]},
+				{ "context" : "IsNotFollowingPlayer",
+				 "actions":[
+					"TargetPlayer",
+					"MoveToTarget",
+					"TargetEnemyInDetectionRadius"
+				] },
+				{"context": "default",
+					"actions": [
+					"TargetPlayer",
+					"CircleMove",
+					"TargetEnemyInDetectionRadius"
+				] }
+			],
+			"neutral": [
+				{"context": "IsTouchingTarget",
+				"actions": [
+					"ApplySlowToTarget",
+					"MoveToTarget"	
+				]},
+				{"context": "default",
+				"actions": [ 
+				"TargetPlayer",
+				"Wander"
+				]}
+			],
+			"angry": [
+				{
+					"context" : "IsTouchingTarget",
+					"actions" : [
+						"ApplySlowToTarget",
+						"MoveToTarget"
+					]
+				},
+				{ "context" : "default",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget"
+					]
+				}
+			]
 		}
-	]
+    ]
 }
+    

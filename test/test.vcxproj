@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp" />
+    <ClCompile Include="..\Source\Almanac.cpp" />
     <ClCompile Include="..\Source\Boss.cpp" />
     <ClCompile Include="..\Source\BoundaryCollision.cpp" />
     <ClCompile Include="..\Source\Collision.cpp" />
@@ -23,6 +25,8 @@
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\Projectile.cpp" />
+    <ClCompile Include="..\Source\ProjectileManager.cpp" />
     <ClCompile Include="..\Source\RoomData.cpp" />
     <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
@@ -31,10 +35,11 @@
     <ClCompile Include="..\Source\rooms.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Almanac.h" />
     <ClInclude Include="..\Source\Boss.h" />
     <ClInclude Include="..\Source\BoundaryCollision.h" />
     <ClInclude Include="..\Source\Collision.h" />
-    <ClInclude Include="..\Source\Behaviour\Behaviours.hpp" />
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h" />
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\FSM.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
@@ -43,6 +48,8 @@
     <ClInclude Include="..\Source\HUD.h" />
     <ClInclude Include="..\Source\Player.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.h" />
+    <ClInclude Include="..\Source\Projectile.h" />
+    <ClInclude Include="..\Source\ProjectileManager.h" />
     <ClInclude Include="..\Source\RoomData.h" />
     <ClInclude Include="..\Source\Grid.h" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />

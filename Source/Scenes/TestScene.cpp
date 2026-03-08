@@ -11,21 +11,40 @@
 #include "../Loaders/DataLoader.h"
 #include "../Collision.h"
 #include "../RoomData.h"
+#include "Projectile.h"
+#include "ProjectileManager.h"
 #include "../HUD.h"
+#include "../almanac.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
+TexturedSprite* bulletSprite = nullptr;
+
 
 AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
 AEGfxTexture* shadowpng = nullptr;
+AEGfxTexture* bulletpng = nullptr;
+AEGfxTexture* aoepng = nullptr;
 AEGfxTexture* heartpng = nullptr;
+AEGfxTexture* almanacpng = nullptr;
+AEGfxTexture* pDoorTex = nullptr;	// Door image
+
+//AEGfxTexture* almanacpagepng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
+TexturedSprite * almanacIcon = nullptr;
+
+//TexturedSprite* almanacPage = nullptr;
+Almanac almanac {};
+//std::vector<TexturedSprite> almanacPageSprites;
+
 s8 font = 0;
 
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
+static ProjectileManager projManager;
+
 
 
 //Gift gift{ "boat", {"happy"}, Sprite()};
@@ -44,6 +63,11 @@ vector<enemy*> enemyList
 vector<gift*> gift;
 */
 
+//almanac vector
+//std::vector<AlmanacEntry> almanacVector;
+//vector of all enemytypes for the almanac
+//std::vector<std::string> enemyTypeNames {};
+
 void TestLoad()
 {
 	DataLoader::Load();
@@ -51,9 +75,16 @@ void TestLoad()
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
+	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
+	//heartpng = AEGfxTextureLoad("Assets/heart.png");
+	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+
+	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
+	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
+
 
 	//healthIcons[0] = TexturedSprite(sqmesh, heartpng, Vector2{ -600.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
 	//healthIcons[1] = TexturedSprite(sqmesh, heartpng, Vector2{ -500.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
@@ -70,6 +101,7 @@ void TestLoad()
 	//healthIcons[0].scale = Vector2{ 64.f,64.f };
 	//healthIcons[1].scale = Vector2{ 64.f,64.f };
 	//healthIcons[2].scale = Vector2{ 64.f,64.f };
+	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
@@ -83,6 +115,18 @@ void TestLoad()
 	healthIcons[1].scale = Vector2{ 64.f,64.f };
 	healthIcons[2].scale = Vector2{ 64.f,64.f };
 
+	//enemyTypes.push_back(rocktype);
+
+	LoadAlmanacPages(almanac);
+	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
+	LoadAlmanacEntries(almanac/*, enemyTypeNames*/);
+
+	//almanacIcon = DataLoader::CreateTexture("Assets/almanac.png");
+
+	//almanacIcon.position = Vector2{ 600.5f,-350.f };
+
+	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
+
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 });
@@ -94,19 +138,33 @@ void TestLoad()
 	rock.sprite = *thing;
 
 
-	rocktype.neutral = WalkLeft;
-	rocktype.happy = WalkRight;
-	rocktype.angry = WalkToTarget; 
+	//rocktype.neutral = WalkLeft;
+	//rocktype.happy = WalkRight;
+	//rocktype.angry = WalkToTarget; 
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 
 	// Global Data Here
 	
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
+	globalTransferData.projectileList.clear();
+
 	globalTransferData.player = &player;
 
 	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	projManager.InitFireball(sqmesh, bulletpng);
+	projManager.InitAOE(sqmesh, aoepng);
+
+	// Enable to allow for random values each run
+	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
+	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
+	gameMap.InitMap(globalTransferData, curSeed);
+	std::cout << "Current Seed: " << curSeed << "\n";
+	// Interesting ones: 32461, 32608, 31931, 18283
+	// Too easy: 32702, 0xA341311Cu, 
+
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 
 	
 
@@ -128,7 +186,7 @@ void TestDraw()
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	
 	
-	gameMap.RenderCurrentRoom(sqmesh);
+	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 	// Draw objects: current-room objects + carried objects
@@ -167,7 +225,12 @@ void TestDraw()
 				e->sprite.RenderSprite();
 			}
 		}
+		
+		for (Projectile* p : roomData.projectileList) if (p) p->ProjectileRender();
+		for (Projectile* p : carryData.projectileList) if (p) p->ProjectileRender();
+
 	}
+	
 
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite();
@@ -176,12 +239,20 @@ void TestDraw()
 	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
+	
 	renderPlayerLives(player, healthIcons, font);
+	(*almanacIcon).RenderSprite();
+	RenderAlmanacPages(almanac, font);
+
+	AlmanacInputs(almanac/*, sqmesh*/);
 
 	//rock.sprite.RenderSprite();
 
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
+
+	
+
 }
 
 void TestFree()
@@ -195,10 +266,16 @@ void TestUnload()
 		delete thing;
 		thing = nullptr;
 	}
+	delete almanacIcon;
+
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
 	AEGfxTextureUnload(shadowpng);
+	AEGfxTextureUnload(bulletpng);
+	
 	AEGfxTextureUnload(heartpng);
+	//AEGfxTextureUnload(heartpng);
+	AEGfxTextureUnload(almanacpng);
 
 	AEGfxDestroyFont(font);
 	
@@ -210,10 +287,15 @@ void TestUnload()
 	for (Gift* g : globalTransferData.giftList) {
 		delete g;
 	}
+
+	for (Projectile* p : globalTransferData.projectileList) delete p;
 	
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 	DataLoader::Unload();
+	if (gameMap.GetCurrentRoom())
+		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+
 }
 
 void TestUpdate(float dt)
@@ -226,6 +308,10 @@ void TestUpdate(float dt)
 
 	//to test damage
 	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+
+	checkIfAlmanacClicked(*almanacIcon, almanac);
+
+	
 
 	//std::cout << player.position.x << player.position.y;
 
@@ -241,14 +327,14 @@ void TestUpdate(float dt)
 	// Update Enemies (carryData version is only for "Friends")
 	for (Enemy* e : roomData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
 
 	for (Enemy* e : carryData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
@@ -336,9 +422,26 @@ void TestUpdate(float dt)
 	if (player.position != positionResetTest) {
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
+			e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
+		}
+		for (Projectile* p : roomData.projectileList) {
+			p->RemoveProjectile();
 		}
 	}
+
+	if (AEInputCheckTriggered(AEVK_SPACE))
+		projManager.ShootFireball(roomData, player.position, player.direction,
+			500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
+
+		if (AEInputCheckTriggered(AEVK_Q))
+			projManager.ShootAOE(roomData, player.position, player.direction,
+				300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
+
+		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
+
+
 	
+
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {
 	//	if (!(gift->velocity == Vector2())) {
@@ -385,7 +488,13 @@ void TestUpdate(float dt)
 	for (Gift* gift : things) {
 		if (gift->velocity != Vector2(0,0)) {
 			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (CollisionIntersection_RectRect_Static(AABB{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+				if (CollisionIntersection_RectRect_Static(
+				
+				
+				
+				
+				
+				{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
 					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
 					gift->velocity = Vector2(0, 0);
 					enemy->AssessTraits(gift->traits);
