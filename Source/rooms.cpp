@@ -140,6 +140,7 @@ namespace mapRooms
 			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
 				i->shadow.position = Vector2{ 0.f, -35.f };
+				i->shadow.UpdateTransform();
 				i->ChangeState(EnemyStates::ES_NEUTRAL);
 				i->roomData = &this->currentRoomData;
 			}
