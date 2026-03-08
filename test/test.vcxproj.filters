@@ -69,6 +69,9 @@
     <ClCompile Include="..\Source\FSM.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Sprite.h">
@@ -101,7 +104,7 @@
     <ClInclude Include="..\Source\BoundaryCollision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Behaviour\Behaviours.hpp">
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Scenes\TestScene.h">

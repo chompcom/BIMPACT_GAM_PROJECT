@@ -12,6 +12,7 @@
 #include "../Collision.h"
 #include "../RoomData.h"
 #include "../HUD.h"
+#include "../almanac.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -20,9 +21,18 @@ TexturedSprite* thing = nullptr;
 AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
 AEGfxTexture* heartpng = nullptr;
+AEGfxTexture* almanacpng = nullptr;
 AEGfxTexture* pDoorTex = nullptr;	// Door image
 
+//AEGfxTexture* almanacpagepng = nullptr;
+
 std::vector<TexturedSprite> healthIcons;
+TexturedSprite * almanacIcon = nullptr;
+
+//TexturedSprite* almanacPage = nullptr;
+Almanac almanac {};
+//std::vector<TexturedSprite> almanacPageSprites;
+
 s8 font = 0;
 
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
@@ -44,13 +54,19 @@ vector<enemy*> enemyList
 vector<gift*> gift;
 */
 
+//almanac vector
+//std::vector<AlmanacEntry> almanacVector;
+//vector of all enemytypes for the almanac
+//std::vector<std::string> enemyTypeNames {};
+
 void TestLoad()
 {
 	DataLoader::Load();
 	sqmesh = CreateSquareMesh();
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
-	heartpng = AEGfxTextureLoad("Assets/heart.png");
+	//heartpng = AEGfxTextureLoad("Assets/heart.png");
+	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
@@ -73,6 +89,7 @@ void TestLoad()
 	//healthIcons[0].scale = Vector2{ 64.f,64.f };
 	//healthIcons[1].scale = Vector2{ 64.f,64.f };
 	//healthIcons[2].scale = Vector2{ 64.f,64.f };
+	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
@@ -86,19 +103,30 @@ void TestLoad()
 	healthIcons[1].scale = Vector2{ 64.f,64.f };
 	healthIcons[2].scale = Vector2{ 64.f,64.f };
 
+	//enemyTypes.push_back(rocktype);
+
+	LoadAlmanacPages(almanac);
+	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
+	LoadAlmanacEntries(almanac/*, enemyTypeNames*/);
+
+	//almanacIcon = DataLoader::CreateTexture("Assets/almanac.png");
+
+	//almanacIcon.position = Vector2{ 600.5f,-350.f };
+
+	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
+
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
-	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
-);
+	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 });
 	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
 	//gift2.sprite = DataLoader::CreateTexture("Assets/pattyfish.png");
 
 	rock.sprite = *thing;
 
 
-	rocktype.neutral = WalkLeft;
-	rocktype.happy = WalkRight;
-	rocktype.angry = WalkToTarget; 
+	//rocktype.neutral = WalkLeft;
+	//rocktype.happy = WalkRight;
+	//rocktype.angry = WalkToTarget; 
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 
 	// Global Data Here
@@ -162,7 +190,12 @@ void TestDraw()
 	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
+	
 	renderPlayerLives(player, healthIcons, font);
+	(*almanacIcon).RenderSprite();
+	RenderAlmanacPages(almanac, font);
+
+	AlmanacInputs(almanac/*, sqmesh*/);
 
 	//rock.sprite.RenderSprite();
 
@@ -181,9 +214,12 @@ void TestUnload()
 		delete thing;
 		thing = nullptr;
 	}
+	delete almanacIcon;
+
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
-	AEGfxTextureUnload(heartpng);
+	//AEGfxTextureUnload(heartpng);
+	AEGfxTextureUnload(almanacpng);
 
 	AEGfxDestroyFont(font);
 	
@@ -211,6 +247,10 @@ void TestUpdate(float dt)
 	//to test damage
 	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
 
+	checkIfAlmanacClicked(*almanacIcon, almanac);
+
+	
+
 	//std::cout << player.position.x << player.position.y;
 
 	// Game map update
@@ -225,14 +265,14 @@ void TestUpdate(float dt)
 	// Update Enemies (carryData version is only for "Friends")
 	for (Enemy* e : roomData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
 
 	for (Enemy* e : carryData.enemyList) {
 		if (e) {
-			e->target = player.sprite.position;
+			//e->target.position = *player.sprite.position;
 			e->Update(dt);
 		}
 	}
@@ -317,6 +357,7 @@ void TestUpdate(float dt)
 	if (player.position != positionResetTest) {
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
+			e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
 		}
 	}
 	

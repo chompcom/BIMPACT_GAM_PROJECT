@@ -9,6 +9,37 @@
 #include <fstream>
 #include <string>
 
+#include "Behaviour/Behaviours.h"
+#include <vector>
+
+
+//Helper function space!!
+namespace {
+
+	void AddBehaviours(EnemyType& tmp, Json::Value& source, std::string const& type) {
+
+		for (Json::Value& thing : source[type]) {
+			BundledBehaviour behavs{};
+			for (Json::Value commernd : thing["actions"]) {
+				std::cout << commernd.asString() << std::endl;
+				behavs.push_back(GetCommand(commernd.asString()));
+			}
+
+			if (type == "happy")
+				tmp.AddHappy(GetFlag(thing["context"].asString()), behavs);
+
+			if (type == "neutral")
+				tmp.AddNeutral(GetFlag(thing["context"].asString()), behavs);
+
+			if (type == "angry")
+				tmp.AddAngry(GetFlag(thing["context"].asString()), behavs);
+		}
+		
+	}
+
+}
+
+
 namespace DataLoader {
 
 	static AEGfxVertexList* squareMesh = nullptr;
@@ -21,37 +52,100 @@ namespace DataLoader {
 	using EnemyPair = std::pair<std::string, EnemyType>;
 	static EnemyTypeList enemyTypes{};
 
+	static std::vector<AlmanacEntry> almanacEntries{};
+
 	static Json::Value theGuy;
 
 	void Load() {
 		squareMesh = CreateSquareMesh();
 		textures.reserve(5);
 		enemyTypes.reserve(5);
-		std::ifstream ifs{"Assets/test.json"};
+		std::ifstream enemyFile{"Assets/test.json"};
+		InitCommands();
+		//std::ifstream ifs{"Assets/test.json"};
+		std::ifstream almanacFile{ "Assets/almanac.json" };
 
-		if (ifs.is_open()) {
+		if (enemyFile.is_open()) {
 			std::cout << "ok there's something!" << std::endl;
-			ifs >> theGuy; //Take the value!
+			enemyFile >> theGuy; //Take the value!
 
 			//std::cout << theGuy["enemies"][0]["name"];
 
-			enemyTypes.reserve(theGuy["enemies"].size());
+			//Getting enemy types
+			enemyTypes.reserve(theGuy["enemyTypes"].size());
 
-			for (Json::Value& name : theGuy["enemies"]) {
+			for (Json::Value& name : theGuy["enemyTypes"]) {
+
+				//get all the traits
+				Labels tmpTraits;
+				for (Json::Value& trait : name["traits"])
+				{
+					tmpTraits.insert(trait.asString());
+				}
+
+				//get all the likes
+				Labels tmpLikes;
+				for (Json::Value& like : name["likes"])
+				{
+					tmpLikes.insert(like.asString());
+				}
+
+				//get all the dislikes
+				Labels tmpDislikes;
+				for (Json::Value& dislike : name["dislikes"])
+				{
+					tmpDislikes.insert(dislike.asString());
+				}
+
+				EnemyType tmp{ name["name"].asString(), name["health"].asFloat(), name["damage"].asFloat(), 
+					tmpTraits, tmpLikes, tmpDislikes };
 
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
+
+				AddBehaviours(tmp, name, "happy");
+				AddBehaviours(tmp, name, "angry");
+				AddBehaviours(tmp, name, "neutral");
+
+				tmp.health = name["health"].asFloat();
+				tmp.damage = name["damage"].asFloat();
+				tmp.speed = name["speed"].asFloat();
+				tmp.detectionRadius = name["detectionRadius"].asFloat();
+				tmp.safeRadius = name["safeRadius"].asFloat();
+
+				for (Json::Value& thing : name["likes"]){
+					tmp.likes.insert(thing.asString());
+				}
 	
+
 				enemyTypes.insert({
 					name["name"].asString(),
 					tmp
 					});
 
-				//std::cout << "name: " << name["name"] << std::endl;
+				// std::cout << "name: " << name["name"] << std::endl;
 			}
-
+			
 			for (EnemyPair const& type : enemyTypes) {
 				std::cout << type.first << std::endl;
 			}
+
+		}
+
+		if (almanacFile.is_open()) {
+			//Getting almanac entries
+			almanacEntries.reserve(theGuy["almanacEntries"].size());
+
+			for (Json::Value& name : theGuy["almanacEntries"]) 
+			{
+				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
+					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
+				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
+				tmp.enemyEntrySprite.UpdateTransform();
+
+				almanacEntries.push_back(tmp);
+				// std::cout << "name: " << name["name"] << std::endl;
+			}
+
 		}
 	}
 
@@ -66,13 +160,17 @@ namespace DataLoader {
 		return TexturedSprite(squareMesh, textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
 	}
 
-	
+	//This is so that other files can get the almanac entry vector
+	std::vector<AlmanacEntry> GetAlmanacVector()
+	{
+		return almanacEntries;
+	}
 
-	EnemyType GetEnemyType(std::string name)
+	EnemyType const& GetEnemyType(std::string name)
 	{
 		EnemyTypeList::const_iterator finder = enemyTypes.find(name); 
 		if (finder == enemyTypes.end()) {
-			return EnemyType{"default",100,0,{},{},{}};
+			return enemyTypes.find("Default")->second;
 		}
 		return finder->second;
 	}
