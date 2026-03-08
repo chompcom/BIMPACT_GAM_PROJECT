@@ -1,5 +1,6 @@
 #include "AEEngine.h"
 #include <vector>
+#include "Sprite.h"
 #pragma once
 
 
@@ -31,10 +32,12 @@ struct GridTile {
 class Grid {
 private: 
 	int width, height,tileSize;
+	float offsetX, offsetY;
 	std::vector<std::vector<GridTile>> tiles;
 	
 public:
-	Grid(int w, int h, int ts);	
+	Grid() : width(0), height(0), tileSize(0), offsetX(0), offsetY(0) {}
+	Grid(int w, int h, int ts, float osX, float osY);
 	int LoadFromFile(const char* fileName);
 	const GridType GetTile(int x, int y) const;
 	int GetWidth() const;
@@ -42,6 +45,9 @@ public:
 	bool IsValid(int x, int y) const;
 	bool IsEmpty(int x, int y) const;
 	void SetTile(int x, int y, GridType type);
+	void SetOffset(float osX, float osY);
+	void PrintRetrievedInformation(void);
+	void RenderGrid(AEGfxVertexList* mesh);
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY);
 	bool IsDoor(int x, int y) const;
 };

@@ -15,6 +15,7 @@
 #include "ProjectileManager.h"
 #include "../HUD.h"
 #include "../almanac.h"
+#include "Grid.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -34,6 +35,9 @@ AEGfxTexture* pDoorTex = nullptr;	// Door image
 
 std::vector<TexturedSprite> healthIcons;
 TexturedSprite * almanacIcon = nullptr;
+
+static Grid grid;
+
 
 //TexturedSprite* almanacPage = nullptr;
 Almanac almanac {};
@@ -79,6 +83,12 @@ void TestLoad()
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+
+	grid.LoadFromFile("Assets/Grid/Grid.txt");
+
+	float offsetX = -(grid.GetWidth() * 130 / 2.0f);   
+	float offsetY = (grid.GetHeight() * 130 / 2.0f);  
+	grid.SetOffset(offsetX, offsetY);
 
 	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
 	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
@@ -221,6 +231,11 @@ void TestDraw()
 
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	grid.RenderGrid(sqmesh);
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	player.sprite.RenderSprite(true);
 
 	
 
@@ -405,8 +420,15 @@ void TestUpdate(float dt)
 
 		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 
+		int collision = grid.CheckInstanceBinaryMapCollision(
+			player.position.x, player.position.y,
+			player.sprite.scale.x, player.sprite.scale.y
+		);
+		Vector2 prevPosition = player.position;
+		if(collision& (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
+		//	player.position = { 0,0 };  // just undo the move
+		}
 
-	
 
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {

@@ -1,9 +1,10 @@
 #include "AEEngine.h"
 #include "Grid.h"
 #include <fstream>
+#include <iostream>
 
-Grid::Grid(int w, int h, int ts) 
-	: width(w), height(h), tileSize(ts) {
+Grid::Grid(int w, int h, int ts, float osX, float osY)
+	: width(w), height(h), tileSize(ts), offsetX(osX), offsetY(osY) {
 	tiles.resize(height);
 	for (int i = 0; i < height; ++i) {
 		tiles[i].resize(width);
@@ -22,6 +23,7 @@ int Grid::LoadFromFile(const char* filename) {
 	std::string temp;
 	file >> temp >> width;
 	file >> temp >> height;
+	file >> temp >> tileSize;
 
 	tiles.clear();
 	tiles.resize(height);
@@ -72,43 +74,86 @@ void Grid::SetTile(int x, int y, GridType type) {
 	tiles[y][x].type = type;
 }
 
+void Grid::SetOffset(float osX, float osY) {
+	offsetX = osX;
+	offsetY = osY;
+}
+
+void Grid::PrintRetrievedInformation(void) // prints the width and height of the map, then prints the contents of MapData in a grid format
+{
+	std::cout << "Width " << GetWidth() << std::endl;
+	std::cout << "Height " << GetHeight() << std::endl;
+	for (int i = 0; i < GetHeight(); i++) {
+		for (int j = 0; j < GetWidth(); j++) {
+			std::cout << static_cast<int>(GetTile(j, i)) << " ";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+}
+
+void Grid::RenderGrid(AEGfxVertexList* mesh) {
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j) {
+			GridType type = tiles[i][j].type;
+			float x = offsetX + j * tileSize + tileSize / 2.0f;
+			float y = offsetY - i * tileSize - tileSize / 2.0f;
+
+			Color color;
+			if (type == GridType::WALL)
+				color = Color{ 1.0f, 1.0, 1.0f, 1.0f };  
+			else if (type == GridType::DOOR)
+				color = Color{ 1.0f, 0, 0, 1.0f };  
+			else if( type == GridType::EMPTY)
+				color = Color{ 0, 1.0f, 1.0f, 1.0f };  
+			else
+				continue;
+
+			Sprite tile(mesh, Vector2(x, y), Vector2((float)tileSize, (float)tileSize), color);
+			tile.RenderSprite();
+		}
+	}
+}
+
 int Grid::CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY) {
 	int isTouch = 0;
 	int rightx1, righty1, rightx2, righty2;
 	// hotspot 1 
-	rightx1 = static_cast<int>((PosX + scaleX / 2)/tileSize);
-	righty1 = static_cast<int>((PosY + scaleY / 4)/tileSize);
+	rightx1 = static_cast<int>((PosX + scaleX / 2 - offsetX) / tileSize);
+	righty1 = static_cast<int>((offsetY - (PosY + scaleY / 4)) / tileSize);
 	//hotspot 2 
-	rightx2 = static_cast<int>((PosX + scaleX / 2)/tileSize);
-	righty2 = static_cast<int>((PosY - scaleY / 4)/tileSize);
+	rightx2 = static_cast<int>((PosX + scaleX / 2 - offsetX) / tileSize);
+    righty2 = static_cast<int>((offsetY - (PosY - scaleY / 4)) / tileSize);
 	if (GetTile((int)rightx1, (int)righty1) !=  GridType::EMPTY || GetTile((int)rightx2, (int)righty2) != GridType::EMPTY) {
 		isTouch |= COLLISION_RIGHT; //if either hotspot on the right side is in a collision cell, set the COLLISION_RIGHT bit in isTouch
 	}
 	int leftx1, lefty1, leftx2, lefty2;
 	//hotspot 1 
-	leftx1 = static_cast<int>((PosX - scaleX / 2)/tileSize);
-	lefty1 = static_cast<int>((PosY + scaleY / 4)/tileSize);
+	leftx1 = static_cast<int>((PosX - scaleX / 2 - offsetX) / tileSize);
+	lefty1 = static_cast<int>((offsetY - (PosY + scaleY / 4)) / tileSize);
 	//hotspot 2
-	leftx2 = static_cast<int>((PosX - scaleX / 2)/tileSize);
-	lefty2 = static_cast<int>((PosY - scaleY / 4)/tileSize);
+	leftx2 = static_cast<int>((PosX - scaleX / 2 - offsetX) / tileSize);
+	lefty2 = static_cast<int>((offsetY - (PosY - scaleY / 4)) / tileSize);
 	if (GetTile((int)leftx1, (int)lefty1) != GridType::EMPTY || GetTile((int)leftx2, (int)lefty2) != GridType::EMPTY) {
 		isTouch |= COLLISION_LEFT; //if either hotspot on the left side is in a collision cell, set the COLLISION_LEFT bit in isTouch
 	}
-	int topx1, topy1, topx2, topy2; //hotspot 1 
-	topx1 = static_cast<int>((PosX + scaleX / 4)/tileSize);
-	topy1 = static_cast<int>((PosY + scaleY / 2)/tileSize);
-	//hotspot 2 
-	topx2 = static_cast<int>((PosX - scaleX / 4)/tileSize);
-	topy2 = static_cast<int>((PosY + scaleY / 2)/tileSize);
+	int topx1, topy1, topx2, topy2; //hotspot 1
+	topx1 = static_cast<int>((PosX + scaleX / 4 - offsetX) / tileSize);
+	topy1 = static_cast<int>((offsetY - (PosY + scaleY / 2)) / tileSize);
+	//hotspot 2
+	topx2 = static_cast<int>((PosX - scaleX / 4 - offsetX) / tileSize);
+	topy2 = static_cast<int>((offsetY - (PosY + scaleY / 2)) / tileSize);
 	if (GetTile((int)topx1, (int)topy1) != GridType::EMPTY || GetTile((int)topx2, (int)topy2) != GridType::EMPTY) {
 		isTouch |= COLLISION_TOP; //if either hotspot on the top side is in a collision cell, set the COLLISION_TOP bit in isTouch
 	}
 	int bottomx1, bottomy1, bottomx2, bottomy2; //hotspot 1
-	bottomx1 = static_cast<int>((PosX + scaleX / 4)/tileSize);
-	bottomy1 = static_cast<int>((PosY - scaleY / 2)/tileSize);
+	bottomx1 = static_cast<int>((PosX + scaleX / 4 - offsetX) / tileSize);
+	bottomy1 = static_cast<int>((offsetY - (PosY - scaleY / 2)) / tileSize);
 	//hotspot 2
-	bottomx2 = static_cast<int>((PosX - scaleX / 4)/tileSize);
-	bottomy2 = static_cast<int>((PosY - scaleY / 2)/tileSize);
+	bottomx2 = static_cast<int>((PosX - scaleX / 4 - offsetX) / tileSize);
+	bottomy2 = static_cast<int>((offsetY - (PosY - scaleY / 2)) / tileSize);
 	if (GetTile((int)bottomx1, (int)bottomy1) != GridType::EMPTY || GetTile((int)bottomx2, (int)bottomy2) != GridType::EMPTY) {
 		isTouch |= COLLISION_BOTTOM; //if either hotspot on the bottom side is in a collision cell, set the COLLISION_BOTTOM bit in isTouch
 	}
