@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Gift.h"
+#include "Projectile.h"
 
 class Enemy;
 // this class contains data for what is inside the room!
@@ -13,7 +14,7 @@ struct RoomData {
         Player* player;
         std::vector<Enemy*> enemyList;
         std::vector<Gift*> giftList;
-
+        std::vector<Projectile*> projectileList;
         RoomData();
 
 };

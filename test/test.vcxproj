@@ -20,6 +20,8 @@
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\Projectile.cpp" />
+    <ClCompile Include="..\Source\ProjectileManager.cpp" />
     <ClCompile Include="..\Source\RoomData.cpp" />
     <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
@@ -36,6 +38,8 @@
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.h" />
+    <ClInclude Include="..\Source\Projectile.h" />
+    <ClInclude Include="..\Source\ProjectileManager.h" />
     <ClInclude Include="..\Source\RoomData.h" />
     <ClInclude Include="..\Source\Grid.h" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />

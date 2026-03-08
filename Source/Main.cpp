@@ -29,6 +29,7 @@
 
 #include <iostream>
 
+#include <Grid.h>
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -60,6 +61,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (current != GS_RESTART) {
             GSM_Update();
             fpLoad();
+            Grid grid(10, 10, 50);
+            std::cout << grid.GetHeight() << ", " << grid.GetWidth() << std::endl;
         }
         else {
             next = previous;
@@ -86,7 +89,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         previous = current;
         current = next;
-        
         //super scuffed fps check
         //std::cout << AEFrameRateControllerGetFrameRate() << std::endl;
         

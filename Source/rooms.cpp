@@ -101,7 +101,13 @@ namespace mapRooms
 			g = nullptr;
 		}
 		currentRoomData.giftList.clear();
+		for (Projectile* p : currentRoomData.projectileList) {
+			delete p;
+			p = nullptr;
+		}
+		currentRoomData.projectileList.clear();
 	}
+	
 
 	void Room::Init(RoomType rmType) {
 

@@ -11,15 +11,22 @@
 #include "../Loaders/DataLoader.h"
 #include "../Collision.h"
 #include "../RoomData.h"
+#include "Projectile.h"
+#include "ProjectileManager.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
+TexturedSprite* bulletSprite = nullptr;
+
 
 AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
-
+AEGfxTexture* bulletpng = nullptr;
+AEGfxTexture* aoepng = nullptr;
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
+static ProjectileManager projManager;
+
 
 
 //Gift gift{ "boat", {"happy"}, Sprite()};
@@ -44,6 +51,7 @@ void TestLoad()
 	sqmesh = CreateSquareMesh();
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
+	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
@@ -63,9 +71,13 @@ void TestLoad()
 	
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
+	globalTransferData.projectileList.clear();
+
 	globalTransferData.player = &player;
 
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	projManager.InitFireball(sqmesh, bulletpng);
+	projManager.InitAOE(sqmesh, aoepng);
 }
 
 void TestInit()
@@ -97,7 +109,12 @@ void TestDraw()
 
 		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
 		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
+		
+		for (Projectile* p : roomData.projectileList) if (p) p->ProjectileRender();
+		for (Projectile* p : carryData.projectileList) if (p) p->ProjectileRender();
+
 	}
+	
 
 	player.sprite.RenderSprite();
 	//rock.sprite.RenderSprite();
@@ -109,6 +126,9 @@ void TestDraw()
 
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
+
+	
+
 }
 
 void TestFree()
@@ -124,7 +144,7 @@ void TestUnload()
 	}
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
-
+	AEGfxTextureUnload(bulletpng);
 	
 	
 	// Dellocate enemy and gift assets
@@ -135,10 +155,15 @@ void TestUnload()
 	for (Gift* g : globalTransferData.giftList) {
 		delete g;
 	}
+
+	for (Projectile* p : globalTransferData.projectileList) delete p;
 	
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 	DataLoader::Unload();
+	if (gameMap.GetCurrentRoom())
+		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+
 }
 
 void TestUpdate(float dt)
@@ -251,8 +276,24 @@ void TestUpdate(float dt)
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
 		}
+		for (Projectile* p : roomData.projectileList) {
+			p->RemoveProjectile();
+		}
 	}
+
+	if (AEInputCheckTriggered(AEVK_SPACE))
+		projManager.ShootFireball(roomData, player.position, player.direction,
+			500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
+
+		if (AEInputCheckTriggered(AEVK_Q))
+			projManager.ShootAOE(roomData, player.position, player.direction,
+				300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
+
+		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
+
+
 	
+
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {
 	//	if (!(gift->velocity == Vector2())) {
@@ -299,7 +340,13 @@ void TestUpdate(float dt)
 	for (Gift* gift : things) {
 		if (gift->velocity != Vector2(0,0)) {
 			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (CollisionIntersection_RectRect_Static(AABB{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+				if (CollisionIntersection_RectRect_Static(
+				
+				
+				
+				
+				
+				{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
 					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
 					gift->velocity = Vector2(0, 0);
 					enemy->AssessTraits(gift->traits);
