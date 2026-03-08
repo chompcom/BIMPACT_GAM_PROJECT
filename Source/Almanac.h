@@ -11,11 +11,10 @@ public:
 	std::string description;
 	std::string area;
 	TexturedSprite enemyEntrySprite;
-	Vector2 pictureScale;
 	bool unlocked;
 
 	AlmanacEntry(EnemyType enemyType, std::string description, std::string area, 
-		TexturedSprite enemyEntrySprite, Vector2 pictureScale = Vector2(100,100));
+		TexturedSprite enemyEntrySprite);
 
 };
 
@@ -25,6 +24,7 @@ public:
 	std::vector<AlmanacEntry> entries;
 	bool isOpen;
 	int currentPageNumber;
+	std::string currentArea;
 	std::vector<TexturedSprite> arrowSprites;
 	std::vector<TexturedSprite> closeSprites;
 	int const maxPages;
@@ -34,9 +34,8 @@ public:
 
 void LoadAlmanacPages(Almanac & almanac);
 
-//void LoadAlmanacEntries(Almanac & almanac, std::vector<EnemyType> allEnemyTypes);
-void LoadAlmanacEntries(Almanac& almanac, std::vector<std::string> allEnemyTypes);
+void LoadAlmanacEntries(Almanac& almanac);
 
 void RenderAlmanacPages(Almanac & almanac, s8 font);
 
-void AlmanacInputs(Almanac& almanac, AEGfxVertexList* removeLater);
+void AlmanacInputs(Almanac& almanac/*, AEGfxVertexList* removeLater*/);

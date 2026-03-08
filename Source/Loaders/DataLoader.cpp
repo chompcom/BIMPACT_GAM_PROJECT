@@ -23,8 +23,6 @@ namespace DataLoader {
 	using EnemyPair = std::pair<std::string, EnemyType>;
 	static EnemyTypeList enemyTypes{};
 
-	//using AlmanacEntryList = std::unordered_map<std::string, AlmanacEntry>;
-	//using AlmanacPair = std::pair<std::string, AlmanacEntry>;
 	static std::vector<AlmanacEntry> almanacEntries{};
 
 	static Json::Value theGuy;
@@ -109,27 +107,17 @@ namespace DataLoader {
 			//Getting almanac entries
 			almanacEntries.reserve(theGuy["almanacEntries"].size());
 
-			for (Json::Value& name : theGuy["almanacEntries"]) {
-
-				//EnemyType tmp{ name["name"].asString(), name["health"].asFloat(), name["damage"].asFloat(),
-				//	tmpTraits, tmpLikes, tmpDislikes };
+			for (Json::Value& name : theGuy["almanacEntries"]) 
+			{
 				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
-					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString()), 
-					Vector2(name["xPictureScale"].asInt(), name["xPictureScale"].asInt())};
+					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
+				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
+				tmp.enemyEntrySprite.UpdateTransform();
 
 				almanacEntries.push_back(tmp);
-
-				//almanacEntries.insert({
-				//	name["name"].asString(),
-				//	tmp
-				//	});
-
 				// std::cout << "name: " << name["name"] << std::endl;
 			}
 
-			//for (EnemyPair const& type : enemyTypes) {
-			//	std::cout << type.first << std::endl;
-			//}
 		}
 	}
 

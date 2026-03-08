@@ -56,7 +56,7 @@ vector<gift*> gift;
 //almanac vector
 //std::vector<AlmanacEntry> almanacVector;
 //vector of all enemytypes for the almanac
-std::vector<std::string> enemyTypeNames {"Pop Rocks", "Bouncy Spikes", "Slimey"};
+//std::vector<std::string> enemyTypeNames {};
 
 void TestLoad()
 {
@@ -66,8 +66,6 @@ void TestLoad()
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
-
-	//almanacpagepng = AEGfxTextureLoad("Assets/AlmanacScreen/openAlmanacPlant.png");
 
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
@@ -85,21 +83,17 @@ void TestLoad()
 
 	//enemyTypes.push_back(rocktype);
 
-
 	LoadAlmanacPages(almanac);
 	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
-	LoadAlmanacEntries(almanac, enemyTypeNames);
+	LoadAlmanacEntries(almanac/*, enemyTypeNames*/);
 
 	//almanacIcon = DataLoader::CreateTexture("Assets/almanac.png");
 
 	//almanacIcon.position = Vector2{ 600.5f,-350.f };
 
-	//almanacIcon = DataLoader::CreateTexture("Assets/heart.png");
 	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
 
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
-
-	//almanacPage = new TexturedSprite(sqmesh, almanacpagepng, Vector2(0, 0), Vector2(1600, 900), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 });
 	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
@@ -170,9 +164,7 @@ void TestDraw()
 	(*almanacIcon).RenderSprite();
 	RenderAlmanacPages(almanac, font);
 
-	AlmanacInputs(almanac, sqmesh);
-
-	//(*almanacPage).RenderSprite();
+	AlmanacInputs(almanac/*, sqmesh*/);
 
 	//rock.sprite.RenderSprite();
 
