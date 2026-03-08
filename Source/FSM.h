@@ -11,6 +11,7 @@ class Boss;
 
 enum BossStates {
 	BOSS_IDLE,
+	BOSS_WALK,
 	BOSS_CHARGE,
 	BOSS_JUMP,
 	BOSS_SHOOT,
@@ -43,7 +44,9 @@ class Boss1_FSM : public Boss_FSM {
 		AttackState attackPhase;
 		Vector2 target;
 		s16 counter;
+		bool canWalk;
 
+		Vector2 chargeDirection{ 0, 1 };
 		f32 chargeDamage;
 		f32 chargeStartup;
 		f32 chargeInterval;

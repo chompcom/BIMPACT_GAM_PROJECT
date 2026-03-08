@@ -137,9 +137,10 @@ namespace mapRooms
 			this->rmType = roomType;
 		}
 		if (rmType == RoomType::Normal) {
-			
-			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png")));
+			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
+				i->shadow.position = Vector2{ 0.f, -35.f };
+				i->shadow.UpdateTransform();
 				i->ChangeState(EnemyStates::ES_NEUTRAL);
 				i->roomData = &this->currentRoomData;
 			}
@@ -150,12 +151,15 @@ namespace mapRooms
 			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
 			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 
-			currentRoomData.giftList.push_back(new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
+			Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			gift->shadow.position = Vector2{ 0.f, -40.f };
+			currentRoomData.giftList.push_back(gift);
 		}
 		if (rmType == RoomType::Boss) {
-			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 5.0f, 4.0f, 3.0f} };
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), currentRoomData, attackData);
+			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 4.0f, 2.0f, 3.0f} };
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 		}
 		
 	} 

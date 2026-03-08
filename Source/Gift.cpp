@@ -7,11 +7,12 @@
 #include <iostream>
 
 //simple contructor for gift class, for testing
-Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
+Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position) :
 	//initialiser list
 	name{ n },
 	traits{ t },
 	sprite{ sprite },
+	shadow{ shadowSprite },
 	position{ position },
 	velocity { Vector2 {0.f, 0.f}},
 	pickUpState{ false },
@@ -19,10 +20,11 @@ Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, Vector2 position) :
 {
 }
 
-Gift::Gift(TexturedSprite sprite, Vector2 position) :
+Gift::Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position) :
 	name{ "Unnamed Gift" },
 	traits{ },
 	sprite{ sprite },
+	shadow{ shadowSprite },
 	position{ position },
 	velocity{ Vector2 {0.f, 0.f} },
 	pickUpState{ false },
@@ -64,7 +66,6 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 		//set the gift's sprite position to match its actual position if not 
 		//getting shaken
 		
-		
 	}
 	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
 	//set the gift's sprite position to match its actual position
@@ -72,7 +73,10 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 
 	//set the gift's sprite position to match its actual position if not 
 	//getting shaken
-	if (!gift.shakeState) gift.sprite.position = gift.position;
+	if (!gift.shakeState) {
+		gift.sprite.position = gift.position;
+		gift.shadow.position = gift.position - Vector2{ 0, 40 };
+	}
 
 	return;
 }

@@ -5,9 +5,9 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
-Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
+Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
-	,wanderTimer{}
+	,wanderTimer{}, shadow{shadowSprite}
 {
 		ChangeState(initialState);
 }
@@ -71,6 +71,10 @@ void Enemy::Update(float dt) {
 			break;//don't do the other checks
 		}
 	}
+
+	shadow.position = sprite.position;
+	shadow.UpdateTransform();
+
 	if (wanderTimer > 0.f) 
 		wanderTimer -= dt;
 

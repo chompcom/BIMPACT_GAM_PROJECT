@@ -84,7 +84,11 @@ void Wander(Enemy& me, float dt) {
 		me.velocity = Vector2{randx, randy};
 		std::cout << me.velocity.x << " " << me.velocity.y << std::endl;	
 	}
+	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
+		me.velocity = -me.velocity;
 	me.sprite.position += me.velocity.Normalized() * me.type.speed * dt;
+
+
 	me.sprite.UpdateTransform();
 	
 }
@@ -96,6 +100,7 @@ void CircleMove(Enemy& me, float dt) {
 	me.sprite.position += direction.Normalized() * me.type.speed * dt;
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
+
 
 }
 
