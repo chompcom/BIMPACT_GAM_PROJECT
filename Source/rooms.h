@@ -7,6 +7,7 @@
 #include <unordered_map>	// Maybe?
 #include "Utils/Vector2.hpp"
 #include "RoomData.h"
+#include "Utils/Utils.h"
 //#include "AEEngine.h"
 
 struct AEGfxTexture;
@@ -44,6 +45,8 @@ namespace mapRooms {
 		Room* down;
 
 		RoomType rmType;
+		bool visited;
+		std::string themeTag{ "Default" };			// For thematic purposes
 
 		// Additional(s):
 		// Store Images of Rooms
@@ -58,9 +61,7 @@ namespace mapRooms {
 		void Update(float dt) ;
 			
 
-
-
-			//handle collisions
+		//handle collisions
 		
 
 		// Should we store player position? Idk if this is the best place. (Donnid)
@@ -93,6 +94,7 @@ namespace mapRooms {
 
 		int		GetGridSize() const;
 		Room*	GetRoom(int x, int y);
+const	Room*	GetRoom(int x, int y) const;
 		Room*	GetCurrentRoom();
 
 		// Transition Scene for later ig???
@@ -105,6 +107,8 @@ namespace mapRooms {
 		void	RenderDebugMap(AEGfxVertexList* squareMesh) const;   
 
 		RoomData&	GetTransferData();
+
+		unsigned int RandInt(int low, int high);			// Rand generator
 	private:
 
 		// Storage
@@ -120,7 +124,6 @@ namespace mapRooms {
 
 		// RNG things
 		unsigned int rngState;
-		unsigned int RandInt(int low, int high);			// Rand generator
 
 		bool	InBounds(int x, int y) const;				// Check if (x, y) is in bounds
 		int		GetRoomIdx(int x, int y) const;				// Converts x, y to array index of type [int]
@@ -142,5 +145,27 @@ namespace mapRooms {
 
 		// Door trigger cooldown (prevents re-trigger)
 		float doorCooldown{ 0.0f };
+
+		// Temp Door
+		AEGfxTexture* doorTex{ nullptr };
+		void RenderRoomDoors(AEGfxVertexList* squareMesh, AEGfxTexture* doorTexture) const;
+
+		//// Door Rendering Struct
+		//struct DoorThemeTextures
+		//{
+		//	// Each room should have theme_opened.png and theme_closed.png
+		//	AEGfxTexture* closed{ nullptr };
+		//	AEGfxTexture* opened{ nullptr };
+		//};
+
+		//// Unordered map for string <-> doorthemetextures
+		//std::unordered_map<std::string, DoorThemeTextures> doorThemeCache;
+		//DoorThemeTextures defaultDoorTex{};
+
+		//void BuildDoorThemeCache();
+		//void RenderDoors(AEGfxVertexList* squareMesh) const;
+		//void DrawDoorSprite(AEGfxVertexList* mesh, AEGfxTexture* tex, Vector2 pos, Vector2 scale, float rotRad) const;
 	};
+
+
 }

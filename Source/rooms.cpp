@@ -39,7 +39,7 @@ namespace Config {
 
 		do
 		{
-			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)	// Skip directories, we are looking for files
 				continue;
 
 			// Full path to file
@@ -68,25 +68,36 @@ namespace Config {
 		return (dx <= (aHalf.x + bHalf.x)) && (dy <= (aHalf.y + bHalf.y));
 	}
 
+	// Extracting filename from fullpath
+	std::string ExtractThemeTag(std::string const& fullPath, mapRooms::RoomType type)
+	{
+		if (type == mapRooms::RoomType::Boss) return "Boss";
+		if (fullPath.empty()) return "Default";
 
+		std::string fileName = ExtractFileName(fullPath);	// Extract File name only
+		
+		
+		size_t underScore = fileName.find_last_of('_');		// Get position of underscore
+		if (underScore != std::string::npos) fileName = fileName.substr(0, underScore);
+
+
+		if (fileName.empty()) return "Default";
+		return fileName;
+	}
 
 }
 
-#include "Enemy.h"
-
-
+// Is this still needed lmao
 EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
-//Gift gift{ "boat", {"happy"}, Sprite() };
-
-//AEGfxVertexList* somemesh = nullptr;
-//AEGfxVertexList* somemesh2 = nullptr;
 
 namespace mapRooms
 {
     Room::Room(RoomType roomType) :
         left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
-        rmType{ roomType }
-		,toBeTransferred{nullptr},
+        rmType{ roomType },
+		visited{ false },
+		themeTag{ "Default" },
+		toBeTransferred{nullptr},
 		currentRoomData{}
     {}
 	Room::~Room() {
@@ -102,6 +113,11 @@ namespace mapRooms
 			g = nullptr;
 		}
 		currentRoomData.giftList.clear();
+
+		if (currentRoomData.boss) {
+			delete currentRoomData.boss;
+			currentRoomData.boss = nullptr;
+		}
 	}
 
 	void Room::Init(RoomType roomType) {
@@ -122,12 +138,6 @@ namespace mapRooms
 				i->ChangeState(EnemyStates::ES_NEUTRAL);
 			}
 
-			// Gifts here (1 Gift per room for now)
-			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-			//Vector2 giftPos{ 200.0f, 450.0f };
-			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
 			currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
 		}
 		if (rmType == RoomType::Boss) {
@@ -140,19 +150,9 @@ namespace mapRooms
 	void Room::Update(float dt) {
 		for (Enemy* i : currentRoomData.enemyList) {
 			//i->Update(dt);
+
+
 		}
-
-
-
-		//// TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???)
-		//for (Gift* gift : things) {
-		//	if (!(gift->velocity == Vector2())) {
-		//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-		//			gift->velocity = -gift->velocity;
-		//			rock.AssessTraits(gift->traits);
-		//		}
-		//	}
-		//}
 
 	}
 
@@ -235,8 +235,9 @@ namespace mapRooms
 
 				}
 
-				rm->roomTexturePath = chosenPath;
-				rm->roomTexture = (chosenPath.empty() ? nullptr : GetOrLoadTexture(chosenPath));
+				rm->roomTexturePath		= chosenPath;
+				rm->roomTexture			= (chosenPath.empty() ? nullptr : GetOrLoadTexture(chosenPath));
+				rm->themeTag			= Config::ExtractThemeTag(chosenPath, rm->rmType); // hopefully this works
 
 			}
 		}
@@ -269,6 +270,8 @@ namespace mapRooms
 		// Load available Pngs
 		LoadRoomArtLists();
 		AssignRoomArt();
+
+		doorTex = GetOrLoadTexture("Assets/Door/door.png");
 
 		// Somehow assign startX and startY into starting room coordinates value
 		currentRoom = GetRoom(startX, startY);
@@ -342,70 +345,14 @@ namespace mapRooms
 		if (dirFromAToB == Direction::Down) { a->down = b; b->up = a; }
 	}
 
-	 //OLD Generate Rooms (likely working)
-	//void Map::GenerateRooms()
-	//{
-	//	// STEP 1: FIXED STARTING POINT (x=0, y=0)
-	//	startX = 0;
-	//	startY = 0;
-	//	
-	//	//int minDist = gridSize - 1; 
-	//	int minDist = startX + 1;	// Should clamp this but we ball
-	//	// STEP 2: Get End
-	//	do
-	//	{
-	//		bossX = RandInt(0, gridSize - 1);
-	//		bossY = RandInt(0, gridSize - 1);
-	//		int dist = std::abs(bossX - startX) + std::abs(bossY - startY);
-	//		if (bossX == startX && bossY == startY) continue;
-	//		if (dist < minDist) continue;
-	//		break;
-	//	} while (true);
-	//	// 3) Mark start/boss types
-	//	GetRoom(startX, startY)->rmType = RoomType::Start;
-	//	GetRoom(bossX, bossY)->rmType = RoomType::Boss;
-	//	// 4) Carve a guaranteed path start -> boss
-	//	int x = startX;
-	//	int y = startY;
-	//	while (x != bossX || y != bossY)
-	//	{
-	//		bool needX = (x != bossX);
-	//		bool needY = (y != bossY);
-	//		// choose whether to move in x or y if both are possible
-	//		bool moveX = false;
-	//		if (needX && needY) moveX = (RandInt(0, 1) == 0);
-	//		else moveX = needX;
-	//		int nx = x;
-	//		int ny = y;
-	//		if (moveX)
-	//			nx += (bossX > x) ? 1 : -1;   // step toward boss in x
-	//		else
-	//			ny += (bossY > y) ? 1 : -1;   // step toward boss in y
-	//		Room* a = GetRoom(x, y);
-	//		Room* b = GetRoom(nx, ny);
-	//		// Link pointers both ways (no bitmask needed)
-	//		if (nx == x + 1) { a->right = b; b->left = a; }
-	//		if (nx == x - 1) { a->left = b; b->right = a; }
-	//		if (ny == y + 1) { a->down = b; b->up = a; }
-	//		if (ny == y - 1) { a->up = b; b->down = a; }
-	//		// Mark intermediate rooms as Normal (don�t overwrite Start/Boss)
-	//		if (b->rmType == RoomType::Normal)
-	//		{
-	//			// already normal; ok
-	//		}
-	//		else if (b->rmType != RoomType::Boss)
-	//		{
-	//			b->rmType = RoomType::Normal;
-	//		}
-	//		x = nx;
-	//		y = ny;
-	//	}
-	//}
-
 	// Simple generation using random pathing. Alternative would be randomized DFS. Computationally intensive however.
 	// https://en.wikipedia.org/wiki/File:Depth-First_Search_Animation.ogv explains how DFS works
 	void Map::GenerateRooms() {
-		int roomsVisit = RandInt(2, gridSize * gridSize);	// Set How many rooms to make available
+
+		int MinRooms = min(3, gridSize * gridSize - 1);
+		int MaxRooms = max(3, gridSize * gridSize - 1);
+
+		int roomsVisit = RandInt(MinRooms, MaxRooms);	// Set How many rooms to make available
 		
 		startX =		RandInt(0, gridSize - 1), startY = RandInt(0, gridSize - 1);
 		int startIdx =	GetRoomIdx(startX, startY);
@@ -561,12 +508,53 @@ namespace mapRooms
 		GetRoom(bossIdx% gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
 
 		// Init all rooms now;
-		//for (Room curRoom : this->rooms) {
+		//for (Room &curRoom : this->rooms) {
 		//	if (curRoom.rmType != RoomType::Empty) {
 		//		curRoom.Init(curRoom.rmType);	// init room here
 		//	}
 		//}
 
+		// Link all Adjacent Rooms here
+		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
+			int curX = idx % gridSize, curY = idx / gridSize;	// Get x, y value of 2d room array
+			Room* curRoom = GetRoom(curX, curY);
+
+			if (!visited[idx] || curRoom->rmType == RoomType::Empty) continue; // HAHAH FORGOT ABOUT THIS FOR VOID ROOMS...
+
+			// Check Left
+			if (InBounds(curX - 1, curY))
+			{
+				int idxRoom		= GetRoomIdx(curX - 1, curY);
+				Room* neighbour = GetRoom(curX - 1, curY);
+				if (visited[idxRoom] && (curRoom->left == nullptr || neighbour->right == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Left);
+			}
+
+			// Check Right
+			if (InBounds(curX + 1, curY))
+			{
+				int idxRoom		= GetRoomIdx(curX + 1, curY);
+				Room* neighbour = GetRoom(curX + 1, curY);
+				if (visited[idxRoom] && (curRoom->right == nullptr || neighbour->left == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Right);
+			}
+
+			// Check Up
+			if (InBounds(curX, curY - 1))
+			{
+				int idxRoom		= GetRoomIdx(curX, curY - 1);
+				Room* neighbour = GetRoom(curX, curY - 1);
+				if (visited[idxRoom] && (curRoom->up == nullptr || neighbour->down == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Up);
+			}
+
+			// Check Down
+			if (InBounds(curX, curY + 1))
+			{
+				int idxRoom		= GetRoomIdx(curX, curY + 1);
+				Room* neighbour = GetRoom(curX, curY + 1);
+				if (visited[idxRoom] && (curRoom->down == nullptr || neighbour->up == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Down);
+			}
+		}
+
+		// Init Rooms here
 		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
 			if (visited[idx]) GetRoom(idx % gridSize, idx / gridSize)->Init(GetRoom(idx % gridSize, idx / gridSize)->rmType);
 		}
@@ -576,6 +564,8 @@ namespace mapRooms
 	int Map::GetGridSize() const {
 		return gridSize;
 	}
+
+	
 
 	void Map::RenderCurrentRoom(AEGfxVertexList* squaremesh) const {
 		if (!currentRoom || !squaremesh || !currentRoom->roomTexture) return;	// possibly skip empty textures?
@@ -592,125 +582,174 @@ namespace mapRooms
 		AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND);
 		AEGfxSetTransparency(1.0f);
 
+		// Render Room
 		TexturedSprite bg(
 			squaremesh,
 			currentRoom->roomTexture,
 			Vector2{ 0.0f, 0.0f },                  // centered
 			Vector2{ winW, winH },                  // fill screen
-			Color{ 1.0f, 1.0f, 1.0f, 1.0f }          // no tint
+			Color{ 1.0f, 1.0f, 1.0f, 1.0f }			// no tint
 		);
-
 		bg.RenderSprite();
+
+		// Render Room Doors
+		//GetOrLoadTexture()
+		//RenderDoorsSimple(squaremesh);
+
+		//TexturedSprite dr = DataLoader::CreateTexture("Assets/Rooms/Door/door.png");	// Does this require freeing
+		RenderRoomDoors(squaremesh, doorTex);
+
+
+		// Render Enemy?
 		for (Enemy* i : currentRoom->currentRoomData.enemyList)
 			i->sprite.RenderSprite();
 
 	}
 
-	// FOR DEBUGGING PURPOSE
-	// Render map was done using AI cuz implementation details are quite cmi. Will analyze it and do my own function of it.
+	// Render map
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
 	{
 		if (!squareMesh) return;
-		if (gridSize <= 0) return;
+		if (gridSize <= 0) return; // shouldn't happen ngl
 
-		// ---------- 1) Build reachable set via BFS over pointer-links ----------
-		std::vector<bool> reachable(static_cast<size_t>(gridSize * gridSize), false);
-
-		// Questionable sequence
-		if (currentRoom)
-		{
-			// Find currentRoom index by pointer difference (works because rooms is a contiguous vector)
-			int startIdx = static_cast<int>(currentRoom - &rooms[0]);
-			if (startIdx >= 0 && startIdx < gridSize * gridSize)
-			{
-				std::vector<int> queue;
-				queue.push_back(startIdx);
-				reachable[static_cast<size_t>(startIdx)] = true;
-
-				// Simple BFS
-				for (size_t qi = 0; qi < queue.size(); ++qi)
-				{
-					int idx = queue[qi];
-					Room const& r = rooms[static_cast<size_t>(idx)];
-
-					auto pushIfValid = [&](Room const* nextPtr)
-						{
-							if (!nextPtr) return;
-
-							int nextIdx = static_cast<int>(nextPtr - &rooms[0]);
-							if (nextIdx < 0 || nextIdx >= gridSize * gridSize) return;
-
-							size_t ni = static_cast<size_t>(nextIdx);
-							if (reachable[ni]) return;
-
-							// Only treat non-empty rooms as real nodes
-							if (rooms[ni].rmType == RoomType::Empty) return;
-
-							reachable[ni] = true;
-							queue.push_back(nextIdx);
-						};
-
-					pushIfValid(r.left);
-					pushIfValid(r.right);
-					pushIfValid(r.up);
-					pushIfValid(r.down);
-				}
-			}
-		}
-
-		// ---------- 2) Render minimap with "unreachable darken" ----------
 		float minX = AEGfxGetWinMinX();
+		float maxX = AEGfxGetWinMaxX();
+		float minY = AEGfxGetWinMinY();
 		float maxY = AEGfxGetWinMaxY();
 
-		float cell = 18.0f;
+		float cell	= 18.0F;
 		float gap = 4.0f;
 
-		float startXPix = minX + 30.0f;
-		float startYPix = maxY - 30.0f;
+		float startXPixel = minX + 30.0f;
+		float startYPixel = maxY - 30.0f;
 
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		AEGfxSetTransparency(1.0f);
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR); // COLOR RENDERING
+		AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND); // Normal color blending
+		AEGfxSetTransparency(1.0f); // Opaque
 
-		for (int y = 0; y < gridSize; ++y)
-		{
-			for (int x = 0; x < gridSize; ++x)
-			{
-				int idx = GetRoomIdx(x, y);
-				Room const& rm = rooms[static_cast<size_t>(idx)];
+		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
+			int curX = idx % gridSize, curY = idx / gridSize;	// Get x, y value of 2d room array
+			Room const* curRoom = Map::GetRoom(curX, curY);
+			Room const& rm = *(curRoom);
+			
+			if (rm.rmType == RoomType::Empty) continue;			// Skip void rooms obviously, given that this is a 2D Array
 
-				// Skip empty / non-generated rooms
-				if (rm.rmType == RoomType::Empty) continue;
+			Color c;
 
-				// Base color
-				Color c{ 0.6f, 0.6f, 0.6f, 0.85f };                    // Normal
-				if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };
-				if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };
+			if (rm.rmType == RoomType::Start) c = Color{ 0.2f, 0.9f, 0.2f, 0.90f };						// Green
+			else if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };				// Red
+			else c = Color{ 0.6f, 0.6f, 0.6f, 0.85f };													// Normal
 
-				// Current room highlight always wins
-				bool isCurrent = (currentRoom == &rooms[static_cast<size_t>(idx)]);
-				if (isCurrent) c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };
+			if (this->currentRoom == &(const_cast<Room&>(rm))) c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };	// Blue for current room?
+			else if ((rm.visited)) c = Color{ c.r * 0.5f, c.g * 0.5f , c.b * 0.5f, 0.55f };				// Dimmed color on map if room is visited
 
-				// Darken if NOT reachable from current room (but don't darken current room)
-				bool isReachable = reachable[static_cast<size_t>(idx)];
-				if (!isCurrent && !isReachable)
-				{
-					// Dark + a bit transparent so it looks "inactive"
-					c = Color{ c.r * 0.25f, c.g * 0.25f, c.b * 0.25f, 0.55f };
-				}
+			float px = startXPixel + curX * (cell + gap) + (cell / 2.0f);								// Essentially minX + 30 + current X (e.g., 0) * (total cell space) + half cell (for center)
+			float py = startYPixel - curY * (cell + gap) - (cell / 2.0f);								// Essentially minY - 30 + current X (e.g., 0) * (total cell space) - half cell (for center)
 
-				float px = startXPix + x * (cell + gap) + cell * 0.5f;
-				float py = startYPix - y * (cell + gap) - cell * 0.5f;
-
-				Sprite tile(squareMesh, Vector2{ px, py }, Vector2{ cell, cell }, c);
-				tile.RenderSprite();
-			}
+			Sprite tile(squareMesh, Vector2{ px, py }, Vector2{ cell, cell }, c);						// Convert each tile into a sprite, then render such
+			tile.RenderSprite(); // Render
 		}
 	}
 
+	void Map::RenderRoomDoors(AEGfxVertexList* squareMesh, AEGfxTexture* doorTexture) const
+	{
+		if (!squareMesh || !doorTexture || !currentRoom) return;
 
+		// Init settings here
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+		AEGfxSetColorToMultiply(1.0f, 1.0f, 1.0f, 1.0f);
+		AEGfxSetColorToAdd(0.0f, 0.0f, 0.0f, 0.0f);
+		AEGfxTextureSet(doorTexture, 0.0f, 0.0f);
+
+		// Init variables
+		const float winMinX = AEGfxGetWinMinX();
+		const float winMaxX = AEGfxGetWinMaxX();
+		const float winMinY = AEGfxGetWinMinY();
+		const float winMaxY = AEGfxGetWinMaxY();
+
+		// Size of doors
+		const float doorW = 280.0f;
+		const float doorH = 220.0f;
+		const float edgeOffset = 35.0f;	// Offset from screen
+
+		// Render Door Up Asset
+		if (currentRoom->up)
+		{
+			float offsetUp = 0.75f;
+			AEMtx33 scale, rot, trans, temp, finalMtx;
+			AEMtx33Scale(&scale, doorW, doorH * offsetUp);
+			AEMtx33Rot(&rot, 0.0f);	// Up is 0 rad
+			AEMtx33Trans(&trans, 0.0f, winMaxY - edgeOffset);
+
+			AEMtx33Concat(&temp, &rot, &scale);
+			AEMtx33Concat(&finalMtx, &trans, &temp);
+
+			AEGfxSetTransform(finalMtx.m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+		}
+
+		// Down
+		if (currentRoom->down)
+		{
+			// DOOR is not perfecion...
+			float offsetDown = 0.75f;
+			AEMtx33 scale, rot, trans, temp, finalMtx;
+			AEMtx33Scale(&scale, doorW, doorH * offsetDown);
+			AEMtx33Rot(&rot, PI);	// Down is 180 from top = PI
+			AEMtx33Trans(&trans, 0.0f, winMinY + edgeOffset);
+
+			AEMtx33Concat(&temp, &rot, &scale);
+			AEMtx33Concat(&finalMtx, &trans, &temp);
+
+			AEGfxSetTransform(finalMtx.m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+		}
+
+		// Left
+		if (currentRoom->left)
+		{
+			// DOOR is not perfecion...
+			float offsetLeft = 0.92f;
+			AEMtx33 scale, rot, trans, temp, finalMtx;
+			AEMtx33Scale(&scale, doorW, doorH * offsetLeft);
+			AEMtx33Rot(&rot, PI * 0.5f); // Left is 90 deg counterclockwise -> PI / 2
+			AEMtx33Trans(&trans, winMinX + edgeOffset, 0.0f);
+
+			AEMtx33Concat(&temp, &rot, &scale);
+			AEMtx33Concat(&finalMtx, &trans, &temp);
+
+			AEGfxSetTransform(finalMtx.m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);
+		}
+
+		// Right
+		if (currentRoom->right)
+		{
+			// DOOR is not perfecion...
+			float offsetRight = 0.99f;
+			AEMtx33 scale, rot, trans, temp, finalMtx;
+			AEMtx33Scale(&scale, doorW, doorH * offsetRight);
+			AEMtx33Rot(&rot, -PI * 0.5f); // Right is 90 deg clockwise or 270 counterclockwise -> - (PI / 2) OR (2PI * (3/4))
+			AEMtx33Trans(&trans, winMaxX - edgeOffset, 0.0f);
+
+			// T * (R * S)
+			AEMtx33Concat(&temp, &rot, &scale);
+			AEMtx33Concat(&finalMtx, &trans, &temp);
+
+			// Set Transform for rendering
+			AEGfxSetTransform(finalMtx.m);
+			AEGfxMeshDraw(squareMesh, AE_GFX_MDM_TRIANGLES);	// Render Door Right
+		}
+	}
 
 	Room* Map::GetRoom(int x, int y) {
+		size_t idx = static_cast<size_t>(GetRoomIdx(x, y));
+		return &(Map::rooms[idx]);
+	}
+
+	const Room* Map::GetRoom(int x, int y) const {
 		size_t idx = static_cast<size_t>(GetRoomIdx(x, y));
 		return &(Map::rooms[idx]);
 	}
@@ -736,6 +775,8 @@ namespace mapRooms
 		if (!target) return false;	// again should not happen just a function safeguard
 
 		currentRoom = target; // Room changed
+		//currentRoom->visited = true;
+		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 
 		//currentRoom->toBeTransferred = previousRoom->toBeTransferred;	// Hopefully?
