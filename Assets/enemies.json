@@ -1,0 +1,352 @@
+{
+	"enemies" :[
+		{
+			"name": "Default",
+			"sprite": "Assets/poprocks.png",
+			"color": [255,255,255,255],
+			"damage": 0,
+			"speed" : 0,
+			"likes" : [],
+			"dislikes": [],
+			"happy": {},
+			"neutral": {},
+			"angry": {}
+		},
+		{
+			"name": "Ice",
+			"sprite": "Assets/ice.png",
+			"happy": {
+				"IsTouchingTarget": [
+					"ApplySlowToTarget"
+				],
+				"IsTargetInSightRadius":[
+					"MoveToTarget",
+					"SafeDistancePlayer"
+				],
+				"default":[
+					"TargetPlayer",
+					"TargetEnemyInDetectionRadius",
+					"Wander"
+				]
+			},
+			"angry": {
+				"IsTouchingTarget": [
+					"ApplySlowToTarget"
+				],
+				"TargetInSightRadius": [
+					"MoveToTarget"
+				],
+				"default": [
+					"TargetPlayer"
+				]
+			},
+			"neutral": {
+				"IsTouchingTarget": [
+					"ApplySlowToTarget"
+				],
+				"default":[
+					"TargetPlayer",
+					"Wander"
+				]
+
+			}
+		},
+
+		{
+			"name": "Campfire",
+			"attackRate": 1,
+			"happyProjectile": {
+				"sprite" : "Assets/fire.png"
+			},
+			"entry" : "A cozy campfire that get's a LOT less cozy the closer you get to it.",
+			"happy":{
+				"default":[
+					"GoToMiddle",
+					"ShootProjectile"
+				]
+			},
+			"angry": {
+				"TargetNotInSightRadius":[
+					"MoveToTarget"
+				],
+				"default":[
+					"TargetPlayer",
+					"ShootProjectile"
+				]
+			},
+			"neutral":{
+				"IsTargetInSightRadius":[
+					"ApplySlowToTarget"
+					,"AttackAnim"
+				],
+				"default":[
+					"TargetPlayer"
+				]
+			}
+		},
+			
+		{
+			"name": "Booger",
+			"sprite": "Assets/booger.png",
+			"color": [255,255,255,255],
+			"damage": 0,
+			"speed" : 20,
+			"likes" : ["Gross"],
+			"dislikes": ["Clean"],
+			"happy": {
+				"IsTouchingTarget": [
+					"ApplySlowToTarget",
+					"MoveToTarget"
+				],
+				"IsNotFollowingPlayer":[
+					"TargetPlayer",
+					"MoveToTarget",
+					"TargetEnemyInDetectionRadius"
+				],
+				"default": [
+					"TargetPlayer",
+					"CircleMove",
+					"TargetEnemyInDetectionRadius"
+				]
+			},
+			"neutral": {
+				"IsTouchingTarget": [
+					"ApplySlowToTarget",
+					"MoveToTarget"
+				],
+				"default":[
+					"TargetPlayer",
+					"Wander"
+				]
+			},
+			"angry": {
+				"IsTouchingTarget":[
+					"ApplySlowToTarget",
+					"MoveToTarget"
+				],
+				"default":[
+					"TargetPlayer",
+					"MoveToTarget"
+				]
+			}
+		},
+		{
+			"name" : "Snowman",
+			"entry": "This frosty guy just stands around being happy. Don't touch him unnecessarily or your feet may just get piled by snowballs the next time you see him.",
+			"likes": ["Cold"],
+			"neutral": { 
+				"IsTouchingTarget": [
+					"BecomeAngry"
+				],
+				"default":[
+					"TargetPlayer"
+				]
+			},
+			"angry" : {
+				"TargetInLOS": [
+					"ShootProjectile"
+				],
+				"default": [
+					"TargetPlayer"
+				]
+			},
+			"happy" : {
+				"TargetInLOS" : [
+					"ShootProjectile"
+				],
+				"default":[
+					"TargetEnemyInDetectionRadius"
+				]
+			}
+			
+
+		},
+		{
+			"name":"THE OVEN",
+			"neutral":{
+				"WanderTimerDone":[
+					"ShootProjectile"
+				],
+				"default":[
+					"Wander"
+				]
+			},
+			"happy": {
+				"IsNotFollowingPlayer": [
+					"TargetPlayer",
+					"MoveToTarget"
+				],
+				"WanderTimerDone":[
+					"TargetPlayer",
+					"ShootProjectile"
+				],
+				"default":[
+					"Wander"
+				]
+			},
+			"angry": {
+				"TargetInSightRadius":[
+					"ShootProjectile"
+				],
+				"TargetNotInSightRadius":[
+					"MoveToTarget"
+				],
+				"default":[
+					"TargetPlayer",
+					"Wander"
+				]
+			}
+		},
+		{
+			"name":"Teeny Tiny Dragon",
+			"neutral":{
+				"IsTouchingTarget":[
+					"ApplySlowToTarget",
+					"DVDMove"
+				],
+				"default":[
+					"DVDMove",
+					"TargetPlayer"
+				]
+			},
+			"angry": {
+				"IsTargetInSightRadius":[
+					"ShootProjectile"
+				],
+				"default":[
+					"TargetPlayer",
+					"MoveToTarget"
+				]
+			},
+			"happy": {
+				"IsTargetInSightRadius":[
+					"ShootProjectile"
+				],
+				"IfNoTarget":[
+					"TargetRandomEnemy"
+				],
+				"default":[
+					"MoveToTarget"
+				]
+			}
+
+		},
+		{
+			"name":"Chameleon"
+		},
+		{
+			"name": "Pop Rocks",
+			"neutral":{
+				"IsTargetInSightRadius":[
+					"ShootProjectile"
+				]
+				,
+				"default":[
+					"TargetPlayer",
+					"Wander"
+				]
+			},
+			"angry":{
+				"IsTargetInSightRadius":[
+					"ShootProjectile"
+				]
+				,
+				"default":[
+					"TargetPlayer",
+					"MoveToTarget"
+				]
+			}
+			,
+			"happy":{
+				"IsTargetingPlayer": [
+					"MoveToTarget",
+					"SafeDistancePlayer"
+				],
+				"IsTargetInSightRadius":[
+					"ShootProjectile"
+				]
+				,
+				"default":[
+					"TargetPlayer",
+					"TargetEnemyInDetectionRadius",
+					"Wander"
+				]
+			}
+		},
+		{
+			"name": "Bouncy Spikes",
+			"neutral": { 
+				"IsTouchingTarget": [
+					"DamageTarget",
+					"DVDBounce"
+				],	
+				"default":[
+					"TargetPlayer",
+					"DVDMove"
+				]
+			},
+			"angry" : { 
+				"IsTouchingTarget": [
+					"DamageTarget",
+					"DVDBounce"
+				],	
+				"default":[
+					"TargetPlayer",
+					"DVDMove"
+				]
+			},
+			"happy": { 
+				"IsTouchingTarget": [
+					"DamageTarget",
+					"DVDBounce"
+				],	
+				"default":[
+					"TargetEnemyInDetectionRadius",
+					"DVDMove"
+				]
+			}
+		},
+		{
+			"name":"Goblin Knight",
+			"angry":{
+				"IsTargetInSightRadius":[
+					"TargetPlayer",
+					"AttackAnim",
+					"DamageTarget"
+				],
+				"TargetInLOS":[
+					"ShootProjectile"
+				],
+				"default": [
+					"TargetPlayer",
+					"Wander"
+				]
+			},
+			"happy":{
+				"IsTargetInSightRadius":[
+					"AttackAnim",
+					"DamageTarget"
+				],
+				"TargetInLOS":[
+					"ShootProjectile"
+				],
+				"IfNoTarget":[
+					"TargetRandomEnemy"
+				],
+				"default":[
+					"Wander",
+					"MoveToTarget"
+				]
+			},
+			"neutral":{
+				"IsTouchingTarget":[
+					"BecomeAngry"
+				],
+				"default":[
+					"TargetPlayer",
+					"Wander"
+				]
+			}
+		}
+	]
+}
