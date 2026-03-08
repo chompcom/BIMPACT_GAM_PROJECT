@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "Gift.h"
 #include "Enemy.h"
+#include "HUD.h"
 #include "GameStateList.h"
 #include "GameStateManager.h"
 

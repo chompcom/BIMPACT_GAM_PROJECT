@@ -97,8 +97,13 @@ void WalkToTarget(Enemy& me, float dt) {
 		me.sprite.position += (newTarget-me.sprite.position)* 10 *dt;
 	}
 	else 
-	me.sprite.position += direction.Normalized() * 50 * dt;
+	me.sprite.position += direction.Normalized() * 150 * dt;
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
-	me.sprite.color = Color{ 0.0f,1.0f,0.0f,1.0f };
+	me.sprite.color = Color{ 0.0f,0.0f,1.0f,1.0f };
 	me.sprite.UpdateTransform();
+
 } 
+
+
+
+

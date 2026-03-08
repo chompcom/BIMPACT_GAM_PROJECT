@@ -4,6 +4,7 @@
 #include "AEEngine.h"
 #include "BoundaryCollision.h"
 #include "Collision.h"
+#include <iostream>
 
 //contructor for player class
 Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
@@ -11,20 +12,46 @@ Player::Player(TexturedSprite sprite, f32 throwStrength, f32 speed, Vector2 posi
 	sprite{ sprite },
 	throwStrength{ throwStrength },
 	speed{ speed }, 
+	health { 3 },
 	position{ position },
 	direction{ direction },
 	pickUpState{ false },
 	throwState{ false },
 	heldGift{ nullptr },
 	throwForce{ 0.f },
-	pickUpCooldown{ 0.f }
+	pickUpCooldown{ 0.f },
+	invulnerableTimer{ 0.f }
 {
 }
+
+static bool fadingIn = false; //for the blinking effect when the player is immune
 
 void UpdatePlayer(Player & player, f32 deltaTime)
 {
 	u8 w{ AEInputCheckCurr(AEVK_W) }, a{ AEInputCheckCurr(AEVK_A) },
 		s{ AEInputCheckCurr(AEVK_S) }, d{ AEInputCheckCurr(AEVK_D) };
+
+	//Let player blink if invulnerable
+	if (player.invulnerableTimer > 0.f)
+	{
+		if (!fadingIn)
+		{
+			player.sprite.color.a -= (0.5f * deltaTime) * 10;
+			if (player.sprite.color.a <= 0.2f) fadingIn = true;
+		}
+		else
+		{
+			player.sprite.color.a += (0.5f * deltaTime) * 10;
+			if (player.sprite.color.a >= 1.f) fadingIn = false;
+		}
+
+		player.invulnerableTimer -= deltaTime;
+	}
+	else if (player.sprite.color.a < 1.f)
+	{
+		fadingIn = false;
+		player.sprite.color.a = 1.f;
+	}
 
 	//set the player's pick up to false if there is still time in the pickUpCooldown
 	if (player.pickUpCooldown > 0.f)
@@ -63,15 +90,34 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 
 	//if the player is holding an item and they press space, 
 	//let them charge their throw
-	if (player.pickUpState && AEInputCheckCurr(AEVK_SPACE) && player.pickUpCooldown <= 0.0f)
+	if (player.pickUpState && player.heldGift != nullptr && 
+		AEInputCheckCurr(AEVK_SPACE) && player.pickUpCooldown <= 0.0f)
 	{
+		//reset the held gift's position after shaking
+		(*player.heldGift).sprite.position = (*player.heldGift).position;
+
+		(*player.heldGift).shakeState = true;
+
+		//Calculate the player's throwing force
 		player.throwState = true;
 		player.throwForce += deltaTime * player.throwStrength;
 		player.throwForce = AEClamp(player.throwForce, 2000.f, 10000.f);
+
+		//Shake the gift
+		Vector2 shakeVector{ (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 , 
+			(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 };
+
+		shakeVector = shakeVector.Normalized() * (player.throwForce / 700.f);
+		(*player.heldGift).sprite.position += shakeVector;
+
 	}
+
 	//if the player released their spacebar and they are holding a gift
 	else if (AEInputCheckReleased(AEVK_SPACE) && player.heldGift != nullptr && player.pickUpState)
 	{
+		//reset the held gift's position after shaking
+		(*player.heldGift).sprite.position = (*player.heldGift).position;
+		(*player.heldGift).shakeState = false;
 		//put down the gift and give it a velocity depenedent 
 		//on how long the player has been charging up for
 		player.throwState = false;
@@ -81,8 +127,17 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.heldGift = nullptr;
 		player.throwForce = 0.f;
 	}
+}
 
-	return;
+//function for player to take damage
+void playerTakesDamage(Player& player)
+{
+	if (player.invulnerableTimer <= 0.f)
+	{
+		--(player.health);
+
+		player.invulnerableTimer = 3.f;
+	}
 }
 
 

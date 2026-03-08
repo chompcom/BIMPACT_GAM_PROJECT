@@ -22,7 +22,9 @@ class Sprite {
 
 		void UpdateTransform();
 
-		void RenderSprite();
+		//void RenderSprite();
+
+		void RenderSprite(bool changeAlpha = false);
 };
 
 class TexturedSprite : public Sprite {
@@ -31,7 +33,7 @@ class TexturedSprite : public Sprite {
 
 		TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor = Color{ 1.0f,1.0f,1.0f,1.0f });
 
-		void RenderSprite();
+		void RenderSprite(bool changeAlpha = false);
 };
 
 AEGfxVertexList* CreateSquareMesh();

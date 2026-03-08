@@ -11,11 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Source\Boss.cpp" />
     <ClCompile Include="..\Source\BoundaryCollision.cpp" />
     <ClCompile Include="..\Source\Collision.cpp" />
     <ClCompile Include="..\Source\Enemy.cpp" />
+    <ClCompile Include="..\Source\FSM.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
+    <ClCompile Include="..\Source\HUD.cpp" />
     <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
@@ -30,13 +33,17 @@
     <ClCompile Include="..\Source\rooms.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Boss.h" />
     <ClInclude Include="..\Source\BoundaryCollision.h" />
     <ClInclude Include="..\Source\Collision.h" />
     <ClInclude Include="..\Source\Behaviour\Behaviours.hpp" />
     <ClInclude Include="..\Source\Enemy.h" />
+    <ClInclude Include="..\Source\FSM.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
+    <ClInclude Include="..\Source\HUD.h" />
+    <ClInclude Include="..\Source\Player.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.h" />
     <ClInclude Include="..\Source\Projectile.h" />
     <ClInclude Include="..\Source\ProjectileManager.h" />
@@ -90,6 +97,8 @@
     <IntDir>$(SolutionDir).tmp\$(Configuration)-$(Platform)\</IntDir>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)Extern\AlphaEngine\include</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(SolutionDir)Extern\AlphaEngine\lib</LibraryPath>
+    <Linkage-jsoncpp>
+    </Linkage-jsoncpp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\</OutDir>
@@ -140,14 +149,12 @@ xcopy "$(SolutionDir)Extern\AlphaEngine\lib\fmod.dll" "$(OutDir)" /s /r /y /q</C
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets" Condition="Exists('..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets')" />
-    <Import Project="..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets" Condition="Exists('..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets')" />
+    <Import Project="..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets" Condition="Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\jsoncpp.redist.0.6.0.1\build\native\jsoncpp.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\jsoncpp.0.6.0.1\build\native\jsoncpp.targets'))" />
+    <Error Condition="!Exists('..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\JsonCpp.Windows.1.9.2\build\JsonCpp.Windows.targets'))" />
   </Target>
 </Project>

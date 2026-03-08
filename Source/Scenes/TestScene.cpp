@@ -13,6 +13,7 @@
 #include "../RoomData.h"
 #include "Projectile.h"
 #include "ProjectileManager.h"
+#include "../HUD.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -24,6 +25,11 @@ AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
 AEGfxTexture* bulletpng = nullptr;
 AEGfxTexture* aoepng = nullptr;
+AEGfxTexture* heartpng = nullptr;
+
+std::vector<TexturedSprite> healthIcons;
+s8 font = 0;
+
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 static ProjectileManager projManager;
 
@@ -52,6 +58,38 @@ void TestLoad()
 	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
+	heartpng = AEGfxTextureLoad("Assets/heart.png");
+
+	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+
+	//healthIcons[0] = TexturedSprite(sqmesh, heartpng, Vector2{ -600.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[1] = TexturedSprite(sqmesh, heartpng, Vector2{ -500.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[2] = TexturedSprite(sqmesh, heartpng, Vector2{ -400.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+
+	//healthIcons[0] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[1] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[2] = DataLoader::CreateTexture("Assets/heart.png");
+
+	//healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	//healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	//healthIcons[2].position = Vector2{ -400.5f,-350.f };
+
+	//healthIcons[0].scale = Vector2{ 64.f,64.f };
+	//healthIcons[1].scale = Vector2{ 64.f,64.f };
+	//healthIcons[2].scale = Vector2{ 64.f,64.f };
+
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+
+	healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	healthIcons[2].position = Vector2{ -400.5f,-350.f };
+
+	healthIcons[0].scale = Vector2{ 64.f,64.f };
+	healthIcons[1].scale = Vector2{ 64.f,64.f };
+	healthIcons[2].scale = Vector2{ 64.f,64.f };
+
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 }
@@ -75,9 +113,14 @@ void TestLoad()
 
 	globalTransferData.player = &player;
 
+	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 	projManager.InitFireball(sqmesh, bulletpng);
 	projManager.InitAOE(sqmesh, aoepng);
+
+	
+
+
 }
 
 void TestInit()
@@ -106,6 +149,7 @@ void TestDraw()
 
 		for (Gift* g : roomData.giftList)   if (g) g->sprite.RenderSprite();
 		for (Enemy* e : roomData.enemyList) if (e) e->sprite.RenderSprite();
+		if (roomData.boss) roomData.boss->sprite.RenderSprite();
 
 		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
 		for (Enemy* e : carryData.enemyList) if (e) e->sprite.RenderSprite();
@@ -116,11 +160,13 @@ void TestDraw()
 	}
 	
 
-	player.sprite.RenderSprite();
+	player.sprite.RenderSprite(true);
 	//rock.sprite.RenderSprite();
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
+
+	renderPlayerLives(player, healthIcons, font);
 
 	//rock.sprite.RenderSprite();
 
@@ -146,6 +192,9 @@ void TestUnload()
 	AEGfxTextureUnload(playerpng);
 	AEGfxTextureUnload(bulletpng);
 	
+	AEGfxTextureUnload(heartpng);
+
+	AEGfxDestroyFont(font);
 	
 	// Dellocate enemy and gift assets
 	for (Enemy *e: globalTransferData.enemyList) {
@@ -172,6 +221,9 @@ void TestUpdate(float dt)
 	// Player update
 	UpdatePlayer(player, dt);
 	player.sprite.UpdateTransform();
+
+	//to test damage
+	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
 
 	//std::cout << player.position.x << player.position.y;
 
@@ -213,6 +265,10 @@ void TestUpdate(float dt)
 		}
 	}
 
+	if (roomData.boss) {
+		roomData.boss->Update(player, dt);
+		roomData.boss->sprite.UpdateTransform();
+	}
 
 	// Gifts and Enemy Check
 	for (Gift* gift : currentRoom->currentRoomData.giftList) {

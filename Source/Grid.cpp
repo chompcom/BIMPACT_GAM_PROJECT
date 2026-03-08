@@ -113,4 +113,8 @@ int Grid::CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, 
 		isTouch |= COLLISION_BOTTOM; //if either hotspot on the bottom side is in a collision cell, set the COLLISION_BOTTOM bit in isTouch
 	}
 	return isTouch;
+	return  tiles.at(y).at(x).type ==  GridType::EMPTY; // if i use at it is slower but check bounds compared to Tiles[w][h], see performance first and change if needed 
+}
+bool Grid::IsDoor(int x, int y) const {
+	return  tiles.at(y).at(x).type == GridType::DOOR; // if i use at it is slower but check bounds compared to Tiles[w][h], see performance first and change if needed 
 }

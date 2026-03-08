@@ -18,7 +18,8 @@ enum class GridType {
 	INVALID = -1,
 	EMPTY,
 	WALL,
-	DOOR
+	DOOR,
+	NUM_TYPES
 
 };
 
@@ -42,5 +43,6 @@ public:
 	bool IsEmpty(int x, int y) const;
 	void SetTile(int x, int y, GridType type);
 	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY);
+	bool IsDoor(int x, int y) const;
 };
 
