@@ -72,33 +72,33 @@ namespace DataLoader {
 			//std::cout << theGuy["enemies"][0]["name"];
 
 			//Getting enemy types
-			enemyTypes.reserve(theGuy["enemyTypes"].size());
+			enemyTypes.reserve(theGuy["enemies"].size());
 
-			for (Json::Value& name : theGuy["enemyTypes"]) {
+			for (Json::Value& name : theGuy["enemies"]) {
 
 				//get all the traits
-				Labels tmpTraits;
-				for (Json::Value& trait : name["traits"])
-				{
-					tmpTraits.insert(trait.asString());
-				}
+				//Labels tmpTraits;
+				//for (Json::Value& trait : name["traits"])
+				//{
+				//	tmpTraits.insert(trait.asString());
+				//}
 
-				//get all the likes
-				Labels tmpLikes;
-				for (Json::Value& like : name["likes"])
-				{
-					tmpLikes.insert(like.asString());
-				}
+				////get all the likes
+				//Labels tmpLikes;
+				//for (Json::Value& like : name["likes"])
+				//{
+				//	tmpLikes.insert(like.asString());
+				//}
 
 				//get all the dislikes
-				Labels tmpDislikes;
-				for (Json::Value& dislike : name["dislikes"])
-				{
-					tmpDislikes.insert(dislike.asString());
-				}
+				//Labels tmpDislikes;
+				//for (Json::Value& dislike : name["dislikes"])
+				//{
+				//	tmpDislikes.insert(dislike.asString());
+				//}
 
-				EnemyType tmp{ name["name"].asString(), name["health"].asFloat(), name["damage"].asFloat(), 
-					tmpTraits, tmpLikes, tmpDislikes };
+				//EnemyType tmp{ name["name"].asString(), name["health"].asFloat(), name["damage"].asFloat(), 
+				//	tmpTraits, tmpLikes, tmpDislikes };
 
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
 
@@ -131,8 +131,12 @@ namespace DataLoader {
 
 		}
 
+
+
 		if (almanacFile.is_open()) {
 			//Getting almanac entries
+
+			almanacFile >> theGuy;
 			almanacEntries.reserve(theGuy["almanacEntries"].size());
 
 			for (Json::Value& name : theGuy["almanacEntries"]) 
@@ -141,9 +145,10 @@ namespace DataLoader {
 					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
+				
 
 				almanacEntries.push_back(tmp);
-				// std::cout << "name: " << name["name"] << std::endl;
+				 std::cout << "name: " << name["name"] << std::endl;
 			}
 
 		}
