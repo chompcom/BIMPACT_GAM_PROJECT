@@ -1,6 +1,8 @@
 #include "AEEngine.h"
 #include "../Sprite.h"
+#include <Windows.h>	// Windows
 #include <iostream>
+
 
 bool AreCirclesIntersecting(Vector2 circle1_Center, f32 circle1_Radius, Vector2 circle2_Center, f32 circle2_Radius) {
 	f32 radius_Sum = circle1_Radius + circle2_Radius;
@@ -52,4 +54,18 @@ bool IsCursorInRect(Vector2 rect_Center, float rect_Width, float rect_Length)
 
 		cursorPositionY < (rect_Center.y + (rect_Length / 2.f)) &&
 		cursorPositionY >(rect_Center.y - (rect_Length / 2.f)));
+}
+//}
+
+std::string ExtractFileName(const std::string& fullpath) {
+	// 1. Get ONLY filename by finding the last slash
+	size_t lastSlash = fullpath.find_last_of("\\/");
+	std::string file = (lastSlash == std::string::npos) ? fullpath : fullpath.substr(lastSlash + 1);
+
+	// 2. Get filename WITHOUT extension
+	size_t lastDot = file.find_last_of('.');
+	if (lastDot != std::string::npos) file.erase(lastDot);
+
+	// 3. Return file name ONLY
+	return file.empty() ? "Default" : file;
 }

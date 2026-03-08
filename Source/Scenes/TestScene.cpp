@@ -22,6 +22,7 @@ AEGfxTexture* rockpng = nullptr;
 AEGfxTexture* playerpng = nullptr;
 AEGfxTexture* heartpng = nullptr;
 AEGfxTexture* almanacpng = nullptr;
+AEGfxTexture* pDoorTex = nullptr;	// Door image
 
 //AEGfxTexture* almanacpagepng = nullptr;
 
@@ -67,6 +68,27 @@ void TestLoad()
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
+	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+
+	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
+	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
+
+
+	//healthIcons[0] = TexturedSprite(sqmesh, heartpng, Vector2{ -600.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[1] = TexturedSprite(sqmesh, heartpng, Vector2{ -500.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+	//healthIcons[2] = TexturedSprite(sqmesh, heartpng, Vector2{ -400.5f,-350.f }, Vector2{ 64.f,64.f }, Color{ 1.f,1.f,1.f,1.f });
+
+	//healthIcons[0] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[1] = DataLoader::CreateTexture("Assets/heart.png");
+	//healthIcons[2] = DataLoader::CreateTexture("Assets/heart.png");
+
+	//healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	//healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	//healthIcons[2].position = Vector2{ -400.5f,-350.f };
+
+	//healthIcons[0].scale = Vector2{ 64.f,64.f };
+	//healthIcons[1].scale = Vector2{ 64.f,64.f };
+	//healthIcons[2].scale = Vector2{ 64.f,64.f };
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
@@ -114,7 +136,16 @@ void TestLoad()
 	globalTransferData.player = &player;
 
 	//square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+
+	// Enable to allow for random values each run
+	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
+	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
+	gameMap.InitMap(globalTransferData, curSeed);
+	std::cout << "Current Seed: " << curSeed << "\n";
+	// Interesting ones: 32461, 32608, 31931, 18283
+	// Too easy: 32702, 0xA341311Cu, 
+
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 
 	
 
@@ -136,7 +167,7 @@ void TestDraw()
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	
 	
-	gameMap.RenderCurrentRoom(sqmesh);
+	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 	// Draw objects: current-room objects + carried objects
