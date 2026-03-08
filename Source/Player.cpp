@@ -76,7 +76,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 
 		//set the player's sprite position to match its actual position
 		player.sprite.position = player.position;
-		player.shadow.position = Vector2{ player.sprite.position.x, player.sprite.position.y - 45 };
+		player.shadow.position = player.position - Vector2{ 0, 40 };
 	}
 
 	//if player is trying to move, set their direction

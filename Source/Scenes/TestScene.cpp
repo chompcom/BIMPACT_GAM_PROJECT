@@ -137,7 +137,12 @@ void TestDraw()
 		RoomData& roomData = room->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
-		for (Gift* g : roomData.giftList)   if (g) g->sprite.RenderSprite();
+		for (Gift* g : roomData.giftList) {
+			if (g) {
+				if (!g->pickUpState) g->shadow.RenderSprite();
+				g->sprite.RenderSprite();
+			}
+		}
 		for (Enemy* e : roomData.enemyList) {
 			if (e) {
 				e->shadow.RenderSprite();
@@ -150,7 +155,12 @@ void TestDraw()
 
 		}
 
-		for (Gift* g : carryData.giftList)   if (g) g->sprite.RenderSprite();
+		for (Gift* g : carryData.giftList) {
+			if (g) {
+				if (!g->pickUpState) g->shadow.RenderSprite();
+				g->sprite.RenderSprite();
+			}
+		}
 		for (Enemy* e : carryData.enemyList) {
 			if (e) {
 				e->shadow.RenderSprite();
@@ -248,12 +258,14 @@ void TestUpdate(float dt)
 		if (g) {
 			UpdateGift(*g, player, dt);
 			g->sprite.UpdateTransform();
+			g->shadow.UpdateTransform();
 		}
 	}
 	for (Gift* g : carryData.giftList) {
 		if (g) {
 			UpdateGift(*g, player, dt);
 			g->sprite.UpdateTransform();
+			g->shadow.UpdateTransform();
 		}
 	}
 
