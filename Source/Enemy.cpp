@@ -4,12 +4,37 @@
 #include "Traits.h"
 #include "BoundaryCollision.h"
 #include <set>
+#include <map>
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{ nullptr }, target{}
+	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 {
 		ChangeState(initialState);
-//		mesh = CreateSquareMesh();
-//		sprite.mesh = mesh;
+}
+
+
+
+Enemy::Target::Target() : 
+	position{nullptr}, isPlayer{false}, isActive{false}
+{ }
+
+Enemy::Target::~Target() {
+	position = nullptr;
+	isPlayer = false;
+	isActive = false;
+}
+
+Enemy::Target& Enemy::Target::operator=(Enemy& them) {
+	position = &them.sprite.position;	
+	isActive = true;
+	isPlayer = false;
+	return *this;
+}
+Enemy::Target& Enemy::Target::operator=(Player& them) {
+
+	isActive = true;
+	isPlayer = true;
+	position = &them.sprite.position;
+	return *this;
 }
 
 Enemy::~Enemy() {
@@ -22,6 +47,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 	switch (newstate)
 	{
 	case ES_HAPPY:
+
 		currentBehavior = enemyType.happy;
 		break;
 	case ES_NEUTRAL:
@@ -34,8 +60,15 @@ void Enemy::ChangeState(EnemyStates newstate)
 }
 
 void Enemy::Update(float dt) {
-	if (currentBehavior == nullptr) return;
-	this->currentBehavior(*this,dt);
+	for (auto& combi : currentBehavior) {
+		if ( combi.first(*this)) { //so we are doing the check one at a time
+			for (Command& actions : combi.second){
+				actions(*this,dt);
+			}
+			break;//don't do the other checks
+		}
+	}
+
 }
 
 void Enemy::AssessTraits(Labels labels){
@@ -53,57 +86,21 @@ void Enemy::AssessTraits(Labels labels){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes },
-		neutral{ nullptr }, happy{ nullptr }, angry{ nullptr } {
-}
-void EnemyType::AddNeutral(Command cmd){
-	//neutral.push_back(cmd);
-}
-void EnemyType::AddNeutral(std::vector<Command> bunch){
-	//for (Command thing : bunch)
-		//neutral.push_back(thing);
+	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{},happy()
+{
 }
 
-void EnemyType::AddHappy(Command cmd){
-	//happy.push_back(cmd);
-}
-void EnemyType::AddHappy(std::vector<Command> bunch){
-}
-
-void EnemyType::AddAngry(Command cmd){
-	//neutral.push_back(cmd);
-}
-void EnemyType::AddAngry(std::vector<Command> bunch){
+void EnemyType::AddNeutral(FlagCheck const& checker, BundledBehaviour const& behaviours)
+{
+	neutral.push_back({ checker, behaviours });
 }
 
-void WalkLeft(Enemy& me, float dt) {
-	me.sprite.position += Vector2(-50, 0) * dt;
-	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
-		me.currentBehavior = WalkRight;
-	me.sprite.UpdateTransform();
+void EnemyType::AddAngry(FlagCheck const& checker, BundledBehaviour const& behaviours)
+{
+	angry.push_back({ checker, behaviours });
 }
 
-void WalkRight(Enemy& me, float dt){
-	me.sprite.position += Vector2(50,0) * dt;
-	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900) ? me.currentBehavior = WalkLeft : 0;
-	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
-	me.sprite.UpdateTransform();
+void EnemyType::AddHappy(FlagCheck const& checker, BundledBehaviour const& behaviours)
+{
+	happy.push_back({ checker, behaviours });
 }
-
-void WalkToTarget(Enemy& me, float dt) {
-	Vector2 direction{ (me.target - me.sprite.position) };
-	if ( me.sprite.position.Distance(me.target) <= 160.f) {
-		Vector2 newTarget = me.target + (me.sprite.position - me.target).Normalized() * 160.f;
-		me.sprite.position += (newTarget-me.sprite.position)* 10 *dt;
-	}
-	else 
-	me.sprite.position += direction.Normalized() * 150 * dt;
-	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
-	me.sprite.color = Color{ 0.0f,0.0f,1.0f,1.0f };
-	me.sprite.UpdateTransform();
-
-} 
-
-
-
-

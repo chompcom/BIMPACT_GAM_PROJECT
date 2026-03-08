@@ -11,6 +11,7 @@
 #include "Enemy.h"
 #include "Loaders/DataLoader.h"
 #include "Collision.h"
+#include "Behaviour/Behaviours.h"
 
 #include "RoomData.h"
 #include "Gift.h"		// ????
@@ -114,12 +115,11 @@ namespace mapRooms
 			this->rmType = roomType;
 		}
 		if (rmType == RoomType::Normal) {
-			somethingelse.neutral = WalkLeft;
-			somethingelse.happy = WalkToTarget;
-			somethingelse.angry = WalkRight;
-			currentRoomData.enemyList.push_back(new Enemy(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+			
+			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
 				i->ChangeState(EnemyStates::ES_NEUTRAL);
+				i->roomData = &this->currentRoomData;
 			}
 
 			// Gifts here (1 Gift per room for now)
@@ -128,7 +128,7 @@ namespace mapRooms
 			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
 			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 
-			currentRoomData.giftList.push_back(new Gift("boat", { "happy" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
+			currentRoomData.giftList.push_back(new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png")));
 		}
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 5.0f, 4.0f, 3.0f} };
