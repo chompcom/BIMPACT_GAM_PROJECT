@@ -55,7 +55,7 @@ bool IsCursorInRect(Vector2 rect_Center, float rect_Width, float rect_Length)
 		cursorPositionY < (rect_Center.y + (rect_Length / 2.f)) &&
 		cursorPositionY >(rect_Center.y - (rect_Length / 2.f)));
 }
-}
+//}
 
 std::string ExtractFileName(const std::string& fullpath) {
 	// 1. Get ONLY filename by finding the last slash
