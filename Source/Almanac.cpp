@@ -81,7 +81,6 @@ void LoadAlmanacEntries(Almanac& almanac)
 {
 	almanac.entries.clear();
 	almanac.entries = DataLoader::GetAlmanacVector();
-	std::cout << "Size of Almanac after loading" << almanac.entries.size() << "\n";
 }
 
 //Only called in RenderAlmanacPages, renders the appropriate items ON the current page

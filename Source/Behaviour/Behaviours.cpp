@@ -74,7 +74,19 @@ void ApplySlowToTarget(Enemy& me, float dt) {
 }
 
 void Wander(Enemy& me, float dt) {
-
+	if (me.wanderTimer <= 0.f) {
+		me.wanderTimer = 3.f;
+		me.velocity = Vector2{};
+	}
+	if (me.velocity == Vector2{}) {
+		float randx = AERandFloat() * 2 - 1;
+		float randy = AERandFloat() * 2 - 1;
+		me.velocity = Vector2{randx, randy};
+		std::cout << me.velocity.x << " " << me.velocity.y << std::endl;	
+	}
+	me.sprite.position += me.velocity.Normalized() * me.type.speed * dt;
+	me.sprite.UpdateTransform();
+	
 }
 
 void CircleMove(Enemy& me, float dt) {
@@ -106,6 +118,63 @@ void TargetPlayer(Enemy& me, float dt) {
 		me.target = *me.roomData->player;
 }
 
+void SafeDistancePlayer(Enemy& me, float dt) {
+	Vector2 playerPos = me.roomData->player->sprite.position;
+	if (AreCirclesIntersecting(me.sprite.position, me.sprite.scale.x, playerPos, me.type.safeRadius) ) {
+
+		Vector2 direction{ (playerPos - me.sprite.position) };
+		direction = -direction;
+		me.sprite.position += direction.Normalized() * me.type.speed;
+	}
+}
+void TargetRandomEnemy(Enemy& me, float dt) {
+	if (me.roomData->enemyList.empty()) return;
+	me.target = *me.roomData->enemyList[	
+		std::rand() % me.roomData->enemyList.size()];
+}
+void TargetMiddle(Enemy& me, float dt) {
+	me.target.initialPosition = Vector2();
+}
+void TargetCorner(Enemy& me, float dt) {
+
+	me.target.initialPosition = Vector2(100,100);
+}
+void FireProjectile(Enemy& me, float dt) {
+
+}
+void DVDMove(Enemy& me, float dt) {
+
+}
+void DVDBounce(Enemy& me, float dt) {
+
+}
+void BecomeAngry(Enemy& me, float dt) {
+	me.ChangeState(ES_ANGRY);
+}
+void BecomeNeutral(Enemy& me, float dt) {
+
+	me.ChangeState(ES_NEUTRAL);
+}
+void DamageTarget(Enemy& me, float dt) {
+//now this gets tricky!!
+//hard code for now!!
+	if (me.attackTimer <= 0) {
+		me.attackTimer = 3;
+		
+		if (me.target.isPlayer) {
+			playerTakesDamage(*me.roomData->player);
+		}
+
+	}
+
+}
+
+void PullTarget(Enemy& me, float dt) {
+
+}
+void PushTarget(Enemy& me, float dt) {
+
+}
 
 //unused template functions
 bool DefaultFlag(Enemy& me){
@@ -148,7 +217,20 @@ void InitCommands() {
 		{"Wander", Wander},
 		{"CircleMove", CircleMove},
 		{"TargetEnemyInDetectionRadius", TargetEnemyInDetectionRadius},
-		{"TargetPlayer",TargetPlayer}
+		{"TargetPlayer",TargetPlayer},
+		{"SafeDistancePlayer",SafeDistancePlayer},
+		{"TargetRandomEnemy",TargetRandomEnemy},
+		{"TargetMiddle", TargetMiddle},
+		{"TargetCorner", TargetCorner},
+		{"FireProjectile", FireProjectile},
+		{"DVDMove", DVDMove},
+		{"DVDBounce", DVDBounce},
+		{"BecomeAngry", BecomeAngry},
+		{"BecomeNeutral", BecomeNeutral},
+		{"DamageTarget", DamageTarget},
+		{"PullTarget", PullTarget},
+		{"PushTarget", PushTarget}
+
     };
 }
 

@@ -1,0 +1,18 @@
+IsTouchingTarget
+	target is touching the enemy within the sprite scale
+IsNotTouchingTarget
+	target is not touching me
+IsTargetInDetectionRadius
+	target is within detectionRadius
+IsTargetNotInDetectionRadius
+	target is not within detectionRadius
+IsFollowingPlayer
+	target is within safeRadius
+IsNotFollowingPlayer
+	target is outside safeRadius
+IsTargetInLOS
+	target is in line of sight (line not blocked by wall)
+IsTargetNotInLOS
+	target is not in line of sight
+WanderTimerDone
+	when the timer started by "wander" is done

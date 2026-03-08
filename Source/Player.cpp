@@ -140,6 +140,13 @@ void playerTakesDamage(Player& player)
 	}
 }
 
+void playerHealsDamage(Player& player)
+{
+
+	player.health++;
+
+}
+
 
 
 

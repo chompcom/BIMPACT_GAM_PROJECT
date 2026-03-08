@@ -29,3 +29,5 @@ public:
 void UpdatePlayer(Player & player, f32 deltaTime);
 
 void playerTakesDamage(Player & player);
+
+void playerHealsDamage(Player& player);

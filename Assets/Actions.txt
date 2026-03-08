@@ -1,0 +1,42 @@
+ApplySlowToTarget
+	applies slow speed modifier
+
+MoveToTarget
+	move to target
+SafeDistancePlayer
+	keep away from player at safeRadius
+TargetPlayer
+	set target to player
+TargetRandomEnemy
+	set target to a random enemy in list
+TargetEnemyInDetectionRadius
+	find the closest enemy in detectionRadius and target them
+Wander
+	activate wander timer and move in a random direction
+TargetMiddle
+	target the middle thing
+TargetCorner
+	move to the nearest corner if not already in corner
+ShootProjectile
+	shoots a projectile at the rate given by attackRate
+CircleMove
+	move in a circle around target
+DVDMove
+	move like the dvd logo (bounce around)
+DVDBounce
+	do a bounce "off" the target
+BecomeAngry
+	change state to angry
+BecomeNeutral
+	change state to neutral
+DamageTarget
+	straight up damage the target at an attack rate. Be careful with this one.
+PullTarget
+	"pull" target towards self like a gravity. Strength based on strength.
+PushTarget
+	"push" target away from self. Strength based on strength.
+
+
+//later
+AttackAnim
+	plays attack animation

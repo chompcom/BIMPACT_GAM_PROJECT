@@ -136,6 +136,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\ProjectileManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\Boss.h">
       <Filter>Header Files</Filter>
     </ClInclude>

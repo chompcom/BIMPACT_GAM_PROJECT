@@ -7,6 +7,7 @@
 #include <map>
 Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
+	,wanderTimer{}
 {
 		ChangeState(initialState);
 }
@@ -14,7 +15,7 @@ Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, EnemyStates
 
 
 Enemy::Target::Target() : 
-	position{nullptr}, isPlayer{false}, isActive{false}
+	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{false}
 { }
 
 Enemy::Target::~Target() {
@@ -25,6 +26,7 @@ Enemy::Target::~Target() {
 
 Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	position = &them.sprite.position;	
+	initialPosition = them.sprite.position;
 	isActive = true;
 	isPlayer = false;
 	return *this;
@@ -34,6 +36,7 @@ Enemy::Target& Enemy::Target::operator=(Player& them) {
 	isActive = true;
 	isPlayer = true;
 	position = &them.sprite.position;
+	initialPosition = them.sprite.position;
 	return *this;
 }
 
@@ -68,7 +71,11 @@ void Enemy::Update(float dt) {
 			break;//don't do the other checks
 		}
 	}
+	if (wanderTimer > 0.f) 
+		wanderTimer -= dt;
 
+	if (attackTimer > 0.f) 
+		attackTimer -= dt;
 }
 
 void Enemy::AssessTraits(Labels labels){
