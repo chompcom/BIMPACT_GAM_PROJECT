@@ -12,6 +12,10 @@ namespace DataLoader {
 	void Load();
 	void Unload();
 
+	auto LoadJson(std::string filename);	// auto cuz we never load the header here
+	bool DumpFile(std::string filename, std::vector<std::pair<std::string, std::string>> const& data);
+
+
 	AEGfxVertexList* GetMesh();
 
 	TexturedSprite CreateTexture(std::string filename);

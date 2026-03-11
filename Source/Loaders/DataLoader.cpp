@@ -56,6 +56,36 @@ namespace DataLoader {
 
 	static Json::Value theGuy;
 
+	auto LoadJson(std::string file) {
+		Json::Value res;
+		std::ifstream fileInstance{ file };
+
+		if (fileInstance.is_open()) {
+			fileInstance >> res;
+		}
+		return res;
+	}
+
+	bool DumpFile(std::string filename, std::vector<std::pair<std::string, std::string>> const &data) {
+		Json::Value output;
+		std::ofstream o{ filename };
+
+		if (o.is_open()) {
+			for (std::pair<std::string, std::string> const& entry : data) output[entry.first] = entry.second;
+			// Output
+			Json::StreamWriterBuilder builder;
+			builder["commentStyle"] = "None";
+			builder["indentation"] = "   ";
+			std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+			writer->write(output, &o);
+			o << std::endl;	// Write and flush
+			return true;
+		}
+		return false;
+	}
+
+
+
 	void Load() {
 		squareMesh = CreateSquareMesh();
 		textures.reserve(5);
