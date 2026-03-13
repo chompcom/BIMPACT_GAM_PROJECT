@@ -7,6 +7,8 @@
 #include "BoundaryCollision.h"
 #include "Collision.h"
 #include "Utils/Utils.h"
+#include "ProjectileManager.h"
+#include "Grid.h"
 
 #include <iostream>
 
@@ -17,7 +19,30 @@ using CommandPair = std::pair<std::string, Command>;
 using FlagList = std::unordered_map<std::string, FlagCheck>;
 
 
-//list of all the various functions
+// ******************************
+
+// HELPER FUNCTIONS
+
+// ******************************
+namespace {
+	Vector2 PathFind(Vector2 const& pos, Vector2 const& end, Grid const& grid) {
+		//BFS I suppose
+
+		//snap to cell
+		
+
+
+		return Vector2{};
+	}
+
+}
+
+
+// ******************************
+
+// BEHAVIOUR FUNCTIONS
+
+// ******************************
 namespace { //functions namespace begin
     
 bool IsTouchingTarget(Enemy& me) {
@@ -25,9 +50,11 @@ bool IsTouchingTarget(Enemy& me) {
 	if (!me.target.isActive) return false;
 
 	float collTime;
-	if (CollisionIntersection_RectRect(me.sprite.position,me.sprite.scale, Vector2{}, 
-			*me.target.position, me.sprite.scale, Vector2{}, collTime) ) {
-				std::cout << "touching!!" << std::endl;
+	if (CollisionIntersection_RectRect(me.sprite.position,me.sprite.scale * 0.5f, 
+		me.velocity, 
+			*me.target.position, me.sprite.scale * 0.5f, 
+			*me.target.position - me.target.initialPosition
+			, collTime) ) {
 				return true;
 	}
 		
@@ -36,12 +63,10 @@ bool IsTouchingTarget(Enemy& me) {
 }
 
 bool IsNotFollowingPlayer(Enemy& me) {
-	if (!me.target.isActive) return false;
 
 	if (AreCirclesIntersecting(me.sprite.position, me.type.safeRadius,
 				me.roomData->player->sprite.position, 0) ) {
 
-		std::cout <<"in player radius" << std::endl;
 		return false;
 
 	}
@@ -51,7 +76,7 @@ bool IsNotFollowingPlayer(Enemy& me) {
 }
 
 void WalkLeft(Enemy& me, float dt) {
-	me.sprite.position += Vector2(-50, 0) * dt;
+	me.velocity += Vector2(-50, 0) * dt;
 	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
 	me.sprite.UpdateTransform();
 }
@@ -63,14 +88,19 @@ void WalkRight(Enemy& me, float dt){
 }
 
 void MoveToTarget(Enemy& me, float dt) {
+	if (me.target.isActive == false) return;
 	Vector2 direction{ (*me.target.position - me.sprite.position) };
-	me.sprite.position += direction.Normalized() * me.type.speed * dt;
+	me.velocity += direction;
+	me.velocity = me.velocity.Normalized();
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
 } 
 
 void ApplySlowToTarget(Enemy& me, float dt) {
-	std::cout << me.type.name << " Applying slow!" << std::endl;
+	if (me.target.isActive == false) return;
+
+	*me.target.speedMod = 0.1f;
+
 }
 
 void Wander(Enemy& me, float dt) {
@@ -82,14 +112,10 @@ void Wander(Enemy& me, float dt) {
 		float randx = AERandFloat() * 2 - 1;
 		float randy = AERandFloat() * 2 - 1;
 		me.velocity = Vector2{randx, randy};
-		std::cout << me.velocity.x << " " << me.velocity.y << std::endl;	
 	}
 	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
 		me.velocity = -me.velocity;
-	me.sprite.position += me.velocity.Normalized() * me.type.speed * dt;
 
-
-	me.sprite.UpdateTransform();
 	
 }
 
@@ -97,7 +123,8 @@ void CircleMove(Enemy& me, float dt) {
 	Vector2 direction{ (*me.target.position - me.sprite.position) };
 	direction = Vector2{direction.y, -direction.x}; //the perpendicular
 
-	me.sprite.position += direction.Normalized() * me.type.speed * dt;
+	me.velocity = direction;
+
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
 	me.sprite.UpdateTransform();
 
@@ -109,7 +136,6 @@ void TargetEnemyInDetectionRadius(Enemy& me, float dt){
 		if (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
 			guy->sprite.position, guy->sprite.scale.x)) {
 				me.target = *guy;
-				std::cout << me.type.name << " is targetting " << guy->type.name << std::endl;
 				return; //found a guy
 			}
 	}
@@ -129,7 +155,7 @@ void SafeDistancePlayer(Enemy& me, float dt) {
 
 		Vector2 direction{ (playerPos - me.sprite.position) };
 		direction = -direction;
-		me.sprite.position += direction.Normalized() * me.type.speed;
+		me.velocity = direction;
 	}
 }
 void TargetRandomEnemy(Enemy& me, float dt) {
