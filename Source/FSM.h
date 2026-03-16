@@ -58,9 +58,37 @@ class Boss1_FSM : public Boss_FSM {
 		f32 jumpEndlag;
 
 		Boss1_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
-			f32 jumpDamage, f32 jumpStartup, f32 jumpInterval, f32 jumpEndlag);
+			f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag);
 
 		void Update(Player& player, f32 dt) override;
 		void ChargeAttack(Player& player, f32 dt);
 		void JumpAttack(Player& player, f32 dt);
+};
+
+class Boss2_FSM : public Boss_FSM {
+	public:
+		AttackState attackPhase;
+		Vector2 target;
+		s16 counter;
+		bool canWalk;
+
+		Vector2 chargeDirection{ 0, 1 };
+		f32 chargeDamage;
+		f32 chargeStartup;
+		f32 chargeInterval;
+		f32 chargeEndlag;
+
+		Vector2 projectileDirection{ 0, 1 };
+		f32 projectileDamage;
+		f32 projectileSpeed;
+		f32 projectileStartup;
+		f32 projectileInterval;
+		f32 projectileEndlag;
+
+		Boss2_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
+			f32 ProjectileDamage, f32 ProjectileSpeed, f32 ProjectileStartup, f32 ProjectileInterval, f32 ProjectileEndlag);
+
+		void Update(Player& player, f32 dt) override;
+		void ChargeAttack(Player& player, f32 dt);
+		void ProjectileAttack(Player& player, f32 dt);
 };
