@@ -20,7 +20,7 @@
 AEGfxVertexList* sqmesh = nullptr;
 
 TexturedSprite* thing = nullptr;
-TexturedSprite* bulletSprite = nullptr;
+
 
 
 AEGfxTexture* rockpng = nullptr;
@@ -47,7 +47,6 @@ Almanac almanac {};
 s8 font = 0;
 
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
-static ProjectileManager projManager;
 
 
 
@@ -83,13 +82,13 @@ void TestLoad()
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
-
+	//bulletSprite = AEGfxTextureLoad("Assets/fireball.png");
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
-	grid.LoadFromFile("Assets/Grid/Grid.txt");
+	grid.LoadFromFile("Assets/Grid/Grid.csv");
 
-	float offsetX = -(grid.GetWidth() * 130 / 2.0f);   
-	float offsetY = (grid.GetHeight() * 130 / 2.0f);  
+	float offsetX = -(grid.GetWidth() * grid.GetTileWidth() / 2.0f);
+	float offsetY = (grid.GetHeight() * grid.GetTileHeight() / 2.0f);
 	grid.SetOffset(offsetX, offsetY);
 
 	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
@@ -163,8 +162,8 @@ void TestLoad()
 
 	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
-	projManager.InitFireball(sqmesh, bulletpng);
-	projManager.InitAOE(sqmesh, aoepng);
+	//projManager.InitFireball(sqmesh, bulletpng);
+	//projManager.InitAOE(sqmesh, aoepng);
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
@@ -261,7 +260,8 @@ void TestDraw()
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	grid.RenderGrid(sqmesh);
+	//grid.PrintRetrievedInformation();
+	//grid.RenderGrid(sqmesh);
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	player.sprite.RenderSprite(true);
@@ -309,7 +309,7 @@ void TestUnload()
 	gameMap.DeleteMap();
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
-		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+		Clear(gameMap.GetCurrentRoom()->currentRoomData);
 
 }
 
@@ -444,16 +444,18 @@ void TestUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_SPACE))
-		projManager.ShootFireball(roomData, player.position, player.direction,
+	if (AEInputCheckTriggered(AEVK_SPACE)) {
+		ShootProjectile(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+			, player.direction,
 			500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
-
-		if (AEInputCheckTriggered(AEVK_Q))
-			projManager.ShootAOE(roomData, player.position, player.direction,
-				300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
-
-		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
-
+	}
+	if (AEInputCheckTriggered(AEVK_Q)) {
+		ShootAOE(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }//player.position
+			,
+			300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
+	}
+		Update(roomData, dt);  // updates + cleans dead projectiles
+		CheckProjectileCollision(roomData, player);
 		int collision = grid.CheckInstanceBinaryMapCollision(
 			player.position.x, player.position.y,
 			player.sprite.scale.x, player.sprite.scale.y

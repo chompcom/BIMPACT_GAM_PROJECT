@@ -8,19 +8,21 @@ enum ProjectileType {
 };
 class Projectile {
 public:
-	Projectile(TexturedSprite* projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg);
+	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg);
 	~Projectile();
 	void ProjectileUpdate(f32 dt);
 	void ProjectileRender();
-	AABB GetCollision() const;
 	int GetDmg() const;
+	Vector2 GetPosition() const;
+	Vector2 GetScale() const;
+	Vector2 GetVelocity() const;
 	bool IsAlive() const;
 	ProjectileType GetType() const;
 	void RemoveProjectile();
 
 	
 private: 
-	TexturedSprite* projectileSprite;
+	TexturedSprite projectileSprite;
 	ProjectileType type;
 	Vector2 velCurr;
 	float lifeTime;
