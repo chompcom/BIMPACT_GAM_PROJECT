@@ -13,6 +13,7 @@ enum EnemyStates {
 	ES_ANGRY
 };
 
+
 class EnemyType;
 class Enemy;
 // forward declaration of room
@@ -37,17 +38,28 @@ class Enemy {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
-//		Vector2 target;
+
+		float speedModifier;
+		float dmgModifier;
+
+		Vector2 velocity;
+
+		float wanderTimer;
+		float attackTimer;
 
 		//Target contains information about the target so you can do things to it
 		struct Target {
 			Vector2* position; //!< Points to target location
-			
+			Vector2 initialPosition; //!< The position when the target was found
+
 			//Well there's only players and enemies as entities you see..
 			bool isPlayer;
 
 			//Sometimes the target is already dead. We don't care about them.
 			bool isActive;
+
+			float* speedMod;
+			float* dmgMod;
 
 			Target();
 			~Target();

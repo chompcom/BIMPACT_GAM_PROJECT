@@ -18,7 +18,7 @@
 			"color": [255,255,255,255],
 			"damage": 0,
 			"speed" : 60,
-			"detectionRadius" : 40,
+			"detectionRadius" : 2,
 			"safeRadius" : 300,
 			"likes" : ["Gross"],
 			"dislikes": ["Clean"],
@@ -26,6 +26,7 @@
 				{ "context": "IsTouchingTarget",
 					"actions": [
 					"ApplySlowToTarget",
+					"SafeDistancePlayer",
 					"MoveToTarget"
 				]},
 				{ "context" : "IsNotFollowingPlayer",

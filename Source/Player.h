@@ -12,6 +12,7 @@ public:
 	TexturedSprite shadow;
 	f32 throwStrength; //throw strength modifier
 	f32 speed; //movement speed modifier
+	f32 baseSpeed; //movement speed modifier
 	s16 health; 
 	Vector2 position;
 	Vector2 direction; //direction player is facing
@@ -25,8 +26,12 @@ public:
 	//constructor
 	Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
 		Vector2 direction = Vector2 {0.f, -1.f});
+		
+	Vector2 GetVelocity() const;
 };
 
 void UpdatePlayer(Player & player, f32 deltaTime);
 
 void playerTakesDamage(Player & player);
+
+void playerHealsDamage(Player& player);
