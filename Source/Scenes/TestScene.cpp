@@ -15,6 +15,7 @@
 #include "ProjectileManager.h"
 #include "../HUD.h"
 #include "../almanac.h"
+#include "ParticleSystem.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -67,6 +68,8 @@ vector<gift*> gift;
 //std::vector<AlmanacEntry> almanacVector;
 //vector of all enemytypes for the almanac
 //std::vector<std::string> enemyTypeNames {};
+
+ParticleSystem testParticles = NULL;
 
 void TestLoad()
 {
@@ -167,6 +170,7 @@ void TestLoad()
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 
 	
+	testParticles = ParticleSystem(sqmesh);
 
 
 }
@@ -229,6 +233,8 @@ void TestDraw()
 		for (Projectile* p : roomData.projectileList) if (p) p->ProjectileRender();
 		for (Projectile* p : carryData.projectileList) if (p) p->ProjectileRender();
 
+
+		for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
 	}
 	
 
@@ -458,6 +464,10 @@ void TestUpdate(float dt)
 		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 
 
+	if (testParticles.activeParticleCount < 20) testParticles.CreateParticles(10, 5.0f, Vector2{ 25.0f, 0.0f });
+	//else testParticles.DestroyParticles();
+
+	testParticles.UpdateParticles(dt);
 	
 
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
