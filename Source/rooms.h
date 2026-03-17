@@ -8,6 +8,7 @@
 #include "Utils/Vector2.hpp"
 #include "RoomData.h"
 #include "Utils/Utils.h"
+#include "ParticleSystem.h"
 //#include "AEEngine.h"
 
 struct AEGfxTexture;
@@ -89,7 +90,7 @@ namespace mapRooms {
 		// Level lifecycle
 		void	InitMap(RoomData& globalSceneData, unsigned int seed);	// Grid size and other spawns based on seed.
 		//void	UpdateMap();								// Idk
-		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt);
+		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt);
 		void	DeleteMap();								// Reset this level stuff (tbh this kinda violates the game loop taught in GIT lol)
 
 		int		GetGridSize() const;

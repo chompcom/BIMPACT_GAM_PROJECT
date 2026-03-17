@@ -57,6 +57,7 @@ void ParticleSystem::DestroyParticles() {
 			continue;
 
 		particles[i].isActive = false;
+		--activeParticleCount;
 	}
 }
 
