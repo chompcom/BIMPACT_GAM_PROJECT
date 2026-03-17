@@ -63,6 +63,7 @@ public:
 	const TileType* GetTileType(int id) const;
 	bool  TileAllowedInBiome(int TileId, const std::string& biome) const;
 	std::vector<TileType const*> GetTilesFromBiome(const std::string& biomeName) const;
+	std::vector<std::string> GetAllBiomes() const;
 
 private:
 	std::unordered_map<int, TileType>tileTypes;				// For querying tiletypes
@@ -124,6 +125,7 @@ public:
 		// Checking where da player is currently in tiles
 		int WorldToCell(float x, float y) const;
 		bool TestCollision(float x, float y) const;
+		static std::vector<std::string> GetAllBiomes();
 
 		static TileDataBase tileDB;
 	private:

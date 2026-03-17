@@ -397,3 +397,20 @@ bool TileDataBase::TileAllowedInBiome(int tileId, const std::string& biome) cons
 	return false;
 }
 
+
+std::vector<std::string> TileDataBase::GetAllBiomes() const
+{
+	std::vector<std::string> result;
+
+	for (auto const& pair : biomes)
+	{
+		result.push_back(pair.first);
+	}
+
+	return result;
+}
+
+std::vector<std::string> Grid::GetAllBiomes()
+{
+	return tileDB.GetAllBiomes();
+}

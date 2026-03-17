@@ -136,6 +136,16 @@ namespace mapRooms
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
 		}
+
+		// Choose biomes, integrate grid system (for map data purposes)
+		std::vector<std::string> biomes = Grid::GetAllBiomes();
+
+		if (!biomes.empty()) {
+			int idx = static_cast<int>(rand() % biomes.size());	// Support weighted randomizer in the future?
+			biome = biomes[idx];
+		}
+
+		// Normal Room Init
 		if (rmType == RoomType::Normal) {
 			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
@@ -155,6 +165,7 @@ namespace mapRooms
 			gift->shadow.position = Vector2{ 0.f, -40.f };
 			currentRoomData.giftList.push_back(gift);
 		}
+		// Boss Init
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 4.0f, 2.0f, 3.0f} };
 			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
