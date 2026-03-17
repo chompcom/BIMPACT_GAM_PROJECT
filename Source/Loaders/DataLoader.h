@@ -7,12 +7,18 @@
 #include "../Enemy.h"
 
 #include "../Almanac.h"
+
+#include "json/json.h"
+
+
 namespace DataLoader {
 	
 	void Load();
 	void Unload();
 
-	auto LoadJson(std::string filename);	// auto cuz we never load the header here
+	//auto LoadJson(std::string filename);	// auto cuz we never load the header here
+	using Json::Value;
+	Json::Value LoadJsonFile(std::string const& file);
 	bool DumpFile(std::string filename, std::vector<std::pair<std::string, std::string>> const& data);
 
 

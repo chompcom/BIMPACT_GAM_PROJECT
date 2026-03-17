@@ -1,6 +1,9 @@
 #include "AEEngine.h"
 #include "Grid.h"
 #include <fstream>
+#include <unordered_map>
+
+#include "Loaders/DataLoader.h"	// For Json
 
 Grid::Grid(int w, int h, int ts) 
 	: width(w), height(h), tileSize(ts) {
@@ -118,3 +121,279 @@ int Grid::CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, 
 bool Grid::IsDoor(int x, int y) const {
 	return  tiles.at(y).at(x).type == GridType::DOOR; // if i use at it is slower but check bounds compared to Tiles[w][h], see performance first and change if needed 
 }
+
+
+
+// MJ Implementation using the above as a base
+//TileDataBase Grid::tileDB;
+//static TileDataBase tileDB{".\Assets\Levels\Room_Data\TilesInfo.json"};
+//TileDataBase Grid::tileDB{ ".\Assets\Levels\Room_Data\TilesInfo.json" };
+
+TileDataBase Grid::tileDB{};
+
+Grid::Grid() : width(0), height(0), tileSize(0), tileSizeX(0), tileSizeY(0) {
+	Grid::tileDB.Load(".\\Assets\\Levels\\Room_Data\\TilesInfo.json");
+};
+
+
+
+//Grid::LoadRoomCSV()
+
+bool Grid::LoadTileDataBase(std::string const& fileName) {
+	return tileDB.Load(fileName);
+}
+
+// Query Type of Tile and TileType
+TileType const* Grid::QueryTileType(int id) { return Grid::tileDB.GetTileType(id); };
+bool Grid::QueryTileAllowedInBiome(int tileId, const std::string& biome) {return tileDB.TileAllowedInBiome(tileId, biome);}
+
+bool Grid::LoadRoomCSV(std::string const& fileName, std::string const& biomeName)
+{
+	tiles_.clear();
+
+	std::ifstream file(fileName);
+	if (!file.is_open()) return false;
+
+	// Get metadata (while newline does not contain numbers at the beginning
+	std::unordered_map<std::string, std::string> metaData;
+	std::string tmpLine;
+	while (file.peek() != EOF && !std::isdigit(file.peek())) {
+		if (std::getline(file, tmpLine) && !tmpLine.empty()) {
+			std::stringstream ss(tmpLine);
+			std::string key, value;
+
+			std::getline(ss, key, ',');
+			std::getline(ss, value, ',');
+
+			metaData[key] = value;
+
+		}
+	}
+
+	// Get biome information
+	std::string biome = metaData["Biome"];
+
+
+	// Get remaining room data
+	std::string line;
+	while (std::getline(file, line)) {
+		if (line.empty()) continue;
+
+		std::stringstream ss{line};
+		std::string value;
+
+		std::vector<int> row;
+
+		while (std::getline(ss, value, ',')) {
+			int tileId = std::stoi(value);
+
+			// Biome Validation
+			if (!QueryTileAllowedInBiome(tileId, biome)) tileId = 0; // back to nth ig
+
+			row.push_back(tileId);
+		}
+
+		if (!row.empty()) tiles_.push_back(row);
+		
+	}
+
+	// Return
+	this->height = (int)tiles_.size();
+	if (this->height > 0) { 
+		width = (int)tiles_.at(0).size(); 
+		// Column
+		float totalGridWidth = static_cast<float>(AEGfxGetWindowWidth()) - this->padding[1] - this->padding[3];
+		this->tileSizeX = static_cast<float>(this->width) / totalGridWidth;
+
+		// Row
+		float totalGridHeight = static_cast<float>(AEGfxGetWindowWidth()) - this->padding[0] - this->padding[2];
+		this->tileSizeY = static_cast<float>(this->height) / totalGridHeight;	// ROW
+	}
+
+
+	return (width > 0 && height > 0);
+}
+
+int Grid::GetCell(int x, int y) const
+{
+	if (y < 0 || y >= height) return -1;
+	if (x < 0 || x >= width) return -1;
+	return tiles_[y][x];
+}
+
+int Grid::GetCell(int idx) const {
+	int x = idx % this->width;
+	int y = idx / this->width;
+
+	if (!(IsValid(x, y))) return -1;
+
+	return tiles_[y][x];
+}
+
+int Grid::WorldToCell(float x, float y) const
+{
+	if (tileSizeX <= 0.0f || tileSizeY <= 0.0f) return -1;
+
+	// Check if they are within the padding
+	// I forget how coordinates work in this game lmao
+	if (y < this->pad.top || y > (AEGfxGetWindowHeight()-this->pad.bottom) || 
+		x < this->pad.left || x > (AEGfxGetWindowWidth() - this->pad.right)) return -1;
+
+	// Offset then calculate
+	int col = static_cast<int>((x - this->pad.left) / (this->tileSizeX));
+	int row = static_cast<int>((y - this->pad.top) / (this->tileSizeY));
+
+	//int col = static_cast<int>(x / tileSizeX);
+	//int row = static_cast<int>(y / tileSizeY);
+
+	if (row < 0 || row >= height || col < 0 || col >= width)
+		return -1;
+
+	return row * width + col;
+
+}
+
+bool Grid::TestCollision(float x, float y) const {
+	int idx = this->WorldToCell(x, y);
+	if (idx < 0) return true; // depends out of bounds may as well collide
+
+	int tileId = this->GetCell(idx);
+	if (tileId < 0) return false;	// tile id shouldn't be less than 0 unless there's a problem in our json
+
+	// Get tile type
+	TileType const* tile = Grid::tileDB.GetTileType(tileId);
+	if (!tile) return false;
+
+	return tile->blocked;
+}
+
+int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY) const
+{
+	//At the end of this function, "Flag" will be used and returned, to determine which sides
+	//of the object instance are colliding. 2 hot spots will be placed on each side.
+
+	int Flag = 0x0000;
+	float x1, y1, x2, y2;
+
+	/*----------------------LEFT-------------------------------*/
+	// 1.1 Hotspot 1
+	x1 = PosX - scaleX / 2;		// To reach the left side
+	y1 = PosY + scaleY / 4;		// To go up 1/4 of the height
+	if (TestCollision(x1, y1)) Flag |= COLLISION_LEFT;
+
+	// 1.2 Hotspot 2
+	x2 = PosX - scaleX / 2;		// To reach the left side
+	y2 = PosY - scaleY / 4;		// To go down 1/4 of the height
+	if (TestCollision(x2, y2)) Flag |= COLLISION_LEFT;
+
+
+	/*----------------------RIGHT-------------------------------*/
+	// 2.1 Hotspot 1
+	x1 = PosX + scaleX / 2;		// To reach the right side
+	y1 = PosY + scaleY / 4;		// To go up 1/4 of the height
+	if (TestCollision(x1, y1)) Flag |= COLLISION_RIGHT;
+
+	// 2.2 Hotspot 2
+	x2 = PosX + scaleX / 2;		// To reach the right side
+	y2 = PosY - scaleY / 4;		// To go down 1/4 of the height
+	if (TestCollision(x2, y2)) Flag |= COLLISION_RIGHT;
+
+
+	/*----------------------TOP-------------------------------*/
+	y1 = y2 = PosY + scaleY / 2; // To reach top side
+	// 3.1 Hotspot 1
+	x1 = PosX - scaleX / 4;		// Top 25% hotspot
+	if (TestCollision(x1, y1)) Flag |= COLLISION_TOP;
+
+	// 3.1 Hotspot 2
+	x2 = PosX + scaleX / 4;		// Top 75% hotspot
+	if (TestCollision(x2, y2)) Flag |= COLLISION_TOP;
+
+
+	/*----------------------BOTTOM-------------------------------*/
+	y1 = y2 = PosY - scaleY / 2; // To reach bottom side
+	// 4.1 Hotspot 1
+	x1 = PosX - scaleX / 4;		 // Bottom 25% hotspot
+	if (TestCollision(x1, y1)) Flag |= COLLISION_BOTTOM;
+
+	// 4.2 Hotspot 2
+	x2 = PosX + scaleX / 4;		 // Bottom 75% hotspot
+	if (TestCollision(x2, y2)) Flag |= COLLISION_BOTTOM;
+
+
+	return Flag;
+}
+
+bool TileDataBase::Load(std::string const& fileName)
+{
+	//using JsonOut = Json::Value;
+	Json::Value file = DataLoader::LoadJsonFile(fileName);
+
+	Json::Value rootTile = file["tileTypes"];
+	for (Json::Value& tile : rootTile) {
+		// Retrive stuff
+		TileType newTile;
+		newTile.id = tile.asInt();
+		newTile.name = tile["name"].asString();
+		newTile.blocked = tile.get("blocked", false).asBool();
+		newTile.asset = tile["asset"].asString();
+
+		this->tileTypes[newTile.id] = newTile;
+	}
+	// Load biomes
+	for (Json::Value& biomeDic : file["biomes"]) {
+		// Retrive stuff
+		BiomeInfo biome;
+		biome.name = biomeDic.asString();
+
+		for (Json::Value const& member : biomeDic) {
+			biome.allowedTiles.push_back(member.asInt());
+		}
+		this->biomes[biome.name] = biome;
+	}
+	return true;
+}
+
+// Get tile by ID from unordered_map of tileTypes
+const TileType* TileDataBase::GetTileType(int id) const
+{
+	auto it = tileTypes.find(id);
+	if (it == tileTypes.end()) return nullptr;
+	return &it->second;
+}
+
+// Get tukes from biome
+std::vector< TileType const*> TileDataBase::GetTilesFromBiome(std::string const& biome) const
+{
+	std::vector<TileType const*> result;
+
+	auto biomeIt = biomes.find(biome);
+	if (biomeIt == biomes.end()) return result;
+
+	std::vector<int> const& allowed = biomeIt->second.allowedTiles;
+
+	for (std::size_t i = 0; i < allowed.size(); ++i)
+	{
+		TileType const* tile = GetTileType(allowed[i]);
+		if (tile != nullptr) result.push_back(tile);
+	}
+
+	return result;
+}
+
+// Get tile by ID from unordered_map of biomes, check if tile id matches any in allowedTiles
+bool TileDataBase::TileAllowedInBiome(int tileId, const std::string& biome) const
+{
+	auto biomeIt = biomes.find(biome);
+	if (biomeIt == biomes.end()) return false;
+
+	const std::vector<int>& allowed = biomeIt->second.allowedTiles;
+
+	for (std::size_t i = 0; i < allowed.size(); ++i)
+	{
+		if (allowed[i] == tileId) return true;
+	}
+
+	return false;
+}
+

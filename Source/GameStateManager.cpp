@@ -39,6 +39,8 @@ void GSM_Update()
 		break;
 	case GS_QUIT:
 		break;
+	case GS_MAINMENU:
+		break;
 	default:
 		break;
 	}

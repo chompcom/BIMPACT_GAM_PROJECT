@@ -1,0 +1,18 @@
+{
+  "levels": [
+    {
+      "levelId": 1,
+      "gridSizeMin": 2,
+      "gridSizeMax": 4,
+      "maxRooms": 8,
+      "seedPool": [101, 202, 303]
+    },
+    {
+      "levelId": 2,
+      "gridSizeMin": 2,
+      "gridSizeMax": 5,
+      "maxRooms": 10,
+      "seedPool": [404, 505, 606]
+    }
+  ]
+}

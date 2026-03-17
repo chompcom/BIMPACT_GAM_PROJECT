@@ -57,13 +57,13 @@ bool IsCursorInRect(Vector2 rect_Center, float rect_Width, float rect_Length)
 }
 //}
 
-std::string ExtractFileName(const std::string& fullpath) {
+std::string ExtractFileName(const std::string& fullpath, const std::string& last) {
 	// 1. Get ONLY filename by finding the last slash
 	size_t lastSlash = fullpath.find_last_of("\\/");
 	std::string file = (lastSlash == std::string::npos) ? fullpath : fullpath.substr(lastSlash + 1);
 
 	// 2. Get filename WITHOUT extension
-	size_t lastDot = file.find_last_of('.');
+	size_t lastDot = file.find_last_of(last);
 	if (lastDot != std::string::npos) file.erase(lastDot);
 
 	// 3. Return file name ONLY

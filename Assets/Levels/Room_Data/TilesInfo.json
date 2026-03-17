@@ -1,0 +1,38 @@
+{
+  "tileTypes": {
+    "0": {
+      "name": "Empty",
+      "blocked": false,
+      "asset": ""
+    },
+    "1": {
+      "name": "Rock",
+      "blocked": true,
+      "asset": "Assets/Room/Items/rock.png"
+    },
+    "2": {
+      "name": "Bush",
+      "blocked": true,
+      "asset": "Assets/Room/Items/bush.png"
+    },
+    "3": {
+      "name": "IceCrystal",
+      "blocked": true,
+      "asset": "Assets/Room/Items/ice_crystal.png"
+    }
+  },
+
+  "biomes": {
+    "Normal": {
+      "allowedTiles": [0,1]
+    },
+
+    "Green": {
+      "allowedTiles": [0,1]
+    },
+
+    "Ice": {
+      "allowedTiles": [0,1]
+    }
+  }
+}

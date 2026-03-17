@@ -8,6 +8,7 @@
 #include "Utils/Vector2.hpp"
 #include "RoomData.h"
 #include "Utils/Utils.h"
+#include "Grid.h"
 //#include "AEEngine.h"
 
 struct AEGfxTexture;
@@ -59,6 +60,12 @@ namespace mapRooms {
 
 		void Init(RoomType rmType = RoomType::Normal);
 		void Update(float dt) ;
+
+
+		// Integration with grid.cpp
+		std::string biome;
+		std::string layoutFile;
+		Grid roomGrid;
 			
 
 		//handle collisions

@@ -56,7 +56,20 @@ namespace DataLoader {
 
 	static Json::Value theGuy;
 
-	auto LoadJson(std::string file) {
+	
+
+	//auto LoadJson(std::string file) {
+	//	Json::Value res;
+	//	std::ifstream fileInstance{ file };
+
+	//	if (fileInstance.is_open()) {
+	//		fileInstance >> res;
+	//	}
+	//	return res;
+	//}
+
+	//template <typename T>
+	Json::Value LoadJsonFile(std::string const& file) {
 		Json::Value res;
 		std::ifstream fileInstance{ file };
 
