@@ -342,11 +342,11 @@ void TestUpdate(float dt)
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 	// Print Current Grid
-	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	for (int i = 0; i < 20; ++i) {
-		for (int j = 0; j < 20; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		std::cout << '\n';
-	}
+	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	//for (int i = 0; i < 20; ++i) {
+	//	for (int j = 0; j < 20; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+	//	std::cout << '\n';
+	//}
 
 	// Game map update
 	gameMap.GetCurrentRoom()->Update(dt);
@@ -356,7 +356,8 @@ void TestUpdate(float dt)
 	RoomData& carryData = gameMap.GetTransferData();
 
 	// Update game map
-	gameMap.UpdateMap(player.position, playerHalfSize, dt);
+	//gameMap.UpdateMap(player.position, playerHalfSize, dt);
+	gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
 
 	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 	Vector2 positionResetTest = player.position;
@@ -480,9 +481,9 @@ void TestUpdate(float dt)
 
 
 	// Update game map
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-	Vector2 positionResetTest = player.position;
-	gameMap.UpdateMap(player.position, playerHalfSize,testParticles,dt);
+	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	//Vector2 positionResetTest = player.position;
+	
 
 
 
