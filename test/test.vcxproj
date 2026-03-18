@@ -25,6 +25,7 @@
     <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
+    <ClCompile Include="..\Source\ParticleSystem.cpp" />
     <ClCompile Include="..\Source\Player.cpp" />
     <ClCompile Include="..\Source\Projectile.cpp" />
     <ClCompile Include="..\Source\ProjectileManager.cpp" />
@@ -48,6 +49,7 @@
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\HUD.h" />
     <ClInclude Include="..\Source\Levels.h" />
+    <ClInclude Include="..\Source\ParticleSystem.h" />
     <ClInclude Include="..\Source\Player.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.h" />
     <ClInclude Include="..\Source\Projectile.h" />

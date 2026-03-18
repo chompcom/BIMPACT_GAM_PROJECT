@@ -992,7 +992,7 @@ namespace mapRooms
 	}
 
 	// Update Loop
-	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt)
+	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt)
 	{
 		if (!currentRoom) return;
 
@@ -1034,6 +1034,7 @@ namespace mapRooms
 				// appear at RIGHT side of the next room, inside boundary
 				playerPos.x = maxX - playerHalfSize.x - warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -1045,6 +1046,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Right)) {
 				playerPos.x = minX + playerHalfSize.x + warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -1056,6 +1058,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Up)) {
 				playerPos.y = minY + playerHalfSize.y + warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -1067,6 +1070,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Down)) {
 				playerPos.y = maxY - playerHalfSize.y - warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}

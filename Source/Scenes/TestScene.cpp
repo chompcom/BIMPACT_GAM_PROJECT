@@ -15,6 +15,7 @@
 #include "ProjectileManager.h"
 #include "../HUD.h"
 #include "../almanac.h"
+#include "ParticleSystem.h"
 
 AEGfxVertexList* sqmesh = nullptr;
 
@@ -67,6 +68,8 @@ vector<gift*> gift;
 //std::vector<AlmanacEntry> almanacVector;
 //vector of all enemytypes for the almanac
 //std::vector<std::string> enemyTypeNames {};
+
+ParticleSystem testParticles = NULL;
 
 void TestLoad()
 {
@@ -169,6 +172,7 @@ void TestLoad()
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 
 	
+	testParticles = ParticleSystem(sqmesh);
 
 
 }
@@ -191,6 +195,11 @@ void TestDraw()
 	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
 	// Draw objects: current-room objects + carried objects
 	if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 	{
@@ -232,12 +241,16 @@ void TestDraw()
 		
 		for (Projectile* p : roomData.projectileList) if (p) p->ProjectileRender();
 		for (Projectile* p : carryData.projectileList) if (p) p->ProjectileRender();
-
 	}
 	
 
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite();
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
 	//rock.sprite.RenderSprite();
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
@@ -466,6 +479,10 @@ void TestUpdate(float dt)
 	}
 
 
+	// Update game map
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	Vector2 positionResetTest = player.position;
+	gameMap.UpdateMap(player.position, playerHalfSize,testParticles,dt);
 
 
 
@@ -494,6 +511,10 @@ void TestUpdate(float dt)
 		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 
 
+	if (testParticles.activeParticleCount < 20) testParticles.CreateParticles(10, 5.0f, Vector2{ 25.0f, 0.0f });
+	//else testParticles.DestroyParticles();
+
+	testParticles.UpdateParticles(dt);
 	
 
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
