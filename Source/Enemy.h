@@ -72,7 +72,7 @@ class Enemy {
 		} target;
 
 		//points to the room it should be inside, so that it knows whats going on inside!
-		const RoomData* roomData;
+		RoomData* roomData;
 
 		FSM currentBehavior;
 

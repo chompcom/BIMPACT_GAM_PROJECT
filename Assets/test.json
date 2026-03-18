@@ -33,6 +33,7 @@
 				 "actions":[
 					"TargetPlayer",
 					"MoveToTarget",
+					"FireProjectile",
 					"TargetEnemyInDetectionRadius"
 				] },
 				{"context": "default",

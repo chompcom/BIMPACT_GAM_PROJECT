@@ -171,7 +171,10 @@ void TargetCorner(Enemy& me, float dt) {
 	me.target.initialPosition = Vector2(100,100);
 }
 void FireProjectile(Enemy& me, float dt) {
-
+	if (me.attackTimer <= 0) {
+		ShootProjectile(DataLoader::CreateTexture("Assets/fireball.png"), *me.roomData, me.sprite.position, me.velocity.Normalized(), me.speedModifier * me.type.speed, 2, me.dmgModifier * me.type.damage, me.sprite.scale, {1.f,1.f,1.f,1.f});	
+		me.attackTimer = 3;
+	}
 }
 void DVDMove(Enemy& me, float dt) {
 
