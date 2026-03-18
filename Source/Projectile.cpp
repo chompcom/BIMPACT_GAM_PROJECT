@@ -1,7 +1,8 @@
 #include "projectile.h"
 
-Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg)
-	: projectileSprite(projectileSprite),type(type), velCurr(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true) {}
+Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg, void* source)
+	: projectileSprite(projectileSprite),type(type), velCurr(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), sourceShot{source} 
+	{}
 
 Projectile::~Projectile() {
 	
@@ -44,5 +45,8 @@ ProjectileType Projectile::GetType() const {
 
 void Projectile::RemoveProjectile() {
 	isAlive = false;
+}
+const void* Projectile::GetSource() const{
+	return sourceShot;
 }
  

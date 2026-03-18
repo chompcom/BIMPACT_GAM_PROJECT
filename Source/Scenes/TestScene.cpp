@@ -474,98 +474,17 @@ void TestUpdate(float dt)
 			,
 			300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
 	}
-		Update(roomData, dt);  // updates + cleans dead projectiles
-		CheckProjectileCollision(roomData, player);
-		int collision = grid.CheckInstanceBinaryMapCollision(
-			player.position.x, player.position.y,
-			player.sprite.scale.x, player.sprite.scale.y
-		);
-		Vector2 prevPosition = player.position;
-		if(collision& (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
-		//	player.position = { 0,0 };  // just undo the move
-		}
-
-
-	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
-	//for (Gift* gift : roomData.giftList) {
-	//	if (!(gift->velocity == Vector2())) {
-	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-	//			gift->velocity = -gift->velocity;
-	//			rock.AssessTraits(gift->traits);
-	//		}
-	//	}
-	//}
-
-
-	//std::vector<Gift*> things{ &gift,&gift2 };
-
-	
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	
-	//rock.Update(dt);
-	//rock.target = player.sprite.position;
-	
-	//UpdatePlayer(player, dt);
-	//player.sprite.UpdateTransform();
-	//UpdateGift(gift, player, dt);
-	//gift.sprite.UpdateTransform();
-	//UpdateGift(gift2, player, dt);
-	//gift2.sprite.UpdateTransform();
-
-
-
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	/*
-	UpdateGift(gift,player,dt);
-	gift.sprite.UpdateTransform();
-	UpdateGift(gift2,player,dt);
-	gift2.sprite.UpdateTransform();
-	rock.Update(dt);
-	rock.target = player.sprite.position;
-
-	gameMap.GetCurrentRoom()->Update(dt);
-
-	std::vector<Gift*> things{ &gift,&gift2 };
-
-	for (Gift* gift : things) {
-		if (gift->velocity != Vector2(0,0)) {
-			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (CollisionIntersection_RectRect_Static(
-				
-				
-				
-				
-				
-				{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
-					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
-					gift->velocity = Vector2(0, 0);
-					enemy->AssessTraits(gift->traits);
-				}
-
-			}
-				
-		}
+	UpdateProjectiles(roomData, dt);  // updates + cleans dead projectiles
+	CheckProjectileCollision(roomData, player);
+	int collision = grid.CheckInstanceBinaryMapCollision(
+		player.position.x, player.position.y,
+		player.sprite.scale.x, player.sprite.scale.y
+	);
+	Vector2 prevPosition = player.position;
+	if(collision& (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
+	//	player.position = { 0,0 };  // just undo the move
 	}
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-
-	/* PSUEDOCODE ZONE
-
-	Room {
-		roomdata* toBeTransfered;
-		roomdata currentRoomData;
-		
-	}	
-	
-	gameMap.currentRoom.
-
-	//takes player position and checks if its at a door?
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-	//if its at a door, roomdata gets transferred
 
 
 
-
-	*/
 }

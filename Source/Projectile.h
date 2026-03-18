@@ -8,7 +8,7 @@ enum ProjectileType {
 };
 class Projectile {
 public:
-	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg);
+	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg, void* source = nullptr);
 	~Projectile();
 	void ProjectileUpdate(f32 dt);
 	void ProjectileRender();
@@ -20,6 +20,8 @@ public:
 	ProjectileType GetType() const;
 	void RemoveProjectile();
 
+	const void* GetSource() const;
+
 	
 private: 
 	TexturedSprite projectileSprite;
@@ -28,4 +30,5 @@ private:
 	float lifeTime;
 	int dmg;
 	bool isAlive;	
+	const void* sourceShot;
 };
