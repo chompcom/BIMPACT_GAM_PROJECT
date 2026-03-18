@@ -18,10 +18,10 @@ bool Levels::LoadLevel(std::string const& fileName, LevelInfo::uNum levelNum)
 	//auto& lvl = json["levels"][levelNum];
 	Json::Value& lvl = json["levels"][(Json::ArrayIndex)levelNum];
 	this->totalLevels = json["levels"].size();
-	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["lelvelId"].asInt());
-	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["gridSizeMin"].asInt());
-	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["gridSizeMax"].asInt());
-	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["maxRooms"].asInt());
+	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["levelId"].asInt());
+	loadedLevel.gridSizeMax = static_cast<unsigned int>(lvl["gridSizeMax"].asInt());
+	loadedLevel.maxRooms = static_cast<unsigned int>(lvl["maxRooms"].asInt());
+
 
 	if (lvl.isMember("seedPool")) {
 		if (!loadedLevel.seedPool.empty()) loadedLevel.seedPool.clear();

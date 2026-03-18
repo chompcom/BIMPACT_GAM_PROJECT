@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include "Sprite.h"	// For render?
 #pragma once
 
 
@@ -110,12 +111,14 @@ public:
 	// MJ HERE
 	public:
 		Grid();
-		bool LoadRoomCSV(const std::string& filename, const std::string& biome);
+		bool LoadRoomCSV(const std::string& filename);
 		int  GetCell(int row, int col) const;
 		int  GetCell(int idx) const;
+		int  SetCell(int row, int col, int val);
+		//Vector2 Grid::CellToWorldCenter(int row, int col) const;
 
 		// Basically Binary Map collision but include other enums
-		int CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY) const;
+		int CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY, int prevCell) const;
 	
 		// For Tile Information
 		bool LoadTileDataBase(std::string const&);
@@ -124,10 +127,16 @@ public:
 
 		// Checking where da player is currently in tiles
 		int WorldToCell(float x, float y) const;
-		bool TestCollision(float x, float y) const;
+		bool TestCollision(float x, float y, int prevCell) const;
 		static std::vector<std::string> GetAllBiomes();
 
 		static TileDataBase tileDB;
+
+		Vector2 CellToWorldCenter(int row, int col) const;
+		float GetTileWidth() const;
+		float GetTileHeight() const;
+
+		void RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerScale, AEGfxRenderMode prevRender);
 	private:
 		//std::vector<std::vector<int>> cells;
 		//int height, width;

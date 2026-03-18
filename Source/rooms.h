@@ -66,13 +66,12 @@ namespace mapRooms {
 		std::string biome;
 		std::string layoutFile;
 		Grid roomGrid;
+		int lastValidCell{-1};
 			
-
+	private:
 		//handle collisions
-		
-
-		// Should we store player position? Idk if this is the best place. (Donnid)
-		
+		void PatchDoorCells();
+				
 		// Enemy 
 		// Enemy object, type, for sprite render
 		
@@ -113,6 +112,10 @@ const	Room*	GetRoom(int x, int y) const;
 		// Draw a simple minimap for debugging
 		void	RenderDebugMap(AEGfxVertexList* squareMesh) const;   
 
+		// Abstracts
+		AEGfxTexture* GetOrLoadTexture(std::string const& path);
+
+
 		RoomData&	GetTransferData();
 
 		unsigned int RandInt(int low, int high);			// Rand generator
@@ -142,12 +145,13 @@ const	Room*	GetRoom(int x, int y) const;
 		RoomData* transferData;
 	
 		// Room background loading ---
+		std::unordered_map<std::string, std::vector<std::string>> biomeRoomFiles{};
 		std::vector<std::string> normalRoomFiles{};                  
 		std::vector<std::string> bossRoomFiles{};                    
 		std::unordered_map<std::string, AEGfxTexture*> textureCache; 
 
 		void			LoadRoomArtLists();     
-		AEGfxTexture*	GetOrLoadTexture(std::string const& path);
+		//AEGfxTexture*	GetOrLoadTexture(std::string const& path);
 		void			AssignRoomArt();        
 
 		// Door trigger cooldown (prevents re-trigger)
