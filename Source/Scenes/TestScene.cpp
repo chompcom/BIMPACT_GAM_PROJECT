@@ -17,20 +17,20 @@
 #include "../almanac.h"
 #include "ParticleSystem.h"
 
-AEGfxVertexList* sqmesh = nullptr;
+AEGfxVertexList* sqmesh			= nullptr;
 
-TexturedSprite* thing = nullptr;
-TexturedSprite* bulletSprite = nullptr;
+TexturedSprite* thing			= nullptr;
+TexturedSprite* bulletSprite	= nullptr;
 
 
-AEGfxTexture* rockpng = nullptr;
-AEGfxTexture* playerpng = nullptr;
-AEGfxTexture* shadowpng = nullptr;
-AEGfxTexture* bulletpng = nullptr;
-AEGfxTexture* aoepng = nullptr;
-AEGfxTexture* heartpng = nullptr;
-AEGfxTexture* almanacpng = nullptr;
-AEGfxTexture* pDoorTex = nullptr;	// Door image
+AEGfxTexture* rockpng		= nullptr;
+AEGfxTexture* playerpng		= nullptr;
+AEGfxTexture* shadowpng		= nullptr;
+AEGfxTexture* bulletpng		= nullptr;
+AEGfxTexture* aoepng		= nullptr;
+AEGfxTexture* heartpng		= nullptr;
+AEGfxTexture* almanacpng	= nullptr;
+AEGfxTexture* pDoorTex		= nullptr;	// Door image
 
 //AEGfxTexture* almanacpagepng = nullptr;
 
@@ -74,12 +74,12 @@ ParticleSystem testParticles = NULL;
 void TestLoad()
 {
 	DataLoader::Load();
-	sqmesh = CreateSquareMesh();
-	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
-	playerpng = AEGfxTextureLoad("Assets/player.png");
-	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
-	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
-	heartpng = AEGfxTextureLoad("Assets/heart.png");
+	sqmesh =	 CreateSquareMesh();
+	rockpng =	 AEGfxTextureLoad("Assets/poprocks.png");
+	playerpng =  AEGfxTextureLoad("Assets/player.png");
+	shadowpng =  AEGfxTextureLoad("Assets/shadow.png");
+	bulletpng =  AEGfxTextureLoad("Assets/fireball.png");
+	heartpng =	 AEGfxTextureLoad("Assets/heart.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
