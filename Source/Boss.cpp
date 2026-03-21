@@ -24,6 +24,23 @@ Boss::~Boss() {}
 
 
 void Boss::Update(Player& player, f32 dt) {
-	bossStateMachine->Update(player, dt);
+	if (currentHealth > 0) {
+		bossStateMachine->Update(player, dt);
+		CollideProjectile();
+	}
+}
+
+void Boss::CollideProjectile() {
+	float collisionTime{ 0.0f };
+	for (Projectile* proj : roomData.projectileList) {
+		if (!proj->IsAlive()) continue;
+
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+			proj->projectileSprite->position, proj->projectileSprite->scale, proj->velCurr, collisionTime)) {
+			currentHealth -= proj->GetDmg();
+			proj->RemoveProjectile();
+		}
+
+	}
 }
 

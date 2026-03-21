@@ -18,8 +18,6 @@ public:
 	ProjectileType GetType() const;
 	void RemoveProjectile();
 
-	
-private: 
 	TexturedSprite* projectileSprite;
 	ProjectileType type;
 	Vector2 velCurr;

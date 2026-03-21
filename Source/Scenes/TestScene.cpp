@@ -221,9 +221,10 @@ void TestDraw()
 			}
 		}
 		if (roomData.boss) {
-			roomData.boss->shadow.RenderSprite();
-			roomData.boss->sprite.RenderSprite();
-
+			if (roomData.boss->currentHealth > 0) {
+				roomData.boss->shadow.RenderSprite();
+				roomData.boss->sprite.RenderSprite();
+			}
 		}
 
 		for (Gift* g : carryData.giftList) {
