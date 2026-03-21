@@ -31,6 +31,8 @@
     <ClCompile Include="..\Source\ProjectileManager.cpp" />
     <ClCompile Include="..\Source\RoomData.cpp" />
     <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
+    <ClCompile Include="..\Source\Screens\MainMenuScene.cpp" />
+    <ClCompile Include="..\Source\Screens\Ui.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Traits.cpp" />
     <ClCompile Include="..\Source\Utils\Utils.cpp" />
@@ -58,6 +60,8 @@
     <ClInclude Include="..\Source\Grid.h" />
     <ClInclude Include="..\Source\Scenes\TestScene.h" />
     <ClInclude Include="..\Source\rooms.h" />
+    <ClInclude Include="..\Source\Screens\MainMenuScene.h" />
+    <ClInclude Include="..\Source\Screens\Ui.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Traits.h" />
     <ClInclude Include="..\Source\Utils\Utils.h" />

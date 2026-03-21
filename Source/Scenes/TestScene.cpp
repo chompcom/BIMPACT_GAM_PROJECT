@@ -16,6 +16,7 @@
 #include "../HUD.h"
 #include "../almanac.h"
 #include "ParticleSystem.h"
+#include "../Screens/Ui.h"
 
 AEGfxVertexList* sqmesh			= nullptr;
 
@@ -71,6 +72,12 @@ vector<gift*> gift;
 
 ParticleSystem testParticles = NULL;
 
+
+static UIManager pauseUi;
+static bool isPaused = false;
+static bool pauseUiInitialized = false;
+static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
+
 void TestLoad()
 {
 	DataLoader::Load();
@@ -83,7 +90,7 @@ void TestLoad()
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 
-	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+	//font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
 	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
 	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
@@ -157,7 +164,7 @@ void TestLoad()
 	globalTransferData.player = &player;
 
 	//square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 	projManager.InitFireball(sqmesh, bulletpng);
 	projManager.InitAOE(sqmesh, aoepng);
 
@@ -174,7 +181,12 @@ void TestLoad()
 	
 	testParticles = ParticleSystem(sqmesh);
 
-
+	// For pause screen;
+	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f,0.0f), Vector2(580.0f, 250.0f));
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	if (tipText) tipText->text = pauseTipText;
+	pauseUiInitialized = true;
+	pauseUi.SetFont(font);
 }
 
 void TestInit()
@@ -287,6 +299,27 @@ void TestDraw()
 
 	
 
+
+	// Pause screen
+	if (isPaused) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		pauseUi.Draw();
+	}
+
 }
 
 void TestFree()
@@ -330,10 +363,29 @@ void TestUnload()
 	if (gameMap.GetCurrentRoom())
 		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 
+
+	pauseUi.Clear();
+	pauseUiInitialized = false;
+	isPaused = false;
 }
 
 void TestUpdate(float dt)
 {
+
+	// Pause toggle
+	if (AEInputCheckTriggered(AEVK_TAB))
+	{
+		isPaused = !isPaused;
+	}
+
+	// When paused:
+	// - update only the pause UI
+	// - skip all gameplay logic below
+	if (isPaused)
+	{
+		pauseUi.Update();
+		return;
+	}
 
 	// Get previous pos
 	Vector2 prevPos{ player.position.x, player.position.y };
@@ -342,11 +394,11 @@ void TestUpdate(float dt)
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 	// Print Current Grid
-	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	//for (int i = 0; i < 20; ++i) {
-	//	for (int j = 0; j < 20; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-	//	std::cout << '\n';
-	//}
+	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	for (int i = 0; i < 9; ++i) {
+		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+		std::cout << '\n';
+	}
 
 	// Game map update
 	gameMap.GetCurrentRoom()->Update(dt);
