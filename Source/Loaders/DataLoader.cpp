@@ -143,6 +143,7 @@ namespace DataLoader {
 			{
 				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
 					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
+					//std::cout << tmp.enemyType.name;
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 				

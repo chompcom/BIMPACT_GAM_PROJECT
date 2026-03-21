@@ -67,6 +67,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\ProjectileManager.cpp">
+	  <Filter>Source Files</Filter>
+	</ClCompile>
     <ClCompile Include="..\Source\Boss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

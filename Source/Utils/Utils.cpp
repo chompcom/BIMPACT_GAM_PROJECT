@@ -2,6 +2,9 @@
 #include "../Sprite.h"
 #include <Windows.h>	// Windows
 #include <iostream>
+#include <cmath> //for floor
+#include <cstring> //for strncpy and strlen
+#include <cstdio>
 
 
 bool AreCirclesIntersecting(Vector2 circle1_Center, f32 circle1_Radius, Vector2 circle2_Center, f32 circle2_Radius) {
@@ -69,3 +72,5 @@ std::string ExtractFileName(const std::string& fullpath) {
 	// 3. Return file name ONLY
 	return file.empty() ? "Default" : file;
 }
+
+
