@@ -6,12 +6,13 @@
 #include "Collision.h"
 #include <iostream>
 //contructor for player class
-Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 _speed, Vector2 position, Vector2 direction) :
 	//initialiser list
 	sprite{ playerSprite },
 	shadow{ shadowSprite },
 	throwStrength{ throwStrength },
-	speed{ speed }, 
+	speed{ 1.f }, 
+	baseSpeed{ _speed},
 	health { 3 },
 	position{ position },
 	direction{ direction },
@@ -23,6 +24,12 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	invulnerableTimer{ 0.f }
 {
 }
+
+
+Vector2 Player::GetVelocity() const {
+	return direction * speed * baseSpeed;
+}
+
 
 static bool fadingIn = false; //for the blinking effect when the player is immune
 
@@ -64,7 +71,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	if (!player.throwState)
 	{
 		//player movement
-		f32 adjustedSpeed = player.speed * deltaTime;
+		f32 adjustedSpeed = player.baseSpeed * player.speed * deltaTime;
 		
 		player.position.y += (static_cast<float>(w) * adjustedSpeed) -
 			(static_cast<float>(s) * adjustedSpeed);
@@ -132,6 +139,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.heldGift = nullptr;
 		player.throwForce = 0.f;
 	}
+	player.speed = 1.0f;
 }
 
 //function for player to take damage
@@ -144,6 +152,13 @@ void playerTakesDamage(Player& player)
 
 		player.invulnerableTimer = 3.f;
 	}
+}
+
+void playerHealsDamage(Player& player)
+{
+
+	player.health++;
+
 }
 
 

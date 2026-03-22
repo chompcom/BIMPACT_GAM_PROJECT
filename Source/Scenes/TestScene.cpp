@@ -243,11 +243,12 @@ void TestDraw()
 	
 
 	player.shadow.RenderSprite();
-	player.sprite.RenderSprite();
+	player.sprite.RenderSprite(true);
 	//rock.sprite.RenderSprite();
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
+
 
 	
 	renderPlayerLives(player, healthIcons, font);
@@ -256,7 +257,15 @@ void TestDraw()
 
 	AlmanacInputs(almanac/*, sqmesh*/);
 
-	//rock.sprite.RenderSprite();
+#if 0
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	TexturedSprite thing = DataLoader::CreateTexture("Assets/poprocks.png");
+	std::pair<int, int> yup{ 5,11 };
+	float width = 110;
+	thing.scale = Vector2{ width,width };
+	//Vector2 offsetpos{ -(yup.second * width) / 2 , (yup.first * width) / 2 };
+	Vector2 offsetpos{ -(yup.second * width) / 2, -(yup.first * width) / 2 + 50};
+	for (int row = 0; row < yup.first; row++) {
 
 	//gift.sprite.RenderSprite();
 	//gift2.sprite.RenderSprite();
@@ -266,6 +275,16 @@ void TestDraw()
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	player.sprite.RenderSprite(true);
+		for (int col = 0; col < yup.second; col++) {
+			thing.position = Vector2{ offsetpos.x + (1.1f*col * width), offsetpos.y + (1.1f*row * width) };
+			thing.UpdateTransform();
+			thing.RenderSprite();
+		}
+
+	}
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	player.sprite.RenderSprite(true);
+#endif
 
 	
 
@@ -325,6 +344,7 @@ void TestUpdate(float dt)
 
 	//to test damage
 	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+	if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
 
 	checkIfAlmanacClicked(*almanacIcon, almanac);
 
@@ -457,7 +477,7 @@ void TestUpdate(float dt)
 			,
 			300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
 	}
-		UpdateProjectile(roomData, dt);  // updates + cleans dead projectiles
+		UpdateProjectiles(roomData, dt);  // updates + cleans dead projectiles
 		CheckProjectileCollision(roomData, player);
 		int collision = grid.CheckInstanceBinaryMapCollision(
 			player.position.x, player.position.y,
@@ -542,24 +562,7 @@ void TestUpdate(float dt)
 				
 		}
 	}
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-
-	/* PSUEDOCODE ZONE
-
-	Room {
-		roomdata* toBeTransfered;
-		roomdata currentRoomData;
-		
-	}	
-	
-	gameMap.currentRoom.
-
-	//takes player position and checks if its at a door?
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-	//if its at a door, roomdata gets transferred
 
 
 
-
-	*/
 }

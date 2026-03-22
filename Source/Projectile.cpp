@@ -1,7 +1,7 @@
 #include "projectile.h"
 #include "AEEngine.h"
 Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot)
-	: projectileSprite(projectileSprite),type(type), velCurr(velCurr),startVel(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), rot(rot) {}
+	: projectileSprite(projectileSprite),type(type), velCurr(velCurr),startVel(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), rot(rot), sourceShot{source} {}
 
 Projectile::~Projectile() {
 	
@@ -53,6 +53,9 @@ ProjectileType Projectile::GetType() const {
 void Projectile::RemoveProjectile() {
 	isAlive = false;
 	
+}
+const void* Projectile::GetSource() const{
+	return sourceShot;
 }
  
 TexturedSprite Projectile::GetSprite() const {

@@ -1,17 +1,17 @@
 #include "ProjectileManager.h"
 
 
-void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color) {
+void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
 	sprite.position = pos;
 	sprite.scale = scale;
 	sprite.color = color;
 	//sprite.direction = dir;
-	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage);
+	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage, source);
     roomData.projectileList.push_back(fireball);
     ProjectileAudio();
 }
 
-void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color) {
+void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
     int numProjectiles = 10;
     float angleAround = 360.0f / numProjectiles;  
 
@@ -26,7 +26,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
 		sprite.color = color;
 
         Vector2 velocity = shotDir * speed;  // uses shotDir
-        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage);
+        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage, source);
         roomData.projectileList.push_back(aoe);
     }
 }
@@ -55,7 +55,7 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     
 }
 
-void UpdateProjectile(RoomData& roomData, float dt) {
+void UpdateProjectiles(RoomData& roomData, float dt) {
     std::vector<Projectile*> rmdata;
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
@@ -97,8 +97,26 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
             Vector2{ 0, 0 },
             tFirst
         );
+
+        bool enemyHit = false;
+        for (Enemy* guy : roomData.enemyList) {
+
+            if (static_cast<void*>(guy) == &(*it)) continue;
+            if ( CollisionIntersection_RectRect(
+                    (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),
+                    guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst) 
+            ) {
+                guy->currentHealth -= (*it)->GetDmg();
+                std::cout << guy << " IS HIT!!" << std::endl;
+                enemyHit = true;
+            }
+        }
+        
         if (hit) {
             playerTakesDamage(player);
+        }
+
+        if (hit || enemyHit) {
             delete* it;
             it = roomData.projectileList.erase(it);
         }

@@ -5,8 +5,12 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
-Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
-	: type{ enemyType }, sprite{ enemySprite }, shadow{ shadowSprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
+
+Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
+	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
+	,wanderTimer{}, shadow{shadowSprite}
+	,speedModifier{1.f}, dmgModifier{1.f}
+	,attackTimer{}
 {
 		ChangeState(initialState);
 }
@@ -14,7 +18,8 @@ Enemy::Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSpr
 
 
 Enemy::Target::Target() : 
-	position{nullptr}, isPlayer{false}, isActive{false}
+	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{false}
+	,speedMod{nullptr}, dmgMod{nullptr}
 { }
 
 Enemy::Target::~Target() {
@@ -25,8 +30,11 @@ Enemy::Target::~Target() {
 
 Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	position = &them.sprite.position;	
+	initialPosition = them.sprite.position;
 	isActive = true;
 	isPlayer = false;
+	speedMod = &them.speedModifier;
+	dmgMod = &them.dmgModifier;
 	return *this;
 }
 Enemy::Target& Enemy::Target::operator=(Player& them) {
@@ -34,6 +42,9 @@ Enemy::Target& Enemy::Target::operator=(Player& them) {
 	isActive = true;
 	isPlayer = true;
 	position = &them.sprite.position;
+	initialPosition = them.sprite.position;
+	speedMod = &them.speed;
+	dmgMod = nullptr;
 	return *this;
 }
 
@@ -69,6 +80,19 @@ void Enemy::Update(float dt) {
 		}
 	}
 
+	//update movement here
+	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
+	speedModifier = 1.0f;
+	sprite.UpdateTransform();
+	
+	shadow.position = sprite.position;
+	shadow.UpdateTransform();
+
+	if (wanderTimer > 0.f) 
+		wanderTimer -= dt;
+
+	if (attackTimer > 0.f) 
+		attackTimer -= dt;
 }
 
 void Enemy::AssessTraits(Labels labels){
@@ -86,7 +110,7 @@ void Enemy::AssessTraits(Labels labels){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{},happy()
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}
 {
 }
 

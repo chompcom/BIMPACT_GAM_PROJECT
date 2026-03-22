@@ -14,8 +14,12 @@ void renderPlayerLives(Player const & player, std::vector<TexturedSprite> health
 	if (player.health <= 0) return;
 	for (int i{ 0 }; i < player.health; ++i)
 	{
-		healthIcons[i].UpdateTransform();
-		healthIcons[i].RenderSprite();
+		TexturedSprite heart = healthIcons[0];
+		heart.position.x += i * 100;
+		heart.UpdateTransform();
+		heart.RenderSprite();
+		//healthIcons[i].UpdateTransform();
+		//healthIcons[i].RenderSprite();
 	}
 }
 

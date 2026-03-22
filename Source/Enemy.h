@@ -13,6 +13,7 @@ enum EnemyStates {
 	ES_ANGRY
 };
 
+
 class EnemyType;
 class Enemy;
 // forward declaration of room
@@ -37,17 +38,28 @@ class Enemy {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
-//		Vector2 target;
+
+		float speedModifier;
+		float dmgModifier;
+
+		Vector2 velocity;
+
+		float wanderTimer;
+		float attackTimer;
 
 		//Target contains information about the target so you can do things to it
 		struct Target {
 			Vector2* position; //!< Points to target location
-			
+			Vector2 initialPosition; //!< The position when the target was found
+
 			//Well there's only players and enemies as entities you see..
 			bool isPlayer;
 
 			//Sometimes the target is already dead. We don't care about them.
 			bool isActive;
+
+			float* speedMod;
+			float* dmgMod;
 
 			Target();
 			~Target();
@@ -60,7 +72,7 @@ class Enemy {
 		} target;
 
 		//points to the room it should be inside, so that it knows whats going on inside!
-		const RoomData* roomData;
+		RoomData* roomData;
 
 		FSM currentBehavior;
 
@@ -97,6 +109,11 @@ public:
 	FSM angry;
 	FSM neutral;
 
+	struct ProjectileInfo {
+		float damage;
+		float radius;
+		float speed;
+	}  happyProjectile, angryProjectile, neutralProjectile;
 
 
 	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits, const Labels& likes, const Labels& dislikes);

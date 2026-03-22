@@ -9,7 +9,7 @@ enum ProjectileType {
 };
 class Projectile {
 public:
-	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot = 0.0f);
+	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot = 0.0f,void* source = nullptr);
 	~Projectile();
 	void UpdateProjectile(f32 dt);
 	void RenderProjectile();
@@ -26,6 +26,9 @@ public: // flag for my scatter particles
 	bool isScatter = false;
 	bool didScatter = false;
 
+	const void* GetSource() const;
+
+	
 private: 
 	TexturedSprite projectileSprite;
 	ProjectileType type;
@@ -36,4 +39,5 @@ private:
 	float rot;
 	Vector2 startVel;
 
+	const void* sourceShot;
 };
