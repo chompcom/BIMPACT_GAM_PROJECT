@@ -105,7 +105,6 @@ void Enemy::AssessTraits(Labels labels){
 		ChangeState(ES_ANGRY);
 	}
 	
-
 }
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
