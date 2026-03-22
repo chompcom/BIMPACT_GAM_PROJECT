@@ -38,6 +38,5 @@ private:
 	bool isAlive;	
 	float rot;
 	Vector2 startVel;
-
 	const void* sourceShot;
 };

@@ -348,12 +348,12 @@ void TestUpdate(float dt)
 
 	checkIfAlmanacClicked(*almanacIcon, almanac);
 
-	
+
 
 	//std::cout << player.position.x << player.position.y;
 
 	// Game map update
-	gameMap.GetCurrentRoom()->Update(dt);		
+	gameMap.GetCurrentRoom()->Update(dt);
 
 
 	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
@@ -442,7 +442,7 @@ void TestUpdate(float dt)
 	for (size_t i = 0; i < carryData.giftList.size(); )
 	{
 		Gift* g = carryData.giftList[i];
-		if (g && g->pickUpState==false)	// If currently picked up, need to check pickupstate = false and remove such????
+		if (g && g->pickUpState == false)	// If currently picked up, need to check pickupstate = false and remove such????
 		{
 			roomData.giftList.push_back(g);
 			carryData.giftList.erase(carryData.giftList.begin() + static_cast<long>(i));	// Remove from current carryData
@@ -455,7 +455,7 @@ void TestUpdate(float dt)
 	// Update game map
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 	Vector2 positionResetTest = player.position;
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	gameMap.UpdateMap(player.position, playerHalfSize, dt);
 	if (player.position != positionResetTest) {
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
@@ -477,28 +477,29 @@ void TestUpdate(float dt)
 			,
 			300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
 	}
-		UpdateProjectiles(roomData, dt);  // updates + cleans dead projectiles
-		CheckProjectileCollision(roomData, player);
-		int collision = grid.CheckInstanceBinaryMapCollision(
-			player.position.x, player.position.y,
-			player.sprite.scale.x, player.sprite.scale.y
-		);
-		Vector2 prevPosition = player.position;
-		if(collision& (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
+	UpdateProjectiles(roomData, dt);  // updates + cleans dead projectiles
+	CheckProjectileCollision(roomData, player);
+	int collision = grid.CheckInstanceBinaryMapCollision(
+		player.position.x, player.position.y,
+		player.sprite.scale.x, player.sprite.scale.y
+	);
+	Vector2 prevPosition = player.position;
+	if (collision & (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
 		//	player.position = { 0,0 };  // just undo the move
-		}
-		if (AEInputCheckTriggered(AEVK_2)) {
-			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-				, player.direction,
-				100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
-		}
-		if (AEInputCheckTriggered(AEVK_3)) {
-			ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-				, player.direction,
-				500.f, 0.5f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
-			
+	}
+	if (AEInputCheckTriggered(AEVK_2)) {
+		ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+			, player.direction,
+			100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
+	}
+	if (AEInputCheckTriggered(AEVK_3)) {
+		ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+			, player.direction,
+			500.f, 0.5f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
 
-		}
+
+	}
+}
 			
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {
@@ -566,3 +567,5 @@ void TestUpdate(float dt)
 
 
 }
+
+*/
