@@ -78,6 +78,8 @@ static bool isPaused = false;
 static bool pauseUiInitialized = false;
 static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
 
+//static UIManager winUI;
+
 void TestLoad()
 {
 	DataLoader::Load();
@@ -187,6 +189,10 @@ void TestLoad()
 	if (tipText) tipText->text = pauseTipText;
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
+
+
+
+
 }
 
 void TestInit()
@@ -320,6 +326,8 @@ void TestDraw()
 		pauseUi.Draw();
 	}
 
+	//winUI.Draw();
+
 }
 
 void TestFree()
@@ -379,13 +387,15 @@ void TestUpdate(float dt)
 	}
 
 	// When paused:
-	// - update only the pause UI
-	// - skip all gameplay logic below
+	// 1. update only the pause UI
+	// 2. skip all gameplay logic below
 	if (isPaused)
 	{
 		pauseUi.Update();
 		return;
 	}
+
+	//winUI.Update();
 
 	// Get previous pos
 	Vector2 prevPos{ player.position.x, player.position.y };
@@ -394,11 +404,11 @@ void TestUpdate(float dt)
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 	// Print Current Grid
-	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	for (int i = 0; i < 9; ++i) {
-		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		std::cout << '\n';
-	}
+	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	//for (int i = 0; i < 9; ++i) {
+	//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+	//	std::cout << '\n';
+	//}
 
 	// Game map update
 	gameMap.GetCurrentRoom()->Update(dt);
