@@ -18,6 +18,7 @@
     <ClCompile Include="..\Source\Collision.cpp" />
     <ClCompile Include="..\Source\Enemy.cpp" />
     <ClCompile Include="..\Source\FSM.cpp" />
+    <ClCompile Include="..\Source\GameOver.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\HUD.cpp" />
@@ -46,6 +47,7 @@
     <ClInclude Include="..\Source\Behaviour\Behaviours.h" />
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\FSM.h" />
+    <ClInclude Include="..\Source\GameOver.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />

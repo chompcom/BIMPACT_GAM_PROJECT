@@ -1,6 +1,8 @@
 #include "AEEngine.h"
 #include "Sprite.h"
 
+#include <iostream>
+
 Sprite::Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor) 
 	: mesh{ spriteMesh }, transform{ 0 }, position {spritePosition}, scale{ spriteScale }, color{ spriteColor } {
 		UpdateTransform();

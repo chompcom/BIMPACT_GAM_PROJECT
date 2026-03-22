@@ -42,8 +42,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-
-    int gGameRunning = 1;
+    //i dont think we need this since we can set next game state to quit? not sure, commented out and its fine?
+    //int gGameRunning = 1;
 
 
     // Initialization of your own variables go here
@@ -57,10 +57,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     GSM_Initialize(GS_MAINMENU);
     // Game Loop
     //_CrtSetBreakAlloc(551);
-    while (gGameRunning)
+    while (/*gGameRunning && */current != GS_QUIT)
     {
-       
-        
         if (current != GS_RESTART) {
             GSM_Update();
             fpLoad();
@@ -80,7 +78,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             fpDraw();
             AESysFrameEnd();
             if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
-                gGameRunning = 0;
+                //gGameRunning = 0;
                 next = GS_QUIT;
             }
         }

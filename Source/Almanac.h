@@ -28,6 +28,7 @@ public:
 	std::vector<TexturedSprite> arrowSprites;
 	std::vector<TexturedSprite> closeSprites;
 	int const maxPages;
+	bool hasBeenOpened;
 
 	Almanac();
 };
