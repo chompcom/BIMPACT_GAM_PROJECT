@@ -40,3 +40,7 @@ void LoadAlmanacEntries(Almanac& almanac);
 void RenderAlmanacPages(Almanac & almanac, s8 font);
 
 void AlmanacInputs(Almanac& almanac/*, AEGfxVertexList* removeLater*/);
+
+void AlmanacInit(Almanac& almanac);
+
+void AlmanacFree(Almanac& almanac);

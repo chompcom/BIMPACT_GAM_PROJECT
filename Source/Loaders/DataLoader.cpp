@@ -212,7 +212,7 @@ namespace DataLoader {
 
 		if (almanacFile.is_open()) {
 			//Getting almanac entries
-
+			almanacEntries.clear();
 			almanacFile >> theGuy;
 			almanacEntries.reserve(theGuy["almanacEntries"].size());
 

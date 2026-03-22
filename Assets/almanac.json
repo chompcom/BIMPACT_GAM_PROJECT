@@ -127,7 +127,7 @@
 			"name": "Pop Rocks",
 			"description": "Explodes when nearby",
 			"area": "normal",
-			"spritePath": "Assets/poprocks.png",
+			"spritePath": "Assets/Enemies/poprocks.png",
 			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
@@ -159,7 +159,7 @@
 			"name": "Booger",
 			"description": "Very sticky",
 			"area": "plant",
-			"spritePath": "Assets/veggiefish.png",
+			"spritePath": "Assets/Enemies/booger.png",
 			"xPictureScale": 110,
 			"yPictureScale": 100
 		},
@@ -231,7 +231,7 @@
 			"name": "THE OVEN",
 			"description": "Bakes warm pastries",
 			"area": "hot",
-			"spritePath": "Assets/veggiefish.png",
+			"spritePath": "Assets/Enemies/oven.png",
 			"xPictureScale": 110,
 			"yPictureScale": 100
 		},

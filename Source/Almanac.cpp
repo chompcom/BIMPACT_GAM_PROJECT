@@ -432,4 +432,18 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 	}
 }
 
+void AlmanacInit(Almanac& almanac)
+{
+	almanac.isOpen = false;
+	almanac.hasBeenOpened = false;
+	almanac.currentPageNumber = 16;
+}
+
+void AlmanacFree(Almanac& almanac)
+{
+	almanac.pageSprites.clear();
+	almanac.entries.clear();
+	almanac.arrowSprites.clear();
+	almanac.closeSprites.clear();
+}
 
