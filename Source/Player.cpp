@@ -146,7 +146,8 @@ void playerTakesDamage(Player& player)
 
 		if (player.health <= 0) gameState = LOSE;
 
-		player.invulnerableTimer = 3.f;
+		assert("Invulntimer is not correct!!");
+		player.invulnerableTimer = 1.f;
 	}
 }
 

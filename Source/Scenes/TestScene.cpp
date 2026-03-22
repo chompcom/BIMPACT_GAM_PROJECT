@@ -145,10 +145,12 @@ void TestLoad()
 	//healthIcons[0].scale = Vector2{ 64.f,64.f };
 	//healthIcons[1].scale = Vector2{ 64.f,64.f };
 	//healthIcons[2].scale = Vector2{ 64.f,64.f };
-
+	healthIcons.clear();
+	healthIcons.resize(3, DataLoader::CreateTexture("Assets/heart.png"));
+	//healthIcons.fill
 	for (int i{ 0 }; i < 3; ++i)
 	{
-		healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+		//healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
 		healthIcons[i].position = Vector2{ -600.5f + (i * 100.f),-350.f};
 		healthIcons[i].scale = Vector2{ 64.f,64.f };
 		healthIcons[i].UpdateTransform();
@@ -589,7 +591,28 @@ void TestUpdate(float dt)
 		// Get previous pos
 		Vector2 prevPos{ player.position.x, player.position.y };
 
-		UpdatePlayer(player, dt); // Player update
+		//UpdatePlayer(player, dt); // Player update
+
+		//to test damage
+		if (player.health > 0)
+		{
+			if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+			if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
+
+			if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
+
+			checkIfAlmanacClicked(*almanacIcon, almanac);
+
+			AlmanacInputs(almanac);
+
+			//for now, 
+			// Player update
+			UpdatePlayer(player, dt);
+			player.sprite.UpdateTransform();
+			player.shadow.UpdateTransform();
+		}
+
+
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 		// Print Current Grid
@@ -626,24 +649,7 @@ void TestUpdate(float dt)
 
 		//HandleGameOverInputs(gameOverButtons);
 
-		//to test damage
-		if (player.health > 0)
-		{
-			if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
-			if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
-
-			if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
-
-			checkIfAlmanacClicked(*almanacIcon, almanac);
-
-			AlmanacInputs(almanac);
-
-			//for now, 
-			// Player update
-			UpdatePlayer(player, dt);
-			player.sprite.UpdateTransform();
-			player.shadow.UpdateTransform();
-		}
+		
 
 		MoveArrow(*arrowSprite, almanac, dt);
 
