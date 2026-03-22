@@ -45,6 +45,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 		player.heldGift = &gift;
 		gift.pickUpState = true;
 		gift.velocity = Vector2{ 0.f, 0.f };
+		PlayerPickUpAudio();
 	}
 	//if the gift is picked up, put it on the player's head
 	if (gift.pickUpState)
