@@ -171,8 +171,22 @@ void TargetCorner(Enemy& me, float dt) {
 	me.target.initialPosition = Vector2(100,100);
 }
 void FireProjectile(Enemy& me, float dt) {
+
+
 	if (me.attackTimer <= 0) {
-		ShootProjectile(DataLoader::CreateTexture("Assets/fireball.png"), *me.roomData, me.sprite.position, me.velocity.Normalized(), me.speedModifier * me.type.speed, 2, me.dmgModifier * me.type.damage, me.sprite.scale, {1.f,1.f,1.f,1.f});	
+		EnemyType::ProjectileInfo proj;
+		switch (me.state) {
+		case ES_ANGRY:
+			proj = me.type.angryProjectile;
+			break;
+		case ES_HAPPY:
+			proj = me.type.happyProjectile;
+			break;
+		default:
+			proj = me.type.neutralProjectile;
+			break;
+		}
+		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, me.velocity.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f});
 		me.attackTimer = 3;
 	}
 }

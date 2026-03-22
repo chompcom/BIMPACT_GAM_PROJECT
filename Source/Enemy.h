@@ -113,6 +113,8 @@ public:
 		float damage;
 		float radius;
 		float speed;
+		float lifetime;
+		std::string spritePath;
 	}  happyProjectile, angryProjectile, neutralProjectile;
 
 

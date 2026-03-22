@@ -11,6 +11,8 @@
 			],
 			"damage": 0,
 			"speed": 0,
+			"detectionRadius": 0,
+			"safeRadius": 0,
 			"traits": [],
 			"likes": [],
 			"dislikes": [],
@@ -30,6 +32,13 @@
 			"speed": 60,
 			"detectionRadius": 2,
 			"safeRadius": 300,
+			"happyProjectile": {
+				"damage":-100,
+				"radius": 300,
+				"lifetime" : 2,
+				"speed": 0,
+				"sprite": "Assets/veggiefish.png"
+			},
 			"likes": [
 				"Gross"
 			],
@@ -106,12 +115,39 @@
 			],
 			"damage": 0,
 			"speed": 0,
+			"detectionRadius": 100,
+			"safeRadius": 200,
 			"attackRate": 5,
 			"likes": ["Hot"],
 			"dislikes": ["Wet"],
+			"angryProjectile": {
+				"damage":50,
+				"radius":200,
+				"speed":0,
+				"lifetime":0.5,
+				"sprite": "Assets/fireball.png"
+			},
 			"happy": [],
-			"neutral": [],
-			"angry": []
+			"neutral": [
+				{ "context":"default",
+				"actions":[
+					"Wander"
+				]
+				}
+			],
+			"angry": [
+				{ "context":"IsTouchingTarget",
+					"actions":[
+						"FireProjectile"
+					]
+				},
+				{ "context":"default",
+				"actions":[
+					"TargetPlayer",
+					"MoveToTarget"
+				]
+				}
+			]
 		},
 		{
 			"name": "THE OVEN",
@@ -122,15 +158,44 @@
 				255,
 				255
 			],
-			"damage": 0,
-			"speed": 0,
-			"attackRate":3,
+			"damage": 10,
+			"speed": 10,
+			"detectionRadius": 500,
+			"safeRadius": 300,
+			"attackRate": 3,
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 75,
+				"speed": 100,
+				"lifetime": 2.5,
+				"sprite": "Assets/fireball.png"
+			},
 			"traits": ["Hot"],
 			"likes": ["Hot"],
 			"dislikes": ["Wet"],
-			"happy": [],
-			"neutral": [],
-			"angry": []
+			"happy": [
+				{}
+			],
+			"neutral": [
+				{ "context" : "IsTouchingTarget",
+					"actions":[
+						"SafeDistancePlayer"
+					]
+				},
+				{ "context": "default",
+					"actions":[
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{"context":"default",
+				"actions":[
+					"TargetPlayer",
+					"FireProjectile",
+					"SafeDistancePlayer"
+				]}
+			]
 		}
     ]
 }
