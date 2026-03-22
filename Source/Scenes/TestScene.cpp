@@ -200,18 +200,27 @@ void TestLoad()
 
 	////square seed: 0xA341311Cu
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
-	// projManager.InitFireball(sqmesh, bulletpng);
-	// projManager.InitAOE(sqmesh, aoepng);
+	projManager.InitFireball(sqmesh, bulletpng);
+	projManager.InitAOE(sqmesh, aoepng);
 
 	//// Enable to allow for random values each run
 	//std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	//unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	//gameMap.InitMap(globalTransferData, curSeed);
 	//std::cout << "Current Seed: " << curSeed << "\n";
-	//// Interesting ones: 32461, 32608, 31931, 18283, 680
+	//// Interesting ones: 32461, 32608, 31931, 18283, 31060, 680
 	//// Too easy: 32702, 0xA341311Cu, 
 
 	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+
+	testParticles = ParticleSystem(sqmesh);
+
+	// For pause screen;
+	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	if (tipText) tipText->text = pauseTipText;
+	pauseUiInitialized = true;
+	pauseUi.SetFont(font);
 
 }
 
@@ -228,8 +237,8 @@ void TestInit()
 
 	//square seed: 0xA341311Cu
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
-	projManager.InitFireball(sqmesh, bulletpng);
-	projManager.InitAOE(sqmesh, aoepng);
+	// projManager.InitFireball(sqmesh, bulletpng);
+	// projManager.InitAOE(sqmesh, aoepng);
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
@@ -240,20 +249,15 @@ void TestInit()
 	// Too easy: 32702, 0xA341311Cu, 
 
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
-
 	
-	testParticles = ParticleSystem(sqmesh);
+	for (int i{ 0 }; i < 3; ++i)
+	{
+		healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+		healthIcons[i].position = Vector2{ -600.5f + (i * 100.f),-350.f };
+		healthIcons[i].scale = Vector2{ 64.f,64.f };
+		healthIcons[i].UpdateTransform();
+	}
 
-	// For pause screen;
-	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f,0.0f), Vector2(580.0f, 250.0f));
-	UIElement* tipText = pauseUi.FindById("tip_text");
-	if (tipText) tipText->text = pauseTipText;
-	pauseUiInitialized = true;
-	pauseUi.SetFont(font);
-}
-
-void TestInit()
-{
 }
 
 void TestDraw()
@@ -392,6 +396,7 @@ void TestDraw()
 
 void TestFree()
 {
+	//healthIcons.clear();
 	//RoomData& roomData = gameMap.GetCurrentRoom()->currentRoomData;
 	//RoomData& carryData = gameMap.GetTransferData();
 	//
@@ -472,6 +477,12 @@ void TestUnload()
 void TestUpdate(float dt)
 {
 
+	if (player.health <= 0)
+	{
+		HandleGameOverInputs(gameOverButtons);
+		return;
+	}
+
 	// Pause toggle
 	if (AEInputCheckTriggered(AEVK_TAB))
 	{
@@ -487,18 +498,20 @@ void TestUpdate(float dt)
 		return;
 	}
 
+
+
 	// Get previous pos
 	Vector2 prevPos{ player.position.x, player.position.y };
 	
 	UpdatePlayer(player, dt); // Player update
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
-	// Print Current Grid
-	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	for (int i = 0; i < 9; ++i) {
-		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		std::cout << '\n';
-	}
+	//// Print Current Grid
+	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	//for (int i = 0; i < 9; ++i) {
+	//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+	//	std::cout << '\n';
+	//}
 
 	// Game map update
 	gameMap.GetCurrentRoom()->Update(dt);
@@ -524,27 +537,22 @@ void TestUpdate(float dt)
 	// Finally reflect changes?
 	player.sprite.UpdateTransform();
 	player.shadow.UpdateTransform();
-	
-	HandleGameOverInputs(gameOverButtons);
 
 	//to test damage
-	if (player.health > 0)
-	{
-		if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
-		if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
+	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+	if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
 
-		if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
+	//if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
 
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+	checkIfAlmanacClicked(*almanacIcon, almanac);
 
-		AlmanacInputs(almanac);
+	AlmanacInputs(almanac);
 
-		//for now, 
-		// Player update
-		UpdatePlayer(player, dt);
-		player.sprite.UpdateTransform();
-		player.shadow.UpdateTransform();
-	}
+	//for now, 
+	// Player update
+	UpdatePlayer(player, dt);
+	player.sprite.UpdateTransform();
+	player.shadow.UpdateTransform();
 
 	MoveArrow(*arrowSprite, almanac, dt);
 

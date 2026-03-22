@@ -9,24 +9,25 @@
       "visible": true,
       "children": [
         {
-          "id": "bg",
-          "x": 0.0,
-          "y": 0.0,
-          "w": 1.0,
-          "h": 1.0,
-          "visible": true,
-          "drawBackground": true,
-          "borderRadiusRatio": 0.0,
-          "roundSegments": 8,
-          "backgroundColor": [0.91, 0.88, 0.73, 1.0]
+            "id": "bg",
+            "x": 0.0,
+            "y": 0.0,
+            "w": 1.0,
+            "h": 1.0,
+            "visible": true,
+            "drawBackground": true,
+            "borderRadiusRatio": 0.0,
+            "roundSegments": 8,
+            "backgroundColor": [ 1.0, 1.0, 1.0, 1.0 ],
+            "texture": "Assets/MainMenuScreen.png"
         },
 
         {
           "id": "top_bar",
           "x": 0.0,
           "y": 0.43,
-          "w": 1.0,
-          "h": 0.14,
+          "w": 0.0,
+          "h": 0.0,
           "visible": true,
           "drawBackground": true,
           "borderRadiusRatio": 0.0,
@@ -35,21 +36,33 @@
         },
 
         {
-          "id": "title",
-          "x": 0.05,
-          "y": 0.27,
+           "id": "title1",
+           "x": 0.29,
+           "y": 0.36,
+           "w": 0.42,
+           "h": 0.08,
+           "visible": true,
+           "text": "F R I E N D",
+           "textScale": 2.56,
+           "textColor": [ 0.0, 0.0, 0.0, 1.0 ]
+        },
+
+        {
+          "id": "title2",
+          "x": 0.29,
+          "y": 0.26,
           "w": 0.42,
           "h": 0.08,
           "visible": true,
-          "text": "F R I E N D    D UN G E O N",
+          "text": "D U N G E O N",
           "textScale": 2.56,
           "textColor": [0.0, 0.0, 0.0, 1.0]
         },
 
         {
           "id": "btn_start",
-          "x": -0.28,
-          "y": 0.10,
+          "x": 0.28,
+          "y": 0.12,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -58,15 +71,15 @@
           "borderRadiusRatio": 0.14,
           "roundSegments": 8,
           "text": "START EXPLORING",
-          "textScale": 0.52,
-          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
-          "textColor": [0.0, 0.0, 0.0, 1.0]
+          "textScale": 1,
+          "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
+          "textColor": [0.8, 0.8, 0.8, 1.0]
         },
 
         {
           "id": "btn_editor",
-          "x": -0.28,
-          "y": -0.05,
+          "x": 0.28,
+          "y": -0.03,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -75,15 +88,15 @@
           "borderRadiusRatio": 0.14,
           "roundSegments": 8,
           "text": "EDITOR'S DUNGEON",
-          "textScale": 0.50,
-          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
-          "textColor": [0.0, 0.0, 0.0, 1.0]
+          "textScale": 1,
+          "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
+          "textColor": [0.8, 0.8, 0.8, 1.0]
         },
 
         {
           "id": "btn_settings",
-          "x": -0.28,
-          "y": -0.20,
+          "x": 0.28,
+          "y": -0.18,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -92,15 +105,15 @@
           "borderRadiusRatio": 0.14,
           "roundSegments": 8,
           "text": "SETTINGS",
-          "textScale": 0.52,
-          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
-          "textColor": [0.0, 0.0, 0.0, 1.0]
+          "textScale": 1,
+           "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
+          "textColor": [0.8, 0.8, 0.8, 1.0]
         },
 
         {
           "id": "btn_quit",
-          "x": -0.28,
-          "y": -0.35,
+          "x": 0.28,
+          "y": -0.33,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -109,22 +122,23 @@
           "borderRadiusRatio": 0.14,
           "roundSegments": 8,
           "text": "QUIT",
-          "textScale": 0.52,
-          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
-          "textColor": [0.0, 0.0, 0.0, 1.0]
+          "textScale": 1,
+           "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
+          "textColor": [0.8, 0.8, 0.8, 1.0]
         },
 
         {
           "id": "character_panel",
-          "x": 0.30,
+          "x": 0.28,
           "y": -0.08,
           "w": 0.30,
           "h": 0.52,
-          "visible": true,
-          "drawBackground": true,
+          "visible": false,
+          "drawBackground": false,
           "borderRadiusRatio": 0.16,
           "roundSegments": 12,
-          "backgroundColor": [0.85, 0.85, 0.85, 1.0]
+          "backgroundColor": [1, 1, 1, 1.0],
+          "texture":  "Assets/MainMenuImage.png"
         },
 
         {
@@ -133,7 +147,7 @@
           "y": -0.08,
           "w": 0.20,
           "h": 0.08,
-          "visible": true,
+          "visible": false,
           "text": "[CHARACTER IMAGE]",
           "textScale": 0.45,
           "textColor": [0.96, 0.96, 0.96, 1.0]
