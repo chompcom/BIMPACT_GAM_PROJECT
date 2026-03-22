@@ -51,7 +51,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 			direction = target - boss->sprite.position;
 			boss->sprite.position += direction.Normalized() * 90 * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
-			if ((abs(boss->sprite.position.x - target.x) <= 0.5f && abs(boss->sprite.position.y - target.y) <= 0.5f) || 
+			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
 				CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
 				currentState = BOSS_IDLE;
 			}
@@ -91,7 +91,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		//direction = target - boss->sprite.position;
 
 		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale, chargeDirection.Normalized() * 150 * dt,
-			player.position, player.sprite.scale, player.direction * player.speed * dt, collisionTime)) {
+			player.position, player.sprite.scale, player.GetVelocity() * dt, collisionTime)) {
 			playerTakesDamage(player);
 		}
 
@@ -147,7 +147,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 
 		if (interval >= 0.9f * jumpInterval) {
 			if (CollisionIntersection_RectRect(target, boss->sprite.scale, Vector2{},
-				player.position, player.sprite.scale, player.direction * player.speed * dt, collisionTime)) {
+				player.position, player.sprite.scale, player.GetVelocity(), collisionTime)) {
 				playerTakesDamage(player);
 			}
 		}

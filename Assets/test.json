@@ -3,70 +3,198 @@
     [
 		{	"name": "Default",
 			"sprite": "Assets/poprocks.png",
-			"color": [255,255,255,255],
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
 			"damage": 0,
-			"speed" : 0,
+			"speed": 0,
+			"detectionRadius": 0,
+			"safeRadius": 0,
 			"traits": [],
-			"likes" : [],
+			"likes": [],
 			"dislikes": [],
-			"happy": {},
-			"neutral": {},
-			"angry": {}
+			"happy": [],
+			"neutral": [],
+			"angry": []
 		},
 		{	"name": "Booger",
 			"sprite": "Assets/booger.png",
-			"color": [255,255,255,255],
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
 			"damage": 0,
-			"speed" : 60,
-			"detectionRadius" : 40,
-			"safeRadius" : 300,
-			"likes" : ["Gross"],
-			"dislikes": ["Clean"],
+			"speed": 60,
+			"detectionRadius": 2,
+			"safeRadius": 300,
+			"happyProjectile": {
+				"damage":100,
+				"radius": 300,
+				"lifetime" : 2,
+				"speed": 0,
+				"sprite": "Assets/veggiefish.png"
+			},
+			"likes": [
+				"Gross"
+			],
+			"dislikes": [
+				"Clean"
+			],
 			"happy": [
-				{ "context": "IsTouchingTarget",
+				{
+					"context": "IsTouchingTarget",
 					"actions": [
-					"ApplySlowToTarget",
-					"MoveToTarget"
-				]},
-				{ "context" : "IsNotFollowingPlayer",
-				 "actions":[
-					"TargetPlayer",
-					"MoveToTarget",
-					"TargetEnemyInDetectionRadius"
-				] },
-				{"context": "default",
+						"ApplySlowToTarget",
+						"SafeDistancePlayer",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
 					"actions": [
-					"TargetPlayer",
-					"CircleMove",
-					"TargetEnemyInDetectionRadius"
-				] }
+						"TargetPlayer",
+						"MoveToTarget",
+						"FireProjectile",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
 			],
 			"neutral": [
-				{"context": "IsTouchingTarget",
-				"actions": [
-					"ApplySlowToTarget",
-					"MoveToTarget"	
-				]},
-				{"context": "default",
-				"actions": [ 
-				"TargetPlayer",
-				"Wander"
-				]}
-			],
-			"angry": [
 				{
-					"context" : "IsTouchingTarget",
-					"actions" : [
+					"context": "IsTouchingTarget",
+					"actions": [
 						"ApplySlowToTarget",
 						"MoveToTarget"
 					]
 				},
-				{ "context" : "default",
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"ApplySlowToTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "default",
 					"actions": [
 						"TargetPlayer",
 						"MoveToTarget"
 					]
 				}
+			]
+		},
+		{	"name": "Pop Rocks",
+			"sprite": "Assets/poprocks.png",
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
+			"damage": 0,
+			"speed": 0,
+			"detectionRadius": 100,
+			"safeRadius": 200,
+			"attackRate": 5,
+			"likes": ["Hot"],
+			"dislikes": ["Wet"],
+			"angryProjectile": {
+				"damage":50,
+				"radius":200,
+				"speed":0,
+				"lifetime":0.5,
+				"sprite": "Assets/fireball.png"
+			},
+			"happy": [],
+			"neutral": [
+				{ "context":"default",
+				"actions":[
+					"Wander"
+				]
+				}
+			],
+			"angry": [
+				{ "context":"IsTouchingTarget",
+					"actions":[
+						"FireProjectile"
+					]
+				},
+				{ "context":"default",
+				"actions":[
+					"TargetPlayer",
+					"MoveToTarget"
+				]
+				}
+			]
+		},
+		{
+			"name": "THE OVEN",
+			"sprite": "Assets/poprocks.png",
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
+			"damage": 10,
+			"speed": 10,
+			"detectionRadius": 500,
+			"safeRadius": 300,
+			"attackRate": 3,
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 75,
+				"speed": 100,
+				"lifetime": 2.5,
+				"sprite": "Assets/fireball.png"
+			},
+			"traits": ["Hot"],
+			"likes": ["Hot"],
+			"dislikes": ["Wet"],
+			"happy": [
+				{}
+			],
+			"neutral": [
+				{ "context" : "IsTouchingTarget",
+					"actions":[
+						"SafeDistancePlayer"
+					]
+				},
+				{ "context": "default",
+					"actions":[
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{"context":"default",
+				"actions":[
+					"TargetPlayer",
+					"FireProjectile",
+					"SafeDistancePlayer"
+				]}
 			]
 		}
     ]

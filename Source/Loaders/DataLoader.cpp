@@ -37,6 +37,20 @@ namespace {
 		
 	}
 
+	bool MapProjectile(EnemyType::ProjectileInfo& tmp, Json::Value& source, std::string const& type) {
+		if (!source[type].isNull()) {
+
+			Json::Value og = source[type];
+
+			tmp.damage     = og["damage"].asFloat();
+			tmp.radius     = og["radius"].asFloat();
+			tmp.speed      = og["speed"].asFloat();
+			tmp.lifetime   = og["lifetime"].asFloat();
+			tmp.spritePath = og["sprite"].asString();
+			return true;
+		}
+		return false;
+	}
 	// Add quarter circle (depending on segments and radius) vertices to a vector list (For rrect mesh)
 	void AddArcPoints(std::vector<Vector2>& points,
 		f32 cx, f32 cy,
@@ -149,31 +163,6 @@ namespace DataLoader {
 			enemyTypes.reserve(theGuy["enemies"].size());
 
 			for (Json::Value& name : theGuy["enemies"]) {
-
-				//get all the traits
-				//Labels tmpTraits;
-				//for (Json::Value& trait : name["traits"])
-				//{
-				//	tmpTraits.insert(trait.asString());
-				//}
-
-				////get all the likes
-				//Labels tmpLikes;
-				//for (Json::Value& like : name["likes"])
-				//{
-				//	tmpLikes.insert(like.asString());
-				//}
-
-				//get all the dislikes
-				//Labels tmpDislikes;
-				//for (Json::Value& dislike : name["dislikes"])
-				//{
-				//	tmpDislikes.insert(dislike.asString());
-				//}
-
-				//EnemyType tmp{ name["name"].asString(), name["health"].asFloat(), name["damage"].asFloat(), 
-				//	tmpTraits, tmpLikes, tmpDislikes };
-
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
 
 				AddBehaviours(tmp, name, "happy");
@@ -185,6 +174,17 @@ namespace DataLoader {
 				tmp.speed = name["speed"].asFloat();
 				tmp.detectionRadius = name["detectionRadius"].asFloat();
 				tmp.safeRadius = name["safeRadius"].asFloat();
+
+
+				if (MapProjectile(tmp.happyProjectile, name, "happyProjectile"))
+				{
+					std::cout << tmp.name << "'s Happy Projectile: " << tmp.happyProjectile.damage << "\n";
+				}
+
+				if (MapProjectile(tmp.angryProjectile, name, "angryProjectile"))
+				{
+					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+				}
 
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());

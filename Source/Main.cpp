@@ -62,8 +62,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         if (current != GS_RESTART) {
             GSM_Update();
             fpLoad();
-            Grid grid(10, 10, 50);
-            std::cout << grid.GetHeight() << ", " << grid.GetWidth() << std::endl;
+          //  Grid grid(10, 10, 50);
+         //   std::cout << grid.GetHeight() << ", " << grid.GetWidth() << std::endl;
         }
         else {
             next = previous;

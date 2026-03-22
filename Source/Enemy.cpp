@@ -5,9 +5,12 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
+
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 	,wanderTimer{}, shadow{shadowSprite}
+	,speedModifier{1.f}, dmgModifier{1.f}
+	,attackTimer{}
 {
 		ChangeState(initialState);
 }
@@ -16,6 +19,7 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 
 Enemy::Target::Target() : 
 	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{false}
+	,speedMod{nullptr}, dmgMod{nullptr}
 { }
 
 Enemy::Target::~Target() {
@@ -29,6 +33,8 @@ Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	initialPosition = them.sprite.position;
 	isActive = true;
 	isPlayer = false;
+	speedMod = &them.speedModifier;
+	dmgMod = &them.dmgModifier;
 	return *this;
 }
 Enemy::Target& Enemy::Target::operator=(Player& them) {
@@ -37,6 +43,8 @@ Enemy::Target& Enemy::Target::operator=(Player& them) {
 	isPlayer = true;
 	position = &them.sprite.position;
 	initialPosition = them.sprite.position;
+	speedMod = &them.speed;
+	dmgMod = nullptr;
 	return *this;
 }
 
@@ -50,7 +58,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 	switch (newstate)
 	{
 	case ES_HAPPY:
-
+		FriendSuccessAudio();
 		currentBehavior = enemyType.happy;
 		break;
 	case ES_NEUTRAL:
@@ -72,6 +80,11 @@ void Enemy::Update(float dt) {
 		}
 	}
 
+	//update movement here
+	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
+	speedModifier = 1.0f;
+	sprite.UpdateTransform();
+	
 	shadow.position = sprite.position;
 	shadow.UpdateTransform();
 
@@ -97,7 +110,7 @@ void Enemy::AssessTraits(Labels labels){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health {health}, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{},happy()
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}
 {
 }
 

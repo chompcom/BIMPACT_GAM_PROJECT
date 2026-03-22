@@ -2,26 +2,16 @@
 #include "Projectile.h"
 #include "RoomData.h"
 #include "Sprite.h"
+#include "Loaders/DataLoader.h"
+#include "math.h"
 
-class ProjectileManager {
-public:
-    ProjectileManager() = default;
+       
+    void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source = nullptr);
+    void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source = nullptr); // doesn't take in dir as dir is auto set
+    void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, float rot = 60.0f, void* source = nullptr);
+    void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source = nullptr);
+    void UpdateProjectiles(RoomData& roomData, float dt);
+    void CheckProjectileCollision(RoomData& roomData, Player& player);
+    void RenderProjectile(RoomData& roomData);
+    void ProjectileClear(RoomData& roomData);
 
-    void InitFireball(AEGfxVertexList* mesh, AEGfxTexture* texture);
-    void InitAOE(AEGfxVertexList* mesh, AEGfxTexture* texture);
-    void ShootFireball(RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color);
-    void ShootAOE(RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color);
-    void Update(RoomData& roomData, float dt);
-    void Render(RoomData& roomData);
-    void Clear(RoomData& roomData);
-
-private:
-    AEGfxVertexList* mesh = nullptr;
-    AEGfxTexture* fireballTex = nullptr;
-    AEGfxTexture* aoeTex = nullptr;
-
-    float speed = 0.0f;
-    float lifetime = 0.0f;
-    int   damage = 0;
-    Vector2 scale = { 1.0f, 1.0f };
-};

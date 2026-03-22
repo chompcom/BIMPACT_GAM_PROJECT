@@ -12,3 +12,12 @@ enum GS_STATES
 	GS_MAINMENU,
 	GS_CONTENT_EDIT
 };
+
+enum LV_STATES
+{
+	RUNNING = 0,
+	PAUSED,
+
+	WIN,
+	LOSE
+};

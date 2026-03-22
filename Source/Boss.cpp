@@ -1,5 +1,8 @@
 #include "AEEngine.h"
 #include "Boss.h"
+#include "GameStateList.h"
+
+extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
 	const RoomData& currentRoom, std::vector<AttackData> attackData)
@@ -24,6 +27,32 @@ Boss::~Boss() {}
 
 
 void Boss::Update(Player& player, f32 dt) {
-	bossStateMachine->Update(player, dt);
+	if (currentHealth > 0) {
+		bossStateMachine->Update(player, dt);
+		CollideProjectile();
+		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
+	}
+	else {
+		gameState = WIN;
+	}
+}
+
+void Boss::CollideProjectile() {
+	float collisionTime{ 0.0f };
+	for (Projectile* proj : roomData.projectileList) {
+		if (!proj->IsAlive()) continue;
+
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
+			if (invulnerableTimer <= 0.f) {
+				currentHealth -= proj->GetDmg();
+				std::cout << "Taken Damage: " << proj->GetDmg();
+				std::cout << "Remaining Health: " << currentHealth;
+				proj->RemoveProjectile();
+				invulnerableTimer = 1.0f;
+			}
+		}
+
+	}
 }
 
