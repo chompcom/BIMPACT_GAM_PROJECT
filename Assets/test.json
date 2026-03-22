@@ -3,73 +3,134 @@
     [
 		{	"name": "Default",
 			"sprite": "Assets/poprocks.png",
-			"color": [255,255,255,255],
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
 			"damage": 0,
-			"speed" : 0,
+			"speed": 0,
 			"traits": [],
-			"likes" : [],
+			"likes": [],
 			"dislikes": [],
-			"happy": {},
-			"neutral": {},
-			"angry": {}
+			"happy": [],
+			"neutral": [],
+			"angry": []
 		},
 		{	"name": "Booger",
 			"sprite": "Assets/booger.png",
-			"color": [255,255,255,255],
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
 			"damage": 0,
-			"speed" : 60,
-			"detectionRadius" : 2,
-			"safeRadius" : 300,
-			"likes" : ["Gross"],
-			"dislikes": ["Clean"],
+			"speed": 60,
+			"detectionRadius": 2,
+			"safeRadius": 300,
+			"likes": [
+				"Gross"
+			],
+			"dislikes": [
+				"Clean"
+			],
 			"happy": [
-				{ "context": "IsTouchingTarget",
+				{
+					"context": "IsTouchingTarget",
 					"actions": [
-					"ApplySlowToTarget",
-					"SafeDistancePlayer",
-					"MoveToTarget"
-				]},
-				{ "context" : "IsNotFollowingPlayer",
-				 "actions":[
-					"TargetPlayer",
-					"MoveToTarget",
-					"FireProjectile",
-					"TargetEnemyInDetectionRadius"
-				] },
-				{"context": "default",
+						"ApplySlowToTarget",
+						"SafeDistancePlayer",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
 					"actions": [
-					"TargetPlayer",
-					"CircleMove",
-					"TargetEnemyInDetectionRadius"
-				] }
+						"TargetPlayer",
+						"MoveToTarget",
+						"FireProjectile",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
 			],
 			"neutral": [
-				{"context": "IsTouchingTarget",
-				"actions": [
-					"ApplySlowToTarget",
-					"MoveToTarget"	
-				]},
-				{"context": "default",
-				"actions": [ 
-				"TargetPlayer",
-				"Wander"
-				]}
-			],
-			"angry": [
 				{
-					"context" : "IsTouchingTarget",
-					"actions" : [
+					"context": "IsTouchingTarget",
+					"actions": [
 						"ApplySlowToTarget",
 						"MoveToTarget"
 					]
 				},
-				{ "context" : "default",
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"ApplySlowToTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "default",
 					"actions": [
 						"TargetPlayer",
 						"MoveToTarget"
 					]
 				}
 			]
+		},
+		{	"name": "Pop Rocks",
+			"sprite": "Assets/poprocks.png",
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
+			"damage": 0,
+			"speed": 0,
+			"attackRate": 5,
+			"likes": ["Hot"],
+			"dislikes": ["Wet"],
+			"happy": [],
+			"neutral": [],
+			"angry": []
+		},
+		{
+			"name": "THE OVEN",
+			"sprite": "Assets/poprocks.png",
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
+			"damage": 0,
+			"speed": 0,
+			"attackRate":3,
+			"traits": ["Hot"],
+			"likes": ["Hot"],
+			"dislikes": ["Wet"],
+			"happy": [],
+			"neutral": [],
+			"angry": []
 		}
     ]
 }
