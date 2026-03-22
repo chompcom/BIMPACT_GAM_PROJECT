@@ -246,6 +246,9 @@ Command GetCommand(std::string name) {
 }
 
 FlagCheck GetFlag(std::string name) {
+	if (flags.find(name) == flags.end()) {
+		return flags["default"];
+	}
     return flags[name];
 }
 

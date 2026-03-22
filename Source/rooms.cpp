@@ -191,6 +191,23 @@ namespace mapRooms
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
+
+			Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			gift->shadow.position = Vector2{ 0.f, -40.f };
+			sauce->shadow.position = Vector2{ 0.f, -40.f };
+			spray->shadow.position = Vector2{ 0.f, -40.f };
+
+			gift->position = Vector2{ -300, 0 };
+			sauce->position = Vector2{ 300,0 };
+			spray->position = Vector2{ 0,-200 };
+
+			currentRoomData.giftList.push_back(gift);
+			currentRoomData.giftList.push_back(sauce);
+			currentRoomData.giftList.push_back(spray);
+
+
 		}
 
 
@@ -245,9 +262,7 @@ namespace mapRooms
 			//Vector2 giftPos{ 200.0f, 450.0f };
 			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
 			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-			Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			gift->shadow.position = Vector2{ 0.f, -40.f };
-			currentRoomData.giftList.push_back(gift);
+			
 		}
 
 		// Boss Init
