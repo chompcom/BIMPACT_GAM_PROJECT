@@ -225,7 +225,8 @@ namespace mapRooms
 						//std::cout << "Spawned " << tile->name << "! \n";
 						const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
 						currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
-						currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth() , j * roomGrid.GetTileHeight()};
+						currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
+
 					}
 				}
 				std::cout << "\n";

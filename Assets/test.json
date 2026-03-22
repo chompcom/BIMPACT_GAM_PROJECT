@@ -32,13 +32,6 @@
 			"speed": 60,
 			"detectionRadius": 2,
 			"safeRadius": 300,
-			"happyProjectile": {
-				"damage":100,
-				"radius": 300,
-				"lifetime" : 2,
-				"speed": 0,
-				"sprite": "Assets/veggiefish.png"
-			},
 			"likes": [
 				"Gross"
 			],
@@ -172,7 +165,7 @@
 			},
 			"traits": ["Hot"],
 			"likes": ["Hot"],
-			"dislikes": ["Wet"],
+			"dislikes": ["Wet", "Gross"],
 			"happy": [
 				{}
 			],

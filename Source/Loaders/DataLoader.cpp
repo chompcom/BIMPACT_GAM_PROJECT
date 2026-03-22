@@ -190,6 +190,11 @@ namespace DataLoader {
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
 				}
+
+				for (Json::Value& thing : name["dislikes"]) {
+					tmp.dislikes.insert(thing.asString());
+				}
+
 	
 
 				enemyTypes.insert({

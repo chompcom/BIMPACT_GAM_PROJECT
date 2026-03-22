@@ -506,6 +506,7 @@ void TestUpdate(float dt)
 
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
+		/*
 		// Print Current Grid
 		std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
 		for (int i = 0; i < 9; ++i)
@@ -514,6 +515,7 @@ void TestUpdate(float dt)
 				std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
 			std::cout << '\n';
 		}
+		*/
 
 		// Game map update
 		gameMap.GetCurrentRoom()->Update(dt);
@@ -521,7 +523,7 @@ void TestUpdate(float dt)
 		mapRooms::Room *currentRoom = gameMap.GetCurrentRoom();
 		RoomData &roomData = currentRoom->currentRoomData;
 		RoomData &carryData = gameMap.GetTransferData();
-		UpdateProjectiles(roomData, dt);
+		
 
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -589,6 +591,9 @@ void TestUpdate(float dt)
 				g->shadow.UpdateTransform();
 			}
 		}
+
+		CheckProjectileCollision(roomData, *roomData.player);
+		UpdateProjectiles(roomData, dt);
 
 		if (roomData.boss)
 		{
