@@ -14,13 +14,13 @@
 #include "Projectile.h"
 #include "ProjectileManager.h"
 #include "../HUD.h"
-#include "../almanac.h"
+#include "../Almanac.h"
 #include "ParticleSystem.h"
 #include "../Screens/Ui.h"
+#include "../GameOver.h"
 
 AEGfxVertexList* sqmesh			= nullptr;
 
-TexturedSprite* thing			= nullptr;
 TexturedSprite* bulletSprite	= nullptr;
 
 
@@ -31,12 +31,19 @@ AEGfxTexture* bulletpng		= nullptr;
 AEGfxTexture* aoepng		= nullptr;
 AEGfxTexture* heartpng		= nullptr;
 AEGfxTexture* almanacpng	= nullptr;
+AEGfxTexture* almanacLitUppng = nullptr;
 AEGfxTexture* pDoorTex		= nullptr;	// Door image
+AEGfxTexture* arrowpng      = nullptr;
 
 //AEGfxTexture* almanacpagepng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
-TexturedSprite * almanacIcon = nullptr;
+TexturedSprite* almanacIcon      = nullptr; 
+TexturedSprite* almanacLitUpIcon = nullptr;
+TexturedSprite* arrowSprite      = nullptr;
+std::vector<TexturedSprite> gameOverButtons;
+
+Sprite gameOverDarkScreen{};
 
 //TexturedSprite* almanacPage = nullptr;
 Almanac almanac {};
@@ -48,34 +55,29 @@ Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1
 
 
 
-//Gift gift{ "boat", {"happy"}, Sprite()};
-//Gift gift2{"bad", {"sad"}, Sprite()};
-//Gift gift{ "boat", {"happy"}, TexturedSprite(sqmesh,nullptr, Vector2(), Vector2(), Color{1,1,1,1}) };
-//Gift gift2{"bad", {"sad"}, TexturedSprite(sqmesh, nullptr, Vector2(), Vector2())};
-
 EnemyType rocktype{"rock",100,10,{"sad"},{"happy"},{"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1}),TexturedSprite(sqmesh,rockpng,Vector2(),Vector2(),Color{1,1,1,1}) };
 mapRooms::Map gameMap;          // Init var for map
 static RoomData globalTransferData{};
-/* PSUDEOCODE SONE
 
-RoomData tobetranfered{};
-vector<enemy*> enemyList
-vector<gift*> gift;
-*/
-
-//almanac vector
-//std::vector<AlmanacEntry> almanacVector;
-//vector of all enemytypes for the almanac
-//std::vector<std::string> enemyTypeNames {};
 
 ParticleSystem testParticles = NULL;
 
 
+LV_STATES gameState;
+
 static UIManager pauseUi;
-static bool isPaused = false;
 static bool pauseUiInitialized = false;
 static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
+
+static UIManager winUi;
+static bool winUiInitialized = false;
+//static char const* winTipText = "[TIP]: Press `TAB` to resume";
+
+static UIManager loseUi;
+static bool loseUiInitialized = false;
+
+bool debugMode;
 
 void TestLoad()
 {
@@ -88,6 +90,11 @@ void TestLoad()
 	heartpng =	 AEGfxTextureLoad("Assets/heart.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
+	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
+	arrowpng = AEGfxTextureLoad("Assets/arrow.png");
+
+	gameOverDarkScreen = {sqmesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{ 0,0,0,0.8f }};
+	//gameOverButtonpng = AEGfxTextureLoad("Assets/arrow.png");
 
 	//font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
@@ -112,67 +119,67 @@ void TestLoad()
 	//healthIcons[2].scale = Vector2{ 64.f,64.f };
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	healthIcons.clear();
+	healthIcons.resize(3, DataLoader::CreateTexture("Assets/heart.png"));
+	//healthIcons.fill
+	for (int i{ 0 }; i < 3; ++i)
+	{
+		//healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+		healthIcons[i].position = Vector2{ -600.5f + (i * 100.f),-350.f};
+		healthIcons[i].scale = Vector2{ 64.f,64.f };
+		healthIcons[i].UpdateTransform();
+	}
 
-	healthIcons[0].position = Vector2{ -600.5f,-350.f };
-	healthIcons[1].position = Vector2{ -500.5f,-350.f };
-	healthIcons[2].position = Vector2{ -400.5f,-350.f };
-
-	healthIcons[0].scale = Vector2{ 64.f,64.f };
-	healthIcons[1].scale = Vector2{ 64.f,64.f };
-	healthIcons[2].scale = Vector2{ 64.f,64.f };
-
-	//enemyTypes.push_back(rocktype);
 
 	LoadAlmanacPages(almanac);
 	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
 	LoadAlmanacEntries(almanac/*, enemyTypeNames*/);
 
-	//almanacIcon = DataLoader::CreateTexture("Assets/almanac.png");
 
-	//almanacIcon.position = Vector2{ 600.5f,-350.f };
 
 	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
-
-	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
+	almanacLitUpIcon = new TexturedSprite(sqmesh, almanacLitUppng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
+	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{ 1.0,1.0,1.0,0.0 });
+	//gameOverButtonSprite = new TexturedSprite(sqmesh, gameOverButtonpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{ 1.0,1.0,1.0,0.0 });
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{ 1,1,1,0 });
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{ 1,1,1,0 });
 
-	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
 
-	//gift2.sprite = DataLoader::CreateTexture("Assets/pattyfish.png");
-
-
-	rock.sprite = *thing;
-
-
-	//rocktype.neutral = WalkLeft;
-	//rocktype.happy = WalkRight;
-	//rocktype.angry = WalkToTarget; 
-	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 
 	// Global Data Here
-	
+	//I moved these and the init map down to init so it'll reset when the game state is restarted
+
+
+	//// square seed: 0xA341311Cu
+	//// Interesting ones: 32461, 32608, 31931, 18283, 680
+	//// Too easy: 32702, 0xA341311Cu, 
+
+	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+
+}
+
+void TestInit()
+{
+	PlayerInit(player);
+
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
 	globalTransferData.projectileList.clear();
+	//carryData.enemyList.clear();
 
 	globalTransferData.player = &player;
 
 	//square seed: 0xA341311Cu
 	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
-	//projManager.InitFireball(sqmesh, bulletpng);
-	//projManager.InitAOE(sqmesh, aoepng);
+
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
 	std::cout << "Current Seed: " << curSeed << "\n";
-	// Interesting ones: 32461, 32608, 31931, 18283, 31060
+	// Interesting ones: 32461, 32608, 31931, 18283, 31060, 680
 	// Too easy: 32702, 0xA341311Cu, 
 
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
@@ -189,10 +196,37 @@ void TestLoad()
 	if (tipText) tipText->text = pauseTipText;
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
-}
 
-void TestInit()
-{
+	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	winUi.BindOnClick("btn_restart", [](UIElement& self)
+	{
+		UNREFERENCED_PARAMETER(self);
+		ChangeState(GS_RESTART);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+	});
+	winUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+	{
+		UNREFERENCED_PARAMETER(self);
+		ChangeState(GS_MAINMENU);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+	});
+	winUiInitialized = true;
+	winUi.SetFont(font);
+
+	loseUi.LoadFromFilePopUp("Assets/UI/lose_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	loseUi.BindOnClick("btn_restart", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_RESTART);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	loseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_MAINMENU);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	loseUiInitialized = true;
+	loseUi.SetFont(font);
+
+	gameState = RUNNING;
+	debugMode = false;
 }
 
 void TestDraw()
@@ -211,7 +245,7 @@ void TestDraw()
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
+	//for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 	// Draw objects: current-room objects + carried objects
@@ -235,9 +269,10 @@ void TestDraw()
 			}
 		}
 		if (roomData.boss) {
-			roomData.boss->shadow.RenderSprite();
-			roomData.boss->sprite.RenderSprite();
-
+			if (roomData.boss->currentHealth > 0) {
+				roomData.boss->shadow.RenderSprite();
+				roomData.boss->sprite.RenderSprite();
+			}
 		}
 
 		for (Gift* g : carryData.giftList) {
@@ -269,10 +304,15 @@ void TestDraw()
 
 	
 	renderPlayerLives(player, healthIcons, font);
-	(*almanacIcon).RenderSprite();
+	//(*almanacIcon).RenderSprite();
+	
+	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite);
+
 	RenderAlmanacPages(almanac, font);
 
-	AlmanacInputs(almanac/*, sqmesh*/);
+	//RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
+
+	
 
 #if 0
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -307,7 +347,7 @@ void TestDraw()
 
 
 	// Pause screen
-	if (isPaused) {
+	if (gameState == PAUSED) {
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		//AEGfxSetTransparency(0.1f);
@@ -325,21 +365,111 @@ void TestDraw()
 
 		pauseUi.Draw();
 	}
+	else if (gameState == WIN){
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		winUi.Draw();
+	}
+	else if (gameState == LOSE) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		loseUi.Draw();
+	}
+
+	if (debugMode) {
+
+		char buffer[50];
+
+		sprintf_s(buffer, 50, "DEBUG MODE ON");
+		//AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+		AEGfxPrint(font, buffer, 0.6, 0.9, 1, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(buffer, 50, "GAME STATE: ");
+		AEGfxPrint(font, buffer, 0.6, 0.8, 1, 1.f, 1.f, 1.f, 1.f);
+		switch (gameState) {
+		case RUNNING:
+			sprintf_s(buffer, 50, "RUNNING");
+			break;
+		case PAUSED:
+			sprintf_s(buffer, 50, "PAUSED");
+			break;
+		case WIN:
+			sprintf_s(buffer, 50, "YOU WIN");
+			break;
+		case LOSE:
+			sprintf_s(buffer, 50, "YOU LOSE");
+			break;
+		}
+		AEGfxPrint(font, buffer, 0.6, 0.7, 1, 1.f, 1.f, 1.f, 1.f);
+		//AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+		
+	}
 
 }
 
 void TestFree()
 {
+	//RoomData& roomData = gameMap.GetCurrentRoom()->currentRoomData;
+	//RoomData& carryData = gameMap.GetTransferData();
+	//
+	//roomData.enemyList.clear();
+	//roomData.giftList.clear();
+	//roomData.projectileList.clear();
+	//carryData.enemyList.clear();
+	//carryData.giftList.clear();
+
+	//globalTransferData.player = &player;
+	// Dellocate enemy and gift assets
+	for (Enemy* e : globalTransferData.enemyList) {
+		delete e;
+	}
+
+	for (Gift* g : globalTransferData.giftList) {
+		delete g;
+	}
+
+	for (Projectile* p : globalTransferData.projectileList) delete p;
+
+	globalTransferData.player = nullptr;
+	gameMap.DeleteMap();
+
+	//if (gameMap.GetCurrentRoom())
+	//projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+
 }
 
 void TestUnload()
 {
 	AEGfxMeshFree(sqmesh);
-	if (thing) {
-		delete thing;
-		thing = nullptr;
-	}
+
 	delete almanacIcon;
+	delete arrowSprite;
+	delete almanacLitUpIcon;
 
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
@@ -349,22 +479,25 @@ void TestUnload()
 	AEGfxTextureUnload(heartpng);
 	//AEGfxTextureUnload(heartpng);
 	AEGfxTextureUnload(almanacpng);
+	AEGfxTextureUnload(almanacLitUppng);
+	AEGfxTextureUnload(arrowpng);
 
 	AEGfxDestroyFont(font);
 	
-	// Dellocate enemy and gift assets
-	for (Enemy *e: globalTransferData.enemyList) {
-		delete e;
-	}
+	//moved to free to prevent mem leaks
+	//// Dellocate enemy and gift assets
+	//for (Enemy *e: globalTransferData.enemyList) {
+	//	delete e;
+	//}
 
-	for (Gift* g : globalTransferData.giftList) {
-		delete g;
-	}
+	//for (Gift* g : globalTransferData.giftList) {
+	//	delete g;
+	//}
 
-	for (Projectile* p : globalTransferData.projectileList) delete p;
-	
-	globalTransferData.player = nullptr;
-	gameMap.DeleteMap();
+	//for (Projectile* p : globalTransferData.projectileList) delete p;
+	//
+	//globalTransferData.player = nullptr;
+	//gameMap.DeleteMap();
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
@@ -373,57 +506,71 @@ void TestUnload()
 
 	pauseUi.Clear();
 	pauseUiInitialized = false;
-	isPaused = false;
+
+	winUi.Clear();
+	winUiInitialized = false;
+
+	loseUi.Clear();
+	loseUiInitialized = false;
+	//isPaused = false;
 }
 
 void TestUpdate(float dt)
 {
-
-	// Pause toggle
-	if (AEInputCheckTriggered(AEVK_TAB))
-	{
-		isPaused = !isPaused;
-	}
-
-	// When paused:
-	// - update only the pause UI
-	// - skip all gameplay logic below
-	if (isPaused)
-	{
-		pauseUi.Update();
-		return;
-	}
+	if (gameState == RUNNING) {
+		// Pause toggle
+		if (AEInputCheckTriggered(AEVK_TAB))
+		{
+			gameState = PAUSED;
+		}
 
 	// Get previous pos
 	Vector2 prevPos{ player.position.x, player.position.y };
-	
 
-	UpdatePlayer(player, dt); // Player update
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+		//to test damage
+		if (player.health > 0)
+		{
+			if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+			if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
 
-	// Print Current Grid
-	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	for (int i = 0; i < 9; ++i) {
-		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		std::cout << '\n';
-	}
+			if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
 
-	// Game map update
-	gameMap.GetCurrentRoom()->Update(dt);
+			checkIfAlmanacClicked(*almanacIcon, almanac);
 
-	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
-	RoomData& roomData = currentRoom->currentRoomData;
-	RoomData& carryData = gameMap.GetTransferData();
+			AlmanacInputs(almanac);
+
+			//for now, 
+			// Player update
+			UpdatePlayer(player, dt);
+			player.sprite.UpdateTransform();
+			player.shadow.UpdateTransform();
+		}
+
+
+		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+
+		// Print Current Grid
+		std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+		for (int i = 0; i < 9; ++i) {
+			for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+			std::cout << '\n';
+		}
+
+		// Game map update
+		gameMap.GetCurrentRoom()->Update(dt);
+
+		mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+		RoomData& roomData = currentRoom->currentRoomData;
+		RoomData& carryData = gameMap.GetTransferData();
 	UpdateProjectiles(roomData, dt);
 
-	
 
-	// Test Player Collision with Map
-	int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
-	if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
-	int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
-	if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) player.position.x = prevPos.x;		// Test for x collision
-	if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM) player.position.y = prevPos.y;		// Test for y collision
+		// Test Player Collision with Map
+		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
+		if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
+		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) player.position.x = prevPos.x;		// Test for x collision
+		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM) player.position.y = prevPos.y;		// Test for y collision
 
 
 
@@ -445,88 +592,88 @@ void TestUpdate(float dt)
 
 
 
-	//std::cout << player.position.x << player.position.y;
+		//std::cout << player.position.x << player.position.y;
 
 
 
-	// Update Enemies (carryData version is only for "Friends")
-	for (Enemy* e : roomData.enemyList) {
-		if (e) {
-			//e->target.position = *player.sprite.position;
-			e->Update(dt);
+		// Update Enemies (carryData version is only for "Friends")
+		for (Enemy* e : roomData.enemyList) {
+			if (e) {
+				//e->target.position = *player.sprite.position;
+				e->Update(dt);
+			}
 		}
-	}
 
-	for (Enemy* e : carryData.enemyList) {
-		if (e) {
-			//e->target.position = *player.sprite.position;
-			e->Update(dt);
+		for (Enemy* e : carryData.enemyList) {
+			if (e) {
+				//e->target.position = *player.sprite.position;
+				e->Update(dt);
+			}
 		}
-	}
 
-	// Update Gifts (Must update both sides)
-	for (Gift* g : roomData.giftList) {
-		if (g) {
-			UpdateGift(*g, player, dt);
-			g->sprite.UpdateTransform();
-			g->shadow.UpdateTransform();
+		// Update Gifts (Must update both sides)
+		for (Gift* g : roomData.giftList) {
+			if (g) {
+				UpdateGift(*g, player, dt);
+				g->sprite.UpdateTransform();
+				g->shadow.UpdateTransform();
+			}
 		}
-	}
-	for (Gift* g : carryData.giftList) {
-		if (g) {
-			UpdateGift(*g, player, dt);
-			g->sprite.UpdateTransform();
-			g->shadow.UpdateTransform();
+		for (Gift* g : carryData.giftList) {
+			if (g) {
+				UpdateGift(*g, player, dt);
+				g->sprite.UpdateTransform();
+				g->shadow.UpdateTransform();
+			}
 		}
-	}
 
-	if (roomData.boss) {
-		roomData.boss->Update(player, dt);
-		roomData.boss->sprite.UpdateTransform();
-		roomData.boss->shadow.UpdateTransform();
-	}
+		if (roomData.boss) {
+			roomData.boss->Update(player, dt);
+			roomData.boss->sprite.UpdateTransform();
+			roomData.boss->shadow.UpdateTransform();
+		}
 
 
-	// Gifts and Enemy Check
-	for (Gift* gift : currentRoom->currentRoomData.giftList) {
-		if (!(gift->velocity == Vector2())) {
-			for (Enemy* e : currentRoom->currentRoomData.enemyList) {
-				if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x)) {
-					gift->velocity = -gift->velocity;
-					e->AssessTraits(gift->traits);
+		// Gifts and Enemy Check
+		for (Gift* gift : currentRoom->currentRoomData.giftList) {
+			if (!(gift->velocity == Vector2())) {
+				for (Enemy* e : currentRoom->currentRoomData.enemyList) {
+					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x)) {
+						gift->velocity = -gift->velocity;
+						e->AssessTraits(gift->traits);
+					}
 				}
 			}
 		}
-	}
 
 
 
 
-	// 4) Transfer enemies to our carrylist if they are essentially happy
-	for (size_t i = 0; i < roomData.enemyList.size(); )
-	{
-		Enemy* e = roomData.enemyList[i];
-		if (e && e->state == EnemyStates::ES_HAPPY)	// This is the happy check ig?
+		// 4) Transfer enemies to our carrylist if they are essentially happy
+		for (size_t i = 0; i < roomData.enemyList.size(); )
 		{
-			carryData.enemyList.push_back(e);
-			roomData.enemyList.erase(roomData.enemyList.begin() + static_cast<long>(i));
-			continue;
+			Enemy* e = roomData.enemyList[i];
+			if (e && e->state == EnemyStates::ES_HAPPY)	// This is the happy check ig?
+			{
+				carryData.enemyList.push_back(e);
+				roomData.enemyList.erase(roomData.enemyList.begin() + static_cast<long>(i));
+				continue;
+			}
+			++i;
 		}
-		++i;
-	}
 
-	// Idk how to check which gifts to pick up
-	for (size_t i = 0; i < roomData.giftList.size(); )
-	{
-		Gift* g = roomData.giftList[i];
-		if (g && g->pickUpState)	// If currently picked up, need to check pickupstate = false and remove such????
+		// Idk how to check which gifts to pick up
+		for (size_t i = 0; i < roomData.giftList.size(); )
 		{
-			carryData.giftList.push_back(g);	// Transfer to carryData list (active list essentially)
-			roomData.giftList.erase(roomData.giftList.begin() + static_cast<long>(i));	// Remove from current roomData
-			break;
+			Gift* g = roomData.giftList[i];
+			if (g && g->pickUpState)	// If currently picked up, need to check pickupstate = false and remove such????
+			{
+				carryData.giftList.push_back(g);	// Transfer to carryData list (active list essentially)
+				roomData.giftList.erase(roomData.giftList.begin() + static_cast<long>(i));	// Remove from current roomData
+				break;
+			}
+			++i;
 		}
-		++i;
-	}
 
 	// Check if gifts are indeed pickedup
 	// Idk how to check which gifts to pick up
@@ -543,20 +690,16 @@ void TestUpdate(float dt)
 	}
 
 
-	// Update game map
-	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-	//Vector2 positionResetTest = player.position;
-	
 
 
 
-	// Room grid works! (To be removed)
-	//std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
-	//std::cout << "x: " << player.position.x << "y: " << player.position.y;
+
+		// Room grid works! (To be removed)
+		//std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
+		//std::cout << "x: " << player.position.x << "y: " << player.position.y;
 
 		// Update game map
 	Vector2 positionResetTest = player.position;
-	//gameMap.UpdateMap(player.position, playerHalfSize, dt);
 	gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
 	/* IF player position is changed to other screen, reset enemies to player position */
 	if (player.position != positionResetTest) {
@@ -581,66 +724,66 @@ void TestUpdate(float dt)
 		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 		*/
 
-	testParticles.UpdateParticles(dt);
-	
-
-	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
-	//for (Gift* gift : roomData.giftList) {
-	//	if (!(gift->velocity == Vector2())) {
-	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-	//			gift->velocity = -gift->velocity;
-	//			rock.AssessTraits(gift->traits);
-	//		}
-	//	}
-	//}
+		//testParticles.UpdateParticles(dt);
 
 
-	//std::vector<Gift*> things{ &gift,&gift2 };
-
-	
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	
-	//rock.Update(dt);
-	//rock.target = player.sprite.position;
-	
-	//UpdatePlayer(player, dt);
-	//player.sprite.UpdateTransform();
-	//UpdateGift(gift, player, dt);
-	//gift.sprite.UpdateTransform();
-	//UpdateGift(gift2, player, dt);
-	//gift2.sprite.UpdateTransform();
+		// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
+		//for (Gift* gift : roomData.giftList) {
+		//	if (!(gift->velocity == Vector2())) {
+		//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+		//			gift->velocity = -gift->velocity;
+		//			rock.AssessTraits(gift->traits);
+		//		}
+		//	}
+		//}
 
 
+		//std::vector<Gift*> things{ &gift,&gift2 };
 
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	/*
-	UpdateGift(gift,player,dt);
-	gift.sprite.UpdateTransform();
-	UpdateGift(gift2,player,dt);
-	gift2.sprite.UpdateTransform();
-	rock.Update(dt);
-	rock.target = player.sprite.position;
 
-	gameMap.GetCurrentRoom()->Update(dt);
+		//thing->position += Vector2(10,10) * dt;
+		//thing->UpdateTransform();
 
-	std::vector<Gift*> things{ &gift,&gift2 };
+		//rock.Update(dt);
+		//rock.target = player.sprite.position;
 
-	for (Gift* gift : things) {
-		if (gift->velocity != Vector2(0,0)) {
-			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (CollisionIntersection_RectRect_Static(
-				
-				
-				
-				
-				
-				{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
-					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
-					gift->velocity = Vector2(0, 0);
-					enemy->AssessTraits(gift->traits);
-				}
+		//UpdatePlayer(player, dt);
+		//player.sprite.UpdateTransform();
+		//UpdateGift(gift, player, dt);
+		//gift.sprite.UpdateTransform();
+		//UpdateGift(gift2, player, dt);
+		//gift2.sprite.UpdateTransform();
+
+
+
+		//thing->position += Vector2(10,10) * dt;
+		//thing->UpdateTransform();
+		/*
+		UpdateGift(gift,player,dt);
+		gift.sprite.UpdateTransform();
+		UpdateGift(gift2,player,dt);
+		gift2.sprite.UpdateTransform();
+		rock.Update(dt);
+		rock.target = player.sprite.position;
+
+		gameMap.GetCurrentRoom()->Update(dt);
+
+		std::vector<Gift*> things{ &gift,&gift2 };
+
+		for (Gift* gift : things) {
+			if (gift->velocity != Vector2(0,0)) {
+				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+					if (CollisionIntersection_RectRect_Static(
+
+
+
+
+
+					{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+						AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
+						gift->velocity = Vector2(0, 0);
+						enemy->AssessTraits(gift->traits);
+					}
 
 			}
 				
@@ -648,20 +791,45 @@ void TestUpdate(float dt)
 	}
 
 
-	Room {
-		roomdata* toBeTransfered;
-		roomdata currentRoomData;
-		
-	}	
-	
-	gameMap.currentRoom.
+		Room {
+			roomdata* toBeTransfered;
+			roomdata currentRoomData;
 
-	//takes player position and checks if its at a door?
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-	//if its at a door, roomdata gets transferred
+		}
 
+		gameMap.currentRoom.
+
+
+		//if its at a door, roomdata gets transferred
 
 
 
-	*/
+
+		*/
+	}
+	else if (gameState == PAUSED) {
+		// When paused:
+		// - update only the pause UI
+		if (AEInputCheckTriggered(AEVK_TAB))
+		{
+			gameState = RUNNING;
+		}
+
+		pauseUi.Update();
+	}
+	else if (gameState == WIN) {
+		winUi.Update();
+	}
+	else if (gameState == LOSE) {
+		loseUi.Update();
+	}
+
+	if (debugMode) {
+		if (AEInputCheckTriggered(AEVK_1)) gameState = RUNNING;
+		if (AEInputCheckTriggered(AEVK_2)) gameState = PAUSED;
+		if (AEInputCheckTriggered(AEVK_3)) gameState = WIN;
+		if (AEInputCheckTriggered(AEVK_4)) gameState = LOSE;
+	}
+
+	if (AEInputCheckTriggered(AEVK_F3)) debugMode = !debugMode;
 }

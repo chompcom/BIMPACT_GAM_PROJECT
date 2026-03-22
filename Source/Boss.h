@@ -22,6 +22,7 @@ class Boss {
 		TexturedSprite sprite;
 		TexturedSprite shadow;
 		f32 currentHealth;
+		Vector2 velocity{};
 		
 		std::unique_ptr<Boss_FSM> bossStateMachine;
 
@@ -33,5 +34,6 @@ class Boss {
 		~Boss();
 
 		void Update(Player& player, f32 dt);
+		void CollideProjectile();
 };
 

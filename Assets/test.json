@@ -33,7 +33,7 @@
 			"detectionRadius": 2,
 			"safeRadius": 300,
 			"happyProjectile": {
-				"damage":-100,
+				"damage":100,
 				"radius": 300,
 				"lifetime" : 2,
 				"speed": 0,

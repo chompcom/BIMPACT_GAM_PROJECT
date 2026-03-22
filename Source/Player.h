@@ -23,6 +23,7 @@ public:
 	f32 throwForce; //amount of force that will be applied to the gift thrown
 	f32 pickUpCooldown; //counter for when the player can pick up a gift
 	f32 invulnerableTimer;
+	bool fadingIn;
 	
 	//constructor
 	Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
@@ -36,3 +37,5 @@ void UpdatePlayer(Player & player, f32 deltaTime);
 void playerTakesDamage(Player & player);
 
 void playerHealsDamage(Player& player);
+
+void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/);
