@@ -5,6 +5,9 @@
 #include "BoundaryCollision.h"
 #include "Collision.h"
 #include <iostream>
+#include "GameStateList.h"
+
+extern LV_STATES gameState;
 
 //contructor for player class
 Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 speed, Vector2 position, Vector2 direction) :
@@ -140,6 +143,8 @@ void playerTakesDamage(Player& player)
 	if (player.invulnerableTimer <= 0.f)
 	{
 		--(player.health);
+
+		if (player.health <= 0) gameState = LOSE;
 
 		player.invulnerableTimer = 3.f;
 	}

@@ -79,10 +79,20 @@ vector<gift*> gift;
 ParticleSystem testParticles = NULL;
 
 
+LV_STATES gameState;
+
 static UIManager pauseUi;
-static bool isPaused = false;
 static bool pauseUiInitialized = false;
 static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
+
+static UIManager winUi;
+static bool winUiInitialized = false;
+//static char const* winTipText = "[TIP]: Press `TAB` to resume";
+
+static UIManager loseUi;
+static bool loseUiInitialized = false;
+
+bool debugMode;
 
 void TestLoad()
 {
@@ -144,14 +154,14 @@ void TestLoad()
 		healthIcons[i].UpdateTransform();
 	}
 
-	for (int i{ 0 }; i < 4; ++i)
+	/*for (int i{0}; i < 4; ++i)
 	{
 		if (i < 2) gameOverButtons.push_back(DataLoader::CreateTexture("Assets/GameOverScreen/GameOverButton.png"));
 		else gameOverButtons.push_back(DataLoader::CreateTexture("Assets/GameOverScreen/GameOverButtonLitUp.png"));
 		gameOverButtons[i].position = Vector2{ (i % 2 == 0) ? -300.f : 300.f, -100.f};
 		gameOverButtons[i].scale = Vector2{ 512.f,128.f };
 		gameOverButtons[i].UpdateTransform();
-	}
+	}*/
 
 
 	//gameOverButtons
@@ -250,10 +260,37 @@ void TestInit()
 	if (tipText) tipText->text = pauseTipText;
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
-}
 
-void TestInit()
-{
+	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	winUi.BindOnClick("btn_restart", [](UIElement& self)
+	{
+		UNREFERENCED_PARAMETER(self);
+		ChangeState(GS_RESTART);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+	});
+	winUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+	{
+		UNREFERENCED_PARAMETER(self);
+		ChangeState(GS_MAINMENU);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+	});
+	winUiInitialized = true;
+	winUi.SetFont(font);
+
+	loseUi.LoadFromFilePopUp("Assets/UI/lose_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	loseUi.BindOnClick("btn_restart", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_RESTART);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	loseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_MAINMENU);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	loseUiInitialized = true;
+	loseUi.SetFont(font);
+
+	gameState = RUNNING;
+	debugMode = false;
 }
 
 void TestDraw()
@@ -272,7 +309,7 @@ void TestDraw()
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
+	//for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 	// Draw objects: current-room objects + carried objects
@@ -341,7 +378,7 @@ void TestDraw()
 
 	RenderAlmanacPages(almanac, font);
 
-	RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
+	//RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
 
 	
 
@@ -370,7 +407,7 @@ void TestDraw()
 
 
 	// Pause screen
-	if (isPaused) {
+	if (gameState == PAUSED) {
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 		//AEGfxSetTransparency(0.1f);
@@ -387,6 +424,70 @@ void TestDraw()
 		overlay.RenderSprite(true);
 
 		pauseUi.Draw();
+	}
+	else if (gameState == WIN){
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		winUi.Draw();
+	}
+	else if (gameState == LOSE) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		loseUi.Draw();
+	}
+
+	if (debugMode) {
+
+		char buffer[50];
+
+		sprintf_s(buffer, 50, "DEBUG MODE ON");
+		//AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+		AEGfxPrint(font, buffer, 0.6, 0.9, 1, 1.f, 1.f, 1.f, 1.f);
+		sprintf_s(buffer, 50, "GAME STATE: ");
+		AEGfxPrint(font, buffer, 0.6, 0.8, 1, 1.f, 1.f, 1.f, 1.f);
+		switch (gameState) {
+		case RUNNING:
+			sprintf_s(buffer, 50, "RUNNING");
+			break;
+		case PAUSED:
+			sprintf_s(buffer, 50, "PAUSED");
+			break;
+		case WIN:
+			sprintf_s(buffer, 50, "YOU WIN");
+			break;
+		case LOSE:
+			sprintf_s(buffer, 50, "YOU LOSE");
+			break;
+		}
+		AEGfxPrint(font, buffer, 0.6, 0.7, 1, 1.f, 1.f, 1.f, 1.f);
+		//AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+		
 	}
 
 }
@@ -467,210 +568,207 @@ void TestUnload()
 
 	pauseUi.Clear();
 	pauseUiInitialized = false;
-	isPaused = false;
+
+	winUi.Clear();
+	winUiInitialized = false;
+
+	loseUi.Clear();
+	loseUiInitialized = false;
+	//isPaused = false;
 }
 
 void TestUpdate(float dt)
 {
+	if (gameState == RUNNING) {
+		// Pause toggle
+		if (AEInputCheckTriggered(AEVK_TAB))
+		{
+			gameState = PAUSED;
+		}
 
-	// Pause toggle
-	if (AEInputCheckTriggered(AEVK_TAB))
-	{
-		isPaused = !isPaused;
-	}
+		// Get previous pos
+		Vector2 prevPos{ player.position.x, player.position.y };
 
-	// When paused:
-	// - update only the pause UI
-	// - skip all gameplay logic below
-	if (isPaused)
-	{
-		pauseUi.Update();
-		return;
-	}
+		UpdatePlayer(player, dt); // Player update
+		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
-	// Get previous pos
-	Vector2 prevPos{ player.position.x, player.position.y };
-	
-	UpdatePlayer(player, dt); // Player update
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+		// Print Current Grid
+		std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+		for (int i = 0; i < 9; ++i) {
+			for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+			std::cout << '\n';
+		}
 
-	// Print Current Grid
-	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	for (int i = 0; i < 9; ++i) {
-		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		std::cout << '\n';
-	}
+		// Game map update
+		gameMap.GetCurrentRoom()->Update(dt);
 
-	// Game map update
-	gameMap.GetCurrentRoom()->Update(dt);
+		mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+		RoomData& roomData = currentRoom->currentRoomData;
+		RoomData& carryData = gameMap.GetTransferData();
 
-	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
-	RoomData& roomData = currentRoom->currentRoomData;
-	RoomData& carryData = gameMap.GetTransferData();
+		// Update game map
+		//gameMap.UpdateMap(player.position, playerHalfSize, dt);
+		gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
 
-	// Update game map
-	//gameMap.UpdateMap(player.position, playerHalfSize, dt);
-	gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
+		//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+		Vector2 positionResetTest = player.position;
 
-	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-	Vector2 positionResetTest = player.position;
+		// Test Player Collision with Map
+		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
+		if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
+		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) player.position.x = prevPos.x;		// Test for x collision
+		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM) player.position.y = prevPos.y;		// Test for y collision
 
-	// Test Player Collision with Map
-	int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
-	if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
-	int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
-	if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) player.position.x = prevPos.x;		// Test for x collision
-	if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM) player.position.y = prevPos.y;		// Test for y collision
-
-	// Finally reflect changes?
-	player.sprite.UpdateTransform();
-	player.shadow.UpdateTransform();
-	
-	HandleGameOverInputs(gameOverButtons);
-
-	//to test damage
-	if (player.health > 0)
-	{
-		if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
-		if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
-
-		if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
-
-		checkIfAlmanacClicked(*almanacIcon, almanac);
-
-		AlmanacInputs(almanac);
-
-		//for now, 
-		// Player update
-		UpdatePlayer(player, dt);
+		// Finally reflect changes?
 		player.sprite.UpdateTransform();
 		player.shadow.UpdateTransform();
-	}
 
-	MoveArrow(*arrowSprite, almanac, dt);
+		//HandleGameOverInputs(gameOverButtons);
 
-	//std::cout << player.position.x << player.position.y;
+		//to test damage
+		if (player.health > 0)
+		{
+			if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+			if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
 
+			if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
 
+			checkIfAlmanacClicked(*almanacIcon, almanac);
 
-	// Update Enemies (carryData version is only for "Friends")
-	for (Enemy* e : roomData.enemyList) {
-		if (e) {
-			//e->target.position = *player.sprite.position;
-			e->Update(dt);
+			AlmanacInputs(almanac);
+
+			//for now, 
+			// Player update
+			UpdatePlayer(player, dt);
+			player.sprite.UpdateTransform();
+			player.shadow.UpdateTransform();
 		}
-	}
 
-	for (Enemy* e : carryData.enemyList) {
-		if (e) {
-			//e->target.position = *player.sprite.position;
-			e->Update(dt);
+		MoveArrow(*arrowSprite, almanac, dt);
+
+		//std::cout << player.position.x << player.position.y;
+
+
+
+		// Update Enemies (carryData version is only for "Friends")
+		for (Enemy* e : roomData.enemyList) {
+			if (e) {
+				//e->target.position = *player.sprite.position;
+				e->Update(dt);
+			}
 		}
-	}
 
-	// Update Gifts (Must update both sides)
-	for (Gift* g : roomData.giftList) {
-		if (g) {
-			UpdateGift(*g, player, dt);
-			g->sprite.UpdateTransform();
-			g->shadow.UpdateTransform();
+		for (Enemy* e : carryData.enemyList) {
+			if (e) {
+				//e->target.position = *player.sprite.position;
+				e->Update(dt);
+			}
 		}
-	}
-	for (Gift* g : carryData.giftList) {
-		if (g) {
-			UpdateGift(*g, player, dt);
-			g->sprite.UpdateTransform();
-			g->shadow.UpdateTransform();
+
+		// Update Gifts (Must update both sides)
+		for (Gift* g : roomData.giftList) {
+			if (g) {
+				UpdateGift(*g, player, dt);
+				g->sprite.UpdateTransform();
+				g->shadow.UpdateTransform();
+			}
 		}
-	}
+		for (Gift* g : carryData.giftList) {
+			if (g) {
+				UpdateGift(*g, player, dt);
+				g->sprite.UpdateTransform();
+				g->shadow.UpdateTransform();
+			}
+		}
 
-	if (roomData.boss) {
-		roomData.boss->Update(player, dt);
-		roomData.boss->sprite.UpdateTransform();
-		roomData.boss->shadow.UpdateTransform();
-	}
+		if (roomData.boss) {
+			roomData.boss->Update(player, dt);
+			roomData.boss->sprite.UpdateTransform();
+			roomData.boss->shadow.UpdateTransform();
+		}
 
 
-	// Gifts and Enemy Check
-	for (Gift* gift : currentRoom->currentRoomData.giftList) {
-		if (!(gift->velocity == Vector2())) {
-			for (Enemy* e : currentRoom->currentRoomData.enemyList) {
-				if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x)) {
-					gift->velocity = -gift->velocity;
-					e->AssessTraits(gift->traits);
+		// Gifts and Enemy Check
+		for (Gift* gift : currentRoom->currentRoomData.giftList) {
+			if (!(gift->velocity == Vector2())) {
+				for (Enemy* e : currentRoom->currentRoomData.enemyList) {
+					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x)) {
+						gift->velocity = -gift->velocity;
+						e->AssessTraits(gift->traits);
+					}
 				}
 			}
 		}
-	}
 
 
 
 
-	// 4) Transfer enemies to our carrylist if they are essentially happy
-	for (size_t i = 0; i < roomData.enemyList.size(); )
-	{
-		Enemy* e = roomData.enemyList[i];
-		if (e && e->state == EnemyStates::ES_HAPPY)	// This is the happy check ig?
+		// 4) Transfer enemies to our carrylist if they are essentially happy
+		for (size_t i = 0; i < roomData.enemyList.size(); )
 		{
-			carryData.enemyList.push_back(e);
-			roomData.enemyList.erase(roomData.enemyList.begin() + static_cast<long>(i));
-			continue;
+			Enemy* e = roomData.enemyList[i];
+			if (e && e->state == EnemyStates::ES_HAPPY)	// This is the happy check ig?
+			{
+				carryData.enemyList.push_back(e);
+				roomData.enemyList.erase(roomData.enemyList.begin() + static_cast<long>(i));
+				continue;
+			}
+			++i;
 		}
-		++i;
-	}
 
-	// Idk how to check which gifts to pick up
-	for (size_t i = 0; i < roomData.giftList.size(); )
-	{
-		Gift* g = roomData.giftList[i];
-		if (g && g->pickUpState)	// If currently picked up, need to check pickupstate = false and remove such????
+		// Idk how to check which gifts to pick up
+		for (size_t i = 0; i < roomData.giftList.size(); )
 		{
-			carryData.giftList.push_back(g);	// Transfer to carryData list (active list essentially)
-			roomData.giftList.erase(roomData.giftList.begin() + static_cast<long>(i));	// Remove from current roomData
-			break;
+			Gift* g = roomData.giftList[i];
+			if (g && g->pickUpState)	// If currently picked up, need to check pickupstate = false and remove such????
+			{
+				carryData.giftList.push_back(g);	// Transfer to carryData list (active list essentially)
+				roomData.giftList.erase(roomData.giftList.begin() + static_cast<long>(i));	// Remove from current roomData
+				break;
+			}
+			++i;
 		}
-		++i;
-	}
 
-	// Check if gifts are indeed pickedup
-	// Idk how to check which gifts to pick up
-	for (size_t i = 0; i < carryData.giftList.size(); )
-	{
-		Gift* g = carryData.giftList[i];
-		if (g && g->pickUpState==false)	// If currently picked up, need to check pickupstate = false and remove such????
+		// Check if gifts are indeed pickedup
+		// Idk how to check which gifts to pick up
+		for (size_t i = 0; i < carryData.giftList.size(); )
 		{
-			roomData.giftList.push_back(g);
-			carryData.giftList.erase(carryData.giftList.begin() + static_cast<long>(i));	// Remove from current carryData
-			continue;
+			Gift* g = carryData.giftList[i];
+			if (g && g->pickUpState == false)	// If currently picked up, need to check pickupstate = false and remove such????
+			{
+				roomData.giftList.push_back(g);
+				carryData.giftList.erase(carryData.giftList.begin() + static_cast<long>(i));	// Remove from current carryData
+				continue;
+			}
+			++i;
 		}
-		++i;
-	}
 
 
-	// Update game map
-	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-	//Vector2 positionResetTest = player.position;
-	
+		// Update game map
+		//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+		//Vector2 positionResetTest = player.position;
 
 
 
-	// Room grid works! (To be removed)
-	//std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
-	//std::cout << "x: " << player.position.x << "y: " << player.position.y;
 
-	if (player.position != positionResetTest) {
-		for (Enemy* e : carryData.enemyList) {
-			e->sprite.position = player.position;
-			e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
+		// Room grid works! (To be removed)
+		//std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
+		//std::cout << "x: " << player.position.x << "y: " << player.position.y;
+
+		if (player.position != positionResetTest) {
+			for (Enemy* e : carryData.enemyList) {
+				e->sprite.position = player.position;
+				e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
+			}
+			for (Projectile* p : roomData.projectileList) {
+				p->RemoveProjectile();
+			}
 		}
-		for (Projectile* p : roomData.projectileList) {
-			p->RemoveProjectile();
-		}
-	}
 
-	if (AEInputCheckTriggered(AEVK_SPACE))
-		projManager.ShootFireball(roomData, player.position, player.direction,
-			500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
+		if (AEInputCheckTriggered(AEVK_SPACE))
+			projManager.ShootFireball(roomData, player.position, player.direction,
+				500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
 
 		if (AEInputCheckTriggered(AEVK_Q))
 			projManager.ShootAOE(roomData, player.position, player.direction,
@@ -679,92 +777,118 @@ void TestUpdate(float dt)
 		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 
 
-	if (testParticles.activeParticleCount < 20) testParticles.CreateParticles(10, 5.0f, Vector2{ 25.0f, 0.0f });
-	//else testParticles.DestroyParticles();
+		//if (testParticles.activeParticleCount < 20) testParticles.CreateParticles(10, 5.0f, Vector2{ 25.0f, 0.0f });
+		//else testParticles.DestroyParticles();
 
-	testParticles.UpdateParticles(dt);
-	
-
-	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
-	//for (Gift* gift : roomData.giftList) {
-	//	if (!(gift->velocity == Vector2())) {
-	//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-	//			gift->velocity = -gift->velocity;
-	//			rock.AssessTraits(gift->traits);
-	//		}
-	//	}
-	//}
+		//testParticles.UpdateParticles(dt);
 
 
-	//std::vector<Gift*> things{ &gift,&gift2 };
-
-	
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	
-	//rock.Update(dt);
-	//rock.target = player.sprite.position;
-	
-	//UpdatePlayer(player, dt);
-	//player.sprite.UpdateTransform();
-	//UpdateGift(gift, player, dt);
-	//gift.sprite.UpdateTransform();
-	//UpdateGift(gift2, player, dt);
-	//gift2.sprite.UpdateTransform();
+		// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
+		//for (Gift* gift : roomData.giftList) {
+		//	if (!(gift->velocity == Vector2())) {
+		//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+		//			gift->velocity = -gift->velocity;
+		//			rock.AssessTraits(gift->traits);
+		//		}
+		//	}
+		//}
 
 
+		//std::vector<Gift*> things{ &gift,&gift2 };
 
-	//thing->position += Vector2(10,10) * dt;
-	//thing->UpdateTransform();
-	/*
-	UpdateGift(gift,player,dt);
-	gift.sprite.UpdateTransform();
-	UpdateGift(gift2,player,dt);
-	gift2.sprite.UpdateTransform();
-	rock.Update(dt);
-	rock.target = player.sprite.position;
 
-	gameMap.GetCurrentRoom()->Update(dt);
+		//thing->position += Vector2(10,10) * dt;
+		//thing->UpdateTransform();
 
-	std::vector<Gift*> things{ &gift,&gift2 };
+		//rock.Update(dt);
+		//rock.target = player.sprite.position;
 
-	for (Gift* gift : things) {
-		if (gift->velocity != Vector2(0,0)) {
-			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-				if (CollisionIntersection_RectRect_Static(
-				
-				
-				
-				
-				
-				{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
-					AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
-					gift->velocity = Vector2(0, 0);
-					enemy->AssessTraits(gift->traits);
+		//UpdatePlayer(player, dt);
+		//player.sprite.UpdateTransform();
+		//UpdateGift(gift, player, dt);
+		//gift.sprite.UpdateTransform();
+		//UpdateGift(gift2, player, dt);
+		//gift2.sprite.UpdateTransform();
+
+
+
+		//thing->position += Vector2(10,10) * dt;
+		//thing->UpdateTransform();
+		/*
+		UpdateGift(gift,player,dt);
+		gift.sprite.UpdateTransform();
+		UpdateGift(gift2,player,dt);
+		gift2.sprite.UpdateTransform();
+		rock.Update(dt);
+		rock.target = player.sprite.position;
+
+		gameMap.GetCurrentRoom()->Update(dt);
+
+		std::vector<Gift*> things{ &gift,&gift2 };
+
+		for (Gift* gift : things) {
+			if (gift->velocity != Vector2(0,0)) {
+				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+					if (CollisionIntersection_RectRect_Static(
+
+
+
+
+
+					{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+						AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
+						gift->velocity = Vector2(0, 0);
+						enemy->AssessTraits(gift->traits);
+					}
+
 				}
 
 			}
-				
 		}
+		gameMap.UpdateMap(player.position, playerHalfSize,dt);
+
+		/* PSUEDOCODE ZONE
+
+		Room {
+			roomdata* toBeTransfered;
+			roomdata currentRoomData;
+
+		}
+
+		gameMap.currentRoom.
+
+		//takes player position and checks if its at a door?
+		gameMap.UpdateMap(player.position, playerHalfSize,dt);
+		//if its at a door, roomdata gets transferred
+
+
+
+
+		*/
 	}
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	else if (gameState == PAUSED) {
+		// When paused:
+		// - update only the pause UI
+		if (AEInputCheckTriggered(AEVK_TAB))
+		{
+			gameState = RUNNING;
+		}
 
-	/* PSUEDOCODE ZONE
+		pauseUi.Update();
+	}
+	else if (gameState == WIN) {
+		winUi.Update();
+	}
+	else if (gameState == LOSE) {
+		loseUi.Update();
+	}
 
-	Room {
-		roomdata* toBeTransfered;
-		roomdata currentRoomData;
-		
-	}	
-	
-	gameMap.currentRoom.
+	if (debugMode) {
+		if (AEInputCheckTriggered(AEVK_1)) gameState = RUNNING;
+		if (AEInputCheckTriggered(AEVK_2)) gameState = PAUSED;
+		if (AEInputCheckTriggered(AEVK_3)) gameState = WIN;
+		if (AEInputCheckTriggered(AEVK_4)) gameState = LOSE;
+	}
 
-	//takes player position and checks if its at a door?
-	gameMap.UpdateMap(player.position, playerHalfSize,dt);
-	//if its at a door, roomdata gets transferred
-
-
-
-
-	*/
+	if (AEInputCheckTriggered(AEVK_F3)) debugMode = !debugMode;
 }

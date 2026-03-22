@@ -1,5 +1,8 @@
 #include "AEEngine.h"
 #include "Boss.h"
+#include "GameStateList.h"
+
+extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
 	const RoomData& currentRoom, std::vector<AttackData> attackData)
@@ -27,6 +30,9 @@ void Boss::Update(Player& player, f32 dt) {
 	if (currentHealth > 0) {
 		bossStateMachine->Update(player, dt);
 		CollideProjectile();
+	}
+	else {
+		gameState = WIN;
 	}
 }
 
