@@ -169,6 +169,7 @@ namespace DataLoader {
 				AddBehaviours(tmp, name, "angry");
 				AddBehaviours(tmp, name, "neutral");
 
+				tmp.spritePath = name["sprite"].asString();
 				tmp.health = name["health"].asFloat();
 				tmp.damage = name["damage"].asFloat();
 				tmp.speed = name["speed"].asFloat();

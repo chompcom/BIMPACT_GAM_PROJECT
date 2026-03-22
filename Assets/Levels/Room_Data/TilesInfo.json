@@ -29,16 +29,31 @@
       "name":"Enemies",
       "blocked": false,
       "asset": ""
+    },
+    "102":{
+      "name":"Booger",
+      "blocked": false,
+      "asset": ""
+    },
+    "103":{
+      "name":"Pop Rocks",
+      "blocked": false,
+      "asset": ""
+    },
+    "104":{
+      "name":"THE OVEN",
+      "blocked": false,
+      "asset": ""
     }
   },
 
   "biomes": {
     "Normal": {
-      "allowedTiles": [0,1,100]
+      "allowedTiles": [0,1,100,103,104]
     },
 
     "Green": {
-      "allowedTiles": [0,1,100]
+      "allowedTiles": [0,1,100, 102]
     },
 
     "Ice": {

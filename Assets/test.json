@@ -21,7 +21,7 @@
 			"angry": []
 		},
 		{	"name": "Booger",
-			"sprite": "Assets/booger.png",
+			"sprite": "Assets/Enemies/booger.png",
 			"color": [
 				255,
 				255,
@@ -106,7 +106,7 @@
 			]
 		},
 		{	"name": "Pop Rocks",
-			"sprite": "Assets/poprocks.png",
+			"sprite": "Assets/Enemies/poprocks.png",
 			"color": [
 				255,
 				255,
@@ -151,7 +151,7 @@
 		},
 		{
 			"name": "THE OVEN",
-			"sprite": "Assets/poprocks.png",
+			"sprite": "Assets/Enemies/oven.png",
 			"color": [
 				255,
 				255,

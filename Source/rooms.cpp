@@ -214,9 +214,24 @@ namespace mapRooms
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
+			std::cout << "Display Room Init of " << biome << "\n";
+			//roomGrid.
+			for (int j = 0; j < roomGrid.GetHeight(); j++) {
+				for (int i = 0; i < roomGrid.GetWidth(); i++) {
+					const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
+					std::cout << (tile ? tile->id : 0) << " ";
+					if (!tile) continue;
+					if (tile->id > 101) {
+						//std::cout << "Spawned " << tile->name << "! \n";
+						const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
+						currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
+						currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth() , j * roomGrid.GetTileHeight()};
+					}
+				}
+				std::cout << "\n";
+			}
 
 
-			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
 				i->shadow.position = Vector2{ 0.f, -35.f };
 				i->shadow.UpdateTransform();
@@ -229,7 +244,6 @@ namespace mapRooms
 			//Vector2 giftPos{ 200.0f, 450.0f };
 			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
 			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
 			Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
 			gift->shadow.position = Vector2{ 0.f, -40.f };
 			currentRoomData.giftList.push_back(gift);
@@ -1000,7 +1014,7 @@ namespace mapRooms
 		currentRoom = target; // Room changed
 		StopAllAudio();
 		RoomEnterAudio();
-		//currentRoom->visited = true;
+		
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 

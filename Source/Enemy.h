@@ -88,6 +88,7 @@ class Enemy {
 class EnemyType {
 public:
 	std::string name;
+	std::string spritePath;
 	f32 health;
 	f32 damage;
 	f32 speed;
