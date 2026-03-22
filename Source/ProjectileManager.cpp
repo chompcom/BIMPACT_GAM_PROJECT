@@ -1,16 +1,17 @@
 #include "ProjectileManager.h"
 
 
-void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color) {
+void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
 	sprite.position = pos;
 	sprite.scale = scale;
 	sprite.color = color;
 	//sprite.direction = dir;
-	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage);
+	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source);
     roomData.projectileList.push_back(fireball);
+    ProjectileAudio();
 }
 
-void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color) {
+void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
     int numProjectiles = 10;
     float angleAround = 360.0f / numProjectiles;  
 
@@ -25,24 +26,65 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
 		sprite.color = color;
 
         Vector2 velocity = shotDir * speed;  // uses shotDir
-        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage);
+        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage,0.0f, source);
         roomData.projectileList.push_back(aoe);
     }
 }
 
-void Update(RoomData& roomData, float dt) {
+void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,float rot, void* source) {
+    sprite.position = pos;
+    sprite.scale = scale;
+    sprite.color = color;
+  //  Vector2 perpendicularVel = { dir.y, -dir.x };
+
+  //  Vector2 swirlVel = (dir * speed) + (perpendicularVel * speed * 50.0f);
+
+    Projectile* rounding = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,rot,source);
+    roomData.projectileList.push_back(rounding);
+    RoundingProjectileAudio();
+}
+
+void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source) {
+    sprite.position = pos;
+    sprite.scale = scale;
+    sprite.color = color;
+    //sprite.direction = dir;
+    Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source);
+    fireball->isScatter = true;
+    roomData.projectileList.push_back(fireball);  
+    
+}
+
+void UpdateProjectiles(RoomData& roomData, float dt) {
+    std::vector<Projectile*> rmdata;
+
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
-        (*it)->ProjectileUpdate(dt);
+        (*it)->UpdateProjectile(dt);
 
         if (!(*it)->IsAlive()) {
-            delete* it;
-            it = roomData.projectileList.erase(it);
+            if ((*it)->isScatter && !(*it)->didScatter) {
+                int numProjectiles = 10;
+                float angleAround = 360.0f / numProjectiles;
+                for (int i = 0; i < numProjectiles; i++) {
+                    float angle = AEDegToRad(angleAround * i);
+                    Vector2 shotDir = { AECos(angle), AESin(angle) };
+                    TexturedSprite spr = (*it)->GetSprite(); 
+                    Projectile* aoe = new Projectile(spr, AOE, shotDir * 200.0f, 1.0f, (*it)->GetDmg());
+                    rmdata.push_back(aoe);
+                }
+            }
+                delete* it;
+                it = roomData.projectileList.erase(it);
+            }
+            else {
+                ++it;
+            }
         }
-        else {
-            ++it;
-        }
+    for(Projectile *p : rmdata)
+       roomData.projectileList.push_back(p);
+
     }
-}
+
 void CheckProjectileCollision(RoomData& roomData, Player& player) {
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         float tFirst = 0.0f;
@@ -55,8 +97,26 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
             Vector2{ 0, 0 },
             tFirst
         );
+
+        bool enemyHit = false;
+        for (Enemy* guy : roomData.enemyList) {
+
+            if (static_cast<void*>(guy) == &(*it)) continue;
+            if ( CollisionIntersection_RectRect(
+                    (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),
+                    guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst) 
+            ) {
+                guy->currentHealth -= (*it)->GetDmg();
+                std::cout << guy << " IS HIT!!" << std::endl;
+                enemyHit = true;
+            }
+        }
+        
         if (hit) {
             playerTakesDamage(player);
+        }
+
+        if (hit || enemyHit) {
             delete* it;
             it = roomData.projectileList.erase(it);
         }
@@ -65,12 +125,12 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         }
     }
 }
-void Render(RoomData& roomData) {
+void RenderProjectile(RoomData& roomData) {
     for (Projectile* p : roomData.projectileList)
-        if (p) p->ProjectileRender();
+        if (p) p->RenderProjectile();
 }
 
-void Clear(RoomData& roomData) {
+void ProjectileClear(RoomData& roomData) {
     for (Projectile* p : roomData.projectileList) delete p;
     roomData.projectileList.clear();
 }

@@ -1,20 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp" />
+    <ClCompile Include="..\Source\Almanac.cpp" />
+    <ClCompile Include="..\Source\Boss.cpp" />
+    <ClCompile Include="..\Source\BoundaryCollision.cpp" />
+    <ClCompile Include="..\Source\Collision.cpp" />
+    <ClCompile Include="..\Source\Enemy.cpp" />
+    <ClCompile Include="..\Source\FSM.cpp" />
+    <ClCompile Include="..\Source\GameStateManager.cpp" />
+    <ClCompile Include="..\Source\Gift.cpp" />
+    <ClCompile Include="..\Source\HUD.cpp" />
+    <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
+    <ClCompile Include="..\Source\Grid.cpp" />
+    <ClCompile Include="..\Source\Main.cpp" />
+    <ClCompile Include="..\Source\Player.cpp" />
+    <ClCompile Include="..\Source\Projectile.cpp" />
+    <ClCompile Include="..\Source\ProjectileManager.cpp" />
+    <ClCompile Include="..\Source\RoomData.cpp" />
+    <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
+    <ClCompile Include="..\Source\Sprite.cpp" />
+    <ClCompile Include="..\Source\Traits.cpp" />
+    <ClCompile Include="..\Source\Utils\Utils.cpp" />
+    <ClCompile Include="..\Source\rooms.cpp" />
+    <ClCompile Include="..\Source\Audio.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Source\Almanac.h" />
+    <ClInclude Include="..\Source\Boss.h" />
+    <ClInclude Include="..\Source\BoundaryCollision.h" />
+    <ClInclude Include="..\Source\Collision.h" />
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h" />
+    <ClInclude Include="..\Source\Enemy.h" />
+    <ClInclude Include="..\Source\FSM.h" />
+    <ClInclude Include="..\Source\GameStateList.h" />
+    <ClInclude Include="..\Source\GameStateManager.h" />
+    <ClInclude Include="..\Source\Gift.h" />
+    <ClInclude Include="..\Source\HUD.h" />
+    <ClInclude Include="..\Source\Player.h" />
+    <ClInclude Include="..\Source\Loaders\DataLoader.h" />
+    <ClInclude Include="..\Source\Projectile.h" />
+    <ClInclude Include="..\Source\ProjectileManager.h" />
+    <ClInclude Include="..\Source\RoomData.h" />
+    <ClInclude Include="..\Source\Grid.h" />
+    <ClInclude Include="..\Source\Scenes\TestScene.h" />
+    <ClInclude Include="..\Source\rooms.h" />
+    <ClInclude Include="..\Source\Sprite.h" />
+    <ClInclude Include="..\Source\Traits.h" />
+    <ClInclude Include="..\Source\Utils\Utils.h" />
+    <ClInclude Include="..\Source\Utils\Vector2.hpp" />
+    <ClInclude Include="..\Source\Audio.h" />
     <ClCompile Include="..\Source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +102,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\ProjectileManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Source\Boss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

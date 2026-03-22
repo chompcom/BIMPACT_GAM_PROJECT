@@ -5,7 +5,6 @@
 #include "BoundaryCollision.h"
 #include "Collision.h"
 #include <iostream>
-
 //contructor for player class
 Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 _speed, Vector2 position, Vector2 direction) :
 	//initialiser list
@@ -102,6 +101,8 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	if (player.pickUpState && player.heldGift != nullptr && 
 		AEInputCheckCurr(AEVK_SPACE) && player.pickUpCooldown <= 0.0f)
 	{
+		//if (AEInputCheckTriggered(AEVK_SPACE))
+		ChargingThrowAudio(deltaTime);
 		//reset the held gift's position after shaking
 		(*player.heldGift).sprite.position = (*player.heldGift).position;
 
@@ -124,6 +125,8 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//if the player released their spacebar and they are holding a gift
 	else if (AEInputCheckReleased(AEVK_SPACE) && player.heldGift != nullptr && player.pickUpState)
 	{
+		StopChargingAudio();
+		PlayerThrowAudio();
 		//reset the held gift's position after shaking
 		(*player.heldGift).sprite.position = (*player.heldGift).position;
 		(*player.heldGift).shakeState = false;
@@ -144,6 +147,7 @@ void playerTakesDamage(Player& player)
 {
 	if (player.invulnerableTimer <= 0.f)
 	{
+		PlayerDmgAudio();
 		--(player.health);
 
 		player.invulnerableTimer = 3.f;

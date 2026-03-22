@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite.h"
+#include "Audio.h"
 
 //forward declaration, needed as Player.h needs the Gift class, 
 //and Gift.h needs the player class

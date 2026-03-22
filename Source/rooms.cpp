@@ -791,6 +791,8 @@ namespace mapRooms
 		if (!target) return false;	// again should not happen just a function safeguard
 
 		currentRoom = target; // Room changed
+		StopAllAudio();
+		RoomEnterAudio();
 		//currentRoom->visited = true;
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;

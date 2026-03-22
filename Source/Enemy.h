@@ -109,6 +109,11 @@ public:
 	FSM angry;
 	FSM neutral;
 
+	struct ProjectileInfo {
+		float damage;
+		float radius;
+		float speed;
+	}  happyProjectile, angryProjectile, neutralProjectile;
 
 
 	EnemyType(std::string name, f32 health, f32 damage, const Labels& traits, const Labels& likes, const Labels& dislikes);

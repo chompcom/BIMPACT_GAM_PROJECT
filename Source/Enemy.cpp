@@ -58,7 +58,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 	switch (newstate)
 	{
 	case ES_HAPPY:
-
+		FriendSuccessAudio();
 		currentBehavior = enemyType.happy;
 		break;
 	case ES_NEUTRAL:
