@@ -8,6 +8,8 @@
 #include "Utils/Vector2.hpp"
 #include "RoomData.h"
 #include "Utils/Utils.h"
+#include "ParticleSystem.h"
+#include "Grid.h"
 //#include "AEEngine.h"
 
 struct AEGfxTexture;
@@ -59,13 +61,18 @@ namespace mapRooms {
 
 		void Init(RoomType rmType = RoomType::Normal);
 		void Update(float dt) ;
+
+
+		// Integration with grid.cpp
+		std::string biome;
+		std::string layoutFile;
+		Grid roomGrid;
+		int lastValidCell{-1};
 			
-
+	private:
 		//handle collisions
-		
-
-		// Should we store player position? Idk if this is the best place. (Donnid)
-		
+		void PatchDoorCells();
+				
 		// Enemy 
 		// Enemy object, type, for sprite render
 		
@@ -89,7 +96,7 @@ namespace mapRooms {
 		// Level lifecycle
 		void	InitMap(RoomData& globalSceneData, unsigned int seed);	// Grid size and other spawns based on seed.
 		//void	UpdateMap();								// Idk
-		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt);
+		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt);
 		void	DeleteMap();								// Reset this level stuff (tbh this kinda violates the game loop taught in GIT lol)
 
 		int		GetGridSize() const;
@@ -105,6 +112,10 @@ const	Room*	GetRoom(int x, int y) const;
 
 		// Draw a simple minimap for debugging
 		void	RenderDebugMap(AEGfxVertexList* squareMesh) const;   
+
+		// Abstracts
+		AEGfxTexture* GetOrLoadTexture(std::string const& path);
+
 
 		RoomData&	GetTransferData();
 
@@ -135,12 +146,13 @@ const	Room*	GetRoom(int x, int y) const;
 		RoomData* transferData;
 	
 		// Room background loading ---
+		std::unordered_map<std::string, std::vector<std::string>> biomeRoomFiles{};
 		std::vector<std::string> normalRoomFiles{};                  
 		std::vector<std::string> bossRoomFiles{};                    
 		std::unordered_map<std::string, AEGfxTexture*> textureCache; 
 
 		void			LoadRoomArtLists();     
-		AEGfxTexture*	GetOrLoadTexture(std::string const& path);
+		//AEGfxTexture*	GetOrLoadTexture(std::string const& path);
 		void			AssignRoomArt();        
 
 		// Door trigger cooldown (prevents re-trigger)

@@ -51,6 +51,37 @@ namespace {
 		}
 		return false;
 	}
+	// Add quarter circle (depending on segments and radius) vertices to a vector list (For rrect mesh)
+	void AddArcPoints(std::vector<Vector2>& points,
+		f32 cx, f32 cy,
+		f32 radius,
+		f32 startAngle, f32 endAngle,
+		int segments,
+		bool skipFirst)
+	{
+		for (int i = 0; i <= segments; ++i)
+		{
+			if (skipFirst && i == 0)
+				continue;
+
+			f32 t = static_cast<f32>(i) / static_cast<f32>(segments);
+			f32 a = startAngle + (endAngle - startAngle) * t;
+
+			f32 x = cx + cosf(a) * radius;
+			f32 y = cy + sinf(a) * radius;
+
+			points.push_back(Vector2(x, y));
+		}
+	}
+
+	// For caching later... 
+	// To be honest, this is likely counter-productive, given that we have alot of meshes created in ui... Meaning that cache misses are likely.
+	std::string MakeRoundRectKey(f32 radiusRatio, int segments)
+	{
+		// NVRO says that returning a temp directly creates another copy... Ty prof pras hahah
+		std::string res{ std::to_string(radiusRatio) + "_" + std::to_string(segments) };
+		return res;
+	}
 
 }
 
@@ -71,10 +102,52 @@ namespace DataLoader {
 
 	static Json::Value theGuy;
 
+	// Sorry Josiah the mesh was a rabbit hole ~ MJ
+	using RoundRectMeshList = std::unordered_map<std::string, AEGfxVertexList*>;	// For Rrect mesh cache
+	using RoundRectMeshPair = std::pair<std::string, AEGfxVertexList*>;				// For rrect mesh pair
+
+	static AEGfxVertexList *circleMesh{ nullptr };			// For square and circle mesh
+	static RoundRectMeshList roundRectMeshes{};										// For rrect unit mesh
+
+	// Loan Json From File into Json::Value object
+	Json::Value LoadJsonFile(std::string const& file) {
+		Json::Value res;
+		std::ifstream fileInstance{ file };
+
+		if (fileInstance.is_open()) {
+			fileInstance >> res;
+		}
+		return res;
+	}
+
+	bool DumpFile(std::string filename, std::vector<std::pair<std::string, std::string>> const &data) {
+		Json::Value output;
+		std::ofstream o{ filename };
+
+		if (o.is_open()) {
+			for (std::pair<std::string, std::string> const& entry : data) output[entry.first] = entry.second;
+			// Output
+			Json::StreamWriterBuilder builder;
+			builder["commentStyle"] = "None";
+			builder["indentation"] = "   ";
+			std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+			writer->write(output, &o);
+			o << std::endl;	// Write and flush
+			return true;
+		}
+		return false;
+	}
+
+
+
 	void Load() {
 		squareMesh = CreateSquareMesh();
+		circleMesh = CreateCircleMesh();
+
 		textures.reserve(5);
 		enemyTypes.reserve(5);
+		roundRectMeshes.reserve(8);
+
 		std::ifstream enemyFile{"Assets/test.json"};
 		InitCommands();
 		//std::ifstream ifs{"Assets/test.json"};
@@ -155,6 +228,11 @@ namespace DataLoader {
 		}
 	}
 
+
+	// -------------------
+	// TEXTURES
+	// -------------------
+
 	TexturedSprite CreateTexture(std::string filename)
 	{
 		TextureList::const_iterator finder = textures.find(filename);
@@ -163,8 +241,154 @@ namespace DataLoader {
 			textures.insert(TexturePair{ filename, AEGfxTextureLoad(filename.c_str())});
 		}
 		//(textures.find(filename))->second
-		return TexturedSprite(squareMesh, textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
+
+		// Ehh not CHECKING if squaremesh exist??? idk man
+		// return TexturedSprite(squareMesh,           textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
+		return TexturedSprite(GetOrCreateSquareMesh(), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 	}
+
+	AEGfxVertexList* GetMesh()
+	{
+		return GetOrCreateSquareMesh();
+	}
+
+	AEGfxVertexList* GetOrCreateSquareMesh()
+	{
+		if (!squareMesh) squareMesh = CreateSquareMesh();
+		return squareMesh;
+	}
+
+	AEGfxVertexList* GetOrCreateCircleMesh()
+	{
+		if (!circleMesh) circleMesh = CreateCircleMesh();
+		return circleMesh;
+	}
+
+
+	/*!
+		Cool but bruh. For creating rounded rectangle meshes. See the excel for demostration is you dk what is border-ratio in HTML...
+	*/
+	AEGfxVertexList* CreateRoundRectMeshInternal(f32 radiusRatio, int segmentsPerCorner, f32 width, f32 height)
+	{
+		AEGfxVertexList* mesh = nullptr;
+		AEGfxMeshStart();
+
+		const u32 white = 0xFFFFFFFF;
+		const f32 pi = AEDegToRad(180);	// PI RAD = 180 DEG hahah
+
+		if (segmentsPerCorner < 1) segmentsPerCorner = 0;	// Segments cannot be less than 1 obviously?
+
+		f32 halfW = width * 0.5f;
+		f32 halfH = height * 0.5f;
+
+		// Radius is based on smaller dimension
+		f32 radius = radiusRatio * ((width < height) ? width : height);
+		radius = AEClamp(radius, 0.0f, (halfW < halfH) ? halfW : halfH);
+
+		// radius == 0 => normal rectangle
+		if (radius <= 0.0f)
+		{
+			// Could have returned rect mesh but lazy scale so nvm
+
+			AEGfxTriAdd(
+				-halfW, -halfH, white, 0.0f, 1.0f,
+				halfW, -halfH, white, 1.0f, 1.0f,
+				halfW, halfH, white, 1.0f, 0.0f
+			);
+
+			AEGfxTriAdd(
+				-halfW, -halfH, white, 0.0f, 1.0f,
+				halfW, halfH, white, 1.0f, 0.0f,
+				-halfW, halfH, white, 0.0f, 0.0f
+			);
+
+			return AEGfxMeshEnd();
+		}
+
+		// Original Vertices
+		f32 left = -halfW + radius;
+		f32 right = halfW - radius;
+		f32 top = halfH - radius;
+		f32 bottom = -halfH + radius;
+
+		// Store vertices
+		std::vector<Vector2> boundary;
+		boundary.reserve(static_cast<size_t>(segmentsPerCorner * 4 + 4));	// Total number of vertices
+
+		// Clockwise boundary (Essentially we are creating vertices at 4 corners in a clockwise manner)
+		// Intention is in order to create rrect, we have to create a quadrant on 4 corners of a rectangle...
+		AddArcPoints(boundary, right, top, radius, PI * 0.5f, 0.0f, segmentsPerCorner, false);
+		AddArcPoints(boundary, right, bottom, radius, 0.0f, -PI * 0.5f, segmentsPerCorner, true);
+		AddArcPoints(boundary, left, bottom, radius, -PI * 0.5f, -PI, segmentsPerCorner, true);
+		AddArcPoints(boundary, left, top, radius, PI, PI * 0.5f, segmentsPerCorner, true);
+
+		/*
+		Fill with triangle fan from center
+		Essentially adds our calculated arc boundaries into vertex lists
+		r = 0.1, segments = 2
+
+		Total vertices = (4*segments+4=12)
+			  p3 ----- p2
+		   p4             p1
+		 p5                 p0
+		 |                   |
+		 p6                 pN-1
+		   p7             pN-2
+			  p8 ----- pN-3
+
+		Each loop:
+						 p1
+						/|
+					   / |
+					  /  |
+					 /   |
+					/    |
+				   C-----p0
+		*/
+		for (size_t i = 0; i < boundary.size(); ++i)
+		{
+			Vector2 const& p0 = boundary[i];
+			Vector2 const& p1 = boundary[(i + 1) % boundary.size()];
+
+			// For uv-mapping texture coordinates (likely-won't be used but yeah)
+			f32 u0 = (p0.x + halfW) / width;
+			f32 v0 = (halfH - p0.y) / height;
+			f32 u1 = (p1.x + halfW) / width;
+			f32 v1 = (halfH - p1.y) / height;
+
+			// Creates a triangle segment of current to next point...
+			AEGfxTriAdd(
+				0.0f, 0.0f, white, 0.5f, 0.5f,	// Center should be 0.5 for UV
+				p0.x, p0.y, white, u0, v0,		// Current Point for UV is based on where isit currently
+				p1.x, p1.y, white, u1, v1		// Computated UV for next Point
+			);
+		}
+
+		mesh = AEGfxMeshEnd();
+		return mesh;
+	}
+
+	// For rrect meshes (UNIT ONLY)
+	AEGfxVertexList* GetOrCreateRoundRectMesh(f32 radiusRatio, int segments)
+	{
+		std::string key = MakeRoundRectKey(radiusRatio, segments);
+
+		RoundRectMeshList::const_iterator finder = roundRectMeshes.find(key);
+		if (finder != roundRectMeshes.end()) return finder->second;
+
+		AEGfxVertexList* mesh = CreateRoundRectMeshInternal(radiusRatio, segments, 1.0f, 1.0f);
+		roundRectMeshes.insert(RoundRectMeshPair{ key, mesh });
+
+		return mesh;
+	}
+
+	// NO CACHING FOR NORMAL RRECT MESHES BECAUSE THAT'S STUPID. Many differing variables like radiusRatio, segments, width and height bruh.
+	// This will EXPLODE cache and likely cause cache misses or collision, so what's the point of "caching"...
+	AEGfxVertexList* CreateRoundRectMesh(f32 radiusRatio, int segments, f32 width, f32 height)
+	{
+		return CreateRoundRectMeshInternal(radiusRatio, segments, width, height);
+	}
+
 
 	//This is so that other files can get the almanac entry vector
 	std::vector<AlmanacEntry> GetAlmanacVector()
@@ -183,16 +407,19 @@ namespace DataLoader {
 
 	void Unload() {
 		for (TexturePair them : textures) {
-			if (them.second)
-				AEGfxTextureUnload(them.second);
+			if (them.second) AEGfxTextureUnload(them.second);
 		}
 		textures.clear(); //just in case
-		if (squareMesh) AEGfxMeshFree(squareMesh);
-	}
 
-	AEGfxVertexList* GetMesh()
-	{
-		return squareMesh;
+		// For rrect mesh cache
+		for (RoundRectMeshPair const& pair : roundRectMeshes)
+		{
+			if (pair.second) AEGfxMeshFree(pair.second);
+		}
+		roundRectMeshes.clear();
+
+		if (squareMesh) { AEGfxMeshFree(squareMesh); squareMesh = nullptr; };
+		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
 	}
 
 } //end DataLoader

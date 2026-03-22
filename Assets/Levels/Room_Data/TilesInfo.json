@@ -1,0 +1,48 @@
+{
+  "tileTypes": {
+    "0": {
+      "name": "Empty",
+      "blocked": false,
+      "asset": ""
+    },
+    "1": {
+      "name": "Rock",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Rocks.png"
+    },
+    "2": {
+      "name": "Bush",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/bush.png"
+    },
+    "3": {
+      "name": "IceCrystal",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/ice_crystal.png"
+    },
+    "100": {
+      "name": "Door",
+      "blocked": false,
+      "asset": ""
+    },
+    "101":{
+      "name":"Enemies",
+      "blocked": false,
+      "asset": ""
+    }
+  },
+
+  "biomes": {
+    "Normal": {
+      "allowedTiles": [0,1,100]
+    },
+
+    "Green": {
+      "allowedTiles": [0,1,100]
+    },
+
+    "Ice": {
+      "allowedTiles": [0,1,100]
+    }
+  }
+}

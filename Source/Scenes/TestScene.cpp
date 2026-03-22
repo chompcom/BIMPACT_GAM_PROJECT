@@ -15,31 +15,28 @@
 #include "ProjectileManager.h"
 #include "../HUD.h"
 #include "../almanac.h"
-#include "Grid.h"
-#include "Audio.h"
+#include "ParticleSystem.h"
+#include "../Screens/Ui.h"
 
-AEGfxVertexList* sqmesh = nullptr;
+AEGfxVertexList* sqmesh			= nullptr;
 
-TexturedSprite* thing = nullptr;
+TexturedSprite* thing			= nullptr;
+TexturedSprite* bulletSprite	= nullptr;
 
 
-
-AEGfxTexture* rockpng = nullptr;
-AEGfxTexture* playerpng = nullptr;
-AEGfxTexture* shadowpng = nullptr;
-AEGfxTexture* bulletpng = nullptr;
-AEGfxTexture* aoepng = nullptr;
-AEGfxTexture* heartpng = nullptr;
-AEGfxTexture* almanacpng = nullptr;
-AEGfxTexture* pDoorTex = nullptr;	// Door image
+AEGfxTexture* rockpng		= nullptr;
+AEGfxTexture* playerpng		= nullptr;
+AEGfxTexture* shadowpng		= nullptr;
+AEGfxTexture* bulletpng		= nullptr;
+AEGfxTexture* aoepng		= nullptr;
+AEGfxTexture* heartpng		= nullptr;
+AEGfxTexture* almanacpng	= nullptr;
+AEGfxTexture* pDoorTex		= nullptr;	// Door image
 
 //AEGfxTexture* almanacpagepng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
 TexturedSprite * almanacIcon = nullptr;
-
-static Grid grid;
-
 
 //TexturedSprite* almanacPage = nullptr;
 Almanac almanac {};
@@ -72,25 +69,27 @@ vector<gift*> gift;
 //vector of all enemytypes for the almanac
 //std::vector<std::string> enemyTypeNames {};
 
+ParticleSystem testParticles = NULL;
+
+
+static UIManager pauseUi;
+static bool isPaused = false;
+static bool pauseUiInitialized = false;
+static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
+
 void TestLoad()
 {
 	DataLoader::Load();
-	sqmesh = CreateSquareMesh();
-	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
-	playerpng = AEGfxTextureLoad("Assets/player.png");
-	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
-	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
-	heartpng = AEGfxTextureLoad("Assets/heart.png");
+	sqmesh =	 CreateSquareMesh();
+	rockpng =	 AEGfxTextureLoad("Assets/poprocks.png");
+	playerpng =  AEGfxTextureLoad("Assets/player.png");
+	shadowpng =  AEGfxTextureLoad("Assets/shadow.png");
+	bulletpng =  AEGfxTextureLoad("Assets/fireball.png");
+	heartpng =	 AEGfxTextureLoad("Assets/heart.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
-	//bulletSprite = AEGfxTextureLoad("Assets/fireball.png");
-	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
-	grid.LoadFromFile("Assets/Grid/Grid.csv");
-
-	float offsetX = -(grid.GetWidth() * grid.GetTileWidth() / 2.0f);
-	float offsetY = (grid.GetHeight() * grid.GetTileHeight() / 2.0f);
-	grid.SetOffset(offsetX, offsetY);
+	//font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
 	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
 	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
@@ -143,7 +142,9 @@ void TestLoad()
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{ 1,1,1,0 });
 
 	//gift.sprite = DataLoader::CreateTexture("Assets/veggiefish.png");
+
 	//gift2.sprite = DataLoader::CreateTexture("Assets/pattyfish.png");
+
 
 	rock.sprite = *thing;
 
@@ -171,7 +172,7 @@ void TestLoad()
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
 	std::cout << "Current Seed: " << curSeed << "\n";
-	// Interesting ones: 32461, 32608, 31931, 18283
+	// Interesting ones: 32461, 32608, 31931, 18283, 31060
 	// Too easy: 32702, 0xA341311Cu, 
 
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
@@ -179,6 +180,15 @@ void TestLoad()
 	InitAudio();
 
 
+	
+	testParticles = ParticleSystem(sqmesh);
+
+	// For pause screen;
+	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f,0.0f), Vector2(580.0f, 250.0f));
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	if (tipText) tipText->text = pauseTipText;
+	pauseUiInitialized = true;
+	pauseUi.SetFont(font);
 }
 
 void TestInit()
@@ -199,11 +209,18 @@ void TestDraw()
 	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
+
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	for (Particle particle : testParticles.particles) if (particle.isActive) particle.sprite.RenderSprite();
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
 	// Draw objects: current-room objects + carried objects
 	if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 	{
 		RoomData& roomData = room->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
+
+		gameMap.GetCurrentRoom()->roomGrid.RenderGrid(DataLoader::GetMesh(), carryData.player->position, carryData.player->sprite.scale, AE_GFX_RM_TEXTURE);
 
 		for (Gift* g : roomData.giftList) {
 			if (g) {
@@ -288,6 +305,27 @@ void TestDraw()
 
 	
 
+
+	// Pause screen
+	if (isPaused) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		pauseUi.Draw();
+	}
+
 }
 
 void TestFree()
@@ -332,15 +370,72 @@ void TestUnload()
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
 	FreeAudio();
 
+
+	pauseUi.Clear();
+	pauseUiInitialized = false;
+	isPaused = false;
 }
 
 void TestUpdate(float dt)
 {
 
-	// Player update
-	UpdatePlayer(player, dt);
+	// Pause toggle
+	if (AEInputCheckTriggered(AEVK_TAB))
+	{
+		isPaused = !isPaused;
+	}
+
+	// When paused:
+	// - update only the pause UI
+	// - skip all gameplay logic below
+	if (isPaused)
+	{
+		pauseUi.Update();
+		return;
+	}
+
+	// Get previous pos
+	Vector2 prevPos{ player.position.x, player.position.y };
+	
+
+	UpdatePlayer(player, dt); // Player update
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+
+	// Print Current Grid
+	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	for (int i = 0; i < 9; ++i) {
+		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+		std::cout << '\n';
+	}
+
+	// Game map update
+	gameMap.GetCurrentRoom()->Update(dt);
+
+	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+	RoomData& roomData = currentRoom->currentRoomData;
+	RoomData& carryData = gameMap.GetTransferData();
+	UpdateProjectiles(roomData, dt);
+
+	
+
+	// Test Player Collision with Map
+	int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
+	if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+	int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
+	if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) player.position.x = prevPos.x;		// Test for x collision
+	if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM) player.position.y = prevPos.y;		// Test for y collision
+
+
+
+
+	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+
+	// Finally reflect changes?
 	player.sprite.UpdateTransform();
 	player.shadow.UpdateTransform();
+
+	//Game Map Update was here
+	
 
 	//to test damage
 	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
@@ -352,14 +447,7 @@ void TestUpdate(float dt)
 
 	//std::cout << player.position.x << player.position.y;
 
-	// Game map update
-	gameMap.GetCurrentRoom()->Update(dt);
 
-
-	mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
-	// Do stuff here
-	RoomData& roomData = currentRoom->currentRoomData;
-	RoomData& carryData = gameMap.GetTransferData();
 
 	// Update Enemies (carryData version is only for "Friends")
 	for (Enemy* e : roomData.enemyList) {
@@ -398,6 +486,7 @@ void TestUpdate(float dt)
 		roomData.boss->shadow.UpdateTransform();
 	}
 
+
 	// Gifts and Enemy Check
 	for (Gift* gift : currentRoom->currentRoomData.giftList) {
 		if (!(gift->velocity == Vector2())) {
@@ -409,6 +498,8 @@ void TestUpdate(float dt)
 			}
 		}
 	}
+
+
 
 
 	// 4) Transfer enemies to our carrylist if they are essentially happy
@@ -453,9 +544,21 @@ void TestUpdate(float dt)
 
 
 	// Update game map
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	//Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	//Vector2 positionResetTest = player.position;
+	
+
+
+
+	// Room grid works! (To be removed)
+	//std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
+	//std::cout << "x: " << player.position.x << "y: " << player.position.y;
+
+		// Update game map
 	Vector2 positionResetTest = player.position;
-	gameMap.UpdateMap(player.position, playerHalfSize, dt);
+	//gameMap.UpdateMap(player.position, playerHalfSize, dt);
+	gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
+	/* IF player position is changed to other screen, reset enemies to player position */
 	if (player.position != positionResetTest) {
 		for (Enemy* e : carryData.enemyList) {
 			e->sprite.position = player.position;
@@ -466,41 +569,21 @@ void TestUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_4)) {
-		ShootProjectile(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-			, player.direction,
-			500.f, 5.0f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
-		FireballAudio();
-	}
-	if (AEInputCheckTriggered(AEVK_Q)) {
-		ShootAOE(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }//player.position
-			,
-			300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
-	}
-	UpdateProjectiles(roomData, dt);  // updates + cleans dead projectiles
-	CheckProjectileCollision(roomData, player);
-	int collision = grid.CheckInstanceBinaryMapCollision(
-		player.position.x, player.position.y,
-		player.sprite.scale.x, player.sprite.scale.y
-	);
-	Vector2 prevPosition = player.position;
-	if (collision & (COLLISION_LEFT | COLLISION_RIGHT | COLLISION_TOP | COLLISION_BOTTOM)) {
-		//	player.position = { 0,0 };  // just undo the move
-	}
-	if (AEInputCheckTriggered(AEVK_2)) {
-		ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-			, player.direction,
-			100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
-	}
-	if (AEInputCheckTriggered(AEVK_3)) {
-		ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-			, player.direction,
-			500.f, 0.5f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
+	/*
+	if (AEInputCheckTriggered(AEVK_SPACE))
+		projManager.ShootFireball(roomData, player.position, player.direction,
+			500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
 
+		if (AEInputCheckTriggered(AEVK_Q))
+			projManager.ShootAOE(roomData, player.position, player.direction,
+				300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
 
-	}
-}
-			
+		projManager.Update(roomData, dt);  // updates + cleans dead projectiles
+		*/
+
+	testParticles.UpdateParticles(dt);
+	
+
 	// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???) 
 	//for (Gift* gift : roomData.giftList) {
 	//	if (!(gift->velocity == Vector2())) {
@@ -565,7 +648,20 @@ void TestUpdate(float dt)
 	}
 
 
+	Room {
+		roomdata* toBeTransfered;
+		roomdata currentRoomData;
+		
+	}	
+	
+	gameMap.currentRoom.
 
+	//takes player position and checks if its at a door?
+	gameMap.UpdateMap(player.position, playerHalfSize,dt);
+	//if its at a door, roomdata gets transferred
+
+
+
+
+	*/
 }
-
-*/

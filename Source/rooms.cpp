@@ -16,12 +16,13 @@
 #include "RoomData.h"
 #include "Gift.h"		// ????
 #include "Boss.h"
+//#include "Grid.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
 	static const int minGrid = 2, maxGrid = 5;
 
-	// Legacy File System Scanning
+	// Legacy File System Scanning (Perhaps rework in a utils class?)
 	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)
 	{
 		outList.clear();	// Clear Lists
@@ -57,6 +58,53 @@ namespace Config {
 		std::sort(outList.begin(), outList.end());
 	}
 
+
+	void ScanCsvFolderWin32(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
+	{
+		outList.clear();	// Clear Lists
+
+		// Pattern Example: Assets\Rooms\Normal\*.png
+		std::string pattern = folder;
+		if (!pattern.empty() && pattern.back() != '\\' && pattern.back() != '/')
+			pattern += "\\";
+		pattern += patternAppend;
+
+		// Idk how this works truly winapi stuff
+		WIN32_FIND_DATAA data{};
+		HANDLE hFind = FindFirstFileA(pattern.c_str(), &data);
+		if (hFind == INVALID_HANDLE_VALUE)
+			return;
+
+		do
+		{
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)	// Skip directories, we are looking for files
+				continue;
+
+			// Full path to file
+			std::string fullPath = folder;
+			if (!fullPath.empty() && fullPath.back() != '\\' && fullPath.back() != '/')
+				fullPath += "\\";
+			fullPath += data.cFileName;
+
+			outList.push_back(fullPath);	// Accumulate Files
+		} while (FindNextFileA(hFind, &data));
+
+		FindClose(hFind);
+
+		std::sort(outList.begin(), outList.end());
+	}
+
+
+	std::string ChooseRandomRoomCsv(std::string const& biome) {
+		// Load csv files
+		std::vector<std::string> files;
+
+		const char* filePath = "./Assets/Levels/Room_Data/";
+		Config::ScanCsvFolderWin32(filePath, (biome + "*.csv"), files);
+
+		int idx = rand() % static_cast<int>(files.size());
+		return files[idx];
+	}
 
 	// Absolute
 	static float AbsF(float v) { return (v < 0.0f) ? -v : v; }
@@ -136,7 +184,38 @@ namespace mapRooms
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
 		}
+
+		// For starting Rooms Init
+		if (this->rmType == RoomType::Start) {
+			biome = "Normal";
+			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
+			this->roomGrid.LoadRoomCSV(this->layoutFile);
+			PatchDoorCells();
+		}
+
+
+		// Normal Room Init
 		if (rmType == RoomType::Normal) {
+
+			
+			// Choose biomes, integrate grid system (for map data purposes)
+			std::vector<std::string> biomes = Grid::GetAllBiomes();
+			if (!biomes.empty()) {
+				//int idx = Map::RandInt(0, biomes.size() - 1);
+				int idx = std::rand() % static_cast<int>(biomes.size());
+				biome = biomes[idx];
+			}
+			else {
+				biome = "Normal";
+			}
+
+			// Grid
+			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
+			this->roomGrid.LoadRoomCSV(this->layoutFile);
+			PatchDoorCells();
+
+
+
 			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 			for (Enemy* i : currentRoomData.enemyList) {
 				i->shadow.position = Vector2{ 0.f, -35.f };
@@ -155,21 +234,94 @@ namespace mapRooms
 			gift->shadow.position = Vector2{ 0.f, -40.f };
 			currentRoomData.giftList.push_back(gift);
 		}
+
+		// Boss Init
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 3.0f, 5.0f, 2.0f}, {10.0f, 4.0f, 2.0f, 3.0f} };
 			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
+
+			// Initialize Default Grid (Should be all zero ig)
+			biome = "Normal"; // or keep previously chosen biome if you want
+			layoutFile = ".\\Assets\\Levels\\Room_Data\\Boss_1.csv";
+			//layoutFile = ChooseRandomBossRoomCsv();	// Maybe if required
+			this->roomGrid.LoadRoomCSV(layoutFile);
+			PatchDoorCells();
 		}
 		
 	} 
 	void Room::Update(float dt) {
-		for (Enemy* i : currentRoomData.enemyList) {
+		//for (Enemy* i : currentRoomData.enemyList) {
 			//i->Update(dt);
 
 
+		//}
+
+		// Check collision with room ig
+		
+
+
+
+	}
+
+
+	void Room::PatchDoorCells()
+	{
+		const int DOOR_TILE = 100;
+		const int DOOR_W = 2;
+		const int DOOR_H = 2;
+
+		int width = this->roomGrid.GetWidth();
+		int height = this->roomGrid.GetHeight();
+
+		// Center the door patch on each wall
+		int doorStartCol = (width - DOOR_W) / 2;
+		int doorStartRow = (height - DOOR_H) / 2;
+
+		if (up)
+		{
+			for (int r = 0; r < DOOR_H; ++r)
+			{
+				for (int c = doorStartCol; c < doorStartCol + DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
+			}
 		}
 
+		if (down)
+		{
+			for (int r = height - DOOR_H; r < height; ++r)
+			{
+				for (int c = doorStartCol; c < doorStartCol + DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
+			}
+		}
+
+		if (left)
+		{
+			for (int r = doorStartRow; r < doorStartRow + DOOR_H; ++r)
+			{
+				for (int c = 0; c < DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
+			}
+		}
+
+		if (right)
+		{
+			for (int r = doorStartRow; r < doorStartRow + DOOR_H; ++r)
+			{
+				for (int c = width - DOOR_W; c < width; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
+			}
+		}
 	}
 
 
@@ -193,16 +345,24 @@ namespace mapRooms
 
 	void Map::LoadRoomArtLists()
 	{
+		// Normal Room Files
+		biomeRoomFiles.clear();
 		normalRoomFiles.clear();
 		bossRoomFiles.clear();
 
-		std::string const normalDir = "Assets/Rooms/Normal";
-		std::string const bossDir = "Assets/Rooms/Boss";
+		//Config::ScanPngFolderWin32(normalDir, normalRoomFiles);
+		std::string const normalDir = "Assets/Rooms/Normal/NORMAL";
+		std::string const greenDir	= "Assets/Rooms/Normal/GREEN";
+		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
+		std::string const bossDir	= "Assets/Rooms/Boss";
 
-		Config::ScanPngFolderWin32(normalDir, normalRoomFiles);
-		Config::ScanPngFolderWin32(bossDir,   bossRoomFiles);
+		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
+		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
+		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);
+		Config::ScanPngFolderWin32(bossDir,		bossRoomFiles);
 
-
+		// Not up yet... There should be a neater way via json lol
+		//Config::ScanPngFolderWin32("Assets/Rooms/Boss", bossRoomFiles);
 	}
 
 	AEGfxTexture* Map::GetOrLoadTexture(std::string const& path)
@@ -219,7 +379,8 @@ namespace mapRooms
 
 	// Asset Code was here
 	void Map::AssignRoomArt() {
-		bool haveNormal = !normalRoomFiles.empty();
+		//bool haveNormal = !normalRoomFiles.empty();
+		bool haveNormal = !biomeRoomFiles.empty();
 		bool haveBoss = !bossRoomFiles.empty();
 
 		for (int y = 0; y < gridSize; ++y)
@@ -243,9 +404,15 @@ namespace mapRooms
 				}
 				else if (rm->rmType == RoomType::Normal || rm->rmType == RoomType::Start) {
 					if (haveNormal) {
-						int pick = static_cast<int>(RandInt(0, static_cast<int>(normalRoomFiles.size()) - 1));
-						chosenPath = normalRoomFiles[pick];
+						/*int pick = static_cast<int>(RandInt(0, static_cast<int>(normalRoomFiles.size()) - 1));
+						chosenPath = normalRoomFiles[pick];*/
 
+						auto it = biomeRoomFiles.find(rm->biome);	// Get biome detail
+						if (it != biomeRoomFiles.end() && !it->second.empty()) {
+							int pick = static_cast<int>(RandInt(0, static_cast<int>(it->second.size()) - 1));
+							chosenPath = it->second[pick];
+						}
+						else continue;  // Doubt this will happen but anyways
 					}
 
 
@@ -598,7 +765,7 @@ namespace mapRooms
 		AEGfxSetBlendMode(AEGfxBlendMode::AE_GFX_BM_BLEND);
 		AEGfxSetTransparency(1.0f);
 
-		// Render Room
+		// Render Room Background
 		TexturedSprite bg(
 			squaremesh,
 			currentRoom->roomTexture,
@@ -613,7 +780,45 @@ namespace mapRooms
 		//RenderDoorsSimple(squaremesh);
 
 		//TexturedSprite dr = DataLoader::CreateTexture("Assets/Rooms/Door/door.png");	// Does this require freeing
+		
+		// Render Room Obstacles
+		
+		
+		// Render Room Doors
 		RenderRoomDoors(squaremesh, doorTex);
+
+
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		// Render Room Obstacles
+		if (currentRoom != nullptr) {
+			Grid const& grid = currentRoom->roomGrid;
+			for (int row = 0; row < grid.GetHeight(); ++row) {
+				for (int col = 0; col < grid.GetWidth(); ++col) {
+
+					int tileId = grid.GetCell(col, row);
+					if (tileId < 0) continue;
+					if (tileId == 0) continue;     // empty
+					if (tileId == 100) continue;   // door tile, no obstacle sprite
+
+					TileType const* tile = Grid::QueryTileType(tileId);
+
+					//std::cout << "Tile: " << tile->asset.c_str() << '\n';
+
+					if (!tile) continue;
+					if (tile->asset.empty()) continue;
+
+					Vector2 pos = grid.CellToWorldCenter(row, col);
+
+					TexturedSprite tex = DataLoader::CreateTexture(tile->asset);
+
+					tex.position = pos;
+					tex.scale = Vector2{ grid.GetTileWidth(), grid.GetTileHeight() };
+					tex.UpdateTransform();
+					tex.RenderSprite();
+
+				}
+			}
+		}
 
 
 		// Render Enemy?
@@ -621,6 +826,8 @@ namespace mapRooms
 			i->sprite.RenderSprite();
 
 	}
+
+
 
 	// Render map
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
@@ -804,7 +1011,7 @@ namespace mapRooms
 	}
 
 	// Update Loop
-	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, float dt)
+	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt)
 	{
 		if (!currentRoom) return;
 
@@ -846,6 +1053,7 @@ namespace mapRooms
 				// appear at RIGHT side of the next room, inside boundary
 				playerPos.x = maxX - playerHalfSize.x - warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -857,6 +1065,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Right)) {
 				playerPos.x = minX + playerHalfSize.x + warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -868,6 +1077,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Up)) {
 				playerPos.y = minY + playerHalfSize.y + warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
@@ -879,6 +1089,7 @@ namespace mapRooms
 			if (MoveTo(Direction::Down)) {
 				playerPos.y = maxY - playerHalfSize.y - warpMargin;
 				doorCooldown = 0.20f;
+				particleSystem.DestroyParticles();
 			}
 			return;
 		}
