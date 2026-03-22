@@ -4,6 +4,7 @@
 #include "GameStateManager.h"
 
 #include "Scenes/TestScene.h"
+#include "Screens/MainMenuScene.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -40,6 +41,14 @@ void GSM_Update()
 	case GS_QUIT:
 		break;
 	case GS_MAINMENU:
+		fpLoad = MainMenuLoad;
+		fpUnload = MainMenuUnload;
+		fpInitialize = MainMenuInit;
+		fpFree = MainMenuFree;
+		fpDraw = MainMenuDraw;
+		fpUpdate = MainMenuUpdate;
+		break;
+	case GS_CONTENT_EDIT:
 		break;
 	default:
 		break;

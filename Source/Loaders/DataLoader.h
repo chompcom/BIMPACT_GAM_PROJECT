@@ -1,14 +1,11 @@
 #pragma once
 
-//#include "json/json.h"
-
 #include "../Sprite.h"
-
 #include "../Enemy.h"
-
 #include "../Almanac.h"
-
 #include "json/json.h"
+
+
 
 
 namespace DataLoader {
@@ -25,6 +22,18 @@ namespace DataLoader {
 	AEGfxVertexList* GetMesh();
 
 	TexturedSprite CreateTexture(std::string filename);
+
+
+	// New procedural mesh getters for UI
+	AEGfxVertexList* GetOrCreateSquareMesh();
+	AEGfxVertexList* GetOrCreateCircleMesh();
+
+	// Creates or retrieve cached unit rrect mesh.
+	AEGfxVertexList* GetOrCreateRoundRectMesh(f32 radiusRatio, int segments);
+
+	// Creates a new final-size rounded-rect mesh.
+	// Intended for extreme aspect ratio UI so corners stay correct.
+	AEGfxVertexList* CreateRoundRectMesh(f32 radiusRatio, int segments, f32 width, f32 height);
 
 	//This is so that other files can get the almanac entry vector
 	std::vector<AlmanacEntry> GetAlmanacVector();

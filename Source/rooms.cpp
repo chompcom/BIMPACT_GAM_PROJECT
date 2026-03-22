@@ -269,40 +269,57 @@ namespace mapRooms
 	void Room::PatchDoorCells()
 	{
 		const int DOOR_TILE = 100;
+		const int DOOR_W = 2;
+		const int DOOR_H = 2;
+
+		int width = this->roomGrid.GetWidth();
+		int height = this->roomGrid.GetHeight();
+
+		// Center the door patch on each wall
+		int doorStartCol = (width - DOOR_W) / 2;
+		int doorStartRow = (height - DOOR_H) / 2;
 
 		if (up)
 		{
-			for (int c = 8; c <= 11; ++c)
+			for (int r = 0; r < DOOR_H; ++r)
 			{
-				roomGrid.SetCell(0, c, DOOR_TILE);
-				roomGrid.SetCell(1, c, DOOR_TILE);
+				for (int c = doorStartCol; c < doorStartCol + DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
 			}
 		}
 
 		if (down)
 		{
-			for (int c = 8; c <= 11; ++c)
+			for (int r = height - DOOR_H; r < height; ++r)
 			{
-				roomGrid.SetCell(18, c, DOOR_TILE);
-				roomGrid.SetCell(19, c, DOOR_TILE);
+				for (int c = doorStartCol; c < doorStartCol + DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
 			}
 		}
 
 		if (left)
 		{
-			for (int r = 8; r <= 11; ++r)
+			for (int r = doorStartRow; r < doorStartRow + DOOR_H; ++r)
 			{
-				roomGrid.SetCell(r, 0, DOOR_TILE);
-				roomGrid.SetCell(r, 1, DOOR_TILE);
+				for (int c = 0; c < DOOR_W; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
 			}
 		}
 
 		if (right)
 		{
-			for (int r = 8; r <= 11; ++r)
+			for (int r = doorStartRow; r < doorStartRow + DOOR_H; ++r)
 			{
-				roomGrid.SetCell(r, 18, DOOR_TILE);
-				roomGrid.SetCell(r, 19, DOOR_TILE);
+				for (int c = width - DOOR_W; c < width; ++c)
+				{
+					roomGrid.SetCell(r, c, DOOR_TILE);
+				}
 			}
 		}
 	}
@@ -785,7 +802,7 @@ namespace mapRooms
 
 					TileType const* tile = Grid::QueryTileType(tileId);
 
-					std::cout << "Tile: " << tile->asset.c_str() << '\n';
+					//std::cout << "Tile: " << tile->asset.c_str() << '\n';
 
 					if (!tile) continue;
 					if (tile->asset.empty()) continue;

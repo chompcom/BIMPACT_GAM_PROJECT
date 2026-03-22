@@ -14,28 +14,37 @@
 #include "Projectile.h"
 #include "ProjectileManager.h"
 #include "../HUD.h"
-#include "../almanac.h"
+#include "../Almanac.h"
 #include "ParticleSystem.h"
+#include "../Screens/Ui.h"
+#include "../GameOver.h"
 
-AEGfxVertexList* sqmesh = nullptr;
+AEGfxVertexList* sqmesh			= nullptr;
 
-TexturedSprite* thing = nullptr;
-TexturedSprite* bulletSprite = nullptr;
+TexturedSprite* thing			= nullptr;
+TexturedSprite* bulletSprite	= nullptr;
 
 
-AEGfxTexture* rockpng = nullptr;
-AEGfxTexture* playerpng = nullptr;
-AEGfxTexture* shadowpng = nullptr;
-AEGfxTexture* bulletpng = nullptr;
-AEGfxTexture* aoepng = nullptr;
-AEGfxTexture* heartpng = nullptr;
-AEGfxTexture* almanacpng = nullptr;
-AEGfxTexture* pDoorTex = nullptr;	// Door image
+AEGfxTexture* rockpng		= nullptr;
+AEGfxTexture* playerpng		= nullptr;
+AEGfxTexture* shadowpng		= nullptr;
+AEGfxTexture* bulletpng		= nullptr;
+AEGfxTexture* aoepng		= nullptr;
+AEGfxTexture* heartpng		= nullptr;
+AEGfxTexture* almanacpng	= nullptr;
+AEGfxTexture* almanacLitUppng = nullptr;
+AEGfxTexture* pDoorTex		= nullptr;	// Door image
+AEGfxTexture* arrowpng = nullptr;
 
 //AEGfxTexture* almanacpagepng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
-TexturedSprite * almanacIcon = nullptr;
+TexturedSprite* almanacIcon = nullptr; 
+TexturedSprite* almanacLitUpIcon = nullptr;
+TexturedSprite* arrowSprite = nullptr;
+std::vector<TexturedSprite> gameOverButtons;
+
+Sprite gameOverDarkScreen{};
 
 //TexturedSprite* almanacPage = nullptr;
 Almanac almanac {};
@@ -45,8 +54,6 @@ s8 font = 0;
 
 Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 static ProjectileManager projManager;
-
-
 
 //Gift gift{ "boat", {"happy"}, Sprite()};
 //Gift gift2{"bad", {"sad"}, Sprite()};
@@ -71,19 +78,30 @@ vector<gift*> gift;
 
 ParticleSystem testParticles = NULL;
 
+
+static UIManager pauseUi;
+static bool isPaused = false;
+static bool pauseUiInitialized = false;
+static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
+
 void TestLoad()
 {
 	DataLoader::Load();
-	sqmesh = CreateSquareMesh();
-	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
-	playerpng = AEGfxTextureLoad("Assets/player.png");
-	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
-	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
-	heartpng = AEGfxTextureLoad("Assets/heart.png");
+	sqmesh =	 CreateSquareMesh();
+	rockpng =	 AEGfxTextureLoad("Assets/poprocks.png");
+	playerpng =  AEGfxTextureLoad("Assets/player.png");
+	shadowpng =  AEGfxTextureLoad("Assets/shadow.png");
+	bulletpng =  AEGfxTextureLoad("Assets/fireball.png");
+	heartpng =	 AEGfxTextureLoad("Assets/heart.png");
 	//heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
+	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
+	arrowpng = AEGfxTextureLoad("Assets/arrow.png");
 
-	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
+	gameOverDarkScreen = {sqmesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{ 0,0,0,0.8f }};
+	//gameOverButtonpng = AEGfxTextureLoad("Assets/arrow.png");
+
+	//font = AEGfxCreateFont("Assets/liberation-mono.ttf", 32);
 
 	//pDoorTex = AEGfxTextureLoad("Assets/door.png");
 	//pDoorTex = DataLoader::CreateTexture("Assets/door.png");
@@ -106,17 +124,37 @@ void TestLoad()
 	//healthIcons[2].scale = Vector2{ 64.f,64.f };
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
-	healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	//healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	//healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+	//healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
 
-	healthIcons[0].position = Vector2{ -600.5f,-350.f };
-	healthIcons[1].position = Vector2{ -500.5f,-350.f };
-	healthIcons[2].position = Vector2{ -400.5f,-350.f };
+	//healthIcons[0].position = Vector2{ -600.5f,-350.f };
+	//healthIcons[1].position = Vector2{ -500.5f,-350.f };
+	//healthIcons[2].position = Vector2{ -400.5f,-350.f };
 
-	healthIcons[0].scale = Vector2{ 64.f,64.f };
-	healthIcons[1].scale = Vector2{ 64.f,64.f };
-	healthIcons[2].scale = Vector2{ 64.f,64.f };
+	//healthIcons[0].scale = Vector2{ 64.f,64.f };
+	//healthIcons[1].scale = Vector2{ 64.f,64.f };
+	//healthIcons[2].scale = Vector2{ 64.f,64.f };
+
+	for (int i{ 0 }; i < 3; ++i)
+	{
+		healthIcons.push_back(DataLoader::CreateTexture("Assets/heart.png"));
+		healthIcons[i].position = Vector2{ -600.5f + (i * 100.f),-350.f};
+		healthIcons[i].scale = Vector2{ 64.f,64.f };
+		healthIcons[i].UpdateTransform();
+	}
+
+	for (int i{ 0 }; i < 4; ++i)
+	{
+		if (i < 2) gameOverButtons.push_back(DataLoader::CreateTexture("Assets/GameOverScreen/GameOverButton.png"));
+		else gameOverButtons.push_back(DataLoader::CreateTexture("Assets/GameOverScreen/GameOverButtonLitUp.png"));
+		gameOverButtons[i].position = Vector2{ (i % 2 == 0) ? -300.f : 300.f, -100.f};
+		gameOverButtons[i].scale = Vector2{ 512.f,128.f };
+		gameOverButtons[i].UpdateTransform();
+	}
+
+
+	//gameOverButtons
 
 	//enemyTypes.push_back(rocktype);
 
@@ -129,6 +167,9 @@ void TestLoad()
 	//almanacIcon.position = Vector2{ 600.5f,-350.f };
 
 	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
+	almanacLitUpIcon = new TexturedSprite(sqmesh, almanacLitUppng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0,1.0,1.0,0.0 });
+	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{ 1.0,1.0,1.0,0.0 });
+	//gameOverButtonSprite = new TexturedSprite(sqmesh, gameOverButtonpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{ 1.0,1.0,1.0,0.0 });
 
 	thing = new TexturedSprite(sqmesh, rockpng, Vector2(0, 10), Vector2(100, 100), Color{ 1.0,1.0,1.0,0.0 });
 
@@ -149,15 +190,44 @@ void TestLoad()
 	rock.ChangeState(EnemyStates::ES_NEUTRAL);
 
 	// Global Data Here
-	
+	//I moved these and the init map down to init so it'll reset when the game state is restarted
+
+	//globalTransferData.enemyList.clear();
+	//globalTransferData.giftList.clear();
+	//globalTransferData.projectileList.clear();
+
+	//globalTransferData.player = &player;
+
+	////square seed: 0xA341311Cu
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	// projManager.InitFireball(sqmesh, bulletpng);
+	// projManager.InitAOE(sqmesh, aoepng);
+
+	//// Enable to allow for random values each run
+	//std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
+	//unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
+	//gameMap.InitMap(globalTransferData, curSeed);
+	//std::cout << "Current Seed: " << curSeed << "\n";
+	//// Interesting ones: 32461, 32608, 31931, 18283, 680
+	//// Too easy: 32702, 0xA341311Cu, 
+
+	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+
+}
+
+void TestInit()
+{
+	PlayerInit(player);
+
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
 	globalTransferData.projectileList.clear();
+	//carryData.enemyList.clear();
 
 	globalTransferData.player = &player;
 
 	//square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
 	projManager.InitFireball(sqmesh, bulletpng);
 	projManager.InitAOE(sqmesh, aoepng);
 
@@ -166,7 +236,7 @@ void TestLoad()
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
 	std::cout << "Current Seed: " << curSeed << "\n";
-	// Interesting ones: 32461, 32608, 31931, 18283, 31060
+	// Interesting ones: 32461, 32608, 31931, 18283, 31060, 680
 	// Too easy: 32702, 0xA341311Cu, 
 
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
@@ -174,7 +244,12 @@ void TestLoad()
 	
 	testParticles = ParticleSystem(sqmesh);
 
-
+	// For pause screen;
+	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f,0.0f), Vector2(580.0f, 250.0f));
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	if (tipText) tipText->text = pauseTipText;
+	pauseUiInitialized = true;
+	pauseUi.SetFont(font);
 }
 
 void TestInit()
@@ -246,7 +321,7 @@ void TestDraw()
 	
 
 	player.shadow.RenderSprite();
-	player.sprite.RenderSprite();
+	player.sprite.RenderSprite(true);
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
@@ -260,10 +335,15 @@ void TestDraw()
 
 	
 	renderPlayerLives(player, healthIcons, font);
-	(*almanacIcon).RenderSprite();
+	//(*almanacIcon).RenderSprite();
+	
+	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite);
+
 	RenderAlmanacPages(almanac, font);
 
-	AlmanacInputs(almanac/*, sqmesh*/);
+	RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
+
+	
 
 #if 0
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -288,10 +368,58 @@ void TestDraw()
 
 	
 
+
+	// Pause screen
+	if (isPaused) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		//AEGfxSetTransparency(0.1f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		pauseUi.Draw();
+	}
+
 }
 
 void TestFree()
 {
+	//RoomData& roomData = gameMap.GetCurrentRoom()->currentRoomData;
+	//RoomData& carryData = gameMap.GetTransferData();
+	//
+	//roomData.enemyList.clear();
+	//roomData.giftList.clear();
+	//roomData.projectileList.clear();
+	//carryData.enemyList.clear();
+	//carryData.giftList.clear();
+
+	//globalTransferData.player = &player;
+	// Dellocate enemy and gift assets
+	for (Enemy* e : globalTransferData.enemyList) {
+		delete e;
+	}
+
+	for (Gift* g : globalTransferData.giftList) {
+		delete g;
+	}
+
+	for (Projectile* p : globalTransferData.projectileList) delete p;
+
+	globalTransferData.player = nullptr;
+	gameMap.DeleteMap();
+
+	if (gameMap.GetCurrentRoom())
+		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+
 }
 
 void TestUnload()
@@ -302,6 +430,8 @@ void TestUnload()
 		thing = nullptr;
 	}
 	delete almanacIcon;
+	delete arrowSprite;
+	delete almanacLitUpIcon;
 
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
@@ -311,30 +441,52 @@ void TestUnload()
 	AEGfxTextureUnload(heartpng);
 	//AEGfxTextureUnload(heartpng);
 	AEGfxTextureUnload(almanacpng);
+	AEGfxTextureUnload(almanacLitUppng);
+	AEGfxTextureUnload(arrowpng);
 
 	AEGfxDestroyFont(font);
 	
-	// Dellocate enemy and gift assets
-	for (Enemy *e: globalTransferData.enemyList) {
-		delete e;
-	}
+	//moved to free to prevent mem leaks
+	//// Dellocate enemy and gift assets
+	//for (Enemy *e: globalTransferData.enemyList) {
+	//	delete e;
+	//}
 
-	for (Gift* g : globalTransferData.giftList) {
-		delete g;
-	}
+	//for (Gift* g : globalTransferData.giftList) {
+	//	delete g;
+	//}
 
-	for (Projectile* p : globalTransferData.projectileList) delete p;
-	
-	globalTransferData.player = nullptr;
-	gameMap.DeleteMap();
+	//for (Projectile* p : globalTransferData.projectileList) delete p;
+	//
+	//globalTransferData.player = nullptr;
+	//gameMap.DeleteMap();
 	DataLoader::Unload();
-	if (gameMap.GetCurrentRoom())
-		projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
+	//if (gameMap.GetCurrentRoom())
+	//	projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 
+
+	pauseUi.Clear();
+	pauseUiInitialized = false;
+	isPaused = false;
 }
 
 void TestUpdate(float dt)
 {
+
+	// Pause toggle
+	if (AEInputCheckTriggered(AEVK_TAB))
+	{
+		isPaused = !isPaused;
+	}
+
+	// When paused:
+	// - update only the pause UI
+	// - skip all gameplay logic below
+	if (isPaused)
+	{
+		pauseUi.Update();
+		return;
+	}
 
 	// Get previous pos
 	Vector2 prevPos{ player.position.x, player.position.y };
@@ -343,11 +495,11 @@ void TestUpdate(float dt)
 	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 	// Print Current Grid
-	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	//for (int i = 0; i < 20; ++i) {
-	//	for (int j = 0; j < 20; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-	//	std::cout << '\n';
-	//}
+	std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	for (int i = 0; i < 9; ++i) {
+		for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+		std::cout << '\n';
+	}
 
 	// Game map update
 	gameMap.GetCurrentRoom()->Update(dt);
@@ -374,14 +526,28 @@ void TestUpdate(float dt)
 	player.sprite.UpdateTransform();
 	player.shadow.UpdateTransform();
 	
+	HandleGameOverInputs(gameOverButtons);
 
 	//to test damage
-	if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
-	if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
+	if (player.health > 0)
+	{
+		if (AEInputCheckTriggered(AEVK_P)) playerTakesDamage(player);
+		if (AEInputCheckTriggered(AEVK_O)) playerHealsDamage(player);
 
-	checkIfAlmanacClicked(*almanacIcon, almanac);
+		if (AEInputCheckTriggered(AEVK_M)) PlayerInit(player);
 
-	
+		checkIfAlmanacClicked(*almanacIcon, almanac);
+
+		AlmanacInputs(almanac);
+
+		//for now, 
+		// Player update
+		UpdatePlayer(player, dt);
+		player.sprite.UpdateTransform();
+		player.shadow.UpdateTransform();
+	}
+
+	MoveArrow(*arrowSprite, almanac, dt);
 
 	//std::cout << player.position.x << player.position.y;
 

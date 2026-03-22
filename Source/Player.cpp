@@ -21,11 +21,12 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	heldGift{ nullptr },
 	throwForce{ 0.f },
 	pickUpCooldown{ 0.f },
-	invulnerableTimer{ 0.f }
+	invulnerableTimer{ 0.f },
+	fadingIn{ false }
 {
 }
 
-static bool fadingIn = false; //for the blinking effect when the player is immune
+//static bool fadingIn = false; //for the blinking effect when the player is immune
 
 void UpdatePlayer(Player & player, f32 deltaTime)
 {
@@ -35,22 +36,24 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//Let player blink if invulnerable
 	if (player.invulnerableTimer > 0.f)
 	{
-		if (!fadingIn)
+		if (!player.fadingIn)
 		{
 			player.sprite.color.a -= (0.5f * deltaTime) * 10;
-			if (player.sprite.color.a <= 0.2f) fadingIn = true;
+			if (player.sprite.color.a <= 0.2f) player.fadingIn = true;
+			//std::cout << player.sprite.color.a << "\n";
 		}
 		else
 		{
 			player.sprite.color.a += (0.5f * deltaTime) * 10;
-			if (player.sprite.color.a >= 1.f) fadingIn = false;
+			if (player.sprite.color.a >= 1.f) player.fadingIn = false;
+			//std::cout << player.sprite.color.a << "\n";
 		}
 
 		player.invulnerableTimer -= deltaTime;
 	}
 	else if (player.sprite.color.a < 1.f)
 	{
-		fadingIn = false;
+		player.fadingIn = false;
 		player.sprite.color.a = 1.f;
 	}
 
@@ -144,12 +147,31 @@ void playerTakesDamage(Player& player)
 
 void playerHealsDamage(Player& player)
 {
-
 	player.health++;
-
 }
 
+void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
+{
+	//put down gift
+	if (player.heldGift)
+	{
+		//mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+		//RoomData* roomData = &(currentRoom->currentRoomData);
+		//roomData->giftList.push_back(player.heldGift);
 
+		player.heldGift->shakeState = false;
+		player.heldGift->pickUpState = false;
+		player.heldGift = nullptr;
+	}
 
+	player.health = 3;
+	player.pickUpState = false;
+	player.throwState = false;
+	player.position = Vector2{ 0.f,0.f };
+	player.direction = Vector2{ 0.f, 0.f };
+	player.throwForce = 0.f;
+	player.pickUpCooldown = 0.f;
+	player.invulnerableTimer = 0.f;
+}
 
 

@@ -10,7 +10,6 @@
       <Extensions>h;hh;hpp;hxx;inl;inc</Extensions>
     </Filter>
   </ItemGroup>
-
   <ItemGroup>
     <ClCompile Include="..\Source\Behaviour\Behaviours.cpp">
       <Filter>Source Files</Filter>
@@ -60,6 +59,9 @@
     <ClCompile Include="..\Source\ProjectileManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Boss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\Source\RoomData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,8 +86,13 @@
     <ClCompile Include="..\Source\Levels.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\Screens\Ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\MainMenuScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
-
   <ItemGroup>
     <ClInclude Include="..\Source\Almanac.h">
       <Filter>Header Files</Filter>
@@ -162,5 +169,14 @@
     <ClInclude Include="..\Source\Levels.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\Screens\Ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Screens\MainMenuScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
