@@ -30,6 +30,21 @@
       "blocked": false,
       "asset": ""
     },
+    "102":{
+      "name":"Booger",
+      "blocked": false,
+      "asset": ""
+    },
+    "103":{
+      "name":"Pop Rocks",
+      "blocked": false,
+      "asset": ""
+    },
+    "104":{
+      "name":"THE OVEN",
+      "blocked": false,
+      "asset": ""
+    },
     "200": {
       "name": "GiftMarker",
       "blocked": false,

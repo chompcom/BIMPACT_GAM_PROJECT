@@ -96,12 +96,16 @@ void Enemy::Update(float dt) {
 }
 
 void Enemy::AssessTraits(Labels labels){
+		for (std::string thing : type.dislikes) {
+			std::cout << "I hate " << thing << " ";
+		}
 	if (HasCommonTrait(labels,type.likes)){
 		ChangeState(ES_HAPPY);
 
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
 		/* code */
+		std::cout << type.name << " is Angry!\n";
 		ChangeState(ES_ANGRY);
 	}
 	

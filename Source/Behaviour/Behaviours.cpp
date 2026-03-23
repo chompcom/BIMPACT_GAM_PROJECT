@@ -187,7 +187,10 @@ void FireProjectile(Enemy& me, float dt) {
 			proj = me.type.neutralProjectile;
 			break;
 		}
-		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, me.velocity.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f});
+
+		Vector2 direction = me.sprite.position - (*me.target.position);
+
+		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me);
 		me.attackTimer = 3;
 	}
 }
@@ -244,6 +247,9 @@ Command GetCommand(std::string name) {
 }
 
 FlagCheck GetFlag(std::string name) {
+	if (flags.find(name) == flags.end()) {
+		return flags["default"];
+	}
     return flags[name];
 }
 

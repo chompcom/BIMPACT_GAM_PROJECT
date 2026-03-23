@@ -281,6 +281,23 @@ namespace mapRooms
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
+
+			Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			gift->shadow.position = Vector2{ 0.f, -40.f };
+			sauce->shadow.position = Vector2{ 0.f, -40.f };
+			spray->shadow.position = Vector2{ 0.f, -40.f };
+
+			gift->position = Vector2{ -300, 0 };
+			sauce->position = Vector2{ 300,0 };
+			spray->position = Vector2{ 0,-200 };
+
+			currentRoomData.giftList.push_back(gift);
+			currentRoomData.giftList.push_back(sauce);
+			currentRoomData.giftList.push_back(spray);
+
+
 		}
 
 
@@ -304,6 +321,23 @@ namespace mapRooms
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
+			std::cout << "Display Room Init of " << biome << "\n";
+			//roomGrid.
+			for (int j = 0; j < roomGrid.GetHeight(); j++) {
+				for (int i = 0; i < roomGrid.GetWidth(); i++) {
+					const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
+					std::cout << (tile ? tile->id : 0) << " ";
+					if (!tile) continue;
+					if (tile->id > 101) {
+						//std::cout << "Spawned " << tile->name << "! \n";
+						const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
+						currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
+						currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
+
+					}
+				}
+				std::cout << "\n";
+			}
 
 			// Spawn gifts and enemies
 			SpawnObjectsFromMarkerTiles();
@@ -326,6 +360,13 @@ namespace mapRooms
 				currentRoomData.giftList.push_back(gift);
 			}
 		}
+			// Gifts here (1 Gift per room for now)
+			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
+			//Vector2 giftPos{ 200.0f, 450.0f };
+			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
+			
+		
 
 		// Boss Init
 		if (rmType == RoomType::Boss) {
@@ -1127,7 +1168,7 @@ namespace mapRooms
 		currentRoom = target; // Room changed
 		StopAllAudio();
 		RoomEnterAudio();
-		//currentRoom->visited = true;
+		
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 

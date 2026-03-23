@@ -530,7 +530,7 @@ void TestUpdate(float dt)
 		mapRooms::Room *currentRoom = gameMap.GetCurrentRoom();
 		RoomData &roomData = currentRoom->currentRoomData;
 		RoomData &carryData = gameMap.GetTransferData();
-		UpdateProjectiles(roomData, dt);
+		
 
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -598,6 +598,9 @@ void TestUpdate(float dt)
 				g->shadow.UpdateTransform();
 			}
 		}
+
+		CheckProjectileCollision(roomData, *roomData.player);
+		UpdateProjectiles(roomData, dt);
 
 		if (roomData.boss)
 		{
