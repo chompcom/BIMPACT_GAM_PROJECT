@@ -21,7 +21,7 @@
 			"angry": []
 		},
 		{	"name": "Booger",
-			"sprite": "Assets/booger.png",
+			"sprite": "Assets/Enemies/booger.png",
 			"color": [
 				255,
 				255,
@@ -32,13 +32,6 @@
 			"speed": 60,
 			"detectionRadius": 2,
 			"safeRadius": 300,
-			"happyProjectile": {
-				"damage":100,
-				"radius": 300,
-				"lifetime" : 2,
-				"speed": 0,
-				"sprite": "Assets/veggiefish.png"
-			},
 			"likes": [
 				"Gross"
 			],
@@ -106,7 +99,7 @@
 			]
 		},
 		{	"name": "Pop Rocks",
-			"sprite": "Assets/poprocks.png",
+			"sprite": "Assets/Enemies/poprocks.png",
 			"color": [
 				255,
 				255,
@@ -151,7 +144,7 @@
 		},
 		{
 			"name": "THE OVEN",
-			"sprite": "Assets/poprocks.png",
+			"sprite": "Assets/Enemies/oven.png",
 			"color": [
 				255,
 				255,
@@ -172,7 +165,7 @@
 			},
 			"traits": ["Hot"],
 			"likes": ["Hot"],
-			"dislikes": ["Wet"],
+			"dislikes": ["Wet", "Gross"],
 			"happy": [
 				{}
 			],

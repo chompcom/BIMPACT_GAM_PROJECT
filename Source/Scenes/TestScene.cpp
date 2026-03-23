@@ -49,7 +49,8 @@ Almanac almanac{};
 // std::vector<TexturedSprite> almanacPageSprites;
 
 s8 font = 0;
-
+//Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
+//static ProjectileManager projManager;
 Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 25000.f, 600.f, Vector2(0, 0)};
 
 EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
@@ -194,6 +195,10 @@ void TestDraw()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	
+	
+	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 
@@ -365,9 +370,9 @@ void TestDraw()
 
 		sprintf_s(buffer, 50, "DEBUG MODE ON");
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
-		AEGfxPrint(font, buffer, 0.6, 0.9, 1, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.9), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
 		sprintf_s(buffer, 50, "GAME STATE: ");
-		AEGfxPrint(font, buffer, 0.6, 0.8, 1, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.8), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
 		switch (gameState)
 		{
 		case RUNNING:
@@ -383,7 +388,7 @@ void TestDraw()
 			sprintf_s(buffer, 50, "YOU LOSE");
 			break;
 		}
-		AEGfxPrint(font, buffer, 0.6, 0.7, 1, 1.f, 1.f, 1.f, 1.f);
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
 }
@@ -513,16 +518,20 @@ void TestUpdate(float dt)
 			player.shadow.UpdateTransform();
 		}
 
-		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+	//winUI.Update();
 
-		// Print Current Grid
-		std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-		for (int i = 0; i < 9; ++i)
-		{
-			for (int j = 0; j < 12; ++j)
-				std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-			std::cout << '\n';
-		}
+	// Get previous pos
+	//Vector2 prevPos{ player.position.x, player.position.y };
+	
+	//UpdatePlayer(player, dt); // Player update
+	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+
+	// Print Current Grid
+	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+	//for (int i = 0; i < 9; ++i) {
+	//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+	//	std::cout << '\n';
+	//}
 
 		// Game map update
 		gameMap.GetCurrentRoom()->Update(dt);
@@ -530,7 +539,7 @@ void TestUpdate(float dt)
 		mapRooms::Room *currentRoom = gameMap.GetCurrentRoom();
 		RoomData &roomData = currentRoom->currentRoomData;
 		RoomData &carryData = gameMap.GetTransferData();
-		UpdateProjectiles(roomData, dt);
+		
 
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -600,6 +609,9 @@ void TestUpdate(float dt)
 				g->shadow.UpdateTransform();
 			}
 		}
+
+		CheckProjectileCollision(roomData, *roomData.player);
+		UpdateProjectiles(roomData, dt);
 
 		if (roomData.boss)
 		{

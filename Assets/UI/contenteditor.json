@@ -1,0 +1,266 @@
+{
+  "elements": [
+    {
+      "id": "root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+      "children": [
+        {
+          "id": "top_header_background",
+          "x": 0.0,
+          "y": 0.43,
+          "w": 1.0,
+          "h": 0.14,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "backgroundColor": [0.92, 0.92, 0.92, 1.0]
+        },
+
+        {
+          "id": "btn_biomes",
+          "x": -0.33,
+          "y": 0.44,
+          "w": 0.14,
+          "h": 0.06,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": false,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "text": "Biomes",
+          "textScale": 0.70,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "btn_obstacles",
+          "x": -0.10,
+          "y": 0.44,
+          "w": 0.18,
+          "h": 0.06,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": false,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "text": "Obstacles",
+          "textScale": 0.70,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "btn_random",
+          "x": 0.42,
+          "y": 0.44,
+          "w": 0.15,
+          "h": 0.06,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.18,
+          "roundSegments": 8,
+          "text": "RANDOM",
+          "textScale": 0.55,
+          "backgroundColor": [0.03, 0.16, 0.52, 1.0],
+          "textColor": [1.0, 1.0, 1.0, 1.0]
+        },
+
+        {
+          "id": "left_panel_background",
+          "x": -0.355,
+          "y": -0.069,
+          "w": 0.29,
+          "h": 0.86,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "backgroundColor": [0.02, 0.22, 0.31, 1.0],
+          "children": [
+            {
+              "id": "label_mode",
+              "x": -0.25,
+              "y": 0.28,
+              "w": 0.42,
+              "h": 0.06,
+              "visible": true,
+              "text": "Select Biomes:",
+              "textScale": 0.62,
+              "textColor": [1.0, 1.0, 1.0, 1.0]
+            },
+
+            {
+              "id": "biome_group",
+              "x": 0.0,
+              "y": 0.0,
+              "w": 1.0,
+              "h": 1.0,
+              "visible": true,
+              "children": [
+                {
+                  "id": "label_selected_biome",
+                  "x": 0.18,
+                  "y": 0.28,
+                  "w": 0.35,
+                  "h": 0.07,
+                  "visible": true,
+                  "drawBackground": true,
+                  "borderRadiusRatio": 0.0,
+                  "roundSegments": 8,
+                  "text": "Normal",
+                  "textScale": 0.62,
+                  "backgroundColor": [0.92, 0.92, 0.92, 1.0],
+                  "textColor": [0.0, 0.0, 0.0, 1.0]
+                },
+
+                {
+                  "id": "biome_preview_frame",
+                  "x": 0.0,
+                  "y": 0.03,
+                  "w": 0.82,
+                  "h": 0.28,
+                  "visible": true,
+                  "drawBackground": true,
+                  "borderRadiusRatio": 0.0,
+                  "roundSegments": 8,
+                  "backgroundColor": [0.95, 0.95, 0.95, 1.0]
+                },
+
+                {
+                  "id": "biome_preview_image",
+                  "x": 0.0,
+                  "y": 0.03,
+                  "w": 0.80,
+                  "h": 0.26,
+                  "visible": true,
+                  "texture": "Assets/Rooms/Normal/NORMAL/Room1.png"
+                },
+
+                {
+                  "id": "btn_confirm",
+                  "x": 0.0,
+                  "y": -0.21,
+                  "w": 0.82,
+                  "h": 0.07,
+                  "visible": true,
+                  "clickable": true,
+                  "drawBackground": true,
+                  "borderRadiusRatio": 0.12,
+                  "roundSegments": 8,
+                  "text": "CONFIRM",
+                  "textScale": 0.55,
+                  "backgroundColor": [0.96, 0.45, 0.15, 1.0],
+                  "textColor": [1.0, 1.0, 1.0, 1.0]
+                }
+              ]
+            },
+
+            {
+              "id": "obstacle_group",
+              "x": 0.0,
+              "y": 0.0,
+              "w": 1.0,
+              "h": 1.0,
+              "visible": false,
+              "children": []
+            },
+
+            {
+              "id": "btn_prev",
+              "x": -0.38,
+              "y": -0.33,
+              "w": 0.10,
+              "h": 0.08,
+              "visible": true,
+              "clickable": true,
+              "drawBackground": false,
+              "borderRadiusRatio": 0.0,
+              "roundSegments": 8,
+              "text": "<",
+              "textScale": 0.90,
+              "textColor": [0.96, 0.45, 0.15, 1.0]
+            },
+
+            {
+              "id": "label_page",
+              "x": 0.0,
+              "y": -0.33,
+              "w": 0.36,
+              "h": 0.06,
+              "visible": true,
+              "drawBackground": true,
+              "borderRadiusRatio": 0.0,
+              "roundSegments": 8,
+              "text": "1 / 1",
+              "textScale": 0.45,
+              "backgroundColor": [0.80, 0.90, 0.95, 1.0],
+              "textColor": [0.0, 0.0, 0.0, 1.0]
+            },
+
+            {
+              "id": "btn_next",
+              "x": 0.38,
+              "y": -0.33,
+              "w": 0.10,
+              "h": 0.08,
+              "visible": true,
+              "clickable": true,
+              "drawBackground": false,
+              "borderRadiusRatio": 0.0,
+              "roundSegments": 8,
+              "text": ">",
+              "textScale": 0.90,
+              "textColor": [0.96, 0.45, 0.15, 1.0]
+            },
+
+            {
+              "id": "btn_export",
+              "x": -0.25,
+              "y": -0.46,
+              "w": 0.35,
+              "h": 0.09,
+              "visible": true,
+              "clickable": true,
+              "drawBackground": true,
+              "borderRadiusRatio": 0.1,
+              "roundSegments": 64,
+              "text": "Export",
+              "textScale": 0.50,
+              "backgroundColor": [0.92, 0.92, 0.92, 1.0],
+              "textColor": [0.0, 0.0, 0.0, 1.0]
+            },
+
+            {
+              "id": "label_status",
+              "x": 0.12,
+              "y": -0.46,
+              "w": 0.55,
+              "h": 0.05,
+              "visible": true,
+              "text": "Ready",
+              "textScale": 0.40,
+              "textColor": [1.0, 1.0, 1.0, 1.0]
+            }
+          ]
+        },
+
+        {
+          "id": "room_preview_panel",
+          "x": 0.145,
+          "y": -0.070,
+          "w": 0.710,
+          "h": 0.860,
+          "visible": true,
+          "drawBackground": false,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8
+        }
+      ]
+    }
+  ]
+}

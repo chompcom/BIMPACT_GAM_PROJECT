@@ -169,6 +169,7 @@ namespace DataLoader {
 				AddBehaviours(tmp, name, "angry");
 				AddBehaviours(tmp, name, "neutral");
 
+				tmp.spritePath = name["sprite"].asString();
 				tmp.health = name["health"].asFloat();
 				tmp.damage = name["damage"].asFloat();
 				tmp.speed = name["speed"].asFloat();
@@ -189,6 +190,11 @@ namespace DataLoader {
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
 				}
+
+				for (Json::Value& thing : name["dislikes"]) {
+					tmp.dislikes.insert(thing.asString());
+				}
+
 	
 
 				enemyTypes.insert({
@@ -280,6 +286,8 @@ namespace DataLoader {
 
 		const u32 white = 0xFFFFFFFF;
 		const f32 pi = AEDegToRad(180);	// PI RAD = 180 DEG hahah
+
+		UNREFERENCED_PARAMETER(pi);
 
 		if (segmentsPerCorner < 1) segmentsPerCorner = 0;	// Segments cannot be less than 1 obviously?
 

@@ -419,7 +419,7 @@ void UIManager::DrawElement(UIElement const& element) const
 		img.scale = element.resolvedSize;
 		img.color = Color{ 1.f, 1.f, 1.f, 1.f };
 		img.UpdateTransform();
-		img.RenderSprite();
+		img.RenderSprite(true);
 		
 	}
 
@@ -459,7 +459,7 @@ void UIManager::DrawRect(UIElement const& element) const
 		element.resolvedSize,
 		element.backgroundColor
 	);
-	sprite.RenderSprite();
+	sprite.RenderSprite(true);
 }
 
 // Drawing circle meshes
@@ -476,7 +476,7 @@ void UIManager::DrawCircle(UIElement const& element) const
 		element.resolvedSize,
 		element.backgroundColor
 	);
-	sprite.RenderSprite();
+	sprite.RenderSprite(true);
 }
 
 // Drawing round rectangle functions
@@ -505,7 +505,7 @@ void UIManager::DrawRoundedRect(UIElement const& element) const
 			element.resolvedSize,
 			element.backgroundColor
 		);
-		sprite.RenderSprite();
+		sprite.RenderSprite(true);
 	}
 	// Aspect ratio is extreme... To prevent distortion in rendering create a new roundrect mesh with the new width and height... Honestly a pain
 	else
@@ -527,7 +527,7 @@ void UIManager::DrawRoundedRect(UIElement const& element) const
 			Vector2(1.0f, 1.0f),
 			element.backgroundColor
 		);
-		sprite.RenderSprite();
+		sprite.RenderSprite(true);
 
 		AEGfxMeshFree(mesh);
 	}
