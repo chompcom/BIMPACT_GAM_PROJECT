@@ -90,7 +90,7 @@ void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 void MainMenuDraw()
 {
 	// Soft background
-	AEGfxSetBackgroundColor(0.12f, 0.12f, 0.12f);
+	//AEGfxSetBackgroundColor(0.12f, 0.12f, 0.12f);
 
 	ui.Draw();
 }
