@@ -166,12 +166,16 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 		}
 
 		//Print health and damage
+		//changed to speed and damage?
 		char buffer[50];
-		sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.health);
+		/*sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.health);
+		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
+		AEGfxPrint(font, buffer, -textWidth / 2 - 0.27f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);*/
+		sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.damage);
 		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, buffer, -textWidth / 2 - 0.555f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);
 
-		sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.damage);
+		sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.speed);
 		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, buffer, -textWidth / 2 - 0.27f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);
 
@@ -428,4 +432,18 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 	}
 }
 
+void AlmanacInit(Almanac& almanac)
+{
+	almanac.isOpen = false;
+	almanac.hasBeenOpened = false;
+	almanac.currentPageNumber = 16;
+}
+
+void AlmanacFree(Almanac& almanac)
+{
+	almanac.pageSprites.clear();
+	almanac.entries.clear();
+	almanac.arrowSprites.clear();
+	almanac.closeSprites.clear();
+}
 

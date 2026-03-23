@@ -414,12 +414,16 @@ void UIManager::DrawElement(UIElement const& element) const
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 		TexturedSprite img = DataLoader::CreateTexture(element.texturePath);
+
+		//std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + element.texturePath + "'))\"";
+		//system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
+
 		//img.mesh = DataLoader::GetOrCreateSquareMesh();
 		img.position = element.resolvedPos;
 		img.scale = element.resolvedSize;
 		img.color = Color{ 1.f, 1.f, 1.f, 1.f };
 		img.UpdateTransform();
-		img.RenderSprite(true);
+		img.RenderSprite();  // ALPHA MAKES NO SENSE
 		
 	}
 

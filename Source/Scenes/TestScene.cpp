@@ -92,6 +92,8 @@ void TestLoad()
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.clear();
+	AlmanacFree(almanac);
+	
 	healthIcons.resize(3, DataLoader::CreateTexture("Assets/heart.png"));
 	for (int i{0}; i < 3; ++i)
 	{
@@ -125,6 +127,7 @@ void TestLoad()
 void TestInit()
 {
 	PlayerInit(player);
+	AlmanacInit(almanac);
 
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
@@ -476,6 +479,12 @@ void TestUnload()
 
 void TestUpdate(float dt)
 {
+	//if (player.health <= 0)
+	//{
+	//	//HandleGameOverInputs(gameOverButtons);
+	//	return;
+	//}
+
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
@@ -556,7 +565,9 @@ void TestUpdate(float dt)
 		if (AEInputCheckTriggered(AEVK_O))
 			playerHealsDamage(player);
 
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+	checkIfAlmanacClicked(*almanacIcon, almanac);
+
+	MoveArrow(*arrowSprite, almanac, dt);
 
 		// std::cout << player.position.x << player.position.y;
 

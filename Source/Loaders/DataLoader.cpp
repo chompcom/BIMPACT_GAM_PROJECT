@@ -202,7 +202,10 @@ namespace DataLoader {
 					tmp
 					});
 
-				// std::cout << "name: " << name["name"] << std::endl;
+
+
+				//std::cout << "name: " << name["name"] << std::endl;
+
 			}
 			
 			for (EnemyPair const& type : enemyTypes) {
@@ -215,7 +218,7 @@ namespace DataLoader {
 
 		if (almanacFile.is_open()) {
 			//Getting almanac entries
-
+			almanacEntries.clear();
 			almanacFile >> theGuy;
 			almanacEntries.reserve(theGuy["almanacEntries"].size());
 
@@ -223,13 +226,14 @@ namespace DataLoader {
 			{
 				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
 					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
-					//std::cout << tmp.enemyType.name;
+				//std::cout << tmp.enemyType.name;
+				//std::cout << name["name"].asString();
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 				
 
 				almanacEntries.push_back(tmp);
-				 std::cout << "name: " << name["name"] << std::endl;
+				std::cout << "name: " << name["name"] << std::endl;
 			}
 
 		}

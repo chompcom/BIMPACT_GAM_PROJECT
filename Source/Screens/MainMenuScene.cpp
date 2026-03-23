@@ -46,12 +46,12 @@ void MainMenuLoad()
 	// Optional hover effects
 	ui.BindOnHover("btn_start", [](UIElement& self)
 		{
-			self.backgroundColor = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+			self.backgroundColor = Color{ 0.6f, 0.6f, 0.6f, 1.0f };
 		});
 
 	ui.BindOnHoverExit("btn_start", [](UIElement& self)
 		{
-			self.backgroundColor = Color{ 0.85f, 0.85f, 0.85f, 1.0f };
+			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
 		});
 
 	ui.BindOnHover("btn_editor", [](UIElement& self)
@@ -66,12 +66,12 @@ void MainMenuLoad()
 
 	ui.BindOnHover("btn_quit", [](UIElement& self)
 		{
-			self.backgroundColor = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+			self.backgroundColor = Color{ 0.6f, 0.6f, 0.6f, 0.9f };
 		});
 
 	ui.BindOnHoverExit("btn_quit", [](UIElement& self)
 		{
-			self.backgroundColor = Color{ 0.85f, 0.85f, 0.85f, 1.0f };
+			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
 		});
 }
 
@@ -90,7 +90,7 @@ void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 void MainMenuDraw()
 {
 	// Soft background
-	AEGfxSetBackgroundColor(0.12f, 0.12f, 0.12f);
+	//AEGfxSetBackgroundColor(0.12f, 0.12f, 0.12f);
 
 	ui.Draw();
 }
