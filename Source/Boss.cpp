@@ -28,6 +28,7 @@ Boss::~Boss() {}
 
 void Boss::Update(Player& player, f32 dt) {
 	if (currentHealth > 0) {
+		//collideWall = false;
 		bossStateMachine->Update(player, dt);
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;

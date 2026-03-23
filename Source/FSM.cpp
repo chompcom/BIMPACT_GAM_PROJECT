@@ -53,9 +53,12 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 			
 			boss->sprite.position += chargeDirection.Normalized() * 90 * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
+
 			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
-				CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+				//CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+				boss->collideWall ) {
 				boss->velocity = {};
+				//boss->collideWall = false;
 				currentState = BOSS_IDLE;
 			}
 
@@ -104,9 +107,11 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 
 		interval += dt;
 		//boss->sprite.UpdateTransform();
-		if (interval >= chargeInterval || CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+		if (interval >= chargeInterval || //CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+			boss->collideWall) {
 			interval = 0.0f;
 			boss->velocity = Vector2{};
+			//boss->collideWall = false;
 			attackPhase = ATTACK_COOLDOWN;
 		}
 

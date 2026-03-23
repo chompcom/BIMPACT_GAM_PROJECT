@@ -515,7 +515,7 @@ void TestUpdate(float dt)
 	//Vector2 prevPos{ player.position.x, player.position.y };
 	
 	//UpdatePlayer(player, dt); // Player update
-	Vector2 playerHalfSize = player.sprite.scale * 0.5f;
+		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 	// Print Current Grid
 	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
@@ -604,7 +604,28 @@ void TestUpdate(float dt)
 
 		if (roomData.boss)
 		{
+			Vector2 bossPrevPos = roomData.boss->sprite.position;
+
 			roomData.boss->Update(player, dt);
+
+			roomData.boss->collideWall = false;
+
+			// Test Player Collision with Map
+			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
+			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
+				currentRoom->lastValidCell = bossCurCell;
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x, roomData.boss->sprite.scale.y, bossCurCell);
+			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
+				roomData.boss->shadow.position.x = bossPrevPos.x;
+				roomData.boss->collideWall = true;
+			}
+			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
+				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->collideWall = true;
+			}
+
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 		}
