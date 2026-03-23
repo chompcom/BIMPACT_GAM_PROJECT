@@ -430,7 +430,7 @@ bool Grid::TestCollision(float x, float y, int prevCell) const {
 		const int doorFlag = 0x64;
 		const int outOfBounds = 0xffffffff;
 
-		if (this->WorldToCell(x, y + tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y - tileSizeY))==doorFlag) {	// TOP DOOR?
+		if (this->WorldToCell(x, y + tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y - tileSizeY))==doorFlag) {			// TOP DOOR?
 			return false;
 		}
 		else if (this->WorldToCell(x, y - tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y + tileSizeY)) == doorFlag) {	// BOTTOM DOOR?
@@ -562,6 +562,8 @@ bool TileDataBase::Load(std::string const& fileName)
 		newTile.name = tile.get("name", "").asString();
 		newTile.blocked = tile.get("blocked", false).asBool();
 		newTile.asset = tile.get("asset", "").asString();
+		newTile.spawnCategory = tile.get("spawnCategory", "").asString();
+		newTile.spawnName = tile.get("spawnName", "").asString();
 
 		tileTypes[newTile.id] = newTile;
 	}

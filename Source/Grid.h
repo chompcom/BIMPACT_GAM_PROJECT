@@ -49,6 +49,9 @@ struct TileType
 	// maybe cloaking (for hiding)?
 	// maybe animations?
 	std::string asset;
+
+	std::string spawnCategory{};
+	std::string spawnName{};
 };
 
 struct BiomeInfo

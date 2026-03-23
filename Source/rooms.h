@@ -72,8 +72,6 @@ namespace mapRooms {
 	private:
 		//handle collisions
 		void PatchDoorCells();
-
-		void SpawnObjectsFromMarkerTiles();
 				
 		// Enemy 
 		// Enemy object, type, for sprite render

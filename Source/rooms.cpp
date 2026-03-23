@@ -133,97 +133,6 @@ namespace Config {
 		if (fileName.empty()) return "Default";
 		return fileName;
 	}
-
-
-	const int giftMarkerTileId = 200;
-	const int enemyMarkerTileId = 500;
-
-	Vector2 GetMarkerCellWorldPosition(Grid const& roomGrid, int row, int column)
-	{
-		return roomGrid.CellToWorldCenter(row, column);
-	}
-
-	std::string ChooseRandomEnemyNameForBiome(std::string const& biome)
-	{
-		// For now all biomes can still use Booger.
-		// Later this can become separate pools per biome.
-		static std::vector<std::string> normalEnemyNames{ "Booger" };
-		static std::vector<std::string> greenEnemyNames{ "Booger" };
-		static std::vector<std::string> iceEnemyNames{ "Booger" };
-
-		std::vector<std::string> const* enemyPool = &normalEnemyNames;
-
-		if (biome == "Green")
-		{
-			enemyPool = &greenEnemyNames;
-		}
-		else if (biome == "Ice")
-		{
-			enemyPool = &iceEnemyNames;
-		}
-
-		if (enemyPool->empty())
-		{
-			return "Default";
-		}
-
-		int randomIndex = std::rand() % static_cast<int>(enemyPool->size());
-		return (*enemyPool)[randomIndex];
-	}
-
-	Enemy* CreateRandomEnemyAtPosition(std::string const& biome, Vector2 spawnPosition, RoomData* roomData)
-	{
-		std::string enemyName = ChooseRandomEnemyNameForBiome(biome);
-
-		Enemy* enemy = new Enemy(
-			DataLoader::GetEnemyType(enemyName),
-			DataLoader::CreateTexture("Assets/poprocks.png"),
-			DataLoader::CreateTexture("Assets/shadow.png")
-		);
-
-		enemy->sprite.position = spawnPosition;
-		enemy->shadow.position = spawnPosition - Vector2{ 0.0f, 35.0f };
-		enemy->sprite.UpdateTransform();
-		enemy->shadow.UpdateTransform();
-
-		enemy->ChangeState(EnemyStates::ES_NEUTRAL);
-		enemy->roomData = roomData;
-
-		return enemy;
-	}
-
-	Gift* CreateRandomGiftAtPosition(Vector2 spawnPosition)
-	{
-		int randomGiftIndex = std::rand() % 2;
-
-		std::string giftName = "PattyFish";
-		Labels giftTraits{ "Gross" };
-		std::string giftTexturePath = "Assets/pattyfish.png";
-
-		if (randomGiftIndex == 1)
-		{
-			giftName = "VeggieFish";
-			giftTraits = Labels{ "Clean" };
-			giftTexturePath = "Assets/veggiefish.png";
-		}
-
-		Gift* gift = new Gift(
-			giftName,
-			giftTraits,
-			DataLoader::CreateTexture(giftTexturePath),
-			DataLoader::CreateTexture("Assets/shadow.png"),
-			spawnPosition
-		);
-
-		gift->position = spawnPosition;
-		gift->sprite.position = spawnPosition;
-		gift->shadow.position = spawnPosition - Vector2{ 0.0f, 40.0f };
-		gift->sprite.UpdateTransform();
-		gift->shadow.UpdateTransform();
-
-		return gift;
-	}
-
 }
 
 // Is this still needed lmao
@@ -304,46 +213,195 @@ namespace mapRooms
 		// Normal Room Init
 		if (rmType == RoomType::Normal) {
 
-			
-			// Choose biomes, integrate grid system (for map data purposes)
-			std::vector<std::string> biomes = Grid::GetAllBiomes();
-			if (!biomes.empty()) {
-				//int idx = Map::RandInt(0, biomes.size() - 1);
-				int idx = std::rand() % static_cast<int>(biomes.size());
-				biome = biomes[idx];
+			// =========================
+			// [1] Choose biome / layout
+			// =========================
+			std::vector<std::string> biomeNames = Grid::GetAllBiomes();
+
+			if (!biomeNames.empty()) {
+				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
+				biome = biomeNames[randomBiomeIndex];
 			}
 			else {
 				biome = "Normal";
 			}
 
-			// Grid
-			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
-			this->roomGrid.LoadRoomCSV(this->layoutFile);
+			layoutFile = Config::ChooseRandomRoomCsv(biome);
+			roomGrid.LoadRoomCSV(layoutFile);
+			themeTag = biome;
 			PatchDoorCells();
+
+			// 2. Marker helper lambdas used only in Init
+			auto isGenericEnemyMarker = [](int tileId) { return tileId == 200; };
+			auto isSpecificEnemyMarker = [](int tileId) { return tileId >= 201 && tileId <= 499; };
+			auto isGenericGiftMarker = [](int tileId) { return tileId == 500; };
+			auto isSpecificGiftMarker = [](int tileId) { return tileId >= 501 && tileId <= 799; };
+
+			auto findRandomSpecificMarkerForBiome =
+				[this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
+				{
+					std::vector<TileType const*> biomeTiles = Grid::GetTilesFromBiome(biome);
+					std::vector<TileType const*> validMarkers{};
+
+					for (TileType const* currentTileType : biomeTiles)
+					{
+						if (!currentTileType) continue;
+						if (currentTileType->spawnCategory != spawnCategory) continue;
+
+						if (spawnCategory == "enemy" && !isSpecificEnemyMarker(currentTileType->id)) continue;
+						if (spawnCategory == "gift" && !isSpecificGiftMarker(currentTileType->id)) continue;
+						if (currentTileType->spawnName.empty()) continue;
+
+						validMarkers.push_back(currentTileType);
+					}
+
+					if (validMarkers.empty()) return nullptr;
+
+					int randomMarkerIndex = std::rand() % static_cast<int>(validMarkers.size());
+					return validMarkers[randomMarkerIndex];
+				};
+
+			auto createEnemyByName = [this](std::string const& enemyName, Vector2 spawnPosition)
+				{
+					EnemyType const& enemyType = DataLoader::GetEnemyType(enemyName);
+
+					Enemy* enemy = new Enemy(
+						enemyType,
+						DataLoader::CreateTexture(enemyType.spritePath),
+						DataLoader::CreateTexture("Assets/shadow.png")
+					);
+
+					enemy->sprite.position = spawnPosition;
+					enemy->shadow.position = spawnPosition - Vector2{ 0.0f, 35.0f };
+					enemy->sprite.UpdateTransform();
+					enemy->shadow.UpdateTransform();
+
+					enemy->ChangeState(EnemyStates::ES_NEUTRAL);
+					enemy->roomData = &currentRoomData;
+
+					currentRoomData.enemyList.push_back(enemy);
+				};
+
+			auto createGiftFromMarker = [this](TileType const& giftMarkerTile, Vector2 spawnPosition)
+				{
+
+					std::string giftDisplayName = giftMarkerTile.spawnName.empty() ? giftMarkerTile.name : giftMarkerTile.spawnName;
+
+					std::string giftTexturePath = giftMarkerTile.asset.empty() ? "Assets/default.png" : giftMarkerTile.asset;
+
+					Labels giftTraits{};
+
+					// Idk how should i set traits
+					if (giftDisplayName == "Spray")
+					{
+						giftTraits.insert("Clean");
+					}
+					else
+					{
+						// HotSauce / Trash default to Gross for now
+						giftTraits.insert("Gross");
+					}
+
+					Gift* gift = new Gift(
+						giftDisplayName,
+						giftTraits,
+						DataLoader::CreateTexture(giftTexturePath),
+						DataLoader::CreateTexture("Assets/shadow.png"),
+						spawnPosition
+					);
+
+					gift->position = spawnPosition;
+					gift->sprite.position = spawnPosition;
+					gift->shadow.position = spawnPosition - Vector2{ 0.0f, 40.0f };
+					gift->sprite.UpdateTransform();
+					gift->shadow.UpdateTransform();
+
+					currentRoomData.giftList.push_back(gift);
+				};
+
+
+			// [STEP 3]: Scan room grid and spawn by marker
+			for (int row = 0; row < roomGrid.GetHeight(); ++row)
+			{
+				for (int column = 0; column < roomGrid.GetWidth(); ++column)
+				{
+					// IMPORTANT:
+					// Current GetCell behaves like GetCell(x, y),
+					// so use (column, row) here.
+					int currentTileId = roomGrid.GetCell(column, row);
+					Vector2 spawnPosition = roomGrid.CellToWorldCenter(row, column);	// Set to world coordinates spawn?
+
+					if (isGenericEnemyMarker(currentTileId))
+					{
+						TileType const* randomEnemyMarker =
+							findRandomSpecificMarkerForBiome("enemy");
+
+						if (randomEnemyMarker && !randomEnemyMarker->spawnName.empty())
+						{
+							createEnemyByName(randomEnemyMarker->spawnName, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isSpecificEnemyMarker(currentTileId))
+					{
+						TileType const* currentTileType = Grid::QueryTileType(currentTileId);
+
+						if (currentTileType && !currentTileType->spawnName.empty())
+						{
+							createEnemyByName(currentTileType->spawnName, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isGenericGiftMarker(currentTileId))
+					{
+						TileType const* randomGiftMarker =
+							findRandomSpecificMarkerForBiome("gift");
+
+						if (randomGiftMarker && !randomGiftMarker->spawnName.empty())
+						{
+							createGiftFromMarker(*randomGiftMarker, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isSpecificGiftMarker(currentTileId))
+					{
+						TileType const* currentTileType = Grid::QueryTileType(currentTileId);
+
+						if (currentTileType && !currentTileType->spawnName.empty())
+						{
+							createGiftFromMarker(*currentTileType, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+				}
+			}
+		}
+
 
 			std::cout << "Display Room Init of " << biome << "\n";
 			//roomGrid.
-			for (int j = 0; j < roomGrid.GetHeight(); j++) {
-				for (int i = 0; i < roomGrid.GetWidth(); i++) {
-					const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
-					std::cout << (tile ? tile->id : 0) << " ";
-					if (!tile) continue;
-					if (tile->id > 101) {
-						//std::cout << "Spawned " << tile->name << "! \n";
-						const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
-						currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
-						currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
+			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
+			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
+			//		const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
+			//		std::cout << (tile ? tile->id : 0) << " ";
+			//		if (!tile) continue;
+			//		if (tile->id > 101) {
+			//			//std::cout << "Spawned " << tile->name << "! \n";
+			//			const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
+			//			currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
+			//			currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
 
-					}
-				}
-				std::cout << "\n";
-			}
-
-			// Spawn gifts and enemies
-			SpawnObjectsFromMarkerTiles();
+			//		}
+			//	}
+			//	std::cout << "\n";
+			//}
 
 			// Spawn enemies
-			if (currentRoomData.enemyList.empty()) {
+			if (0 && currentRoomData.enemyList.empty()) {
 				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 				for (Enemy* i : currentRoomData.enemyList) {
 					i->shadow.position = Vector2{ 0.f, -35.f };
@@ -354,12 +412,12 @@ namespace mapRooms
 			}
 
 			// Spawn gifts
-			if (currentRoomData.giftList.empty()) {
+			if (0 && currentRoomData.giftList.empty()) {
 				Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
 				gift->shadow.position = Vector2{ 0.f, -40.f };
 				currentRoomData.giftList.push_back(gift);
 			}
-		}
+		//}
 			// Gifts here (1 Gift per room for now)
 			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
 			//Vector2 giftPos{ 200.0f, 450.0f };
@@ -396,41 +454,6 @@ namespace mapRooms
 
 
 
-	}
-
-	// Spawner for gifts and enemies
-	void Room::SpawnObjectsFromMarkerTiles()
-	{
-		using namespace Config;	// Some anonymous functions were stored there
-		for (int row = 0; row < roomGrid.GetHeight(); ++row)
-		{
-			for (int column = 0; column < roomGrid.GetWidth(); ++column)
-			{
-				// Note: Current GetCell in this codebase behaves like GetCell(x, y), so use (column, row) here.
-				int currentTileId = roomGrid.GetCell(column, row);
-
-				if (currentTileId == enemyMarkerTileId)
-				{
-					Vector2 spawnPosition = GetMarkerCellWorldPosition(roomGrid, row, column);
-
-					Enemy* enemy = CreateRandomEnemyAtPosition(biome, spawnPosition, &currentRoomData);
-					currentRoomData.enemyList.push_back(enemy);
-
-					// Remove marker from the collision / visual grid after spawning
-					roomGrid.SetCell(row, column, 0);
-				}
-				else if (currentTileId == giftMarkerTileId)
-				{
-					Vector2 spawnPosition = GetMarkerCellWorldPosition(roomGrid, row, column);
-
-					Gift* gift = CreateRandomGiftAtPosition(spawnPosition);
-					currentRoomData.giftList.push_back(gift);
-
-					// Remove marker from the collision / visual grid after spawning
-					roomGrid.SetCell(row, column, 0);
-				}
-			}
-		}
 	}
 
 

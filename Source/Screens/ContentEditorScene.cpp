@@ -18,30 +18,20 @@ namespace
 	constexpr int obstaclePaletteRows = 5;
 	constexpr int obstaclePaletteItemsPerPage = obstaclePaletteColumns * obstaclePaletteRows;
 
-	// Thumbnail layout inside the left panel
+	// Layout constants (left panel)
 	constexpr float obstacleThumbnailStartX = -688.0f;
 	constexpr float obstacleThumbnailStartY = 100.0f;
 	constexpr float obstacleThumbnailGapX = 72.0f;
 	constexpr float obstacleThumbnailGapY = 70.0f;
 	constexpr float obstacleThumbnailSize = 48.0f;
 
-	struct RectBounds
-	{
-		float left{};
-		float right{};
-		float top{};
-		float bottom{};
-	};
+	struct RectBounds {float left{}, right{}, top{}, bottom{};};
 
 	Vector2 GetMouseWorldPosition()
 	{
-		s32 mouseX = 0;
-		s32 mouseY = 0;
+		s32 mouseX = 0, mouseY = 0;
 		AEInputGetCursorPosition(&mouseX, &mouseY);
-
-		float worldX = AEGfxGetWinMinX() + static_cast<float>(mouseX);
-		float worldY = AEGfxGetWinMaxY() - static_cast<float>(mouseY);
-
+		float worldX = AEGfxGetWinMinX() + static_cast<float>(mouseX), worldY = AEGfxGetWinMaxY() - static_cast<float>(mouseY);
 		return Vector2{ worldX, worldY };
 	}
 
@@ -58,86 +48,34 @@ namespace
 		return contentEditorState.biomeNames[contentEditorState.selectedBiomeIndex];
 	}
 
-	std::string GetSelectedBiomeRoomTexturePath()
-	{
-		return Grid::GetPathNameBiome(GetSelectedBiomeName());
-	}
-
-	std::string GetSelectedBiomePreviewTexturePath()
-	{
-		// Use dedicated thumbnail if it exists. (Shouldn't have anyways lol)
-		if (GetSelectedBiomeName() == "Normal" && FileExists("Assets/UI/NORMAL_thumb.png"))
-		{
-			return "Assets/UI/NORMAL_thumb.png";
-		}
-
-		if (GetSelectedBiomeName() == "Green" && FileExists("Assets/UI/green_thumb.png"))
-		{
-			return "Assets/UI/green_thumb.png";
-		}
-
-		if (GetSelectedBiomeName() == "Ice" && FileExists("Assets/UI/ICE_thumb.png"))
-		{
-			return "Assets/UI/ICE_thumb.png";
-		}
-
-		return GetSelectedBiomeRoomTexturePath();
-	}
-
 	void ClearEditorRoomGrid()
 	{
 		for (int row = 0; row < contentEditorState.roomGrid.GetHeight(); ++row)
 		{
-			for (int column = 0; column < contentEditorState.roomGrid.GetWidth(); ++column)
-			{
-				contentEditorState.roomGrid.SetCell(row, column, 0);
-			}
+			for (int column = 0; column < contentEditorState.roomGrid.GetWidth(); ++column) contentEditorState.roomGrid.SetCell(row, column, 0);
 		}
 	}
+
 
 	void RebuildObstaclePaletteForSelectedBiome()
 	{
 		contentEditorState.obstaclePalette.clear();
 
-		std::vector<TileType const*> biomeTiles =
-			Grid::GetTilesFromBiome(GetSelectedBiomeName());
+		std::vector<TileType const*> biomeTiles = Grid::GetTilesFromBiome(GetSelectedBiomeName());
 
 		for (TileType const* currentTileType : biomeTiles)
 		{
-			if (!currentTileType)
-			{
-				continue;
-			}
-
 			// Skip empty and special marker tiles
-			if (currentTileType->id == 0)
-			{
-				continue;
-			}
-
-			if (currentTileType->id >= 100)
-			{
-				continue;
-			}
-
-			if (currentTileType->asset.empty())
-			{
-				continue;
-			}
+			if (!currentTileType || currentTileType->id == 0 || currentTileType->id == 100) continue;
+			
+			// If this line proofs buggy idk.
+			if (currentTileType->asset.empty()) continue;
 
 			contentEditorState.obstaclePalette.push_back(currentTileType);
 		}
 
 		contentEditorState.currentObstaclePalettePage = 0;
-
-		if (!contentEditorState.obstaclePalette.empty())
-		{
-			contentEditorState.selectedTileId = contentEditorState.obstaclePalette[0]->id;
-		}
-		else
-		{
-			contentEditorState.selectedTileId = 0;
-		}
+		contentEditorState.selectedTileId = (!contentEditorState.obstaclePalette.empty()) ? (contentEditorState.selectedTileId = contentEditorState.obstaclePalette[0]->id) : (0);
 	}
 
 	void RemoveTilesNotAllowedForSelectedBiome()
@@ -148,20 +86,9 @@ namespace
 			{
 				int currentTileId = contentEditorState.roomGrid.GetCell(column, row);
 
-				if (currentTileId <= 0)
-				{
-					continue;
-				}
+				if (currentTileId <= 0 || currentTileId == 100) continue;
 
-				if (currentTileId >= 100)
-				{
-					continue;
-				}
-
-				if (!contentEditorState.roomGrid.QueryTileAllowedInBiome(currentTileId, GetSelectedBiomeName()))
-				{
-					contentEditorState.roomGrid.SetCell(row, column, 0);
-				}
+				if (!contentEditorState.roomGrid.QueryTileAllowedInBiome(currentTileId, GetSelectedBiomeName())) contentEditorState.roomGrid.SetCell(row, column, 0);
 			}
 		}
 	}
@@ -335,7 +262,7 @@ namespace
 		UIElement* biomePreviewImage = contentEditorUi.FindById("biome_preview_image");
 		if (biomePreviewImage)
 		{
-			biomePreviewImage->texturePath = GetSelectedBiomePreviewTexturePath();
+			biomePreviewImage->texturePath = Grid::GetPathNameBiome(GetSelectedBiomeName());
 		}
 	}
 
@@ -381,18 +308,43 @@ namespace
 			return;
 		}
 
-		int numberOfPlacements = 4 + (std::rand() % 9);
+		int numberMaxItems = 10; // (9 + 4 = 13)
+		int numberOfPlacements = 4 + (std::rand() % numberMaxItems);
 
 		for (int i = 0; i < numberOfPlacements; ++i)
 		{
-			int randomRow = 1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+			int randomRow =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
 
-			int randomColumn = 1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
+			int randomColumn =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
 
-			int randomPaletteIndex = std::rand() % static_cast<int>(contentEditorState.obstaclePalette.size());
+			int randomPaletteIndex =
+				std::rand() % static_cast<int>(contentEditorState.obstaclePalette.size());
 
-			contentEditorState.roomGrid.SetCell(randomRow, randomColumn, contentEditorState.obstaclePalette[randomPaletteIndex]->id
-			);
+			contentEditorState.roomGrid.SetCell(randomRow,randomColumn, contentEditorState.obstaclePalette[randomPaletteIndex]->id);
+		}
+
+		// Place one generic enemy marker
+		{
+			int randomRow =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+
+			int randomColumn =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
+
+			contentEditorState.roomGrid.SetCell(randomRow, randomColumn, 200);
+		}
+
+		// Place one generic gift marker
+		{
+			int randomRow =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+
+			int randomColumn =
+				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
+
+			contentEditorState.roomGrid.SetCell(randomRow, randomColumn, 500);
 		}
 
 		contentEditorState.statusMessage = "Randomized";
@@ -453,20 +405,19 @@ namespace
 			);
 			thumbnailSlotBackground.RenderSprite(true);
 
-			if (!currentTileType->asset.empty() && FileExists(currentTileType->asset))
+			if (!currentTileType->asset.empty())	// && FileExists(currentTileType->asset) Doubt i need this
 			{
 				AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 				AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 				AEGfxSetTransparency(1.0f);
 
-				TexturedSprite thumbnailSprite =
-					DataLoader::CreateTexture(currentTileType->asset);
+				TexturedSprite thumbnailSprite = (!FileExists(currentTileType->asset)) ? (DataLoader::CreateTexture("Assets/default.png")) : (DataLoader::CreateTexture(currentTileType->asset));
 
 				thumbnailSprite.position = Vector2{ thumbnailCenterX, thumbnailCenterY };
 				thumbnailSprite.scale = Vector2{ obstacleThumbnailSize, obstacleThumbnailSize };
 				thumbnailSprite.UpdateTransform();
 
-				// true here is important because the current sprite render path can darken textures otherwise
+				// true here is important because the current sprite render path can darken textures otherwise. Act idk anymore, the more you know / don't know.
 				thumbnailSprite.RenderSprite(true);
 			}
 
@@ -656,11 +607,9 @@ void ContentEditorUpdate(float dt)
 	contentEditorState.hoveredCellIndex =
 		GetEditorRoomCellIndexAtWorldPosition(mouseWorldPosition.x, mouseWorldPosition.y);
 
-	if (contentEditorState.currentTab == ContentEditorTab::Obstacles &&
-		AEInputCheckTriggered(AEVK_LBUTTON))
+	if (contentEditorState.currentTab == ContentEditorTab::Obstacles && AEInputCheckTriggered(AEVK_LBUTTON))
 	{
-		int firstPaletteIndex =
-			contentEditorState.currentObstaclePalettePage * obstaclePaletteItemsPerPage;
+		int firstPaletteIndex = contentEditorState.currentObstaclePalettePage * obstaclePaletteItemsPerPage;
 
 		int lastPaletteIndex = firstPaletteIndex + obstaclePaletteItemsPerPage;
 		if (lastPaletteIndex > static_cast<int>(contentEditorState.obstaclePalette.size()))
@@ -744,7 +693,7 @@ void ContentEditorDraw()
 		AEGfxSetTransparency(1.0f);
 
 		TexturedSprite roomBackgroundSprite =
-			DataLoader::CreateTexture(GetSelectedBiomeRoomTexturePath());
+			DataLoader::CreateTexture(Grid::GetPathNameBiome(GetSelectedBiomeName()));
 
 		roomBackgroundSprite.position = Vector2{
 			(previewPanelBounds.left + previewPanelBounds.right) * 0.5f,
@@ -777,34 +726,15 @@ void ContentEditorDraw()
 			{
 				int currentTileId = contentEditorState.roomGrid.GetCell(column, row);
 
-				if (currentTileId <= 0)
-				{
-					continue;
-				}
-
-				if (currentTileId >= 100)
-				{
-					continue;
-				}
+				if (currentTileId <= 0 || currentTileId == 100) continue;
 
 				TileType const* currentTileType = Grid::QueryTileType(currentTileId);
-				if (!currentTileType)
-				{
-					continue;
-				}
+				if (!currentTileType) continue;
+				if (currentTileType->asset.empty()) continue;
+				
 
-				if (currentTileType->asset.empty())
-				{
-					continue;
-				}
+				TexturedSprite obstacleSprite = (!FileExists(currentTileType->asset)) ? (DataLoader::CreateTexture("Assets/default.png")) : (DataLoader::CreateTexture(currentTileType->asset));
 
-				if (!FileExists(currentTileType->asset))
-				{
-					continue;
-				}
-
-				TexturedSprite obstacleSprite =
-					DataLoader::CreateTexture(currentTileType->asset);
 
 				obstacleSprite.position = GetEditorRoomCellWorldCenter(row, column);
 				obstacleSprite.scale = Vector2{ placedObstacleDrawSize, placedObstacleDrawSize };
