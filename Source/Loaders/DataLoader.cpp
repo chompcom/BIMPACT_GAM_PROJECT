@@ -277,6 +277,8 @@ namespace DataLoader {
 		const u32 white = 0xFFFFFFFF;
 		const f32 pi = AEDegToRad(180);	// PI RAD = 180 DEG hahah
 
+		UNREFERENCED_PARAMETER(pi);
+
 		if (segmentsPerCorner < 1) segmentsPerCorner = 0;	// Segments cannot be less than 1 obviously?
 
 		f32 halfW = width * 0.5f;

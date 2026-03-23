@@ -30,7 +30,8 @@ namespace {
 
 		//snap to cell
 		
-
+		UNREFERENCED_PARAMETER(pos);
+		UNREFERENCED_PARAMETER(grid);
 
 		return Vector2{};
 	}
@@ -191,7 +192,7 @@ void FireProjectile(Enemy& me, float dt) {
 	}
 }
 void DVDMove(Enemy& me, float dt) {
-
+	//UNREFERENCED_PARAMETER(me);
 }
 void DVDBounce(Enemy& me, float dt) {
 

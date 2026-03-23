@@ -5,6 +5,7 @@
 
 #include "Scenes/TestScene.h"
 #include "Screens/MainMenuScene.h"
+#include "Screens/ContentEditorScene.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -49,6 +50,12 @@ void GSM_Update()
 		fpUpdate = MainMenuUpdate;
 		break;
 	case GS_CONTENT_EDIT:
+		fpLoad = ContentEditorLoad;
+		fpUnload = ContentEditorUnload;
+		fpInitialize = ContentEditorInit;
+		fpFree = ContentEditorFree;
+		fpDraw = ContentEditorDraw;
+		fpUpdate = ContentEditorUpdate;
 		break;
 	default:
 		break;

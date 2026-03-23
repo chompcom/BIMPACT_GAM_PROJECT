@@ -34,7 +34,7 @@ void MainMenuLoad()
 	ui.BindOnClick("btn_editor", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
-			//ChangeState(GS_CONTENT_EDIT);
+			ChangeState(GS_CONTENT_EDIT);
 		});
 
 	ui.BindOnClick("btn_quit", [](UIElement& self)
@@ -50,6 +50,16 @@ void MainMenuLoad()
 		});
 
 	ui.BindOnHoverExit("btn_start", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 0.85f, 0.85f, 0.85f, 1.0f };
+		});
+
+	ui.BindOnHover("btn_editor", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		});
+
+	ui.BindOnHoverExit("btn_editor", [](UIElement& self)
 		{
 			self.backgroundColor = Color{ 0.85f, 0.85f, 0.85f, 1.0f };
 		});

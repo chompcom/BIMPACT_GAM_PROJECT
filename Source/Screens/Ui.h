@@ -1,5 +1,18 @@
 #pragma once
 
+/*!***************************************************************************
+\file       ui.h
+\author     Quah Ming Jun
+\par        DP email: m.quah\@digipen.edu
+\par        Course: CSD1451
+
+\brief
+	This header file contains the declaration and documentation for UI functions defined in Ui.cpp;
+	This aims to overhaul the entire UI management in this project, which can be adopted
+	subsequently for future projects for making UI workflow efficient.
+***************************************************************************/
+
+
 #include <string>	// for string
 #include <vector>	// for vectors
 #include <memory>	// for smart pointer
@@ -75,14 +88,138 @@ public:
 
 	void Clear();
 
-	// Manual workflow (Please don't be stupid and use, but possible)
+
+	/*
+	\brief
+		Manual workflow (Please don't be stupid and use, but possible).
+
+	\param[in] id
+		id.
+
+	\param[in] parent
+		Parent element (html like).
+
+	\return
+		Pointer to element created.
+
+
+	\par	How to create raw text (and where to use)
+
+		// GLOBAL
+		static UIManager winUI;
+
+		// LOAD
+		UIElement* winScreen = winUI.CreateElement("win_div");
+		winScreen->localPos = Vector2(0.0f, 0.0f);
+		winScreen->sizeRatio = Vector2(1.0f, 1.0f);
+		winScreen->text = "YOU WIN!";
+		winScreen->textScale = 5.0f;
+		winScreen->visible = true;
+		winUI.SetFont(font);
+
+		// DRAW
+		winUI.draw();
+
+		// Update
+		winUI.update();
+
+		// Unload
+		Dataloader::unload();	// As long as this is called in the unload function pointer, all meshes created at runtime will be freed.
+	*/
 	UIElement* CreateElement(std::string const& id, UIElement* parent = nullptr);
 
-	// JSON workflow (Good practice)
+
+	/*
+	\brief Creates window from JSON file. JSON workflow (Good practice)
+
+	\param[in] filePath
+		Current JSON Filepath from root of this program's executable containing the UI information...
+		To find current filepath, cd or echo %CD% (cmd), $pwd.path (powershell), or echo $PWD (linux).
+		In code, do system("echo %CD%") depending on current cli (make sure it is visible).
+
+	\return
+		Result of Loading
+
+	\par
+		How to use this guide (for entire windows that are the scene / screens itself for this state)
+
+	// Global
+	static UIManager pauseUi;
+
+	// Load Function Pointer;
+	std::string filePath = "Assets/UI/pause.json";
+	bool res = pauseUi.LoadFromFile(filePath);
+	if (!res){
+		std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
+		system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
+		return;
+	}
+
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	tipText->text = RandomTip();	// Perhaps you want to change the text here
+	tipText->scale = 0.35f;			// Scale Tip size
+	pauseUi.SetFont(font);	// Make sure to set font hahah. I'm not creating a font object in the UIManager itself by default so gl. Perhaps could be done in future.
+
+	// Update
+	pauseUi.update();
+
+	// Draw
+	pauseUi.draw();
+
+	// Unload
+		Dataloader::unload();	// As long as this is called in the unload function pointer, all meshes created at runtime will be freed.
+	*/
 	bool LoadFromFile(std::string const& filePath);
 
-	// Popup
+	/*
+	\brief Creates popup window from JSON file
+
+	\param[in] filePath
+		Current JSON Filepath from root of this program's executable containing the UI information...
+		To find current filepath, cd or echo %CD% (cmd), $pwd.path (powershell), or echo $PWD (linux).
+		In code, do system("echo %CD%") depending on current cli (make sure it is visible).
+
+	\param[in] pos
+		Vector2 [x, y] position of object
+
+	\param[in] size
+		Vector2 [x, y] size or scale of object
+
+	\return
+		Result of Loading
+
+	\par
+		How to use this guide (for popup windows mostly that do not cover entirety of the screen itself)
+
+	// Global
+	static UIManager pauseUi;
+
+	// Load Function Pointer;
+	std::string filePath = "Assets/UI/pause_popup.json";
+	bool res = pauseUi.LoadFromFilePopUp(filePath, Vector2(0.0f,0.0f), Vector2(580.0f, 250.0f));
+	if (!res){
+		// Debug check: Verify if the file actually exists via PowerShell
+		std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
+		system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
+		return;
+	}
+	
+	UIElement* tipText = pauseUi.FindById("tip_text");
+	tipText->text = RandomTip();	// Perhaps you want to change the text here
+	tipText->scale = 0.35f;			// Scale Tip size
+	pauseUi.SetFont(font);	// Make sure to set font hahah. I'm not creating a font object in the UIManager itself by default so gl. Perhaps could be done in future.
+
+	// Update
+	pauseUi.update();
+
+	// Draw
+	pauseUi.draw();
+
+	// Unload
+		Dataloader::unload();	// As long as this is called in the unload function pointer, all meshes created at runtime will be freed.
+	*/
 	bool LoadFromFilePopUp(std::string const& filePath, Vector2 pos, Vector2 size);
+
 
 	// Find By Id (Can be used to bind stuff)
 	UIElement* FindById(std::string const& id);

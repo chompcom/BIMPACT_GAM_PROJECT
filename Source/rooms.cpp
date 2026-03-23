@@ -134,6 +134,96 @@ namespace Config {
 		return fileName;
 	}
 
+
+	const int giftMarkerTileId = 200;
+	const int enemyMarkerTileId = 500;
+
+	Vector2 GetMarkerCellWorldPosition(Grid const& roomGrid, int row, int column)
+	{
+		return roomGrid.CellToWorldCenter(row, column);
+	}
+
+	std::string ChooseRandomEnemyNameForBiome(std::string const& biome)
+	{
+		// For now all biomes can still use Booger.
+		// Later this can become separate pools per biome.
+		static std::vector<std::string> normalEnemyNames{ "Booger" };
+		static std::vector<std::string> greenEnemyNames{ "Booger" };
+		static std::vector<std::string> iceEnemyNames{ "Booger" };
+
+		std::vector<std::string> const* enemyPool = &normalEnemyNames;
+
+		if (biome == "Green")
+		{
+			enemyPool = &greenEnemyNames;
+		}
+		else if (biome == "Ice")
+		{
+			enemyPool = &iceEnemyNames;
+		}
+
+		if (enemyPool->empty())
+		{
+			return "Default";
+		}
+
+		int randomIndex = std::rand() % static_cast<int>(enemyPool->size());
+		return (*enemyPool)[randomIndex];
+	}
+
+	Enemy* CreateRandomEnemyAtPosition(std::string const& biome, Vector2 spawnPosition, RoomData* roomData)
+	{
+		std::string enemyName = ChooseRandomEnemyNameForBiome(biome);
+
+		Enemy* enemy = new Enemy(
+			DataLoader::GetEnemyType(enemyName),
+			DataLoader::CreateTexture("Assets/poprocks.png"),
+			DataLoader::CreateTexture("Assets/shadow.png")
+		);
+
+		enemy->sprite.position = spawnPosition;
+		enemy->shadow.position = spawnPosition - Vector2{ 0.0f, 35.0f };
+		enemy->sprite.UpdateTransform();
+		enemy->shadow.UpdateTransform();
+
+		enemy->ChangeState(EnemyStates::ES_NEUTRAL);
+		enemy->roomData = roomData;
+
+		return enemy;
+	}
+
+	Gift* CreateRandomGiftAtPosition(Vector2 spawnPosition)
+	{
+		int randomGiftIndex = std::rand() % 2;
+
+		std::string giftName = "PattyFish";
+		Labels giftTraits{ "Gross" };
+		std::string giftTexturePath = "Assets/pattyfish.png";
+
+		if (randomGiftIndex == 1)
+		{
+			giftName = "VeggieFish";
+			giftTraits = Labels{ "Clean" };
+			giftTexturePath = "Assets/veggiefish.png";
+		}
+
+		Gift* gift = new Gift(
+			giftName,
+			giftTraits,
+			DataLoader::CreateTexture(giftTexturePath),
+			DataLoader::CreateTexture("Assets/shadow.png"),
+			spawnPosition
+		);
+
+		gift->position = spawnPosition;
+		gift->sprite.position = spawnPosition;
+		gift->shadow.position = spawnPosition - Vector2{ 0.0f, 40.0f };
+		gift->sprite.UpdateTransform();
+		gift->shadow.UpdateTransform();
+
+		return gift;
+	}
+
 }
 
 // Is this still needed lmao
@@ -215,24 +305,26 @@ namespace mapRooms
 			PatchDoorCells();
 
 
+			// Spawn gifts and enemies
+			SpawnObjectsFromMarkerTiles();
 
-			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
-			for (Enemy* i : currentRoomData.enemyList) {
-				i->shadow.position = Vector2{ 0.f, -35.f };
-				i->shadow.UpdateTransform();
-				i->ChangeState(EnemyStates::ES_NEUTRAL);
-				i->roomData = &this->currentRoomData;
+			// Spawn enemies
+			if (currentRoomData.enemyList.empty()) {
+				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+				for (Enemy* i : currentRoomData.enemyList) {
+					i->shadow.position = Vector2{ 0.f, -35.f };
+					i->shadow.UpdateTransform();
+					i->ChangeState(EnemyStates::ES_NEUTRAL);
+					i->roomData = &this->currentRoomData;
+				}
 			}
 
-			// Gifts here (1 Gift per room for now)
-			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-			//Vector2 giftPos{ 200.0f, 450.0f };
-			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
-			Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			gift->shadow.position = Vector2{ 0.f, -40.f };
-			currentRoomData.giftList.push_back(gift);
+			// Spawn gifts
+			if (currentRoomData.giftList.empty()) {
+				Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+				gift->shadow.position = Vector2{ 0.f, -40.f };
+				currentRoomData.giftList.push_back(gift);
+			}
 		}
 
 		// Boss Init
@@ -263,6 +355,41 @@ namespace mapRooms
 
 
 
+	}
+
+	// Spawner for gifts and enemies
+	void Room::SpawnObjectsFromMarkerTiles()
+	{
+		using namespace Config;	// Some anonymous functions were stored there
+		for (int row = 0; row < roomGrid.GetHeight(); ++row)
+		{
+			for (int column = 0; column < roomGrid.GetWidth(); ++column)
+			{
+				// Note: Current GetCell in this codebase behaves like GetCell(x, y), so use (column, row) here.
+				int currentTileId = roomGrid.GetCell(column, row);
+
+				if (currentTileId == enemyMarkerTileId)
+				{
+					Vector2 spawnPosition = GetMarkerCellWorldPosition(roomGrid, row, column);
+
+					Enemy* enemy = CreateRandomEnemyAtPosition(biome, spawnPosition, &currentRoomData);
+					currentRoomData.enemyList.push_back(enemy);
+
+					// Remove marker from the collision / visual grid after spawning
+					roomGrid.SetCell(row, column, 0);
+				}
+				else if (currentTileId == giftMarkerTileId)
+				{
+					Vector2 spawnPosition = GetMarkerCellWorldPosition(roomGrid, row, column);
+
+					Gift* gift = CreateRandomGiftAtPosition(spawnPosition);
+					currentRoomData.giftList.push_back(gift);
+
+					// Remove marker from the collision / visual grid after spawning
+					roomGrid.SetCell(row, column, 0);
+				}
+			}
+		}
 	}
 
 
@@ -836,8 +963,8 @@ namespace mapRooms
 		if (gridSize <= 0) return; // shouldn't happen ngl
 
 		float minX = AEGfxGetWinMinX();
-		float maxX = AEGfxGetWinMaxX();
-		float minY = AEGfxGetWinMinY();
+		float maxX = AEGfxGetWinMaxX(); UNREFERENCED_PARAMETER(maxX);
+		float minY = AEGfxGetWinMinY();	UNREFERENCED_PARAMETER(minY);
 		float maxY = AEGfxGetWinMaxY();
 
 		float cell	= 18.0F;
