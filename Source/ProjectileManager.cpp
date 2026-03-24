@@ -1,17 +1,17 @@
 #include "ProjectileManager.h"
 
 
-void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
+void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
 	sprite.position = pos;
 	sprite.scale = scale;
 	sprite.color = color;
 	//sprite.direction = dir;
-	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source);
+	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source, isFriend);
     roomData.projectileList.push_back(fireball);
     ProjectileAudio();
 }
 
-void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
+void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     int numProjectiles = 10;
     float angleAround = 360.0f / numProjectiles;  
 
@@ -31,7 +31,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
     }
 }
 
-void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,float rot, void* source) {
+void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,float rot, void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
@@ -45,7 +45,7 @@ void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vecto
     RoundingProjectileAudio();
 }
 
-void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source) {
+void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
@@ -57,7 +57,7 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     
 }
 
-void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source) {
+void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
@@ -99,32 +99,39 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
 void CheckProjectileCollision(RoomData& roomData, Player& player) {
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         float tFirst = 0.0f;
-        bool hit = CollisionIntersection_RectRect(
-            (*it)->GetPosition(),
-            (*it)->GetScale(),
-            (*it)->GetVelocity(),
-            player.sprite.position,
-            player.sprite.scale,
-            Vector2{ 0, 0 },
-            tFirst
-        );
+        bool hit = false;
 
         bool enemyHit = false;
-        for (Enemy* guy : roomData.enemyList) {
+        //The projectile is shot by a friend
+        if ((*it)->friendProjectile) {
+            for (Enemy* guy : roomData.enemyList) {
 
-            if (static_cast<void*>(guy) == (*it)->GetSource()) continue;
-            if ( CollisionIntersection_RectRect(
+                if (static_cast<void*>(guy) == (*it)->GetSource()) continue;
+                if (CollisionIntersection_RectRect(
                     (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),
-                    guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst) 
-            ) {
-                guy->currentHealth -= (*it)->GetDmg();
-                std::cout << (*it)->GetSource() << " HIT " << guy << "!!\n";
-                enemyHit = true;
+                    guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst)
+                    ) {
+                    guy->currentHealth -= (*it)->GetDmg();
+                    std::cout << (*it)->GetSource() << " HIT " << guy << "!!\n";
+                    enemyHit = true;
+
+                }
             }
         }
-        
-        if (hit) {
-            playerTakesDamage(player);
+        else {
+
+            //deliberate assignment
+            if (hit = CollisionIntersection_RectRect(
+                (*it)->GetPosition(),
+                (*it)->GetScale(),
+                (*it)->GetVelocity(),
+                player.sprite.position,
+                player.sprite.scale,
+                Vector2{ 0, 0 },
+                tFirst
+            )) {
+                playerTakesDamage(player);
+            }
         }
 
         if (hit || enemyHit) {

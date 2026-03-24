@@ -10,7 +10,7 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 	,wanderTimer{}, shadow{shadowSprite}
 	,speedModifier{1.f}, dmgModifier{1.f}
-	,attackTimer{}
+	,attackTimer{}, isActive{true}
 {
 		ChangeState(initialState);
 }
@@ -146,10 +146,17 @@ void Enemy::ChangeState(EnemyStates newstate)
 }
 
 void Enemy::Update(float dt) {
+
+	if (!isActive) return;
+
+	if (currentHealth <= EPSILON) {
+		isActive = false;
+	}
+
 	for (auto& combi : currentBehavior) {
 		if ( combi.first(*this)) { //so we are doing the check one at a time
 			for (Command& actions : combi.second){
-				actions(*this,dt);
+				actions(*this);
 			}
 			break;//don't do the other checks
 		}

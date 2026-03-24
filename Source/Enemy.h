@@ -19,7 +19,7 @@ class EnemyType;
 class Enemy;
 class Boss;
 // forward declaration of room
-typedef void Behaviour(Enemy&,  float dt);
+typedef void Behaviour(Enemy&);
 typedef Behaviour* Command;
 
 //it's for checking flags and stuff

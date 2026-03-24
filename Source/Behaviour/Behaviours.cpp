@@ -76,19 +76,19 @@ bool IsNotFollowingPlayer(Enemy& me) {
 	}
 }
 
-void WalkLeft(Enemy& me, float dt) {
-	me.velocity += Vector2(-50, 0) * dt;
+void WalkLeft(Enemy& me) {
+	me.velocity += Vector2(-50, 0);
 	if (CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900))
 	me.sprite.UpdateTransform();
 }
 
-void WalkRight(Enemy& me, float dt){
-	me.sprite.position += Vector2(50,0) * dt;
+void WalkRight(Enemy& me){
+	me.sprite.position += Vector2(50,0);
 	me.sprite.color = Color{ 1.0f,0.0f,0.0f,1.0f };
 	me.sprite.UpdateTransform();
 }
 
-void MoveToTarget(Enemy& me, float dt) {
+void MoveToTarget(Enemy& me) {
 	if (me.target == false) return;
 	Vector2 direction{ (me.target.GetPosition() - me.sprite.position)};
 	me.velocity += direction;
@@ -97,14 +97,14 @@ void MoveToTarget(Enemy& me, float dt) {
 	me.sprite.UpdateTransform();
 } 
 
-void ApplySlowToTarget(Enemy& me, float dt) {
+void ApplySlowToTarget(Enemy& me) {
 	if (me.target == false) return;
 
 	me.target.GetSpeedMod() = 0.1f;
 
 }
 
-void Wander(Enemy& me, float dt) {
+void Wander(Enemy& me) {
 	if (me.wanderTimer <= 0.f) {
 		me.wanderTimer = 3.f;
 		me.velocity = Vector2{};
@@ -120,7 +120,7 @@ void Wander(Enemy& me, float dt) {
 	
 }
 
-void CircleMove(Enemy& me, float dt) {
+void CircleMove(Enemy& me) {
 
 	if (!me.target) return;
 
@@ -135,10 +135,13 @@ void CircleMove(Enemy& me, float dt) {
 
 }
 
-void TargetEnemyInDetectionRadius(Enemy& me, float dt){
+void TargetEnemyInDetectionRadius(Enemy& me){
 	for (Enemy* guy : me.roomData->enemyList){
+		if (!guy->isActive) continue;
 		if (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
 			guy->sprite.position, guy->sprite.scale.x)) {
+			std::cout << "Found " << guy->type.name << std::endl;
+
 				me.target = *guy;
 				return; //found a guy
 			}
@@ -149,13 +152,13 @@ void TargetEnemyInDetectionRadius(Enemy& me, float dt){
 
 }
 
-void TargetPlayer(Enemy& me, float dt) {
+void TargetPlayer(Enemy& me) {
 
 	if (me.roomData->player)
 		me.target = *me.roomData->player;
 }
 
-void SafeDistancePlayer(Enemy& me, float dt) {
+void SafeDistancePlayer(Enemy& me) {
 	Vector2 playerPos = me.roomData->player->sprite.position;
 	if (AreCirclesIntersecting(me.sprite.position, me.sprite.scale.x, playerPos, me.type.safeRadius) ) {
 
@@ -164,27 +167,36 @@ void SafeDistancePlayer(Enemy& me, float dt) {
 		me.velocity = direction;
 	}
 }
-void TargetRandomEnemy(Enemy& me, float dt) {
+void TargetRandomEnemy(Enemy& me) {
 	
+	std::vector<Enemy*> aliveList{};
+	//check if all dead
+	for (Enemy* me : me.roomData->enemyList) {
+		if (me->isActive) aliveList.push_back(me);
+	}
 	//Very special case, this behaviour specifically targets enemies first! 
 	//Once the enemies are gone then the boss is targeted!
-	if (me.roomData->enemyList.empty()) {
+	if (aliveList.empty()) {
 		if (me.roomData->boss) me.target = *me.roomData->boss;
 		return;
 	}
-	me.target = *me.roomData->enemyList[	
-		std::rand() % me.roomData->enemyList.size()];
+
+
+	do {
+		me.target = *me.roomData->enemyList[
+			std::rand() % aliveList.size()];
+	} while (!me.target.GetActive());
 }
-void TargetMiddle(Enemy& me, float dt) {
+void TargetMiddle(Enemy& me) {
 	me.target.initialPosition = Vector2();
 }
-void TargetCorner(Enemy& me, float dt) {
+void TargetCorner(Enemy& me) {
 
 	me.target.initialPosition = Vector2(100,100);
 }
-void FireProjectile(Enemy& me, float dt) {
+void FireProjectile(Enemy& me) {
 
-
+	if (!me.target) return;
 	if (me.attackTimer <= 0) {
 		EnemyType::ProjectileInfo proj;
 		switch (me.state) {
@@ -201,24 +213,26 @@ void FireProjectile(Enemy& me, float dt) {
 
 		Vector2 direction = me.sprite.position - (me.target.GetPosition());
 
-		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me);
+		bool amIFriendsWithThePlayer = me.state == ES_HAPPY;
+
+		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me, amIFriendsWithThePlayer);
 		me.attackTimer = 3;
 	}
 }
-void DVDMove(Enemy& me, float dt) {
+void DVDMove(Enemy& me) {
 	//UNREFERENCED_PARAMETER(me);
 }
-void DVDBounce(Enemy& me, float dt) {
+void DVDBounce(Enemy& me) {
 
 }
-void BecomeAngry(Enemy& me, float dt) {
+void BecomeAngry(Enemy& me) {
 	me.ChangeState(ES_ANGRY);
 }
-void BecomeNeutral(Enemy& me, float dt) {
+void BecomeNeutral(Enemy& me) {
 
 	me.ChangeState(ES_NEUTRAL);
 }
-void DamageTarget(Enemy& me, float dt) {
+void DamageTarget(Enemy& me) {
 //now this gets tricky!!
 //hard code for now!!
 	if (me.attackTimer <= 0) {
@@ -232,10 +246,10 @@ void DamageTarget(Enemy& me, float dt) {
 
 }
 
-void PullTarget(Enemy& me, float dt) {
+void PullTarget(Enemy& me) {
 
 }
-void PushTarget(Enemy& me, float dt) {
+void PushTarget(Enemy& me) {
 
 }
 
@@ -244,7 +258,7 @@ bool DefaultFlag(Enemy& me){
 	return true;
 }
 
-void DefaultAction(Enemy& me, float dt) {
+void DefaultAction(Enemy& me) {
 
 }
 

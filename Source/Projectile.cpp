@@ -1,8 +1,8 @@
 #include "projectile.h"
 #include "AEEngine.h"
 #include <iostream>
-Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot, void* source)
-	: projectileSprite(projectileSprite),type(type), velCurr(velCurr),startVel(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), rot(rot), sourceShot(source), startPos(projectileSprite.position),
+Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot, void* source, bool fromFriend)
+	: projectileSprite(projectileSprite),type(type), velCurr(velCurr),startVel(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), rot(rot), sourceShot(source), startPos(projectileSprite.position), friendProjectile(fromFriend),
  boomerangSwitch (false) {}
 
 Projectile::~Projectile() {

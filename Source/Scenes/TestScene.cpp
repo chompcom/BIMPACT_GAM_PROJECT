@@ -224,8 +224,9 @@ void TestDraw()
 		}
 		for (Enemy *e : roomData.enemyList)
 		{
-			if (e)
+			if (e && e->isActive)
 			{
+
 				e->shadow.RenderSprite();
 				e->sprite.RenderSprite();
 			}
