@@ -1011,11 +1011,15 @@ namespace mapRooms
 			}
 		}
 
-
+		
 		// Render Enemy?
-		for (Enemy* i : currentRoom->currentRoomData.enemyList)
+		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
+			Color oldColor = i->sprite.color;
+			i->sprite.color = { 0.5f,0.5f,0.5f,1.f };
 			i->sprite.RenderSprite();
-
+			i->sprite.color = oldColor;
+		}
+		
 	}
 
 

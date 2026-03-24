@@ -105,7 +105,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         //The projectile is shot by a friend
         if ((*it)->friendProjectile) {
             for (Enemy* guy : roomData.enemyList) {
-
+                if (!guy->isActive) continue;
                 if (static_cast<void*>(guy) == (*it)->GetSource()) continue;
                 if (CollisionIntersection_RectRect(
                     (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),

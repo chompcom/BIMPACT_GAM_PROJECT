@@ -587,9 +587,8 @@ void TestUpdate(float dt)
 		{
 			if (e)
 			{
-				// e->target.position = *player.sprite.position;
 				e->Update(dt);
-				//do collision test with each enemy
+				//do collision test with each other friend
 				for (Enemy* b : carryData.enemyList) {
 					//If enemy is the same
 					if (e == b) continue;
@@ -664,6 +663,7 @@ void TestUpdate(float dt)
 			{
 				for (Enemy *e : currentRoom->currentRoomData.enemyList)
 				{
+					if (!e->isActive) continue;
 					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;

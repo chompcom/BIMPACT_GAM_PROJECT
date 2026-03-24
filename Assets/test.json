@@ -155,9 +155,9 @@
 			"health": 100,
 			"damage": 10,
 			"speed": 40,
-			"detectionRadius": 1000,
+			"detectionRadius": 300,
 			"safeRadius": 300,
-			"attackRate": 3,
+			"attackRate": 4,
 			"happyProjectile": {
 				"damage": 50,
 				"radius" : 75,

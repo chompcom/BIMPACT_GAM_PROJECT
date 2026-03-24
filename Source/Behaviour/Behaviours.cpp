@@ -45,7 +45,14 @@ namespace {
 
 // ******************************
 namespace { //functions namespace begin
-    
+   
+
+
+
+// ***************************************
+//               CONTEXTS
+// ***************************************
+
 bool IsTouchingTarget(Enemy& me) {
 
 	if (me.target == false) return false;
@@ -75,6 +82,18 @@ bool IsNotFollowingPlayer(Enemy& me) {
 		return true;
 	}
 }
+
+bool IsTargetInDetectionRadius(Enemy& me) {
+	if (!me.target) return false;
+
+	return (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
+		me.target.GetPosition(), 0));
+}
+
+
+// ***************************************
+//               ACTIONS
+// ***************************************
 
 void WalkLeft(Enemy& me) {
 	me.velocity += Vector2(-50, 0);
