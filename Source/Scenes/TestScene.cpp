@@ -581,12 +581,27 @@ void TestUpdate(float dt)
 			}
 		}
 
+		//Friends of the player!
 		for (Enemy *e : carryData.enemyList)
 		{
 			if (e)
 			{
 				// e->target.position = *player.sprite.position;
 				e->Update(dt);
+				//do collision test with each enemy
+				for (Enemy* b : carryData.enemyList) {
+					//If enemy is the same
+					if (e == b) continue;
+					float ti{};
+					if (
+						CollisionIntersection_RectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
+						) 
+					{
+						Vector2 dir = b->sprite.position - (e->sprite.position + Vector2(AERandFloat(),AERandFloat()));
+						e->sprite.position -= dir.Normalized() * b->sprite.scale.x * 0.5f *dt;
+						b->sprite.position += dir.Normalized() * b->sprite.scale.x * 0.5f * dt;
+					}
+				}
 			}
 		}
 
