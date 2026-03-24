@@ -5,7 +5,10 @@
 enum ProjectileType {
 	BULLET,
 	FIREBALL,
-	AOE
+	AOE,
+	ROUNDING,
+	SCATTER,
+	BOOMERANG
 };
 class Projectile {
 public:
@@ -22,13 +25,14 @@ public:
 	void RemoveProjectile();
 	TexturedSprite GetSprite() const;
 
-public: // flag for my scatter particles
+public: // flag for my projectiles
 	bool isScatter = false;
 	bool didScatter = false;
 
 	const void* GetSource() const;
 
-	
+	Vector2 startPos;
+	bool boomerangSwitch = false;
 private: 
 	TexturedSprite projectileSprite;
 	ProjectileType type;
@@ -39,4 +43,6 @@ private:
 	float rot;
 	Vector2 startVel;
 	const void* sourceShot;
+
+	
 };

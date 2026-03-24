@@ -673,7 +673,21 @@ void TestUpdate(float dt)
 				p->RemoveProjectile();
 			}
 		}
-
+		if (AEInputCheckTriggered(AEVK_2)) {
+			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
+		}
+		if (AEInputCheckTriggered(AEVK_3)) {
+			ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				500.f, 0.5f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
+		}
+		if (AEInputCheckTriggered(AEVK_4)) {
+			ShootBoomerang(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				500.f, 2.0f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
+		}
 		/*
 		if (AEInputCheckTriggered(AEVK_SPACE))
 			projManager.ShootFireball(roomData, player.position, player.direction,
