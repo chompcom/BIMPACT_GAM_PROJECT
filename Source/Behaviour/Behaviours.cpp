@@ -48,13 +48,13 @@ namespace { //functions namespace begin
     
 bool IsTouchingTarget(Enemy& me) {
 
-	if (!me.target.isActive) return false;
+	if (me.target == false) return false;
 
 	float collTime;
 	if (CollisionIntersection_RectRect(me.sprite.position,me.sprite.scale * 0.5f, 
 		me.velocity, 
-			*me.target.position, me.sprite.scale * 0.5f, 
-			*me.target.position - me.target.initialPosition
+			me.target.GetPosition(), me.sprite.scale * 0.5f,
+			me.target.GetPosition() - me.target.initialPosition
 			, collTime) ) {
 				return true;
 	}
@@ -89,8 +89,8 @@ void WalkRight(Enemy& me, float dt){
 }
 
 void MoveToTarget(Enemy& me, float dt) {
-	if (me.target.isActive == false) return;
-	Vector2 direction{ (*me.target.position - me.sprite.position) };
+	if (me.target == false) return;
+	Vector2 direction{ (me.target.GetPosition() - me.sprite.position)};
 	me.velocity += direction;
 	me.velocity = me.velocity.Normalized();
 	CollisionBoundary_Static(me.sprite.position, me.sprite.scale, 1600, 900);
@@ -98,9 +98,9 @@ void MoveToTarget(Enemy& me, float dt) {
 } 
 
 void ApplySlowToTarget(Enemy& me, float dt) {
-	if (me.target.isActive == false) return;
+	if (me.target == false) return;
 
-	*me.target.speedMod = 0.1f;
+	me.target.GetSpeedMod() = 0.1f;
 
 }
 
@@ -121,7 +121,10 @@ void Wander(Enemy& me, float dt) {
 }
 
 void CircleMove(Enemy& me, float dt) {
-	Vector2 direction{ (*me.target.position - me.sprite.position) };
+
+	if (!me.target) return;
+
+	Vector2 direction{ (me.target.GetPosition() - me.sprite.position)};
 	direction = Vector2{direction.y, -direction.x}; //the perpendicular
 
 	me.velocity = direction;
@@ -140,6 +143,8 @@ void TargetEnemyInDetectionRadius(Enemy& me, float dt){
 				return; //found a guy
 			}
 	}
+	//If the boss exists.. perhaps target them
+	if (me.roomData->boss) me.target = *me.roomData->boss;
 	//if i didn't find anything, DON'T retarget...
 
 }
@@ -160,7 +165,13 @@ void SafeDistancePlayer(Enemy& me, float dt) {
 	}
 }
 void TargetRandomEnemy(Enemy& me, float dt) {
-	if (me.roomData->enemyList.empty()) return;
+	
+	//Very special case, this behaviour specifically targets enemies first! 
+	//Once the enemies are gone then the boss is targeted!
+	if (me.roomData->enemyList.empty()) {
+		if (me.roomData->boss) me.target = *me.roomData->boss;
+		return;
+	}
 	me.target = *me.roomData->enemyList[	
 		std::rand() % me.roomData->enemyList.size()];
 }
@@ -188,7 +199,7 @@ void FireProjectile(Enemy& me, float dt) {
 			break;
 		}
 
-		Vector2 direction = me.sprite.position - (*me.target.position);
+		Vector2 direction = me.sprite.position - (me.target.GetPosition());
 
 		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me);
 		me.attackTimer = 3;

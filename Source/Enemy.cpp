@@ -18,20 +18,20 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 
 
 Enemy::Target::Target() : 
-	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{false}
-	,speedMod{nullptr}, dmgMod{nullptr}
+	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{nullptr}
+	, speedMod{ nullptr }, dmgMod{ nullptr }, info{}
 { }
 
 Enemy::Target::~Target() {
 	position = nullptr;
 	isPlayer = false;
-	isActive = false;
+	isActive = nullptr;
 }
 
 Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	position = &them.sprite.position;	
 	initialPosition = them.sprite.position;
-	isActive = true;
+	isActive = &them.isActive;
 	isPlayer = false;
 	speedMod = &them.speedModifier;
 	dmgMod = &them.dmgModifier;
@@ -39,13 +39,88 @@ Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 }
 Enemy::Target& Enemy::Target::operator=(Player& them) {
 
-	isActive = true;
+	isActive = &them.isTargetable;
 	isPlayer = true;
 	position = &them.sprite.position;
 	initialPosition = them.sprite.position;
 	speedMod = &them.speed;
 	dmgMod = nullptr;
 	return *this;
+}
+
+Enemy::Target& Enemy::Target::operator=(Boss& them)
+{
+	
+	isActive = &them.isActive;
+	isPlayer = false;
+	position = &them.sprite.position;
+	initialPosition = them.sprite.position;
+
+	//TODO
+	speedMod = nullptr;
+	//The boss doesn't need a damage modifier
+	dmgMod = nullptr;
+	return *this;
+}
+
+Enemy::Target& Enemy::Target::operator=(Vector2 const& position)
+{
+	//by design, the target will be forever alive
+	*isActive = true;
+	isPlayer = false;
+	initialPosition = position;
+	this->position = &initialPosition;
+	//Keeping the target as dumb as possible.
+	info = 0.0f;
+	speedMod = &info;
+	dmgMod = &info;
+	return *this;
+}
+
+Enemy::Target::operator bool() const
+{
+	if (isActive) //check for nullptr
+		return *isActive;
+	else
+		return false;
+}
+
+bool Enemy::Target::GetActive() const
+{
+	return static_cast<bool>(*this);
+}
+
+Vector2 Enemy::Target::GetPosition() const
+{
+	if (!position) {
+		std::cout << "Position is nullptr! Did you set position correctly?\n";
+		return initialPosition;
+	}
+	return *position;
+}
+
+float& Enemy::Target::GetSpeedMod()
+{
+	if (!speedMod) return info;
+	return *speedMod;
+}
+
+float Enemy::Target::GetSpeedMod() const
+{
+	if (!speedMod) return 0.0f;
+	return *speedMod;
+}
+
+float& Enemy::Target::GetDmgMod()
+{
+	if (!dmgMod) return info;
+	return *dmgMod;
+}
+
+float Enemy::Target::GetDmgMod() const
+{
+	if (!dmgMod) return 0.0f;
+	return *dmgMod;
 }
 
 Enemy::~Enemy() {

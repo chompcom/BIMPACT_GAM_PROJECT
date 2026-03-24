@@ -46,6 +46,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//Let player blink if invulnerable
 	if (player.invulnerableTimer > 0.f)
 	{
+		player.isTargetable = false;
 		if (!player.fadingIn)
 		{
 			player.sprite.color.a -= (0.5f * deltaTime) * 10;
@@ -66,7 +67,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.fadingIn = false;
 		player.sprite.color.a = 1.f;
 	}
-
+	player.isTargetable = true;
 	//set the player's pick up to false if there is still time in the pickUpCooldown
 	if (player.pickUpCooldown > 0.f)
 	{

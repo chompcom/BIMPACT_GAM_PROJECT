@@ -6,6 +6,7 @@
 #include "RoomData.h"
 #include <map>
 #include "Player.h"
+#include "Boss.h"
 
 enum EnemyStates {
 	ES_HAPPY,
@@ -16,6 +17,7 @@ enum EnemyStates {
 
 class EnemyType;
 class Enemy;
+class Boss;
 // forward declaration of room
 typedef void Behaviour(Enemy&,  float dt);
 typedef Behaviour* Command;
@@ -39,6 +41,8 @@ class Enemy {
 		f32 currentHealth;
 		EnemyStates state;
 
+		bool isActive;
+
 		float speedModifier;
 		float dmgModifier;
 
@@ -49,17 +53,12 @@ class Enemy {
 
 		//Target contains information about the target so you can do things to it
 		struct Target {
-			Vector2* position; //!< Points to target location
 			Vector2 initialPosition; //!< The position when the target was found
 
 			//Well there's only players and enemies as entities you see..
 			bool isPlayer;
 
-			//Sometimes the target is already dead. We don't care about them.
-			bool isActive;
 
-			float* speedMod;
-			float* dmgMod;
 
 			Target();
 			~Target();
@@ -67,8 +66,29 @@ class Enemy {
 			//So i can just set the target to the guy
 			Target& operator=(Enemy& them);
 			Target& operator=(Player& them);
+			Target& operator=(Boss& them);
+			//Assign to create a "dumb target" that doesn't move and is always alive
+			Target& operator=(Vector2 const& position);
+
+			//Conversion to bool to check if Target is even alive.
+			operator bool() const;
+			bool GetActive() const;
+
+			Vector2 GetPosition() const;
+			float& GetSpeedMod();
+			float GetSpeedMod() const;
+			float& GetDmgMod();
+			float GetDmgMod() const;
 
 
+			private: //We keep these private because I don't want to accidentally change them.
+				//Sometimes the target is already dead. We don't care about them
+				Vector2* position; //!< Points to target location
+				float* speedMod;
+				float* dmgMod;
+				bool *isActive;
+				//Any extra info will be stored here
+				float info{};
 		} target;
 
 		//points to the room it should be inside, so that it knows whats going on inside!

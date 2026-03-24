@@ -23,6 +23,7 @@ public:
 	f32 throwForce; //amount of force that will be applied to the gift thrown
 	f32 pickUpCooldown; //counter for when the player can pick up a gift
 	f32 invulnerableTimer;
+	bool isTargetable; //When invulntimer is > 0, this is false
 	bool fadingIn;
 	
 	//constructor

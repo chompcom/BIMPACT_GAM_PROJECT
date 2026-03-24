@@ -30,7 +30,7 @@
 			],
 			"damage": 0,
 			"speed": 60,
-			"detectionRadius": 2,
+			"detectionRadius": 5,
 			"safeRadius": 300,
 			"likes": [
 				"Gross"
@@ -43,7 +43,7 @@
 					"context": "IsTouchingTarget",
 					"actions": [
 						"ApplySlowToTarget",
-						"SafeDistancePlayer",
+						"TargetEnemyInDetectionRadius",
 						"MoveToTarget"
 					]
 				},
@@ -52,7 +52,6 @@
 					"actions": [
 						"TargetPlayer",
 						"MoveToTarget",
-						"FireProjectile",
 						"TargetEnemyInDetectionRadius"
 					]
 				},
