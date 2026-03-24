@@ -28,8 +28,10 @@ Boss::~Boss() {}
 
 void Boss::Update(Player& player, f32 dt) {
 	if (currentHealth > 0) {
+		//collideWall = false;
 		bossStateMachine->Update(player, dt);
 		CollideProjectile();
+		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 	}
 	else {
 		gameState = WIN;
@@ -43,8 +45,13 @@ void Boss::CollideProjectile() {
 
 		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
 			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
-			currentHealth -= proj->GetDmg();
-			proj->RemoveProjectile();
+			if (invulnerableTimer <= 0.f) {
+				currentHealth -= proj->GetDmg();
+				std::cout << "Taken Damage: " << proj->GetDmg();
+				std::cout << "Remaining Health: " << currentHealth;
+				proj->RemoveProjectile();
+				invulnerableTimer = 1.0f;
+			}
 		}
 
 	}

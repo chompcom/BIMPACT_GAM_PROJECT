@@ -22,7 +22,7 @@ class Sprite {
 
 		void UpdateTransform();
 
-		//void RenderSprite();
+		//void RenderSprite()rue);
 
 		void RenderSprite(bool changeAlpha = false);
 };

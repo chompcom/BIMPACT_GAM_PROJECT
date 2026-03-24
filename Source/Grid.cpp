@@ -250,6 +250,7 @@ TileDataBase Grid::tileDB{};
 
 Grid::Grid() : width(0), height(0), tileSizeX(0), tileSizeY(0) {
 	Grid::tileDB.Load(".\\Assets\\Levels\\Room_Data\\TilesInfo.json");
+	
 };
 
 bool Grid::IsValid(int x, int y) const {
@@ -429,7 +430,7 @@ bool Grid::TestCollision(float x, float y, int prevCell) const {
 		const int doorFlag = 0x64;
 		const int outOfBounds = 0xffffffff;
 
-		if (this->WorldToCell(x, y + tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y - tileSizeY))==doorFlag) {	// TOP DOOR?
+		if (this->WorldToCell(x, y + tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y - tileSizeY))==doorFlag) {			// TOP DOOR?
 			return false;
 		}
 		else if (this->WorldToCell(x, y - tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y + tileSizeY)) == doorFlag) {	// BOTTOM DOOR?
@@ -561,6 +562,8 @@ bool TileDataBase::Load(std::string const& fileName)
 		newTile.name = tile.get("name", "").asString();
 		newTile.blocked = tile.get("blocked", false).asBool();
 		newTile.asset = tile.get("asset", "").asString();
+		newTile.spawnCategory = tile.get("spawnCategory", "").asString();
+		newTile.spawnName = tile.get("spawnName", "").asString();
 
 		tileTypes[newTile.id] = newTile;
 	}
@@ -645,6 +648,11 @@ std::vector<std::string> TileDataBase::GetAllBiomes() const
 	}
 
 	return result;
+}
+
+
+std::string TileDataBase::GetTexturePath(std::string const& biome) {
+	return this->biomes[biome].imagePath;
 }
 
 std::vector<std::string> Grid::GetAllBiomes()
@@ -798,4 +806,15 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 
 
 	AEGfxSetRenderMode(prevRender);
+}
+
+std::vector<TileType const*> Grid::GetTilesFromBiome(std::string const& biome)
+{
+	return tileDB.GetTilesFromBiome(biome);
+}
+
+
+std::string Grid::GetPathNameBiome(std::string const& biome)
+{
+	return tileDB.GetTexturePath(biome);
 }

@@ -17,7 +17,7 @@ Boss1_FSM::Boss1_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 Charge
 
 void Boss1_FSM::Update(Player& player, f32 dt) {
 	//std::cout << "FSM linked\n";
-	Vector2 direction{};
+	//Vector2 direction{};
 	switch (currentState) {
 		case BOSS_IDLE:
 			boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
@@ -28,6 +28,8 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				if (AERandFloat() >= 0.75f) {
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
+					chargeDirection = target - boss->sprite.position;
+					boss->velocity = chargeDirection.Normalized() * 90;
 					currentState = BOSS_WALK;
 				}
 			}
@@ -48,11 +50,15 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 			break;
 		case BOSS_WALK:
 			std::cout << "Boss Walk\n";
-			direction = target - boss->sprite.position;
-			boss->sprite.position += direction.Normalized() * 90 * dt;
+			
+			boss->sprite.position += chargeDirection.Normalized() * 90 * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
+
 			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
-				CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+				//CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+				boss->collideWall ) {
+				boss->velocity = {};
+				//boss->collideWall = false;
 				currentState = BOSS_IDLE;
 			}
 
@@ -81,6 +87,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		if (interval >= chargeStartup) {
 			interval = 0.0f;
 			chargeDirection = target - boss->sprite.position;
+			boss->velocity = chargeDirection.Normalized() * 150;
 			attackPhase = ATTACK_ATTACK;
 		}
 
@@ -100,8 +107,11 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 
 		interval += dt;
 		//boss->sprite.UpdateTransform();
-		if (interval >= chargeInterval || CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+		if (interval >= chargeInterval || //CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
+			boss->collideWall) {
 			interval = 0.0f;
+			boss->velocity = Vector2{};
+			//boss->collideWall = false;
 			attackPhase = ATTACK_COOLDOWN;
 		}
 
@@ -130,6 +140,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 
 		interval += dt;
 		if (interval >= 0.4f * jumpStartup) {
+			boss->invulnerableTimer = dt;
 			boss->sprite.position += Vector2{ 0, 1 } * 180 * dt;
 		}
 		if (interval >= jumpStartup) {
@@ -144,6 +155,8 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		interval += dt;
 		boss->sprite.position = Vector2{ target.x, target.y + 180 * jumpInterval } + Vector2{ 0, -1 } * 180 * interval;
 		boss->shadow.position = Vector2{ target.x, target.y - 35 };
+		
+		if (interval < 0.9f * jumpInterval) boss->invulnerableTimer = dt;
 
 		if (interval >= 0.9f * jumpInterval) {
 			if (CollisionIntersection_RectRect(target, boss->sprite.scale, Vector2{},

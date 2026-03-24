@@ -49,6 +49,9 @@ struct TileType
 	// maybe cloaking (for hiding)?
 	// maybe animations?
 	std::string asset;
+
+	std::string spawnCategory{};
+	std::string spawnName{};
 };
 
 struct BiomeInfo
@@ -68,6 +71,7 @@ public:
 	bool  TileAllowedInBiome(int TileId, const std::string& biome) const;
 	std::vector<TileType const*> GetTilesFromBiome(const std::string& biomeName) const;
 	std::vector<std::string> GetAllBiomes() const;
+	std::string GetTexturePath(std::string const& biome);
 
 private:
 	std::unordered_map<int, TileType>tileTypes;				// For querying tiletypes
@@ -147,6 +151,10 @@ public:
 		float GetTileHeight() const;
 
 		void RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerScale, AEGfxRenderMode prevRender);
+
+		// Support for content editor staticmethod
+		static std::vector<TileType const*> GetTilesFromBiome(std::string const& biome);
+		static std::string GetPathNameBiome(std::string const& biome);
 	private:
 		//std::vector<std::vector<int>> cells;
 		//int height, width;

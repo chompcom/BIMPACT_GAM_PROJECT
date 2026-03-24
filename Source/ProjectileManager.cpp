@@ -112,13 +112,13 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         bool enemyHit = false;
         for (Enemy* guy : roomData.enemyList) {
 
-            if (static_cast<void*>(guy) == &(*it)) continue;
+            if (static_cast<void*>(guy) == (*it)->GetSource()) continue;
             if ( CollisionIntersection_RectRect(
                     (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),
                     guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst) 
             ) {
                 guy->currentHealth -= (*it)->GetDmg();
-                std::cout << guy << " IS HIT!!" << std::endl;
+                std::cout << (*it)->GetSource() << " HIT " << guy << "!!\n";
                 enemyHit = true;
             }
         }

@@ -23,6 +23,8 @@ class Boss {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		Vector2 velocity{};
+		f32 invulnerableTimer{ 0.f };
+		bool collideWall{ false };
 		
 		std::unique_ptr<Boss_FSM> bossStateMachine;
 

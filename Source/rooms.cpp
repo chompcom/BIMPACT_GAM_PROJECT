@@ -133,7 +133,6 @@ namespace Config {
 		if (fileName.empty()) return "Default";
 		return fileName;
 	}
-
 }
 
 // Is this still needed lmao
@@ -191,49 +190,241 @@ namespace mapRooms
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
+
+			Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			gift->shadow.position = Vector2{ 0.f, -40.f };
+			sauce->shadow.position = Vector2{ 0.f, -40.f };
+			spray->shadow.position = Vector2{ 0.f, -40.f };
+
+			gift->position = Vector2{ -300, 0 };
+			sauce->position = Vector2{ 300,0 };
+			spray->position = Vector2{ 0,-200 };
+
+			currentRoomData.giftList.push_back(gift);
+			currentRoomData.giftList.push_back(sauce);
+			currentRoomData.giftList.push_back(spray);
+
+
 		}
 
 
 		// Normal Room Init
 		if (rmType == RoomType::Normal) {
 
-			
-			// Choose biomes, integrate grid system (for map data purposes)
-			std::vector<std::string> biomes = Grid::GetAllBiomes();
-			if (!biomes.empty()) {
-				//int idx = Map::RandInt(0, biomes.size() - 1);
-				int idx = std::rand() % static_cast<int>(biomes.size());
-				biome = biomes[idx];
+			// =========================
+			// [1] Choose biome / layout
+			// =========================
+			std::vector<std::string> biomeNames = Grid::GetAllBiomes();
+
+			if (!biomeNames.empty()) {
+				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
+				biome = biomeNames[randomBiomeIndex];
 			}
 			else {
 				biome = "Normal";
 			}
 
-			// Grid
-			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
-			this->roomGrid.LoadRoomCSV(this->layoutFile);
+			layoutFile = Config::ChooseRandomRoomCsv(biome);
+			roomGrid.LoadRoomCSV(layoutFile);
+			themeTag = biome;
 			PatchDoorCells();
 
+			// 2. Marker helper lambdas used only in Init
+			auto isGenericEnemyMarker = [](int tileId) { return tileId == 200; };
+			auto isSpecificEnemyMarker = [](int tileId) { return tileId >= 201 && tileId <= 499; };
+			auto isGenericGiftMarker = [](int tileId) { return tileId == 500; };
+			auto isSpecificGiftMarker = [](int tileId) { return tileId >= 501 && tileId <= 799; };
+
+			auto findRandomSpecificMarkerForBiome =
+				[this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
+				{
+					std::vector<TileType const*> biomeTiles = Grid::GetTilesFromBiome(biome);
+					std::vector<TileType const*> validMarkers{};
+
+					for (TileType const* currentTileType : biomeTiles)
+					{
+						if (!currentTileType) continue;
+						if (currentTileType->spawnCategory != spawnCategory) continue;
+
+						if (spawnCategory == "enemy" && !isSpecificEnemyMarker(currentTileType->id)) continue;
+						if (spawnCategory == "gift" && !isSpecificGiftMarker(currentTileType->id)) continue;
+						if (currentTileType->spawnName.empty()) continue;
+
+						validMarkers.push_back(currentTileType);
+					}
+
+					if (validMarkers.empty()) return nullptr;
+
+					int randomMarkerIndex = std::rand() % static_cast<int>(validMarkers.size());
+					return validMarkers[randomMarkerIndex];
+				};
+
+			auto createEnemyByName = [this](std::string const& enemyName, Vector2 spawnPosition)
+				{
+					EnemyType const& enemyType = DataLoader::GetEnemyType(enemyName);
+
+					Enemy* enemy = new Enemy(
+						enemyType,
+						DataLoader::CreateTexture(enemyType.spritePath),
+						DataLoader::CreateTexture("Assets/shadow.png")
+					);
+
+					enemy->sprite.position = spawnPosition;
+					enemy->shadow.position = spawnPosition - Vector2{ 0.0f, 35.0f };
+					enemy->sprite.UpdateTransform();
+					enemy->shadow.UpdateTransform();
+
+					enemy->ChangeState(EnemyStates::ES_NEUTRAL);
+					enemy->roomData = &currentRoomData;
+
+					currentRoomData.enemyList.push_back(enemy);
+				};
+
+			auto createGiftFromMarker = [this](TileType const& giftMarkerTile, Vector2 spawnPosition)
+				{
+
+					std::string giftDisplayName = giftMarkerTile.spawnName.empty() ? giftMarkerTile.name : giftMarkerTile.spawnName;
+
+					std::string giftTexturePath = giftMarkerTile.asset.empty() ? "Assets/default.png" : giftMarkerTile.asset;
+
+					Labels giftTraits{};
+
+					// Idk how should i set traits
+					if (giftDisplayName == "Spray")
+					{
+						giftTraits.insert("Clean");
+					}
+					else
+					{
+						// HotSauce / Trash default to Gross for now
+						giftTraits.insert("Gross");
+					}
+
+					Gift* gift = new Gift(
+						giftDisplayName,
+						giftTraits,
+						DataLoader::CreateTexture(giftTexturePath),
+						DataLoader::CreateTexture("Assets/shadow.png"),
+						spawnPosition
+					);
+
+					gift->position = spawnPosition;
+					gift->sprite.position = spawnPosition;
+					gift->shadow.position = spawnPosition - Vector2{ 0.0f, 40.0f };
+					gift->sprite.UpdateTransform();
+					gift->shadow.UpdateTransform();
+
+					currentRoomData.giftList.push_back(gift);
+				};
 
 
-			currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/poprocks.png"), DataLoader::CreateTexture("Assets/shadow.png")));
-			for (Enemy* i : currentRoomData.enemyList) {
-				i->shadow.position = Vector2{ 0.f, -35.f };
-				i->shadow.UpdateTransform();
-				i->ChangeState(EnemyStates::ES_NEUTRAL);
-				i->roomData = &this->currentRoomData;
+			// [STEP 3]: Scan room grid and spawn by marker
+			for (int row = 0; row < roomGrid.GetHeight(); ++row)
+			{
+				for (int column = 0; column < roomGrid.GetWidth(); ++column)
+				{
+					// IMPORTANT:
+					// Current GetCell behaves like GetCell(x, y),
+					// so use (column, row) here.
+					int currentTileId = roomGrid.GetCell(column, row);
+					Vector2 spawnPosition = roomGrid.CellToWorldCenter(row, column);	// Set to world coordinates spawn?
+
+					if (isGenericEnemyMarker(currentTileId))
+					{
+						TileType const* randomEnemyMarker =
+							findRandomSpecificMarkerForBiome("enemy");
+
+						if (randomEnemyMarker && !randomEnemyMarker->spawnName.empty())
+						{
+							createEnemyByName(randomEnemyMarker->spawnName, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isSpecificEnemyMarker(currentTileId))
+					{
+						TileType const* currentTileType = Grid::QueryTileType(currentTileId);
+
+						if (currentTileType && !currentTileType->spawnName.empty())
+						{
+							createEnemyByName(currentTileType->spawnName, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isGenericGiftMarker(currentTileId))
+					{
+						TileType const* randomGiftMarker =
+							findRandomSpecificMarkerForBiome("gift");
+
+						if (randomGiftMarker && !randomGiftMarker->spawnName.empty())
+						{
+							createGiftFromMarker(*randomGiftMarker, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+					else if (isSpecificGiftMarker(currentTileId))
+					{
+						TileType const* currentTileType = Grid::QueryTileType(currentTileId);
+
+						if (currentTileType && !currentTileType->spawnName.empty())
+						{
+							createGiftFromMarker(*currentTileType, spawnPosition);
+						}
+
+						roomGrid.SetCell(row, column, 0);
+					}
+				}
+			}
+		}
+
+
+			std::cout << "Display Room Init of " << biome << "\n";
+			//roomGrid.
+			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
+			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
+			//		const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
+			//		std::cout << (tile ? tile->id : 0) << " ";
+			//		if (!tile) continue;
+			//		if (tile->id > 101) {
+			//			//std::cout << "Spawned " << tile->name << "! \n";
+			//			const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
+			//			currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
+			//			currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
+
+			//		}
+			//	}
+			//	std::cout << "\n";
+			//}
+
+			// Spawn enemies
+			if (0 && currentRoomData.enemyList.empty()) {
+				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+				for (Enemy* i : currentRoomData.enemyList) {
+					i->shadow.position = Vector2{ 0.f, -35.f };
+					i->shadow.UpdateTransform();
+					i->ChangeState(EnemyStates::ES_NEUTRAL);
+					i->roomData = &this->currentRoomData;
+				}
 			}
 
+			// Spawn gifts
+			if (0 && currentRoomData.giftList.empty()) {
+				Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+				gift->shadow.position = Vector2{ 0.f, -40.f };
+				currentRoomData.giftList.push_back(gift);
+			}
+		//}
 			// Gifts here (1 Gift per room for now)
 			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
 			//Vector2 giftPos{ 200.0f, 450.0f };
 			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
 			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-
-			Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			gift->shadow.position = Vector2{ 0.f, -40.f };
-			currentRoomData.giftList.push_back(gift);
-		}
+			
+		
 
 		// Boss Init
 		if (rmType == RoomType::Boss) {
@@ -836,8 +1027,8 @@ namespace mapRooms
 		if (gridSize <= 0) return; // shouldn't happen ngl
 
 		float minX = AEGfxGetWinMinX();
-		float maxX = AEGfxGetWinMaxX();
-		float minY = AEGfxGetWinMinY();
+		float maxX = AEGfxGetWinMaxX(); UNREFERENCED_PARAMETER(maxX);
+		float minY = AEGfxGetWinMinY();	UNREFERENCED_PARAMETER(minY);
 		float maxY = AEGfxGetWinMaxY();
 
 		float cell	= 18.0F;
@@ -1000,7 +1191,7 @@ namespace mapRooms
 		currentRoom = target; // Room changed
 		StopAllAudio();
 		RoomEnterAudio();
-		//currentRoom->visited = true;
+		
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 

@@ -50,13 +50,15 @@ void HandleGameOverInputs(std::vector<TexturedSprite>& buttonSprite)
 	if (IsCursorInRect(Vector2(buttonSprite[0].position.x, buttonSprite[0].position.y), buttonSprite[0].scale.x, buttonSprite[0].scale.y)
 		&& AEInputCheckReleased(AEVK_LBUTTON))
 	{
-		next = GS_QUIT;
+		//next = GS_MAINMENU;
+		ChangeState(GS_MAINMENU);
 	}
 
 	if (IsCursorInRect(Vector2(buttonSprite[1].position.x, buttonSprite[1].position.y), buttonSprite[1].scale.x, buttonSprite[1].scale.y)
 		&& AEInputCheckReleased(AEVK_LBUTTON))
 	{
-		next = GS_RESTART;
+		//next = GS_RESTART;
+		ChangeState(GS_RESTART);
 	}
 }
 
