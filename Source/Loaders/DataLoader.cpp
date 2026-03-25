@@ -175,7 +175,14 @@ namespace DataLoader {
 				tmp.speed = name["speed"].asFloat();
 				tmp.detectionRadius = name["detectionRadius"].asFloat();
 				tmp.safeRadius = name["safeRadius"].asFloat();
+				tmp.attackRate = name["attackRate"].asFloat();
 
+				if (name["traits"]) {
+					for (Json::Value& traitStr : name["traits"]) {
+						tmp.traits.insert(traitStr.asString());
+						
+					}
+				}
 
 				if (MapProjectile(tmp.happyProjectile, name, "happyProjectile"))
 				{

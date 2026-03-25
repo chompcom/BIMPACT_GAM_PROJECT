@@ -20,7 +20,7 @@
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
-	static const int minGrid = 2, maxGrid = 5;
+	static const int minGrid = 3, maxGrid = 4;
 
 	// Legacy File System Scanning (Perhaps rework in a utils class?)
 	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)
@@ -186,7 +186,7 @@ namespace mapRooms
 
 		// For starting Rooms Init
 		if (this->rmType == RoomType::Start) {
-			biome = "Normal";
+			biome = "Start";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
 			//this->layoutFile = "Assets\"
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
@@ -546,6 +546,7 @@ namespace mapRooms
 		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
 		std::string const bossDir	= "Assets/Rooms/Boss";
 
+		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
 		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
 		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);

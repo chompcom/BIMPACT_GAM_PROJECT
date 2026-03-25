@@ -236,7 +236,7 @@ void FireProjectile(Enemy& me) {
 		bool amIFriendsWithThePlayer = me.state == ES_HAPPY;
 
 		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me, amIFriendsWithThePlayer);
-		me.attackTimer = 3;
+		me.attackTimer = me.type.attackRate;
 	}
 }
 void DVDMove(Enemy& me) {
