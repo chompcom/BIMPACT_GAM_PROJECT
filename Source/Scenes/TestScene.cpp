@@ -580,6 +580,8 @@ void TestUpdate(float dt)
 			{
 				// e->target.position = *player.sprite.position;
 				e->Update(dt);
+				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1400, 700))
+					e->velocity = -e->velocity;
 			}
 		}
 
@@ -620,7 +622,7 @@ void TestUpdate(float dt)
 					e->shadow.position.y = e->prevPos.y;
 					e->velocity = -e->velocity;
 				}*/
-				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 900))
+				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1400, 700))
 					e->velocity = -e->velocity;
 			}
 		}
@@ -690,6 +692,8 @@ void TestUpdate(float dt)
 						e->AssessTraits(gift->traits);
 					}
 				}
+				//if (CollisionBoundary_Static(gift->sprite.position, gift->sprite.scale, 1200, 600))
+					//gift->velocity = -gift->velocity;
 			}
 		}
 
