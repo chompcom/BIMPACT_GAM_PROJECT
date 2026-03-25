@@ -9,6 +9,7 @@
 #include "../Enemy.h"
 #include "../rooms.h"
 #include "../Loaders/DataLoader.h"
+#include "../BoundaryCollision.h"
 #include "../Collision.h"
 #include "../RoomData.h"
 #include "Projectile.h"
@@ -588,6 +589,7 @@ void TestUpdate(float dt)
 			if (e)
 			{
 				e->Update(dt);
+
 				//do collision test with each other friend
 				for (Enemy* b : carryData.enemyList) {
 					//If enemy is the same
@@ -602,6 +604,24 @@ void TestUpdate(float dt)
 						b->sprite.position += dir.Normalized() * b->sprite.scale.x * 0.5f * dt;
 					}
 				}
+
+				// Test Player Collision with Map
+				/*int enemyCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(e->sprite.position.x, e->sprite.position.y);
+				if (enemyCurCell >= 0 && enemyCurCell != 0xffffff)
+					currentRoom->lastValidCell = enemyCurCell;
+				int enemyColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(e->sprite.position.x, e->sprite.position.y, e->sprite.scale.x, e->sprite.scale.y, enemyCurCell);
+				if (enemyColRes & COLLISION_LEFT || enemyColRes & COLLISION_RIGHT) {
+					e->sprite.position.x = e->prevPos.x; // Test for x collision
+					e->shadow.position.x = e->prevPos.x;
+					e->velocity = -e->velocity;
+				}
+				if (enemyColRes & COLLISION_TOP || enemyColRes & COLLISION_BOTTOM) {
+					e->sprite.position.y = e->prevPos.y; // Test for y collision
+					e->shadow.position.y = e->prevPos.y;
+					e->velocity = -e->velocity;
+				}*/
+				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 900))
+					e->velocity = -e->velocity;
 			}
 		}
 

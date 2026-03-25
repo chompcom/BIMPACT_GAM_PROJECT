@@ -47,6 +47,7 @@ class Enemy {
 		float dmgModifier;
 
 		Vector2 velocity;
+		Vector2 prevPos;
 
 		float wanderTimer;
 		float attackTimer;

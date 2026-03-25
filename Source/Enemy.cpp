@@ -8,7 +8,7 @@
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
-	,wanderTimer{}, shadow{shadowSprite}
+	, wanderTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
 {
@@ -163,6 +163,7 @@ void Enemy::Update(float dt) {
 	}
 
 	//update movement here
+	prevPos = sprite.position;
 	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
 	speedModifier = 1.0f;
 	sprite.UpdateTransform();
