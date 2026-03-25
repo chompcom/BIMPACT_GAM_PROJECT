@@ -118,6 +118,7 @@ void MoveToTarget(Enemy& me) {
 
 void ApplySlowToTarget(Enemy& me) {
 	if (me.target == false) return;
+	if (me.state == ES_HAPPY && me.target.isPlayer) return;
 
 	me.target.GetSpeedMod() = 0.1f;
 
