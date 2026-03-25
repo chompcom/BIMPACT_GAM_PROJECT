@@ -87,7 +87,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 
 		int collideFlags = 0x00;
 
-		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, boundaries.x, boundaries.y, collideFlags)) {
+		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, boundaries.x, boundaries.y, collideFlags)) {
 			// Left and Right collision inverse x
 			if (collideFlags & 0x00000003) {
 				gift.velocity.x *= -1;

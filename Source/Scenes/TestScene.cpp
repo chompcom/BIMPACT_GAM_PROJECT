@@ -647,7 +647,7 @@ void TestUpdate(float dt)
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
@@ -686,7 +686,7 @@ void TestUpdate(float dt)
 				
 
 
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -696,7 +696,7 @@ void TestUpdate(float dt)
 			{
 				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
