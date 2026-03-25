@@ -159,10 +159,17 @@
 						"TargetEnemyInDetectionRadius"		
 					]
 				},
+				{ "context": "IsWandering",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"Wander"
+					]
+				},
+
 				{"context":"default",
 				"actions":[ 
-					"Wander",
-					"TargetEnemyInDetectionRadius"		
+					"FireProjectile",
+					"Wander"
 				]
 				}
 			],
