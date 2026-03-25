@@ -90,6 +90,13 @@ bool IsTargetInDetectionRadius(Enemy& me) {
 		me.target.GetPosition(), 0));
 }
 
+bool IsWanderTimerUp(Enemy& me) {
+	return me.wanderTimer <= 0.f;
+}
+
+bool IsWaitTimerUp(Enemy& me) {
+	return me.waitTimer <= 0.f;
+}
 
 // ***************************************
 //               ACTIONS
@@ -120,7 +127,7 @@ void ApplySlowToTarget(Enemy& me) {
 	if (me.target == false) return;
 	if (me.state == ES_HAPPY && me.target.isPlayer) return;
 
-	me.target.GetSpeedMod() = 0.1f;
+	me.target.GetSpeedMod() = 0.2f;
 
 }
 
@@ -262,12 +269,22 @@ void DamageTarget(Enemy& me) {
 	if (me.attackTimer <= 0) {
 		me.attackTimer = me.type.attackRate;
 		
-		if (me.target.isPlayer) {
-			playerTakesDamage(*me.roomData->player);
+		if (me.target.isPlayer && me.state != ES_HAPPY) {
+			if (me.type.damage < 0.f) {
+				playerHealsDamage(*me.roomData->player);
+			}
+			else {
+				playerTakesDamage(*me.roomData->player);
+			}
 		}
+		me.target.DealDamage(me.type.damage);
 
 	}
 
+}
+
+void Wait(Enemy& me) {
+	me.waitTimer = 3;
 }
 
 void PullTarget(Enemy& me) {
@@ -316,6 +333,8 @@ void InitCommands() {
         {"IsTouchingTarget",IsTouchingTarget},
 		{"IsNotFollowingPlayer", IsNotFollowingPlayer},
 		{"IsTargetInDetectionRadius", IsTargetInDetectionRadius},
+		{"IsWaitTimerUp", IsWaitTimerUp},
+		{"IsWanderTimerUp", IsWanderTimerUp},
 		{"default", DefaultFlag}
     };
 
@@ -340,7 +359,9 @@ void InitCommands() {
 		{"DamageTarget", DamageTarget},
 		{"PullTarget", PullTarget},
 		{"PushTarget", PushTarget},
+		{"Wait", Wait},
 		{"ClearTarget", ClearTarget}
+
 
     };
 }
@@ -348,10 +369,6 @@ void InitCommands() {
 
 //anonymous namespace for reasons
 namespace {
-    
-
-    
-   
     
 
 } //end anonymous namespace

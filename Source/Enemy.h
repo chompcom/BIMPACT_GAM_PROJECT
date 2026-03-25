@@ -50,6 +50,7 @@ class Enemy {
 		Vector2 prevPos;
 
 		float wanderTimer;
+		float waitTimer;
 		float attackTimer;
 
 		//Target contains information about the target so you can do things to it
@@ -81,12 +82,14 @@ class Enemy {
 			float& GetDmgMod();
 			float GetDmgMod() const;
 
+			void DealDamage(float dmg);
 
 			private: //We keep these private because I don't want to accidentally change them.
 				//Sometimes the target is already dead. We don't care about them
 				Vector2* position; //!< Points to target location
 				float* speedMod;
 				float* dmgMod;
+				float* health;
 				bool *isActive;
 				//Any extra info will be stored here
 				float info{};

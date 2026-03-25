@@ -189,6 +189,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 	player.throwState = false;
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
+	player.baseSpeed = 400.f;
 	player.throwForce = 0.f;
 	player.pickUpCooldown = 0.f;
 	player.invulnerableTimer = 0.f;

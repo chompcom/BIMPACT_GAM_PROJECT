@@ -683,6 +683,7 @@ void TestUpdate(float dt)
 					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;
+
 						e->AssessTraits(gift->traits);
 					}
 				}

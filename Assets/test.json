@@ -276,7 +276,7 @@
 				"sprite": "Assets/snowball.png"
 			},
 			"traits": ["Cold","Wet"],
-			"likes": ["Cold", "Gross"],
+			"likes": ["Cold", "Wet"],
 			"dislikes": ["Hot"],
 			"happy": [
 				{ "context": "IsTargetInDetectionRadius",
