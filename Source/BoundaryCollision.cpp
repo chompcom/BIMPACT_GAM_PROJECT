@@ -36,6 +36,37 @@ bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength
 	}
 }
 
+
+bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& COLLISION_FLAGS) {
+	const int	COLLISION_LEFT		= 0x00000001;	//0001
+	const int	COLLISION_RIGHT		= 0x00000002;	//0010
+	const int	COLLISION_TOP		= 0x00000004;	//0100
+	const int	COLLISION_BOTTOM	= 0x00000008;	//1000
+
+	Vector2 min = position - scale * 0.5f;
+	Vector2 max = position + scale * 0.5f;
+
+	if (min.x < (float)(-1 * windowLength / 2)) {
+		position.x = (float)(-1 * windowLength / 2) + scale.x / 2.f;
+		COLLISION_FLAGS |= COLLISION_LEFT;
+	}
+	if (max.x > (float)(windowLength / 2)) {
+		position.x = (float)(windowLength / 2) - scale.x / 2.f;
+		COLLISION_FLAGS |= COLLISION_RIGHT;
+	}
+	if (min.y < (float)(-1 * windowHeight / 2)) {
+		position.y = (float)(-1 * windowHeight / 2) + scale.y / 2.f;
+		COLLISION_FLAGS |= COLLISION_TOP;
+
+	}
+	if (max.y > (float)(windowHeight / 2)) {
+		position.y = (float)(windowHeight / 2) - scale.y / 2.f;
+		COLLISION_FLAGS |= COLLISION_BOTTOM;
+	}
+
+	return COLLISION_FLAGS != 0x00000000;
+}
+
 /*bool CollisionBoundary_Dynamic(const AABB& boundingBox, s32 windowLength, s32 windowHeight, Vector2 velocity) {
 	float tFirst = 0.0f;
 	float tLast = (float)AEFrameRateControllerGetFrameTime();;

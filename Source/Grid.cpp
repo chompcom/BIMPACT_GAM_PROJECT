@@ -673,7 +673,7 @@ Vector2 Grid::CellToWorldCenter(int curCell) const
 {
 	int x = curCell % this->width;
 	int y = curCell / this->width;
-	Vector2 res = { x, y };
+	Vector2 res = this->CellToWorldCenter(y, x);
 	return res;
 }
 

@@ -630,6 +630,8 @@ void TestUpdate(float dt)
 		//accumulatedTime += dt;
 		
 
+		
+
 		// Update Gifts (Must update both sides)
 		for (Gift* g : roomData.giftList)
 		{
@@ -638,34 +640,36 @@ void TestUpdate(float dt)
 				//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-				
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary());	// A weird quirk would be standing v close to wall and throwing gifts however
-
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
 				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, g->sprite.scale.x, g->sprite.scale.y, prevCell);
+
+				// get angle lmao tan-1(opp / adj) 
+				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
+					
+				// Collides but no velocity?
+				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 0.5f, 0.5f };
 
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
 					tmp += " LEFT ";
-					//g->velocity.x = -g->velocity.x;
-					g->velocity.y -= 1.3;
+					g->velocity.x *= -1;	// Inverse x if left
 				}
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
-					//g->velocity.y = -g->velocity.y;
-					g->velocity.y -= 1.3;
+					g->velocity.x *= -1;	// Inverse x if left
+				
 				}
 				if (res & COLLISION_TOP) {
 					tmp += " TOP ";
-					//g->velocity.x = -g->velocity.x;
-					g->velocity.x -= 1.3;
+					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (res & COLLISION_BOTTOM) {
 					tmp += " BOTTOM ";
-					//g->velocity.x = -g->velocity.x;
-					g->velocity.x -= 1.3;
+					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (tmp.size() > 0) { 
-					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+					g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+					g->velocity /= 1.3;		// Dampen bounce
 					std::cout << tmp << '\n';
 				};
 				
@@ -679,7 +683,8 @@ void TestUpdate(float dt)
 		{
 			if (g)
 			{
-				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()});
+				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
+				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
 				g->sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
