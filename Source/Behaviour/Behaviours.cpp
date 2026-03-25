@@ -94,8 +94,20 @@ bool IsWanderTimerUp(Enemy& me) {
 	return me.wanderTimer <= 0.f;
 }
 
+bool IsWandering(Enemy& me) {
+	return me.wanderTimer > 0.f;
+}
+
 bool IsWaitTimerUp(Enemy& me) {
 	return me.waitTimer <= 0.f;
+}
+
+bool IsWaiting(Enemy& me) {
+	if (me.waitTimer > 0.f) {
+		std::cout << me.type.name << " is really waiting!\n";
+
+	}
+	return me.waitTimer > 0.f;
 }
 
 // ***************************************
@@ -115,7 +127,10 @@ void WalkRight(Enemy& me){
 }
 
 void MoveToTarget(Enemy& me) {
-	if (me.target == false) return;
+	if (me.target == false) {
+		me.velocity = Vector2();
+		return;
+	}
 	Vector2 direction{ (me.target.GetPosition() - me.sprite.position)};
 	me.velocity += direction;
 	me.velocity = me.velocity.Normalized();
@@ -126,6 +141,7 @@ void MoveToTarget(Enemy& me) {
 void ApplySlowToTarget(Enemy& me) {
 	if (me.target == false) return;
 	if (me.state == ES_HAPPY && me.target.isPlayer) return;
+
 
 	me.target.GetSpeedMod() = 0.2f;
 
@@ -167,7 +183,6 @@ void TargetEnemyInDetectionRadius(Enemy& me){
 		if (!guy->isActive) continue;
 		if (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
 			guy->sprite.position, guy->sprite.scale.x)) {
-			std::cout << "Found " << guy->type.name << std::endl;
 
 				me.target = *guy;
 				return; //found a guy
@@ -284,7 +299,11 @@ void DamageTarget(Enemy& me) {
 }
 
 void Wait(Enemy& me) {
-	me.waitTimer = 3;
+	
+	if (me.waitTimer <= 0.f) {
+		std::cout << me.type.name << "is waiting. \n";
+		me.waitTimer = 3;
+	}
 }
 
 void PullTarget(Enemy& me) {
@@ -329,12 +348,14 @@ void InitCommands() {
     commands.reserve(30);
     flags.reserve(30);
 
-    flags = {
-        {"IsTouchingTarget",IsTouchingTarget},
+	flags = {
+		{"IsTouchingTarget",IsTouchingTarget},
 		{"IsNotFollowingPlayer", IsNotFollowingPlayer},
 		{"IsTargetInDetectionRadius", IsTargetInDetectionRadius},
 		{"IsWaitTimerUp", IsWaitTimerUp},
 		{"IsWanderTimerUp", IsWanderTimerUp},
+		{"IsWandering", IsWandering },
+		{ "IsWaiting" , IsWaiting },
 		{"default", DefaultFlag}
     };
 

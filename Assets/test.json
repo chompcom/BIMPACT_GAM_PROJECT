@@ -131,17 +131,18 @@
 				"sprite": "Assets/fireball.png"
 			},
 			"happy": [
+				{ "context": "IsWaiting",
+					"actions":[
+						"ClearTarget"
+						,"MoveToTarget"
+					]
+				},
 				{
 					"context":"IsTouchingTarget",
 					"actions":[
-						"FireProjectile"
-					]
-				},
-				{ "context": "IsNotFollowingPlayer",
-					"actions":[
-						"TargetPlayer",
-						"MoveToTarget",
-						"TargetEnemyInDetectionRadius"		
+						"ClearTarget",
+						"FireProjectile",
+						"Wait"
 					]
 				},
 				{ "context": "IsTargetInDetectionRadius",
@@ -149,6 +150,14 @@
 					"TargetEnemyInDetectionRadius",
 					"MoveToTarget"
 				  ]
+				},
+				{ "context": "IsNotFollowingPlayer",
+					"actions":[
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"		
+					]
 				},
 				{"context":"default",
 				"actions":[ 
@@ -211,12 +220,20 @@
 			"likes": ["Hot"],
 			"dislikes": ["Wet", "Gross"],
 			"happy": [
+				{ "context": "IsTargetInDetectionRadius",
+				  "actions" : [
+					"MoveToTarget",
+					"CircleMove",
+					"FireProjectile"
+				  ]
+				},
+
 				{ "context": "default",
 				   "actions": [
 					"TargetPlayer",
 					"MoveToTarget",
-					"TargetEnemyInDetectionRadius",
-					"FireProjectile"	
+					"ClearTarget",
+					"TargetEnemyInDetectionRadius"
 				]}
 			],
 			"neutral": [
@@ -286,6 +303,7 @@
 				},
 				{ "context": "default",
 				   "actions": [
+					"ClearTarget",
 					"TargetEnemyInDetectionRadius"
 				]}
 			],
