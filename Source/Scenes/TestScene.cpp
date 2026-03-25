@@ -653,7 +653,7 @@ void TestUpdate(float dt)
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
 					
 				// Collides but no velocity?
-				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
+				if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
 
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
