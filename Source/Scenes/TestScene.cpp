@@ -535,7 +535,7 @@ void TestUpdate(float dt)
 		//	std::cout << '\n';
 		//}
 
-			// Game map update
+		// Game map update
 		gameMap.GetCurrentRoom()->Update(dt);
 
 		mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
@@ -629,7 +629,42 @@ void TestUpdate(float dt)
 		{
 			if (g)
 			{
-				UpdateGift(*g, player, dt);
+				//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
+				
+				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
+				
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary());	// A weird quirk would be standing v close to wall and throwing gifts however
+
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, g->sprite.scale.x, g->sprite.scale.y, prevCell);
+
+				std::string tmp{};
+				if (res & COLLISION_LEFT) {
+					tmp += " LEFT ";
+					//g->velocity.x = -g->velocity.x;
+					g->velocity.y /= -1.3;
+				}
+				if (res & COLLISION_RIGHT) {
+					tmp += " RIGHT ";
+					//g->velocity.y = -g->velocity.y;
+					g->velocity.y /= -1.3;
+				}
+				if (res & COLLISION_TOP) {
+					tmp += " TOP ";
+					//g->velocity.x = -g->velocity.x;
+					g->velocity.x /= -1.3;
+				}
+				if (res & COLLISION_BOTTOM) {
+					tmp += " BOTTOM ";
+					//g->velocity.x = -g->velocity.x;
+					g->velocity.x /= -1.3;
+				}
+				if (tmp.size() > 0) { 
+					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+					std::cout << tmp << '\n';
+				};
+				
+
+
 				g->sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
@@ -638,7 +673,7 @@ void TestUpdate(float dt)
 		{
 			if (g)
 			{
-				UpdateGift(*g, player, dt);
+				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()});
 				g->sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
