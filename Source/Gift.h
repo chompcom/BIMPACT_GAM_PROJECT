@@ -7,6 +7,7 @@
 //forward declaration, needed as Player.h needs the Gift class, 
 //and Gift.h needs the player class
 class Player;
+namespace mapRooms { struct Room; };
 
 //simple gift class for testing
 class Gift {
@@ -25,4 +26,4 @@ public:
 	Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position = Vector2{ 0.f, 0.f });
 };
 
-void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries);
+void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries, mapRooms::Room* curRoom);
