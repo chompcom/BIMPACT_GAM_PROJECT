@@ -33,7 +33,7 @@ AEAudio RoundingProjectileSound;
 // Room
 AEAudioGroup RoomAudio;
 AEAudio DoorSound;
-
+AEAudio ForestAudio;
 
 static float chargingTimer = 0.0f;
 static bool maxPlaying = false;
@@ -76,6 +76,7 @@ void InitAudio() {
 	 // Room Group
 	 RoomAudio = AEAudioCreateGroup();
 	 DoorSound = AEAudioLoadSound("Assets/Audio/Room/Door.wav");
+	 ForestAudio = AEAudioLoadSound("Assets/Audio/Room/ForestBiome.wav");
 }
 
 void FreeAudio() {
@@ -93,9 +94,9 @@ void PlayerDmgAudio() {
 }
 void PlayerFootstepAudio() {
 	int step = rand() % 3;
-	if (step == 0) AEAudioPlay(Footstep_1, PlayerAudio, 1.0f, 1.0f, 0);
-	else if (step == 1) AEAudioPlay(Footstep_2, PlayerAudio, 1.0f, 1.0f, 0);
-	else AEAudioPlay(Footstep_3, PlayerAudio, 1.0f, 1.0f, 0);
+	if (step == 0) AEAudioPlay(Footstep_1, PlayerAudio, 0.4f, 1.0f, 0);
+	else if (step == 1) AEAudioPlay(Footstep_2, PlayerAudio, 0.4f, 1.0f, 0);
+	else AEAudioPlay(Footstep_3, PlayerAudio, 0.4f, 1.0f, 0);
 }
 
 void PlayerPickUpAudio() {
@@ -180,6 +181,11 @@ void StopMobAudio() {
 void RoomEnterAudio() {
 	AEAudioPlay(DoorSound, RoomAudio, 0.5f, 2.0f, 0);
 }
+
+void ForestBiomeAudio() {
+	AEAudioPlay(ForestAudio, RoomAudio, 0.5, 2.0f, 1);
+}
+
 
 void StopAllAudio() {
 	AEAudioStopGroup(PlayerAudio);

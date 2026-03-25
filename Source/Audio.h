@@ -33,7 +33,7 @@ void RoomEnterAudio();
 // Background
 
 void MainMenuAudio();
-void FireBiomeAudio();
+void BossRoomAudio();
 void WaterBiomeAudio();
 void ForestBiomeAudio();
 void AlmanacBGAudio();

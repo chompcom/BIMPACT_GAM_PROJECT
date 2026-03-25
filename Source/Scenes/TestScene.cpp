@@ -266,7 +266,7 @@ void TestDraw()
 			if (p)
 				p->RenderProjectile();
 	}
-
+	
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite(true);
 	// rock.sprite.RenderSprite();
@@ -543,6 +543,12 @@ void TestUpdate(float dt)
 		RoomData& carryData = gameMap.GetTransferData();
 
 
+		static mapRooms::Room* lastRoom = nullptr;
+		if (currentRoom != lastRoom)
+		{
+			lastRoom = currentRoom;
+			if (currentRoom->biome == "Green") ForestBiomeAudio();
+		}
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
 		if (curCell >= 0 && curCell != 0xffffff)
