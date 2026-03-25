@@ -188,6 +188,7 @@ namespace mapRooms
 		if (this->rmType == RoomType::Start) {
 			biome = "Normal";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
+			//this->layoutFile = "Assets\"
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
@@ -531,6 +532,7 @@ namespace mapRooms
 		DeleteMap();
 	}
 
+	// Maybe make it dynamic
 	void Map::LoadRoomArtLists()
 	{
 		// Normal Room Files
