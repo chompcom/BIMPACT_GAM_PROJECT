@@ -819,12 +819,17 @@ void TestUpdate(float dt)
 		/* IF player position is changed to other screen, reset enemies to player position */
 		if (player.position != positionResetTest)
 		{
+			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+				enemy->ChangeState(ES_NEUTRAL);
+			}
 			for (Enemy* e : carryData.enemyList)
 			{
 				e->sprite.position = player.position;
 				e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
 				// assess friend traits when entering a new room!
+
 				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+					
 					enemy->AssessTraits(e->type.traits, false);
 				}
 			}
