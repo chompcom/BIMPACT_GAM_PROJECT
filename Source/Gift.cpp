@@ -35,7 +35,7 @@ Gift::Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position)
 
 
 //this is just to test throwing
-void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
+void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries)
 {
 	//if player and gift are intersecting, pick up the gift
 	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
@@ -57,7 +57,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	{
 		//gift.sprite.position = gift.position;
 		gift.position += gift.velocity * deltaTime;
-		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, 1600, 900)) {
+		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, boundaries.x, boundaries.y)) {
 			gift.velocity /= -1.3;
 		}
 		else {

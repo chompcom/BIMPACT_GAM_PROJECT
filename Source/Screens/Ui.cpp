@@ -347,24 +347,21 @@ bool UIManager::PointInRoundedRect(UIElement const& element, Vector2 const& poin
 	f32 radius = element.borderRadiusRatio * minSide;
 	radius = AEClamp(radius, 0.0f, minSide * 0.5f);
 
-	// 2. Mirror the point into the first quadrant (symmetry)
 	// This allows us to calculate the distance for only one corner
 	const f32 deltaX = std::fabs(point.x - element.resolvedPos.x);
 	const f32 deltaY = std::fabs(point.y - element.resolvedPos.y);
 
-	// 3. Offset the point relative to the "inner" corner 
 	// (The center point of the corner's curvature circle)
 	const f32 qx = deltaX - (halfWidth - radius);
 	const f32 qy = deltaY - (halfHeight - radius);
 
-	// 4. Calculate the Signed Distance Field (SDF)
-	// External: Distance to the corner if the point is outside the inner box
+	// Distance to the corner if the point is outside the inner box
 	const f32 externalDist = std::sqrt(AEMax(qx, 0.0f) * AEMax(qx, 0.0f) + AEMax(qy, 0.0f) * AEMax(qy, 0.0f));
 
-	// Internal: Distance to the nearest edge if the point is inside the inner box
+	// Distance to the nearest edge if the point is inside the inner box
 	const f32 internalDist = AEMin(AEMax(qx, qy), 0.0f);
 
-	// Final distance is the combination, subtracting the radius to "round" the edge
+	// Final distance
 	const f32 signedDistance = (externalDist + internalDist) - radius;
 
 	return signedDistance <= 0.0f;

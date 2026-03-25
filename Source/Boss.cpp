@@ -7,7 +7,7 @@ extern LV_STATES gameState;
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
 	const RoomData& currentRoom, std::vector<AttackData> attackData)
 	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite},
-	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }
+	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	if (enemyName == "Boss 1") {
 		std::cout << "true\n";
@@ -32,8 +32,10 @@ void Boss::Update(Player& player, f32 dt) {
 		bossStateMachine->Update(player, dt);
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
+		speedModifier = 1.0f;
 	}
 	else {
+		isActive = false;
 		gameState = WIN;
 	}
 }

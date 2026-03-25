@@ -15,8 +15,9 @@
 // ----------------------------------------------------------------------------
 const int	COLLISION_LEFT = 0x00000001;	//0001
 const int	COLLISION_RIGHT = 0x00000002;	//0010
-const int	COLLISION_TOP = 0x00000004;	//0100
+const int	COLLISION_TOP = 0x00000004;		//0100
 const int	COLLISION_BOTTOM = 0x00000008;	//1000
+
 const int COLLISION_DOOR_LEFT = 0x00000010;
 const int COLLISION_DOOR_RIGHT = 0x00000020;
 const int COLLISION_DOOR_TOP = 0x00000040;
@@ -147,10 +148,14 @@ public:
 		static TileDataBase tileDB;
 
 		Vector2 CellToWorldCenter(int row, int col) const;
+		Vector2 CellToWorldCenter(int curCell) const;
 		float GetTileWidth() const;
 		float GetTileHeight() const;
 
 		void RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerScale, AEGfxRenderMode prevRender);
+
+		// Support for room
+		Vector2 GetBoundary() const;
 
 		// Support for content editor staticmethod
 		static std::vector<TileType const*> GetTilesFromBiome(std::string const& biome);

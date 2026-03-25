@@ -29,7 +29,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					chargeDirection = target - boss->sprite.position;
-					boss->velocity = chargeDirection.Normalized() * 90;
+					boss->velocity = chargeDirection.Normalized() * 90 * boss->speedModifier;
 					currentState = BOSS_WALK;
 				}
 			}
@@ -51,7 +51,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 		case BOSS_WALK:
 			std::cout << "Boss Walk\n";
 			
-			boss->sprite.position += chargeDirection.Normalized() * 90 * dt;
+			boss->sprite.position += boss->velocity * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
 
 			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
@@ -87,7 +87,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		if (interval >= chargeStartup) {
 			interval = 0.0f;
 			chargeDirection = target - boss->sprite.position;
-			boss->velocity = chargeDirection.Normalized() * 150;
+			boss->velocity = chargeDirection.Normalized() * 150 * boss->speedModifier;
 			attackPhase = ATTACK_ATTACK;
 		}
 
@@ -97,12 +97,12 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		std::cout << "Boss Charge Attack\n";
 		//direction = target - boss->sprite.position;
 
-		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale, chargeDirection.Normalized() * 150 * dt,
+		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale, boss->velocity * dt,
 			player.position, player.sprite.scale, player.GetVelocity() * dt, collisionTime)) {
 			playerTakesDamage(player);
 		}
 
-		boss->sprite.position += chargeDirection.Normalized() * 150 * dt;
+		boss->sprite.position += boss->velocity * dt;
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
 
 		interval += dt;

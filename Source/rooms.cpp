@@ -20,7 +20,7 @@
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
-	static const int minGrid = 2, maxGrid = 5;
+	static const int minGrid = 3, maxGrid = 4;
 
 	// Legacy File System Scanning (Perhaps rework in a utils class?)
 	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)
@@ -186,8 +186,9 @@ namespace mapRooms
 
 		// For starting Rooms Init
 		if (this->rmType == RoomType::Start) {
-			biome = "Normal";
+			biome = "Start";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
+			//this->layoutFile = "Assets\"
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
@@ -213,9 +214,7 @@ namespace mapRooms
 		// Normal Room Init
 		if (rmType == RoomType::Normal) {
 
-			// =========================
-			// [1] Choose biome / layout
-			// =========================
+			// 1. Choose biome / layout
 			std::vector<std::string> biomeNames = Grid::GetAllBiomes();
 
 			if (!biomeNames.empty()) {
@@ -237,8 +236,7 @@ namespace mapRooms
 			auto isGenericGiftMarker = [](int tileId) { return tileId == 500; };
 			auto isSpecificGiftMarker = [](int tileId) { return tileId >= 501 && tileId <= 799; };
 
-			auto findRandomSpecificMarkerForBiome =
-				[this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
+			auto findRandomSpecificMarkerForBiome = [this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
 				{
 					std::vector<TileType const*> biomeTiles = Grid::GetTilesFromBiome(biome);
 					std::vector<TileType const*> validMarkers{};
@@ -534,6 +532,7 @@ namespace mapRooms
 		DeleteMap();
 	}
 
+	// Maybe make it dynamic
 	void Map::LoadRoomArtLists()
 	{
 		// Normal Room Files
@@ -547,6 +546,7 @@ namespace mapRooms
 		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
 		std::string const bossDir	= "Assets/Rooms/Boss";
 
+		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
 		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
 		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);
@@ -1011,11 +1011,15 @@ namespace mapRooms
 			}
 		}
 
-
+		
 		// Render Enemy?
-		for (Enemy* i : currentRoom->currentRoomData.enemyList)
+		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
+			Color oldColor = i->sprite.color;
+			i->sprite.color = { 0.5f,0.5f,0.5f,1.f };
 			i->sprite.RenderSprite();
-
+			i->sprite.color = oldColor;
+		}
+		
 	}
 
 

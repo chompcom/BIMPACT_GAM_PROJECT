@@ -25,4 +25,4 @@ public:
 	Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position = Vector2{ 0.f, 0.f });
 };
 
-void UpdateGift(Gift & gift, Player & player, f32 deltaTime);
+void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries);

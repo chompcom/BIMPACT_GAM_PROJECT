@@ -8,9 +8,9 @@
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
-	,wanderTimer{}, shadow{shadowSprite}
+	, wanderTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
 	,speedModifier{1.f}, dmgModifier{1.f}
-	,attackTimer{}
+	,attackTimer{}, isActive{true}
 {
 		ChangeState(initialState);
 }
@@ -18,20 +18,20 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 
 
 Enemy::Target::Target() : 
-	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{false}
-	,speedMod{nullptr}, dmgMod{nullptr}
+	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{nullptr}
+	, speedMod{ nullptr }, dmgMod{ nullptr }, info{}
 { }
 
 Enemy::Target::~Target() {
 	position = nullptr;
 	isPlayer = false;
-	isActive = false;
+	isActive = nullptr;
 }
 
 Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	position = &them.sprite.position;	
 	initialPosition = them.sprite.position;
-	isActive = true;
+	isActive = &them.isActive;
 	isPlayer = false;
 	speedMod = &them.speedModifier;
 	dmgMod = &them.dmgModifier;
@@ -39,13 +39,88 @@ Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 }
 Enemy::Target& Enemy::Target::operator=(Player& them) {
 
-	isActive = true;
+	isActive = &them.isTargetable;
 	isPlayer = true;
 	position = &them.sprite.position;
 	initialPosition = them.sprite.position;
 	speedMod = &them.speed;
 	dmgMod = nullptr;
 	return *this;
+}
+
+Enemy::Target& Enemy::Target::operator=(Boss& them)
+{
+	
+	isActive = &them.isActive;
+	isPlayer = false;
+	position = &them.sprite.position;
+	initialPosition = them.sprite.position;
+
+	//TODO
+	speedMod = &them.speedModifier;
+	//The boss doesn't need a damage modifier
+	dmgMod = nullptr;
+	return *this;
+}
+
+Enemy::Target& Enemy::Target::operator=(Vector2 const& position)
+{
+	//by design, the target will be forever alive
+	*isActive = true;
+	isPlayer = false;
+	initialPosition = position;
+	this->position = &initialPosition;
+	//Keeping the target as dumb as possible.
+	info = 0.0f;
+	speedMod = &info;
+	dmgMod = &info;
+	return *this;
+}
+
+Enemy::Target::operator bool() const
+{
+	if (isActive) //check for nullptr
+		return *isActive;
+	else
+		return false;
+}
+
+bool Enemy::Target::GetActive() const
+{
+	return static_cast<bool>(*this);
+}
+
+Vector2 Enemy::Target::GetPosition() const
+{
+	if (!position) {
+		std::cout << "Position is nullptr! Did you set position correctly?\n";
+		return initialPosition;
+	}
+	return *position;
+}
+
+float& Enemy::Target::GetSpeedMod()
+{
+	if (!speedMod) return info;
+	return *speedMod;
+}
+
+float Enemy::Target::GetSpeedMod() const
+{
+	if (!speedMod) return 0.0f;
+	return *speedMod;
+}
+
+float& Enemy::Target::GetDmgMod()
+{
+	if (!dmgMod) return info;
+	return *dmgMod;
+}
+
+float Enemy::Target::GetDmgMod() const
+{
+	if (!dmgMod) return 0.0f;
+	return *dmgMod;
 }
 
 Enemy::~Enemy() {
@@ -59,28 +134,41 @@ void Enemy::ChangeState(EnemyStates newstate)
 	{
 	case ES_HAPPY:
 		FriendSuccessAudio();
+		sprite.color = { 0.f,1.f,0.f,1.f };
+
 		currentBehavior = enemyType.happy;
 		break;
 	case ES_NEUTRAL:
+		sprite.color = { 1.f,1.f,1.f,1.f };
 		currentBehavior = enemyType.neutral;
 		break;
 	case ES_ANGRY:
+		this->attackTimer = type.attackRate + ((AERandFloat() * 2.f) - 1.f);
+		sprite.color = { 1.f,0.f,0.f,1.f };
 		currentBehavior = enemyType.angry;
 		break;
 	}
 }
 
 void Enemy::Update(float dt) {
+
+	if (!isActive) return;
+
+	if (currentHealth <= EPSILON) {
+		isActive = false;
+	}
+
 	for (auto& combi : currentBehavior) {
 		if ( combi.first(*this)) { //so we are doing the check one at a time
 			for (Command& actions : combi.second){
-				actions(*this,dt);
+				actions(*this);
 			}
 			break;//don't do the other checks
 		}
 	}
 
 	//update movement here
+	prevPos = sprite.position;
 	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
 	speedModifier = 1.0f;
 	sprite.UpdateTransform();
@@ -95,16 +183,16 @@ void Enemy::Update(float dt) {
 		attackTimer -= dt;
 }
 
-void Enemy::AssessTraits(Labels labels){
+void Enemy::AssessTraits(Labels labels, bool giftCheck){
 		for (std::string thing : type.dislikes) {
 			std::cout << "I hate " << thing << " ";
 		}
-	if (HasCommonTrait(labels,type.likes)){
+	if (giftCheck && HasCommonTrait(labels,type.likes)){
 		ChangeState(ES_HAPPY);
-
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
 		/* code */
+		
 		std::cout << type.name << " is Angry!\n";
 		ChangeState(ES_ANGRY);
 	}
@@ -113,7 +201,7 @@ void Enemy::AssessTraits(Labels labels){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{}
 {
 }
 

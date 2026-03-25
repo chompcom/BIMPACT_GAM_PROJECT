@@ -46,6 +46,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	//Let player blink if invulnerable
 	if (player.invulnerableTimer > 0.f)
 	{
+		player.isTargetable = false;
 		if (!player.fadingIn)
 		{
 			player.sprite.color.a -= (0.5f * deltaTime) * 10;
@@ -66,7 +67,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.fadingIn = false;
 		player.sprite.color.a = 1.f;
 	}
-
+	player.isTargetable = true;
 	//set the player's pick up to false if there is still time in the pickUpCooldown
 	if (player.pickUpCooldown > 0.f)
 	{
@@ -155,7 +156,7 @@ void playerTakesDamage(Player& player)
 	if (player.invulnerableTimer <= 0.f)
 	{
 		PlayerDmgAudio();
-		--(player.health);
+		if (player.health > 0) --player.health;
 
 		if (player.health <= 0) gameState = LOSE;
 
@@ -166,7 +167,7 @@ void playerTakesDamage(Player& player)
 
 void playerHealsDamage(Player& player)
 {
-	player.health++;
+	if (player.health < 3) ++player.health;
 }
 
 void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
