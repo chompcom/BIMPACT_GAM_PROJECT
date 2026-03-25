@@ -123,6 +123,8 @@ void TestLoad()
 	//// Too easy: 32702, 0xA341311Cu,
 
 	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	//load the gift types if they arent loaded
+	if (allGiftTypes.empty()) LoadGiftTypes();
 }
 
 void TestInit()
@@ -220,7 +222,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : roomData.enemyList)
@@ -247,7 +249,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : carryData.enemyList)
@@ -424,6 +426,8 @@ void TestFree()
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 
+	
+
 	// if (gameMap.GetCurrentRoom())
 	// projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 }
@@ -477,6 +481,8 @@ void TestUnload()
 	loseUi.Clear();
 	loseUiInitialized = false;
 	// isPaused = false;
+
+	allGiftTypes.clear();
 }
 
 void TestUpdate(float dt)
@@ -641,7 +647,7 @@ void TestUpdate(float dt)
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
@@ -680,7 +686,7 @@ void TestUpdate(float dt)
 				
 
 
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -690,7 +696,7 @@ void TestUpdate(float dt)
 			{
 				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -735,11 +741,10 @@ void TestUpdate(float dt)
 				for (Enemy* e : currentRoom->currentRoomData.enemyList)
 				{
 					if (!e->isActive) continue;
-					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
+					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;
-
-						e->AssessTraits(gift->traits);
+						e->AssessTraits(gift->giftType.traits);
 					}
 				}
 				//if (CollisionBoundary_Static(gift->sprite.position, gift->sprite.scale, 1200, 600))

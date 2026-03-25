@@ -26,6 +26,7 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	throwForce{ 0.f },
 	pickUpCooldown{ 0.f },
 	invulnerableTimer{ 0.f },
+	isTargetable { true },
 	fadingIn{ false }
 {
 }
@@ -112,7 +113,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//if (AEInputCheckTriggered(AEVK_SPACE))
 		ChargingThrowAudio(deltaTime);
 		//reset the held gift's position after shaking
-		(*player.heldGift).sprite.position = (*player.heldGift).position;
+		(*player.heldGift).giftType.sprite.position = (*player.heldGift).position;
 
 		(*player.heldGift).shakeState = true;
 
@@ -126,7 +127,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 			(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 };
 
 		shakeVector = shakeVector.Normalized() * (player.throwForce / 700.f);
-		(*player.heldGift).sprite.position += shakeVector;
+		(*player.heldGift).giftType.sprite.position += shakeVector;
 
 	}
 
@@ -136,7 +137,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		StopChargingAudio();
 		PlayerThrowAudio();
 		//reset the held gift's position after shaking
-		(*player.heldGift).sprite.position = (*player.heldGift).position;
+		(*player.heldGift).giftType.sprite.position = (*player.heldGift).position;
 		(*player.heldGift).shakeState = false;
 		//put down the gift and give it a velocity depenedent 
 		//on how long the player has been charging up for

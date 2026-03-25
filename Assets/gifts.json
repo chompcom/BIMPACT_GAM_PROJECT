@@ -1,0 +1,19 @@
+{
+	"giftTypes": [
+		{
+			"name": "Trash",
+			"traits": [ "Gross" ],
+			"spritePath": "Assets/Gifts/trash.png"
+		},
+		{
+			"name": "HotSauce",
+			"traits": [ "Hot", "Spicy" ],
+			"spritePath": "Assets/Gifts/hotsauce.png"
+		},
+		{
+			"name": "Spray",
+			"traits": [ "Wet", "Clean" ],
+			"spritePath": "Assets/Gifts/spray.png"
+		}
+	]
+}
