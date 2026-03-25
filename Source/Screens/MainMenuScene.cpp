@@ -31,6 +31,7 @@ void MainMenuLoad()
 			ChangeState(GS_LEVEL1);
 		});
 
+
 	ui.BindOnClick("btn_editor", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);

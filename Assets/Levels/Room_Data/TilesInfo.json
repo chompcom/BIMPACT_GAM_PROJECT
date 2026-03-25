@@ -109,6 +109,10 @@
   "Ice": {
     "allowedTiles": [0,1,3,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/ICE/Room1.png"
+  },
+  "Ocean": {
+    "allowedTiles": [0,1,3,100,200,500,501,502,503],
+    "imagePath":"Assets/Rooms/Normal/OCEAN/Room1.png"
   }
   }
 }
