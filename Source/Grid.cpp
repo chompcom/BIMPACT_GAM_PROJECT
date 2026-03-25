@@ -385,24 +385,18 @@ int  Grid::SetCell(int row, int col, int val) {
 int Grid::WorldToCell(float x, float y) const
 {
 	//if (tileSizeX <= 0.0f || tileSizeY <= 0.0f) return -1;
-
 	//// Check if they are within the padding
 	//// I forget how coordinates work in this game lmao
 	//if (y < this->pad.top || y > (AEGfxGetWindowHeight()-this->pad.bottom) || 
 	//	x < this->pad.left || x > (AEGfxGetWindowWidth() - this->pad.right)) return -1;
-
 	//// Offset then calculate
 	//int col = static_cast<int>((x - this->pad.left) / (this->tileSizeX));
 	//int row = static_cast<int>((y - this->pad.top) / (this->tileSizeY));
-
 	////int col = static_cast<int>(x / tileSizeX);
 	////int row = static_cast<int>(y / tileSizeY);
-
 	//if (row < 0 || row >= height || col < 0 || col >= width)
 	//	return -1;
-
 	//return row * width + col;
-
 
 	if (tileSizeX <= 0.0f || tileSizeY <= 0.0f) return -1;
 
@@ -419,11 +413,8 @@ int Grid::WorldToCell(float x, float y) const
 	int col = static_cast<int>(localX / tileSizeX);
 	int row = static_cast<int>(localY / tileSizeY);
 
-	if (row < 0 || row >= height || col < 0 || col >= width)
-		return -1;
-
+	if (row < 0 || row >= height || col < 0 || col >= width) return -1;
 	return row * width + col;
-
 }
 
 bool Grid::TestCollision(float x, float y, int prevCell) const {
@@ -678,6 +669,14 @@ Vector2 Grid::CellToWorldCenter(int row, int col) const
 	return Vector2{ x, y };
 }
 
+Vector2 Grid::CellToWorldCenter(int curCell) const
+{
+	int x = curCell % this->width;
+	int y = curCell / this->width;
+	Vector2 res = { x, y };
+	return res;
+}
+
 float Grid::GetTileWidth() const
 {
 	return tileSizeX;
@@ -686,6 +685,11 @@ float Grid::GetTileWidth() const
 float Grid::GetTileHeight() const
 {
 	return tileSizeY;
+}
+
+Vector2 Grid::GetBoundary() const {
+	Vector2 res{ this->GetWidth() * this->GetTileWidth(), this->GetHeight() * this->GetTileHeight() };
+	return res;
 }
 
 
