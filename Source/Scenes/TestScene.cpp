@@ -122,6 +122,8 @@ void TestLoad()
 	//// Too easy: 32702, 0xA341311Cu,
 
 	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	//load the gift types if they arent loaded
+	if (allGiftTypes.empty()) LoadGiftTypes();
 }
 
 void TestInit()
@@ -219,7 +221,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : roomData.enemyList)
@@ -246,7 +248,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : carryData.enemyList)
@@ -423,6 +425,8 @@ void TestFree()
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 
+	
+
 	// if (gameMap.GetCurrentRoom())
 	// projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 }
@@ -476,6 +480,8 @@ void TestUnload()
 	loseUi.Clear();
 	loseUiInitialized = false;
 	// isPaused = false;
+
+	allGiftTypes.clear();
 }
 
 void TestUpdate(float dt)
@@ -611,7 +617,7 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				UpdateGift(*g, player, dt);
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -620,7 +626,7 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				UpdateGift(*g, player, dt);
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -664,10 +670,10 @@ void TestUpdate(float dt)
 				for (Enemy *e : currentRoom->currentRoomData.enemyList)
 				{
 					if (!e->isActive) continue;
-					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
+					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;
-						e->AssessTraits(gift->traits);
+						e->AssessTraits(gift->giftType.traits);
 					}
 				}
 			}
