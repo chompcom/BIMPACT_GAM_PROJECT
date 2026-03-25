@@ -134,12 +134,17 @@ void Enemy::ChangeState(EnemyStates newstate)
 	{
 	case ES_HAPPY:
 		FriendSuccessAudio();
+		sprite.color = { 0.f,1.f,0.f,1.f };
+
 		currentBehavior = enemyType.happy;
 		break;
 	case ES_NEUTRAL:
+		sprite.color = { 1.f,1.f,1.f,1.f };
 		currentBehavior = enemyType.neutral;
 		break;
 	case ES_ANGRY:
+		this->attackTimer = type.attackRate + ((AERandFloat() * 2.f) - 1.f);
+		sprite.color = { 1.f,0.f,0.f,1.f };
 		currentBehavior = enemyType.angry;
 		break;
 	}
@@ -178,16 +183,16 @@ void Enemy::Update(float dt) {
 		attackTimer -= dt;
 }
 
-void Enemy::AssessTraits(Labels labels){
+void Enemy::AssessTraits(Labels labels, bool giftCheck){
 		for (std::string thing : type.dislikes) {
 			std::cout << "I hate " << thing << " ";
 		}
-	if (HasCommonTrait(labels,type.likes)){
+	if (giftCheck && HasCommonTrait(labels,type.likes)){
 		ChangeState(ES_HAPPY);
-
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
 		/* code */
+		
 		std::cout << type.name << " is Angry!\n";
 		ChangeState(ES_ANGRY);
 	}
@@ -196,7 +201,7 @@ void Enemy::AssessTraits(Labels labels){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{}
 {
 }
 

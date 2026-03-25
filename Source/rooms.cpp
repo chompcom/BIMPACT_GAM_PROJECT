@@ -20,7 +20,7 @@
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
-	static const int minGrid = 2, maxGrid = 5;
+	static const int minGrid = 3, maxGrid = 4;
 
 	// Legacy File System Scanning (Perhaps rework in a utils class?)
 	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)

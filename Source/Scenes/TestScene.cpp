@@ -751,6 +751,10 @@ void TestUpdate(float dt)
 			{
 				e->sprite.position = player.position;
 				e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
+				// assess friend traits when entering a new room!
+				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+					enemy->AssessTraits(e->type.traits, false);
+				}
 			}
 			for (Projectile *p : roomData.projectileList)
 			{

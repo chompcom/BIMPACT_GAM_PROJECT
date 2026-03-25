@@ -101,7 +101,7 @@ class Enemy {
 		~Enemy();
 
 		void Update(float dt);
-		void AssessTraits(Labels labelsToCheck);
+		void AssessTraits(Labels labelsToCheck, bool giftCheck = true);
 		void ChangeState(EnemyStates state);
 };
 
@@ -113,7 +113,7 @@ public:
 	f32 health;
 	f32 damage;
 	f32 speed;
-	
+	float attackRate;
 	//! Radius used for "Target___InDetectionRadius"
 	f32 detectionRadius;
 
