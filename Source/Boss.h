@@ -22,7 +22,9 @@ class Boss {
 		TexturedSprite sprite;
 		TexturedSprite shadow;
 		f32 currentHealth;
+		bool isActive; // For checking if its alive
 		Vector2 velocity{};
+		f32 speedModifier{ 1.0f };
 		f32 invulnerableTimer{ 0.f };
 		bool collideWall{ false };
 		

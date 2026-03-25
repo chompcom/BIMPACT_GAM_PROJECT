@@ -5,11 +5,14 @@
 enum ProjectileType {
 	BULLET,
 	FIREBALL,
-	AOE
+	AOE,
+	ROUNDING,
+	SCATTER,
+	BOOMERANG
 };
 class Projectile {
 public:
-	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot = 0.0f,void* source = nullptr);
+	Projectile(TexturedSprite projectileSprite,ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot = 0.0f,void* source = nullptr, bool fromFriend = false);
 	~Projectile();
 	void UpdateProjectile(f32 dt);
 	void RenderProjectile();
@@ -22,13 +25,15 @@ public:
 	void RemoveProjectile();
 	TexturedSprite GetSprite() const;
 
-public: // flag for my scatter particles
+public: // flag for my projectiles
 	bool isScatter = false;
 	bool didScatter = false;
 
 	const void* GetSource() const;
 
-	
+	Vector2 startPos;
+	const bool friendProjectile; 
+	bool boomerangSwitch = false;
 private: 
 	TexturedSprite projectileSprite;
 	ProjectileType type;
@@ -39,4 +44,7 @@ private:
 	float rot;
 	Vector2 startVel;
 	const void* sourceShot;
+	//Just a check if its shot from a friend, then it will hit enemies and not the player
+
+	
 };

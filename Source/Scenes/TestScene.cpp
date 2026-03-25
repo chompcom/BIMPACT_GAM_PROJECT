@@ -9,6 +9,7 @@
 #include "../Enemy.h"
 #include "../rooms.h"
 #include "../Loaders/DataLoader.h"
+#include "../BoundaryCollision.h"
 #include "../Collision.h"
 #include "../RoomData.h"
 #include "Projectile.h"
@@ -224,8 +225,9 @@ void TestDraw()
 		}
 		for (Enemy *e : roomData.enemyList)
 		{
-			if (e)
+			if (e && e->isActive)
 			{
+
 				e->shadow.RenderSprite();
 				e->sprite.RenderSprite();
 			}
@@ -494,18 +496,18 @@ void TestUpdate(float dt)
 		}
 
 		// Get previous pos
-		Vector2 prevPos{player.position.x, player.position.y};
+		Vector2 prevPos{ player.position.x, player.position.y };
 
 		// to test damage
 		if (player.health > 0)
 		{
-			if (AEInputCheckTriggered(AEVK_P))
+			/*if (AEInputCheckTriggered(AEVK_P))
 				playerTakesDamage(player);
 			if (AEInputCheckTriggered(AEVK_O))
 				playerHealsDamage(player);
 
 			if (AEInputCheckTriggered(AEVK_M))
-				PlayerInit(player);
+				PlayerInit(player);*/
 
 			checkIfAlmanacClicked(*almanacIcon, almanac);
 
@@ -518,28 +520,28 @@ void TestUpdate(float dt)
 			player.shadow.UpdateTransform();
 		}
 
-	//winUI.Update();
+		//winUI.Update();
 
-	// Get previous pos
-	//Vector2 prevPos{ player.position.x, player.position.y };
-	
-	//UpdatePlayer(player, dt); // Player update
+		// Get previous pos
+		//Vector2 prevPos{ player.position.x, player.position.y };
+
+		//UpdatePlayer(player, dt); // Player update
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
-	// Print Current Grid
-	//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-	//for (int i = 0; i < 9; ++i) {
-	//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-	//	std::cout << '\n';
-	//}
+		// Print Current Grid
+		//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
+		//for (int i = 0; i < 9; ++i) {
+		//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
+		//	std::cout << '\n';
+		//}
 
-		// Game map update
+			// Game map update
 		gameMap.GetCurrentRoom()->Update(dt);
 
-		mapRooms::Room *currentRoom = gameMap.GetCurrentRoom();
-		RoomData &roomData = currentRoom->currentRoomData;
-		RoomData &carryData = gameMap.GetTransferData();
-		
+		mapRooms::Room* currentRoom = gameMap.GetCurrentRoom();
+		RoomData& roomData = currentRoom->currentRoomData;
+		RoomData& carryData = gameMap.GetTransferData();
+
 
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -562,20 +564,14 @@ void TestUpdate(float dt)
 
 		// Game Map Update was here
 
-		// to test damage
-		if (AEInputCheckTriggered(AEVK_P))
-			playerTakesDamage(player);
-		if (AEInputCheckTriggered(AEVK_O))
-			playerHealsDamage(player);
+		checkIfAlmanacClicked(*almanacIcon, almanac);
 
-	checkIfAlmanacClicked(*almanacIcon, almanac);
-
-	MoveArrow(*arrowSprite, almanac, dt);
+		MoveArrow(*arrowSprite, almanac, dt);
 
 		// std::cout << player.position.x << player.position.y;
 
 		// Update Enemies (carryData version is only for "Friends")
-		for (Enemy *e : roomData.enemyList)
+		for (Enemy* e : roomData.enemyList)
 		{
 			if (e)
 			{
@@ -584,17 +580,50 @@ void TestUpdate(float dt)
 			}
 		}
 
-		for (Enemy *e : carryData.enemyList)
+		//Friends of the player!
+		for (Enemy* e : carryData.enemyList)
 		{
 			if (e)
 			{
-				// e->target.position = *player.sprite.position;
 				e->Update(dt);
+
+				//do collision test with each other friend
+				for (Enemy* b : carryData.enemyList) {
+					//If enemy is the same
+					if (e == b) continue;
+					float ti{};
+					if (
+						CollisionIntersection_RectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
+						)
+					{
+						Vector2 dir = b->sprite.position - (e->sprite.position + Vector2(AERandFloat(), AERandFloat()));
+						e->sprite.position -= dir.Normalized() * b->sprite.scale.x * 0.5f * dt;
+						b->sprite.position += dir.Normalized() * b->sprite.scale.x * 0.5f * dt;
+					}
+				}
+
+				// Test Player Collision with Map
+				/*int enemyCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(e->sprite.position.x, e->sprite.position.y);
+				if (enemyCurCell >= 0 && enemyCurCell != 0xffffff)
+					currentRoom->lastValidCell = enemyCurCell;
+				int enemyColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(e->sprite.position.x, e->sprite.position.y, e->sprite.scale.x, e->sprite.scale.y, enemyCurCell);
+				if (enemyColRes & COLLISION_LEFT || enemyColRes & COLLISION_RIGHT) {
+					e->sprite.position.x = e->prevPos.x; // Test for x collision
+					e->shadow.position.x = e->prevPos.x;
+					e->velocity = -e->velocity;
+				}
+				if (enemyColRes & COLLISION_TOP || enemyColRes & COLLISION_BOTTOM) {
+					e->sprite.position.y = e->prevPos.y; // Test for y collision
+					e->shadow.position.y = e->prevPos.y;
+					e->velocity = -e->velocity;
+				}*/
+				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 900))
+					e->velocity = -e->velocity;
 			}
 		}
 
 		// Update Gifts (Must update both sides)
-		for (Gift *g : roomData.giftList)
+		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
@@ -603,7 +632,7 @@ void TestUpdate(float dt)
 				g->shadow.UpdateTransform();
 			}
 		}
-		for (Gift *g : carryData.giftList)
+		for (Gift* g : carryData.giftList)
 		{
 			if (g)
 			{
@@ -645,12 +674,13 @@ void TestUpdate(float dt)
 		}
 
 		// Gifts and Enemy Check
-		for (Gift *gift : currentRoom->currentRoomData.giftList)
+		for (Gift* gift : currentRoom->currentRoomData.giftList)
 		{
 			if (!(gift->velocity == Vector2()))
 			{
-				for (Enemy *e : currentRoom->currentRoomData.enemyList)
+				for (Enemy* e : currentRoom->currentRoomData.enemyList)
 				{
+					if (!e->isActive) continue;
 					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;
@@ -663,7 +693,7 @@ void TestUpdate(float dt)
 		// 4) Transfer enemies to our carrylist if they are essentially happy
 		for (size_t i = 0; i < roomData.enemyList.size();)
 		{
-			Enemy *e = roomData.enemyList[i];
+			Enemy* e = roomData.enemyList[i];
 			if (e && e->state == EnemyStates::ES_HAPPY) // This is the happy check ig?
 			{
 				carryData.enemyList.push_back(e);
@@ -676,7 +706,7 @@ void TestUpdate(float dt)
 		// Idk how to check which gifts to pick up
 		for (size_t i = 0; i < roomData.giftList.size();)
 		{
-			Gift *g = roomData.giftList[i];
+			Gift* g = roomData.giftList[i];
 			if (g && g->pickUpState) // If currently picked up, need to check pickupstate = false and remove such????
 			{
 				carryData.giftList.push_back(g);										   // Transfer to carryData list (active list essentially)
@@ -690,7 +720,7 @@ void TestUpdate(float dt)
 		// Idk how to check which gifts to pick up
 		for (size_t i = 0; i < carryData.giftList.size();)
 		{
-			Gift *g = carryData.giftList[i];
+			Gift* g = carryData.giftList[i];
 			if (g && g->pickUpState == false) // If currently picked up, need to check pickupstate = false and remove such????
 			{
 				roomData.giftList.push_back(g);
@@ -710,17 +740,31 @@ void TestUpdate(float dt)
 		/* IF player position is changed to other screen, reset enemies to player position */
 		if (player.position != positionResetTest)
 		{
-			for (Enemy *e : carryData.enemyList)
+			for (Enemy* e : carryData.enemyList)
 			{
 				e->sprite.position = player.position;
 				e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
 			}
-			for (Projectile *p : roomData.projectileList)
+			for (Projectile* p : roomData.projectileList)
 			{
 				p->RemoveProjectile();
 			}
 		}
-
+		if (AEInputCheckTriggered(AEVK_2)) {
+			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
+		}
+		if (AEInputCheckTriggered(AEVK_3)) {
+			ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				500.f, 0.5f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
+		}
+		if (AEInputCheckTriggered(AEVK_4)) {
+			ShootBoomerang(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
+				, player.direction,
+				500.f, 2.0f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
+		}
 		/*
 		if (AEInputCheckTriggered(AEVK_SPACE))
 			projManager.ShootFireball(roomData, player.position, player.direction,
@@ -733,83 +777,83 @@ void TestUpdate(float dt)
 			projManager.Update(roomData, dt);  // updates + cleans dead projectiles
 			*/
 
-		// testParticles.UpdateParticles(dt);
+			// testParticles.UpdateParticles(dt);
 
-		// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???)
-		// for (Gift* gift : roomData.giftList) {
-		//	if (!(gift->velocity == Vector2())) {
-		//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-		//			gift->velocity = -gift->velocity;
-		//			rock.AssessTraits(gift->traits);
-		//		}
-		//	}
-		//}
+			// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???)
+			// for (Gift* gift : roomData.giftList) {
+			//	if (!(gift->velocity == Vector2())) {
+			//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
+			//			gift->velocity = -gift->velocity;
+			//			rock.AssessTraits(gift->traits);
+			//		}
+			//	}
+			//}
 
-		// std::vector<Gift*> things{ &gift,&gift2 };
+			// std::vector<Gift*> things{ &gift,&gift2 };
 
-		// thing->position += Vector2(10,10) * dt;
-		// thing->UpdateTransform();
+			// thing->position += Vector2(10,10) * dt;
+			// thing->UpdateTransform();
 
-		// rock.Update(dt);
-		// rock.target = player.sprite.position;
+			// rock.Update(dt);
+			// rock.target = player.sprite.position;
 
-		// UpdatePlayer(player, dt);
-		// player.sprite.UpdateTransform();
-		// UpdateGift(gift, player, dt);
-		// gift.sprite.UpdateTransform();
-		// UpdateGift(gift2, player, dt);
-		// gift2.sprite.UpdateTransform();
+			// UpdatePlayer(player, dt);
+			// player.sprite.UpdateTransform();
+			// UpdateGift(gift, player, dt);
+			// gift.sprite.UpdateTransform();
+			// UpdateGift(gift2, player, dt);
+			// gift2.sprite.UpdateTransform();
 
-		// thing->position += Vector2(10,10) * dt;
-		// thing->UpdateTransform();
-		/*
-		UpdateGift(gift,player,dt);
-		gift.sprite.UpdateTransform();
-		UpdateGift(gift2,player,dt);
-		gift2.sprite.UpdateTransform();
-		rock.Update(dt);
-		rock.target = player.sprite.position;
+			// thing->position += Vector2(10,10) * dt;
+			// thing->UpdateTransform();
+			/*
+			UpdateGift(gift,player,dt);
+			gift.sprite.UpdateTransform();
+			UpdateGift(gift2,player,dt);
+			gift2.sprite.UpdateTransform();
+			rock.Update(dt);
+			rock.target = player.sprite.position;
 
-		gameMap.GetCurrentRoom()->Update(dt);
+			gameMap.GetCurrentRoom()->Update(dt);
 
-		std::vector<Gift*> things{ &gift,&gift2 };
+			std::vector<Gift*> things{ &gift,&gift2 };
 
-		for (Gift* gift : things) {
-			if (gift->velocity != Vector2(0,0)) {
-				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-					if (CollisionIntersection_RectRect_Static(
-
-
+			for (Gift* gift : things) {
+				if (gift->velocity != Vector2(0,0)) {
+					for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+						if (CollisionIntersection_RectRect_Static(
 
 
 
-					{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
-						AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
-						gift->velocity = Vector2(0, 0);
-						enemy->AssessTraits(gift->traits);
-					}
+
+
+						{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
+							AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
+							gift->velocity = Vector2(0, 0);
+							enemy->AssessTraits(gift->traits);
+						}
+
+				}
+
+			}
+		}
+
+
+			Room {
+				roomdata* toBeTransfered;
+				roomdata currentRoomData;
 
 			}
 
-		}
-	}
+			gameMap.currentRoom.
 
 
-		Room {
-			roomdata* toBeTransfered;
-			roomdata currentRoomData;
-
-		}
-
-		gameMap.currentRoom.
-
-
-		//if its at a door, roomdata gets transferred
+			//if its at a door, roomdata gets transferred
 
 
 
 
-		*/
+			*/
 	}
 	else if (gameState == PAUSED)
 	{
@@ -841,8 +885,17 @@ void TestUpdate(float dt)
 			gameState = WIN;
 		if (AEInputCheckTriggered(AEVK_4))
 			gameState = LOSE;
+
+		// to test damage
+		if (AEInputCheckTriggered(AEVK_P))
+			playerTakesDamage(player);
+		if (AEInputCheckTriggered(AEVK_O))
+			playerHealsDamage(player);
+
+		if (AEInputCheckTriggered(AEVK_M))
+			PlayerInit(player);
 	}
 
-	if (AEInputCheckTriggered(AEVK_F3))
+	if (AEInputCheckTriggered(AEVK_F3) || AEInputCheckTriggered(AEVK_BACKQUOTE))
 		debugMode = !debugMode;
 }

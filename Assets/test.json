@@ -28,9 +28,10 @@
 				255,
 				255
 			],
+			"health": 100,
 			"damage": 0,
 			"speed": 60,
-			"detectionRadius": 2,
+			"detectionRadius": 5,
 			"safeRadius": 300,
 			"likes": [
 				"Gross"
@@ -43,7 +44,7 @@
 					"context": "IsTouchingTarget",
 					"actions": [
 						"ApplySlowToTarget",
-						"SafeDistancePlayer",
+						"TargetEnemyInDetectionRadius",
 						"MoveToTarget"
 					]
 				},
@@ -52,7 +53,6 @@
 					"actions": [
 						"TargetPlayer",
 						"MoveToTarget",
-						"FireProjectile",
 						"TargetEnemyInDetectionRadius"
 					]
 				},
@@ -106,8 +106,9 @@
 				255,
 				255
 			],
+			"health": 100,
 			"damage": 0,
-			"speed": 0,
+			"speed": 250,
 			"detectionRadius": 100,
 			"safeRadius": 200,
 			"attackRate": 5,
@@ -151,11 +152,19 @@
 				255,
 				255
 			],
+			"health": 100,
 			"damage": 10,
-			"speed": 10,
-			"detectionRadius": 500,
+			"speed": 40,
+			"detectionRadius": 300,
 			"safeRadius": 300,
-			"attackRate": 3,
+			"attackRate": 4,
+			"happyProjectile": {
+				"damage": 50,
+				"radius" : 75,
+				"speed": 100,
+				"lifetime" : 2,
+				"sprite" : "Assets/pattyfish.png"
+			},
 			"angryProjectile": {
 				"damage": 20,
 				"radius": 75,
@@ -167,7 +176,13 @@
 			"likes": ["Hot"],
 			"dislikes": ["Wet", "Gross"],
 			"happy": [
-				{}
+				{ "context": "default",
+				   "actions": [
+					"TargetPlayer",
+					"MoveToTarget",
+					"TargetEnemyInDetectionRadius",
+					"FireProjectile"	
+				]}
 			],
 			"neutral": [
 				{ "context" : "IsTouchingTarget",
@@ -182,11 +197,17 @@
 				}
 			],
 			"angry": [
+				{"context":"IsNotFollowingPlayer",
+				"actions": [
+					"TargetPlayer",
+					"MoveToTarget",
+					"FireProjectile"
+				]},
 				{"context":"default",
 				"actions":[
 					"TargetPlayer",
 					"FireProjectile",
-					"SafeDistancePlayer"
+					"CircleMove"
 				]}
 			]
 		}
