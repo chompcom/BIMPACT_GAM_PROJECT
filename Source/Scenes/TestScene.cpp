@@ -550,6 +550,9 @@ void TestUpdate(float dt)
 			player.position.x = prevPos.x; // Test for x collision
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
 			player.position.y = prevPos.y; // Test for y collision
+		
+
+
 
 		// Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
@@ -589,12 +592,40 @@ void TestUpdate(float dt)
 				e->Update(dt);
 			}
 		}
+		//static float accumulatedTime = 0;
+		//accumulatedTime += dt;
+		
 
 		// Update Gifts (Must update both sides)
 		for (Gift *g : roomData.giftList)
 		{
 			if (g)
 			{
+				int gcurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(g->position.x, g->position.y);
+				if (gcurCell >= 0 && gcurCell != 0xffffff)
+					currentRoom->lastValidCell = gcurCell;
+				int gcolRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, g->sprite.scale.x, g->sprite.scale.y, gcurCell);
+				
+				int tileId = gameMap.GetCurrentRoom()->roomGrid.GetCell(gcurCell);
+				std::cout << tileId << "\n";
+				
+
+				if (gcolRes & COLLISION_LEFT || gcolRes & COLLISION_RIGHT) {
+					if(currentRoom->lastValidCell == 0x64 ) std::cout << "hi\n";
+					g->velocity.x = -g->velocity.x; // Test for x collision
+					if(gcurCell < 0  && gameMap.GetCurrentRoom()->roomGrid.GetCell(gcurCell) != 0x64){
+						g->position.x = player.position.x;
+					}
+				}
+				if (gcolRes & COLLISION_TOP || gcolRes & COLLISION_BOTTOM){	
+					g->velocity.y = -g->velocity.y;
+					if (gcurCell < 0 && gameMap.GetCurrentRoom()->roomGrid.GetCell(gcurCell) != 0x64) {
+						g->position.y = player.position.y;
+						if(gameMap.GetCurrentRoom()->roomGrid.GetCell(gcurCell) == 0x64)
+						std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(gcurCell) << '\n';
+					}
+			}
+			//	std::cout << gcurCell << std::endl;
 				UpdateGift(*g, player, dt);
 				g->sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
@@ -609,6 +640,7 @@ void TestUpdate(float dt)
 				g->shadow.UpdateTransform();
 			}
 		}
+
 
 		CheckProjectileCollision(roomData, *roomData.player);
 		UpdateProjectiles(roomData, dt);
