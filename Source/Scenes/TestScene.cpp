@@ -52,7 +52,7 @@ Almanac almanac{};
 s8 font = 0;
 //Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 //static ProjectileManager projManager;
-Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 25000.f, 600.f, Vector2(0, 0)};
+Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 20000.f, 600.f, Vector2(0, 0)};
 
 EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
@@ -549,10 +549,10 @@ void TestUpdate(float dt)
 			currentRoom->lastValidCell = curCell;
 		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
 		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT)
-			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.00001f)); // Test for x collision
+			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
 			
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
-			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.00001f)); // Test for y collision
+			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
 		
 
 
@@ -641,13 +641,13 @@ void TestUpdate(float dt)
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 7500 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 1.2f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/7500 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*1.2f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
 					
 				// Collides but no velocity?
-				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
+				if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
 
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
@@ -670,11 +670,21 @@ void TestUpdate(float dt)
 				}
 				if (tmp.size() > 0) { 
 
-					g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-					g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
-					g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
-					
-					g->velocity /= 1.3;		// Dampen bounce
+					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+
+					if (res & COLLISION_LEFT || res & COLLISION_RIGHT) {
+						g->position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x;
+						//g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
+						g->velocity.y /= 1.5f;		// ???
+						g->velocity.x /= 1.1f;		// Dampen bounce
+					}
+					else if (res & COLLISION_TOP || res & COLLISION_BOTTOM) {
+						g->position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y;
+						g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
+						g->velocity.y /= 1.1f;		// Dampen bounce
+						g->velocity.x /= 1.5f;		// ???
+					}
+					//g->velocity /= 1.1f;		// Dampen bounce
 					std::cout << tmp << '\n';
 				};
 				
