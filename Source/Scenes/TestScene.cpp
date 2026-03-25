@@ -547,11 +547,12 @@ void TestUpdate(float dt)
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
 		if (curCell >= 0 && curCell != 0xffffff)
 			currentRoom->lastValidCell = curCell;
-		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x, player.sprite.scale.y, curCell);
+		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
 		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT)
-			player.position.x = prevPos.x; // Test for x collision
+			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.00001f)); // Test for x collision
+			
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
-			player.position.y = prevPos.y; // Test for y collision
+			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.00001f)); // Test for y collision
 		
 
 
@@ -580,8 +581,7 @@ void TestUpdate(float dt)
 			{
 				// e->target.position = *player.sprite.position;
 				e->Update(dt);
-				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1400, 700))
-					e->velocity = -e->velocity;
+				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, currentRoom->roomGrid.GetBoundary().x * 0.99f, currentRoom->roomGrid.GetBoundary().y * 0.99f)) e->velocity = -e->velocity;
 			}
 		}
 
@@ -641,13 +641,13 @@ void TestUpdate(float dt)
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, g->sprite.scale.x, g->sprite.scale.y, prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
 					
 				// Collides but no velocity?
-				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 0.5f, 0.5f };
+				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
 
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
@@ -660,6 +660,7 @@ void TestUpdate(float dt)
 				
 				}
 				if (res & COLLISION_TOP) {
+					std::cout << g->velocity.y;
 					tmp += " TOP ";
 					g->velocity.y *= -1;	// Inverse y if top
 				}
@@ -668,7 +669,11 @@ void TestUpdate(float dt)
 					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (tmp.size() > 0) { 
+
 					g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+					g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
+					g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
+					
 					g->velocity /= 1.3;		// Dampen bounce
 					std::cout << tmp << '\n';
 				};
