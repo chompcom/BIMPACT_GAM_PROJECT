@@ -57,7 +57,7 @@ Enemy::Target& Enemy::Target::operator=(Boss& them)
 	initialPosition = them.sprite.position;
 
 	//TODO
-	speedMod = nullptr;
+	speedMod = &them.speedModifier;
 	//The boss doesn't need a damage modifier
 	dmgMod = nullptr;
 	return *this;

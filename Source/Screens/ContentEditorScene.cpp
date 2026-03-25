@@ -674,7 +674,7 @@ void ContentEditorUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE))
+	if (AEInputCheckTriggered(AEVK_M))
 	{
 		ChangeState(GS_MAINMENU);
 	}

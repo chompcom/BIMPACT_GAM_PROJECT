@@ -186,7 +186,7 @@ namespace mapRooms
 
 		// For starting Rooms Init
 		if (this->rmType == RoomType::Start) {
-			biome = "Normal";
+			biome = "Start";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
@@ -547,6 +547,7 @@ namespace mapRooms
 		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
 		std::string const bossDir	= "Assets/Rooms/Boss";
 
+		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
 		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
 		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);

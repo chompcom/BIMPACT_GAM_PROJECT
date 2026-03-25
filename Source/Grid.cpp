@@ -343,6 +343,12 @@ bool Grid::LoadRoomCSV(std::string const& fileName)
 		this->tileSizeY = totalGridHeight / static_cast<float>(this->height);
 	}
 
+	/*for (int x{}; x < width; ++x) {
+		for (int y{}; y < height; ++y) {
+			std::cout << GetCell(x, y) << ' ';
+		}
+		std::cout << '\n';
+	}*/
 
 	return (width > 0 && height > 0);
 }
