@@ -647,22 +647,22 @@ void TestUpdate(float dt)
 				if (res & COLLISION_LEFT) {
 					tmp += " LEFT ";
 					//g->velocity.x = -g->velocity.x;
-					g->velocity.y /= -1.3;
+					g->velocity.y -= 1.3;
 				}
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
 					//g->velocity.y = -g->velocity.y;
-					g->velocity.y /= -1.3;
+					g->velocity.y -= 1.3;
 				}
 				if (res & COLLISION_TOP) {
 					tmp += " TOP ";
 					//g->velocity.x = -g->velocity.x;
-					g->velocity.x /= -1.3;
+					g->velocity.x -= 1.3;
 				}
 				if (res & COLLISION_BOTTOM) {
 					tmp += " BOTTOM ";
 					//g->velocity.x = -g->velocity.x;
-					g->velocity.x /= -1.3;
+					g->velocity.x -= 1.3;
 				}
 				if (tmp.size() > 0) { 
 					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
