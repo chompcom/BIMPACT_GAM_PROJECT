@@ -56,6 +56,13 @@
       "spawnCategory": "enemy",
       "spawnName": "THE OVEN"
     },
+    "204": {
+      "name": "SnowmanMarker",
+      "blocked": false,
+      "asset": "Assets/Enemies/snowman.png",
+      "spawnCategory": "enemy",
+      "spawnName": "Snowman"
+    },
     "500": {
       "name": "Generic_GiftMarker",
       "blocked": false,
@@ -92,7 +99,7 @@
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Normal": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Green": {
@@ -100,7 +107,7 @@
     "imagePath":"Assets/Rooms/Normal/GREEN/Room2.png"
   },
   "Ice": {
-    "allowedTiles": [0,1,3,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,3,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/ICE/Room1.png"
   }
   }

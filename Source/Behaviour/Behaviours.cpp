@@ -191,8 +191,8 @@ void TargetRandomEnemy(Enemy& me) {
 	
 	std::vector<Enemy*> aliveList{};
 	//check if all dead
-	for (Enemy* me : me.roomData->enemyList) {
-		if (me->isActive) aliveList.push_back(me);
+	for (Enemy* enemy : me.roomData->enemyList) {
+		if (enemy->isActive) aliveList.push_back(enemy);
 	}
 	//Very special case, this behaviour specifically targets enemies first! 
 	//Once the enemies are gone then the boss is targeted!
@@ -217,6 +217,7 @@ void TargetCorner(Enemy& me) {
 void FireProjectile(Enemy& me) {
 
 	if (!me.target) return;
+		bool amIFriendsWithThePlayer = false;
 	if (me.attackTimer <= 0) {
 		EnemyType::ProjectileInfo proj;
 		switch (me.state) {
@@ -225,6 +226,7 @@ void FireProjectile(Enemy& me) {
 			break;
 		case ES_HAPPY:
 			proj = me.type.happyProjectile;
+			amIFriendsWithThePlayer = true;
 			break;
 		default:
 			proj = me.type.neutralProjectile;
@@ -233,7 +235,6 @@ void FireProjectile(Enemy& me) {
 
 		Vector2 direction = me.sprite.position - (me.target.GetPosition());
 
-		bool amIFriendsWithThePlayer = me.state == ES_HAPPY;
 
 		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me, amIFriendsWithThePlayer);
 		me.attackTimer = me.type.attackRate;
@@ -252,11 +253,14 @@ void BecomeNeutral(Enemy& me) {
 
 	me.ChangeState(ES_NEUTRAL);
 }
+
+//Warning about this guy, it's like free damage. Make sure the context is appropriate!
 void DamageTarget(Enemy& me) {
-//now this gets tricky!!
-//hard code for now!!
+
+	if (!me.target) return;
+
 	if (me.attackTimer <= 0) {
-		me.attackTimer = 3;
+		me.attackTimer = me.type.attackRate;
 		
 		if (me.target.isPlayer) {
 			playerTakesDamage(*me.roomData->player);
@@ -271,6 +275,11 @@ void PullTarget(Enemy& me) {
 }
 void PushTarget(Enemy& me) {
 
+}
+
+void ClearTarget(Enemy& me) {
+	//Set target to be empty
+	me.target = Enemy::Target{};
 }
 
 //unused template functions
@@ -306,6 +315,7 @@ void InitCommands() {
     flags = {
         {"IsTouchingTarget",IsTouchingTarget},
 		{"IsNotFollowingPlayer", IsNotFollowingPlayer},
+		{"IsTargetInDetectionRadius", IsTargetInDetectionRadius},
 		{"default", DefaultFlag}
     };
 
@@ -329,7 +339,8 @@ void InitCommands() {
 		{"BecomeNeutral", BecomeNeutral},
 		{"DamageTarget", DamageTarget},
 		{"PullTarget", PullTarget},
-		{"PushTarget", PushTarget}
+		{"PushTarget", PushTarget},
+		{"ClearTarget", ClearTarget}
 
     };
 }
