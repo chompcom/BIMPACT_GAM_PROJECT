@@ -551,6 +551,9 @@ void TestUpdate(float dt)
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
 			player.position.y = prevPos.y; // Test for y collision
 
+
+		// Test all collisions?
+
 		// Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 		// Finally reflect changes?

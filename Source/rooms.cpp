@@ -213,9 +213,7 @@ namespace mapRooms
 		// Normal Room Init
 		if (rmType == RoomType::Normal) {
 
-			// =========================
-			// [1] Choose biome / layout
-			// =========================
+			// 1. Choose biome / layout
 			std::vector<std::string> biomeNames = Grid::GetAllBiomes();
 
 			if (!biomeNames.empty()) {
@@ -237,8 +235,7 @@ namespace mapRooms
 			auto isGenericGiftMarker = [](int tileId) { return tileId == 500; };
 			auto isSpecificGiftMarker = [](int tileId) { return tileId >= 501 && tileId <= 799; };
 
-			auto findRandomSpecificMarkerForBiome =
-				[this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
+			auto findRandomSpecificMarkerForBiome = [this, &isSpecificEnemyMarker, &isSpecificGiftMarker](std::string const& spawnCategory) -> TileType const*
 				{
 					std::vector<TileType const*> biomeTiles = Grid::GetTilesFromBiome(biome);
 					std::vector<TileType const*> validMarkers{};
