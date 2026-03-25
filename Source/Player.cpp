@@ -156,7 +156,7 @@ void playerTakesDamage(Player& player)
 	if (player.invulnerableTimer <= 0.f)
 	{
 		PlayerDmgAudio();
-		--(player.health);
+		if (player.health > 0) --player.health;
 
 		if (player.health <= 0) gameState = LOSE;
 
@@ -167,7 +167,7 @@ void playerTakesDamage(Player& player)
 
 void playerHealsDamage(Player& player)
 {
-	player.health++;
+	if (player.health < 3) ++player.health;
 }
 
 void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
