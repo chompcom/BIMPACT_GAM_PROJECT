@@ -555,10 +555,10 @@ void TestUpdate(float dt)
 			currentRoom->lastValidCell = curCell;
 		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
 		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT)
-			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.00001f)); // Test for x collision
+			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
 			
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
-			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.00001f)); // Test for y collision
+			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
 		
 
 
@@ -677,18 +677,20 @@ void TestUpdate(float dt)
 				if (tmp.size() > 0) { 
 
 					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-					if ((res & COLLISION_LEFT) || (res & COLLISION_RIGHT))
-					{
-						//snap to cell
+
+					if (res & COLLISION_LEFT || res & COLLISION_RIGHT) {
 						g->position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x;
+						//g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
+						g->velocity.y /= 1.5f;		// ???
+						g->velocity.x /= 1.1f;		// Dampen bounce
 					}
-					if ((res & COLLISION_BOTTOM) || (res & COLLISION_TOP))
-					{
-						//snap to cell
+					else if (res & COLLISION_TOP || res & COLLISION_BOTTOM) {
 						g->position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y;
+						g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
+						g->velocity.y /= 1.1f;		// Dampen bounce
+						g->velocity.x /= 1.5f;		// ???
 					}
-					
-					g->velocity /= 1.1;		// Dampen bounce
+					//g->velocity /= 1.1f;		// Dampen bounce
 					std::cout << tmp << '\n';
 				};
 				
