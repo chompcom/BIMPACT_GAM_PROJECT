@@ -35,6 +35,7 @@ namespace
 		return Vector2{ worldX, worldY };
 	}
 
+	// Check if file exists
 	bool FileExists(std::string const& filePath)
 	{
 		std::ifstream inputFile{ filePath };
@@ -43,11 +44,13 @@ namespace
 		return exists;
 	}
 
+	// Retrieve biome names
 	std::string const& GetSelectedBiomeName()
 	{
 		return contentEditorState.biomeNames[contentEditorState.selectedBiomeIndex];
 	}
 
+	// Clear editor
 	void ClearEditorRoomGrid()
 	{
 		for (int row = 0; row < contentEditorState.roomGrid.GetHeight(); ++row)
@@ -56,7 +59,7 @@ namespace
 		}
 	}
 
-
+	// 
 	void RebuildObstaclePaletteForSelectedBiome()
 	{
 		contentEditorState.obstaclePalette.clear();
@@ -674,7 +677,7 @@ void ContentEditorUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE))
+	if (AEInputCheckTriggered(AEVK_M))
 	{
 		ChangeState(GS_MAINMENU);
 	}

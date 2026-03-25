@@ -32,6 +32,7 @@ void Boss::Update(Player& player, f32 dt) {
 		bossStateMachine->Update(player, dt);
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
+		speedModifier = 1.0f;
 	}
 	else {
 		isActive = false;

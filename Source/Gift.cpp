@@ -4,7 +4,8 @@
 #include "BoundaryCollision.h"
 #include "Utils/Utils.h"
 #include "Collision.h"
-#include "Loaders/DataLoader.h"
+#include "Loaders/DataLoader.h" // from testing
+#include "rooms.h" //from main
 #include <iostream>
 
 //simple contructor for gift class, for testing
@@ -47,7 +48,6 @@ GiftType::GiftType(std::string _name, Labels _traits, TexturedSprite _sprite) :
 	traits{_traits},
 	sprite{_sprite}
 {
-	//std::cout << "VARKAAAAAAAAAAAAAA: " << name << "\n";
 }
 
 Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, Vector2 position) :
@@ -62,7 +62,7 @@ Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, Vector2 position) :
 
 
 //this is just to test throwing
-void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
+void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries, mapRooms::Room* curRoom)
 {
 	//if player and gift are intersecting, pick up the gift
 	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
@@ -84,9 +84,35 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime)
 	{
 		//gift.sprite.position = gift.position;
 		gift.position += gift.velocity * deltaTime;
-		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, 1600, 900)) {
-			gift.velocity /= -1.3;
+
+		int collideFlags = 0x00;
+
+		if (CollisionBoundary_Static(gift.position, gift.sprite.scale, boundaries.x, boundaries.y, collideFlags)) {
+			// Left and Right collision inverse x
+			if (collideFlags & 0x00000003) {
+				gift.velocity.x *= -1;
+			}
+			// Top and Bottom inverse y
+			if (collideFlags & 0x0000000C) {
+				gift.velocity.y *= -1;
+			}
+			// Dampen bounce
+			gift.velocity /= 1.3f;
 		}
+		//else if (curRoom->roomGrid.CheckMapGridCollision(gift.position.x, gift.position.y, gift.sprite.scale.x, gift.sprite.scale.y, -1)) {
+		//	collideFlags = curRoom->roomGrid.CheckMapGridCollision(gift.position.x, gift.position.y, gift.sprite.scale.x, gift.sprite.scale.y, -1);
+
+		//	// Left and Right collision inverse x
+		//	if (collideFlags & 0x00000003) {
+		//		gift.velocity.x *= -1;
+		//	}
+		//	// Top and Bottom inverse y
+		//	if (collideFlags & 0x0000000C) {
+		//		gift.velocity.y *= -1;
+		//	}
+		//	// Dampen bounce
+		//	gift.velocity /= 1.3f;
+		//}
 		else {
 			gift.velocity /= 1.1;
 		}

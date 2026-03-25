@@ -15,7 +15,7 @@ void AlmanacAudio();
 // Mob
 void HydroAttackAudio();
 void FriendSuccessAudio();
-void RoarAudio();
+void RoarAudio(); // for angry dragon
 void SwordAttackAudio();
 void TomWhateverAudio();
 void BoogerStickAudio();
@@ -30,5 +30,16 @@ void RoundingProjectileAudio();
 // Room
 void RoomEnterAudio();
 
+// Background
 
-void StopAllAudio(); // except music lol
+void MainMenuAudio();
+void FireBiomeAudio();
+void WaterBiomeAudio();
+void ForestBiomeAudio();
+void AlmanacBGAudio();
+void GameOverAudio();
+void WinAudio();
+
+
+void StopAllAudio();
+

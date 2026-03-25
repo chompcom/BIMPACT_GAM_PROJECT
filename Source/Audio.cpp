@@ -144,7 +144,7 @@ void HydroAttackAudio() {
 void FriendSuccessAudio() {
 	AEAudioPlay(FriendSuccess, MobAudio, 1.0f, 1.0f, 0);
 }
-void RoarAudio() {
+void RoarAudio() { 
 	AEAudioPlay(Roar, MobAudio, 1.0f, 1.0f, 0);
 }
 void SwordAttackAudio() {
