@@ -648,7 +648,7 @@ void TestUpdate(float dt)
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
 				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
-
+				Vector2 prevPosition = g->position;
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
 					
@@ -658,33 +658,34 @@ void TestUpdate(float dt)
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
 					tmp += " LEFT ";
+					g->position.x = prevPosition.x;
 					g->velocity.x *= -1;	// Inverse x if left
 				}
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
+					g->position.x = prevPosition.x;
 					g->velocity.x *= -1;	// Inverse x if left
 				
 				}
 				if (res & COLLISION_TOP) {
 					std::cout << g->velocity.y;
 					tmp += " TOP ";
+					g->position.y = prevPosition.y;
 					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (res & COLLISION_BOTTOM) {
 					tmp += " BOTTOM ";
+					g->position.y = prevPosition.y;
 					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (tmp.size() > 0) { 
 
-					g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-					g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
-					g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
-					
+				//	g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+				//	g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
+				//	g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
 					g->velocity /= 1.3;		// Dampen bounce
 					std::cout << tmp << '\n';
-				};
-				
-
+				}; 
 
 				g->sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
