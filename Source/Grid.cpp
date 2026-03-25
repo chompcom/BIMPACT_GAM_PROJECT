@@ -468,6 +468,13 @@ int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scal
 
 	int Flag = 0x0000;
 	float x1, y1, x2, y2, x3, y3;
+	
+	
+	//float speedBump = sqrtf()
+
+	//float scaleDown = 0.97; // 97% of scale object
+	//scaleX *= scaleDown;
+	//scaleY *= scaleDown;
 
 	/*----------------------LEFT-------------------------------*/
 	// 1.1 Hotspot 1
@@ -673,7 +680,7 @@ Vector2 Grid::CellToWorldCenter(int curCell) const
 {
 	int x = curCell % this->width;
 	int y = curCell / this->width;
-	Vector2 res = { x, y };
+	Vector2 res = this->CellToWorldCenter(y, x);
 	return res;
 }
 
