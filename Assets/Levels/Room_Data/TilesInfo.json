@@ -87,6 +87,10 @@
   },
 
   "biomes": {
+  "Start": {
+    "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
+    "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
+  },
   "Normal": {
     "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
