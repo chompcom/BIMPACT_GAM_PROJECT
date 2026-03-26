@@ -98,93 +98,158 @@
 			"speed": 200,
 			"detectionRadius": 200,
 			"safeRadius": 200,
-			"attackRate": 1,
+			"attackRate": 5,
 			"likes": ["Hot"],
 			"dislikes": ["Wet"],
 			"happyProjectile":{
-				"damage": 25,
+				"damage": 100,
 				"radius":300,
 				"speed":0,
 				"lifetime":1,
 				"sprite":"Assets/fireball.png"
 			},
+			"neutralProjectile": {
+				"damage":50,
+				"radius":300,
+				"speed":0,
+				"lifetime": 1,
+				"sprite": "Assets/fireball.png"
+			},
 			"angryProjectile": {
 				"damage":50,
-				"radius":200,
+				"radius":500,
 				"speed":0,
 				"lifetime": 1,
 				"sprite": "Assets/fireball.png"
 			},
 			"happy": [
-				{ "context": "IsWaiting",
+				{	
+					"context":"IsWaiting",
 					"actions":[
-						"ClearTarget"
-						,"MoveToTarget"
+						"ClearTarget",
+						"MoveToTarget"
 					]
 				},
+				{
+					"context":"IsAttackCooldownUp",
+					"actions" : [
+						"ClearTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						//Player must be targeted to guarantee projectile fire
+						"TargetPlayer",
+						"FireProjectile"
+					]
+				},
+
 				{
 					"context":"IsTouchingTarget",
 					"actions":[
 						"ClearTarget",
-						"FireProjectile",
 						"Wait"
 					]
 				},
-				{ "context": "IsTargetInDetectionRadius",
-				  "actions": [
-					"TargetEnemyInDetectionRadius",
-					"MoveToTarget"
-				  ]
+				{ 
+					"context":"IsTargetInDetectionRadius",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"MoveToTarget"
+					]
 				},
-				{ "context": "IsNotFollowingPlayer",
-					"actions":[
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
 						"TargetPlayer",
 						"MoveToTarget",
 						"ClearTarget",
-						"TargetEnemyInDetectionRadius"		
+						"TargetEnemyInDetectionRadius"
 					]
 				},
-				{ "context": "IsWanderTimerUp", 
-					"actions":[
-						//Target player to always have a target
-						"TargetPlayer",
-						"FireProjectile",
-						"ClearTarget",
-						"Wander"
-					]
-				},
-				{ "context": "IsWandering",
-					"actions": [
-						"TargetEnemyInDetectionRadius",
-						"Wander"
-					]
-				},
-
-				{"context":"default",
-				"actions":[ 
-					"FireProjectile",
+				{ "context":"default",
+				"actions":[
+					"TargetEnemyInDetectionRadius",
 					"Wander"
 				]
 				}
 			],
 			"neutral": [
-				{ "context":"default",
-				"actions":[
-					"Wander"
-				]
-				}
-			],
-			"angry": [
-				{ "context":"IsTouchingTarget",
+				{	
+					"context":"IsWaiting",
 					"actions":[
+						"ClearTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"IsAttackCooldownUp",
+					"actions" : [
+						"TargetSelf",
+						"ApplySlowToTarget",
+						"Wander",
+						"ClearTarget"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						"TargetPlayer",
 						"FireProjectile"
+					]
+				},
+				{ 
+					"context":"IsTouchingTarget",
+					"actions":[
+						"ClearTarget",
+						"Wait"
 					]
 				},
 				{ "context":"default",
 				"actions":[
 					"TargetPlayer",
-					"MoveToTarget"
+					"Wander"
 				]
+				}
+			],
+			"angry": [
+				{	
+					"context":"IsWaiting",
+					"actions":[
+						"ClearTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"IsAttackCooldownUp",
+					"actions" : [
+						"ClearTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						"TargetPlayer",
+						"FireProjectile"
+					]
+				},
+
+				{
+					"context":"IsTouchingTarget",
+					"actions":[
+						"ClearTarget",
+						"Wait"
+					]
+				},
+				{
+					"context":"default",
+					"actions":[
+						"TargetPlayer",
+						"MoveToTarget"
+					]
 				}
 			]
 		},

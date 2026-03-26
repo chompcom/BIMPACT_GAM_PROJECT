@@ -6,6 +6,7 @@
 #include "Gift.h"
 #include "Projectile.h"
 #include "Boss.h"
+#include "Grid.h"
 
 class Enemy;
 class Boss;
@@ -18,6 +19,7 @@ struct RoomData {
         std::vector<Gift*> giftList;
         std::vector<Projectile*> projectileList;
         Boss* boss;
+        Grid grid;
 
         RoomData();
 

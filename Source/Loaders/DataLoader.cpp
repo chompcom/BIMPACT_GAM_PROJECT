@@ -194,6 +194,11 @@ namespace DataLoader {
 					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
 				}
 
+				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
+				{
+					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+				}
+
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
 				}

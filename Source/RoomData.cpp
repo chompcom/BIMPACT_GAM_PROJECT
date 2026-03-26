@@ -1,2 +1,2 @@
 #include "RoomData.h"
-RoomData::RoomData() : player{ nullptr }, enemyList{}, giftList{}, boss{ nullptr } { };
+RoomData::RoomData() : player{ nullptr }, enemyList{}, giftList{}, boss{ nullptr }, grid{} { };

@@ -5,12 +5,14 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
+#include <Grid.h>
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 	, wanderTimer{}, waitTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
+	, onceWanderTime{false}, onceAttackTime{false}, onceWaitTime{false} 
 {
 		ChangeState(initialState);
 }
@@ -161,7 +163,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 		currentBehavior = enemyType.neutral;
 		break;
 	case ES_ANGRY:
-		this->attackTimer = type.attackRate + ((AERandFloat() * 2.f) - 1.f);
+		this->attackTimer = 3 + ((AERandFloat() * 2.f) - 1.f);
 		sprite.color = { 1.f,0.f,0.f,1.f };
 		currentBehavior = enemyType.angry;
 		break;
@@ -191,17 +193,42 @@ void Enemy::Update(float dt) {
 	speedModifier = 1.0f;
 	sprite.UpdateTransform();
 	
-	shadow.position = sprite.position;
+	shadow.position = sprite.position - Vector2(0,40);
 	shadow.UpdateTransform();
 
-	if (wanderTimer > 0.f) 
+	if (wanderTimer > EPSILON) {
 		wanderTimer -= dt;
+	} 
 
-	if (attackTimer > 0.f) 
+	if (attackTimer > EPSILON) {
 		attackTimer -= dt;
+	}
 
-	if (waitTimer > 0.f) 
+	if (waitTimer > EPSILON) {
 		waitTimer -= dt;
+	}
+
+	//do collision resolution
+	int prevCell = roomData->grid.WorldToCell(sprite.position.x, sprite.position.y);
+	int collisionRes = roomData->grid.CheckMapGridCollision(sprite.position.x, sprite.position.y, sprite.scale.x, sprite.scale.y, prevCell);
+	//gonna try to make it dynamic..
+
+	float gridWidth = roomData->grid.GetTileWidth();
+	float gridHeight = roomData->grid.GetTileHeight();
+
+	if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x > EPSILON) {
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x + gridWidth*0.5f - sprite.scale.x*0.5f;
+	}
+	if (collisionRes & COLLISION_LEFT && velocity.Normalized().x < -EPSILON) {
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x - gridWidth * 0.5f + sprite.scale.x * 0.5f;
+	}
+	if (collisionRes & COLLISION_BOTTOM && velocity.Normalized().y < -EPSILON) {
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y - gridHeight * 0.5f + sprite.scale.y * 0.5f;
+	}
+	if ( collisionRes & COLLISION_TOP && velocity.Normalized().y > EPSILON) {
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f;
+	}
+
 }
 
 void Enemy::AssessTraits(Labels labels, bool giftCheck){

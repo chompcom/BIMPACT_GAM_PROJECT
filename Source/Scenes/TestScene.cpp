@@ -973,6 +973,9 @@ void TestUpdate(float dt)
 			gameState = WIN;
 		if (AEInputCheckTriggered(AEVK_4))
 			gameState = LOSE;
+		if (AEInputCheckTriggered(AEVK_R) || AEInputCheckTriggered(AEVK_5))
+			ChangeState(GS_RESTART);
+
 
 		// to test damage
 		if (AEInputCheckTriggered(AEVK_P))

@@ -451,6 +451,9 @@ namespace mapRooms
 			PatchDoorCells();
 		}
 		
+		//Setting grid to roomGrid
+		currentRoomData.grid = roomGrid;
+
 	} 
 	void Room::Update(float dt) {
 		//for (Enemy* i : currentRoomData.enemyList) {

@@ -102,6 +102,7 @@ class Enemy {
 		RoomData* roomData;
 
 		FSM currentBehavior;
+		int collisionResolution;
 
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
