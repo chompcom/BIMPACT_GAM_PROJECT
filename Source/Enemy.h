@@ -81,7 +81,6 @@ class Enemy {
 			float GetSpeedMod() const;
 			float& GetDmgMod();
 			float GetDmgMod() const;
-
 			void DealDamage(float dmg);
 
 			private: //We keep these private because I don't want to accidentally change them.

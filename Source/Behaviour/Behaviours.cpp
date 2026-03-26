@@ -36,6 +36,10 @@ namespace {
 		return Vector2{};
 	}
 
+	bool CheckIfHated(Enemy const& me, Enemy const& enemy) {
+		return (enemy.state == ES_ANGRY || HasCommonTrait(me.type.dislikes, enemy.type.traits));
+	}
+
 }
 
 
@@ -180,7 +184,7 @@ void CircleMove(Enemy& me) {
 
 void TargetEnemyInDetectionRadius(Enemy& me){
 	for (Enemy* guy : me.roomData->enemyList){
-		if (!guy->isActive) continue;
+		if (!guy->isActive || !CheckIfHated(me,*guy)) continue;
 		if (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
 			guy->sprite.position, guy->sprite.scale.x)) {
 
@@ -214,7 +218,7 @@ void TargetRandomEnemy(Enemy& me) {
 	std::vector<Enemy*> aliveList{};
 	//check if all dead
 	for (Enemy* enemy : me.roomData->enemyList) {
-		if (enemy->isActive) aliveList.push_back(enemy);
+		if (enemy->isActive && CheckIfHated(me,*enemy)) aliveList.push_back(enemy);
 	}
 	//Very special case, this behaviour specifically targets enemies first! 
 	//Once the enemies are gone then the boss is targeted!
@@ -224,10 +228,7 @@ void TargetRandomEnemy(Enemy& me) {
 	}
 
 
-	do {
-		me.target = *me.roomData->enemyList[
-			std::rand() % aliveList.size()];
-	} while (!me.target.GetActive());
+	me.target = *me.roomData->enemyList[std::rand() % aliveList.size()];
 }
 void TargetMiddle(Enemy& me) {
 	me.target.initialPosition = Vector2();
