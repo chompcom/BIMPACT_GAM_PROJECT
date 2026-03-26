@@ -3,12 +3,7 @@
     [
 		{	"name": "Default",
 			"sprite": "Assets/poprocks.png",
-			"color": [
-				255,
-				255,
-				255,
-				255
-			],
+			"color": [ 255, 255, 255, 255 ],
 			"damage": 0,
 			"speed": 0,
 			"detectionRadius": 0,
@@ -22,12 +17,7 @@
 		},
 		{	"name": "Booger",
 			"sprite": "Assets/Enemies/booger.png",
-			"color": [
-				255,
-				255,
-				255,
-				255
-			],
+			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"traits": ["Gross"],
 			"damage": 0,
@@ -101,19 +91,14 @@
 		},
 		{	"name": "Pop Rocks",
 			"sprite": "Assets/Enemies/poprocks.png",
-			"color": [
-				255,
-				255,
-				255,
-				255
-			],
+			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"traits": ["Hot"],
 			"damage": 0,
-			"speed": 250,
-			"detectionRadius": 100,
+			"speed": 200,
+			"detectionRadius": 200,
 			"safeRadius": 200,
-			"attackRate": 5,
+			"attackRate": 1,
 			"likes": ["Hot"],
 			"dislikes": ["Wet"],
 			"happyProjectile":{
@@ -159,6 +144,15 @@
 						"TargetEnemyInDetectionRadius"		
 					]
 				},
+				{ "context": "IsWanderTimerUp", 
+					"actions":[
+						//Target player to always have a target
+						"TargetPlayer",
+						"FireProjectile",
+						"ClearTarget",
+						"Wander"
+					]
+				},
 				{ "context": "IsWandering",
 					"actions": [
 						"TargetEnemyInDetectionRadius",
@@ -194,15 +188,9 @@
 				}
 			]
 		},
-		{
-			"name": "THE OVEN",
+		{	"name": "THE OVEN",
 			"sprite": "Assets/Enemies/oven.png",
-			"color": [
-				255,
-				255,
-				255,
-				255
-			],
+			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"damage": 10,
 			"speed": 40,
@@ -270,15 +258,9 @@
 				]}
 			]
 		},
-		{
-			"name": "Snowman",
+		{ "name": "Snowman",
 			"sprite": "Assets/Enemies/snowman.png",
-			"color": [
-				255,
-				255,
-				255,
-				255
-			],
+			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"damage": 10,
 			"speed": 0,
@@ -336,6 +318,59 @@
 					"TargetPlayer"
 				]}
 
+			]
+		}
+		,
+		{ "name": "Soap",
+			"sprite": "Assets/Enemies/soap.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 10,
+			"speed": 300,
+			"detectionRadius": 300,
+			"safeRadius": 300,
+			"attackRate": 1,
+			"happyProjectile": {
+				"damage": 10,
+				"radius" : 50,
+				"speed": 1,
+				"lifetime" : 3,
+				"sprite" : "Assets/snowball.png"
+			},
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 3,
+				"sprite": "Assets/snowball.png"
+			},
+			"traits": ["Clean","Wet"],
+			"likes": ["Clean", "Wet"],
+			"dislikes": ["Gross"],
+			"happy": [
+				{ "context":"IsNotFollowingPlayer",
+				  "actions" : [
+					"TargetPlayer",
+					 "MoveToTarget",
+					 "FireProjectile"
+				  ]
+				}
+				,{ "context":"default", 
+				   "actions":[
+					"ClearTarget",
+					"MoveToTarget"
+				   ]
+				}
+			],
+			"neutral": [
+				{ "context": "IsWaiting",
+				  "actions":[
+					"ClearTarget",
+					"MoveToTarget"
+				  ]
+				}
+			],
+			"angry": [
 			]
 		}
     ]

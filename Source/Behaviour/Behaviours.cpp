@@ -95,15 +95,15 @@ bool IsTargetInDetectionRadius(Enemy& me) {
 }
 
 bool IsWanderTimerUp(Enemy& me) {
-	return me.wanderTimer <= 0.f;
+	return me.wanderTimer <= EPSILON;
 }
 
 bool IsWandering(Enemy& me) {
-	return me.wanderTimer > 0.f;
+	return me.wanderTimer > EPSILON;
 }
 
 bool IsWaitTimerUp(Enemy& me) {
-	return me.waitTimer <= 0.f;
+	return me.waitTimer <= EPSILON;
 }
 
 bool IsWaiting(Enemy& me) {

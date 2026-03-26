@@ -50,10 +50,14 @@ class Enemy {
 		Vector2 prevPos;
 
 		float wanderTimer;
+		bool onceWanderTime;
 		float waitTimer;
+		bool onceWaitTime;
 		float attackTimer;
+		bool onceAttackTime;
 
 		//Target contains information about the target so you can do things to it
+		//Object itself returns whether it is active or not
 		struct Target {
 			Vector2 initialPosition; //!< The position when the target was found
 
