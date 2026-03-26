@@ -244,11 +244,20 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 - 0.35f, 1.f, r, g, b, 1.f);
 
-		text = "Find out your enemies' liked";
+		//text = "Find out your enemies' liked";
+		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
+		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.25f, 1.f, r, g, b, 1.f);
+
+		//text = "gifts to befriend them";
+		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
+		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.15f, 1.f, r, g, b, 1.f);
+
+
+		text = "Give your enemies gifts they";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.25f, 1.f, r, g, b, 1.f);
 
-		text = "gifts to befriend them";
+		text = "like to befriend them";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.15f, 1.f, r, g, b, 1.f);
 
