@@ -151,9 +151,8 @@ bool OnceAttackCooldownUp(Enemy& me) {
 }
 
 bool IsHittingWall(Enemy& me) {
-
-	int prevCell = me.roomData->grid.WorldToCell(me.prevPos.x, me.prevPos.y);
-	return me.roomData->grid.CheckMapGridCollision(me.prevPos.x, me.prevPos.y, me.sprite.scale.x, me.sprite.scale.y, prevCell);
+	int tmp{ me.collisionResolution };
+	return tmp;
 }
 
 // ***************************************
@@ -210,13 +209,11 @@ void CircleMove(Enemy& me) {
 
 	Vector2 direction{ (me.target.GetPosition() - me.prevPos)};
 	direction = Vector2{direction.y, -direction.x}; //the perpendicular
-
+	if (me.acknowledgeCollision) {
+		me.acknowledgeCollision = false;
+		direction = -direction;
+	}
 	me.velocity = direction;
-
-	CollisionBoundary_Static(me.prevPos, me.sprite.scale, 1600, 900);
-	me.sprite.UpdateTransform();
-
-
 }
 
 void TargetEnemyInDetectionRadius(Enemy& me){
@@ -393,6 +390,13 @@ void DamageTarget(Enemy& me) {
 
 }
 
+void InvertVelocity(Enemy& me) {
+	//me.velocity = -me.velocity; doesn't work
+	std::cout << "Velocity Inverted" << std::endl;
+	me.speedModifier *= -1.f;
+	
+}
+
 void TargetSelf(Enemy& me) {
 	me.target = me; //wow!
 }
@@ -419,7 +423,7 @@ void ChargeAtTarget(Enemy& me) {
 		return;
 	} 
 	me.velocity += me.target.initialPosition - me.prevPos;
-	me.velocity = me.velocity.Normalized();
+	me.velocity = me.velocity.Normalized() * me.speedModifier;
 
 }
 
@@ -471,6 +475,7 @@ void InitCommands() {
 		{"IsAttackOnCooldown", IsAttackOnCooldown},
 		{"IsAttackCooldownUp", IsAttackOnCooldown},
 		{"OnceAttackCooldownUp", OnceAttackCooldownUp}, 
+		{"IsHittingWall", IsHittingWall}, 
 		{"default", DefaultFlag}
     };
 
@@ -483,9 +488,11 @@ void InitCommands() {
 		{"Wander", Wander},
 		{"CircleMove", CircleMove},
 		{"TargetEnemyInDetectionRadius", TargetEnemyInDetectionRadius},
+		{"TargetEnemyInDetectionRadiusDumb", TargetEnemyInDetectionRadiusDumb},
 		{"TargetPlayer",TargetPlayer},
 		{"SafeDistancePlayer",SafeDistancePlayer},
 		{"TargetRandomEnemy",TargetRandomEnemy},
+		{"TargetRandomEnemyDumb",TargetRandomEnemyDumb},
 		{"TargetMiddle", TargetMiddle},
 		{"TargetCorner", TargetCorner},
 		{"FireProjectile", FireProjectile},
@@ -498,7 +505,10 @@ void InitCommands() {
 		{"PushTarget", PushTarget},
 		{"Wait", Wait},
 		{"ClearTarget", ClearTarget},
-		{"TargetSelf", TargetSelf}
+		{"TargetSelf", TargetSelf},
+		{"ChargeAtTarget", ChargeAtTarget},
+		{"TargetNearestThing", TargetNearestThing},
+		{"InvertVelocity", InvertVelocity}
 
 
     };

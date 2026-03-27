@@ -13,6 +13,7 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
 	, onceWanderTime{false}, onceAttackTime{false}, onceWaitTime{false} 
+	, collisionResolution{}, acknowledgeCollision{false}
 {
 		ChangeState(initialState);
 }
@@ -190,8 +191,6 @@ void Enemy::Update(float dt) {
 	//update movement here
 	prevPos = sprite.position;
 	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
-	speedModifier = 1.0f;
-	sprite.UpdateTransform();
 	
 	shadow.position = sprite.position - Vector2(0,40);
 	shadow.UpdateTransform();
@@ -217,17 +216,22 @@ void Enemy::Update(float dt) {
 	float gridHeight = roomData->grid.GetTileHeight();
 
 	if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x > EPSILON) {
-		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x + gridWidth*0.5f - sprite.scale.x*0.5f;
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x + gridWidth*0.5f - sprite.scale.x*0.5f - 0.10f;
 	}
 	if (collisionRes & COLLISION_LEFT && velocity.Normalized().x < -EPSILON) {
-		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x - gridWidth * 0.5f + sprite.scale.x * 0.5f;
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x - gridWidth * 0.5f + sprite.scale.x * 0.5f + 0.10f;
 	}
 	if (collisionRes & COLLISION_BOTTOM && velocity.Normalized().y < -EPSILON) {
-		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y - gridHeight * 0.5f + sprite.scale.y * 0.5f;
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y - gridHeight * 0.5f + sprite.scale.y * 0.5f + 0.10f;
 	}
 	if ( collisionRes & COLLISION_TOP && velocity.Normalized().y > EPSILON) {
-		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f;
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
 	}
+	this->collisionResolution = collisionRes;
+	if (collisionRes && !acknowledgeCollision) acknowledgeCollision = true;
+	//After i update my movement, i reset back the speed modifier but keep the sign
+	speedModifier = speedModifier / abs(speedModifier);
+	sprite.UpdateTransform();
 
 }
 

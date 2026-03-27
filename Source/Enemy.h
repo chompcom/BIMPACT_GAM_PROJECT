@@ -104,6 +104,8 @@ class Enemy {
 		FSM currentBehavior;
 		int collisionResolution;
 
+		bool acknowledgeCollision;
+
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
 
