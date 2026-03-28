@@ -42,6 +42,9 @@ void ForestBiomeAudio();
 void IceBiomeAudio();
 void FireBiomeAudio();
 void OceanBiomeAudio();
+
+// BGM
+void RandomBGMAudio(float dt);
 void BGM1Audio();
 void BGM2Audio();
 void BGM3Audio();
