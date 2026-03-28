@@ -11,14 +11,49 @@
       "asset": "Assets/Rooms/Items/Rocks.png"
     },
     "2": {
-      "name": "Bush",
+      "name": "Boulders",
       "blocked": true,
-      "asset": "Assets/default.png"
+      "asset": "Assets/Rooms/Items/Boulders.png"
     },
     "3": {
+      "name": "Bush",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Bush.png"
+    },
+    "4": {
+      "name": "Log",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/LogBait.png"
+    },
+    "5": {
       "name": "IceCrystal",
       "blocked": true,
-      "asset": "Assets/default.png"
+      "asset": "Assets/Rooms/Items/IceSpikey.png"
+    },
+    "6": {
+      "name": "IceBlock",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Ice.png"
+    },
+    "7": {
+      "name": "IceCrystalBlock",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Ice_SpikesBlock.png"
+    },
+    "8": {
+      "name": "IceCrystalRock",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Ice_Boulder.png"
+    },
+    "9": {
+      "name": "CoralReefs",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Coral_Reefs.png"
+    },
+    "10": {
+      "name": "Seaweed",
+      "blocked": true,
+      "asset": "Assets/Rooms/Items/Seaweed.png"
     },
     "100": {
       "name": "Door",
@@ -28,7 +63,7 @@
     "200": {
       "name": "GenericEnemyMarker",
       "blocked": false,
-      "asset": "",
+      "asset": "Assets/Rooms/Items/WhosthatEnemy.png",
       "spawnCategory": "enemy",
       "spawnName": ""
     },
@@ -56,10 +91,17 @@
       "spawnCategory": "enemy",
       "spawnName": "THE OVEN"
     },
+    "204": {
+      "name": "SnowmanMarker",
+      "blocked": false,
+      "asset": "Assets/Enemies/snowman.png",
+      "spawnCategory": "enemy",
+      "spawnName": "Snowman"
+    },
     "500": {
       "name": "Generic_GiftMarker",
       "blocked": false,
-      "asset": "",
+      "asset": "Assets/Rooms/Items/Gifts.png",
       "spawnCategory":"gift",
       "spawnName":""
     },
@@ -92,15 +134,15 @@
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Normal": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Green": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,3,4,100,200,201,202,203,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/GREEN/Room2.png"
   },
   "Ice": {
-    "allowedTiles": [0,1,2,3,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,3,5,6,7,8,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/ICE/Room1.png"
   }
   }

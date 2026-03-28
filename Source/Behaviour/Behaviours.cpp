@@ -90,6 +90,25 @@ bool IsTargetInDetectionRadius(Enemy& me) {
 		me.target.GetPosition(), 0));
 }
 
+bool IsWanderTimerUp(Enemy& me) {
+	return me.wanderTimer <= 0.f;
+}
+
+bool IsWandering(Enemy& me) {
+	return me.wanderTimer > 0.f;
+}
+
+bool IsWaitTimerUp(Enemy& me) {
+	return me.waitTimer <= 0.f;
+}
+
+bool IsWaiting(Enemy& me) {
+	if (me.waitTimer > 0.f) {
+		std::cout << me.type.name << " is really waiting!\n";
+
+	}
+	return me.waitTimer > 0.f;
+}
 
 // ***************************************
 //               ACTIONS
@@ -108,7 +127,10 @@ void WalkRight(Enemy& me){
 }
 
 void MoveToTarget(Enemy& me) {
-	if (me.target == false) return;
+	if (me.target == false) {
+		me.velocity = Vector2();
+		return;
+	}
 	Vector2 direction{ (me.target.GetPosition() - me.sprite.position)};
 	me.velocity += direction;
 	me.velocity = me.velocity.Normalized();
@@ -120,7 +142,8 @@ void ApplySlowToTarget(Enemy& me) {
 	if (me.target == false) return;
 	if (me.state == ES_HAPPY && me.target.isPlayer) return;
 
-	me.target.GetSpeedMod() = 0.1f;
+
+	me.target.GetSpeedMod() = 0.2f;
 
 }
 
@@ -160,7 +183,6 @@ void TargetEnemyInDetectionRadius(Enemy& me){
 		if (!guy->isActive) continue;
 		if (AreCirclesIntersecting(me.sprite.position, me.type.detectionRadius,
 			guy->sprite.position, guy->sprite.scale.x)) {
-			std::cout << "Found " << guy->type.name << std::endl;
 
 				me.target = *guy;
 				return; //found a guy
@@ -191,8 +213,8 @@ void TargetRandomEnemy(Enemy& me) {
 	
 	std::vector<Enemy*> aliveList{};
 	//check if all dead
-	for (Enemy* me : me.roomData->enemyList) {
-		if (me->isActive) aliveList.push_back(me);
+	for (Enemy* enemy : me.roomData->enemyList) {
+		if (enemy->isActive) aliveList.push_back(enemy);
 	}
 	//Very special case, this behaviour specifically targets enemies first! 
 	//Once the enemies are gone then the boss is targeted!
@@ -217,6 +239,7 @@ void TargetCorner(Enemy& me) {
 void FireProjectile(Enemy& me) {
 
 	if (!me.target) return;
+		bool amIFriendsWithThePlayer = false;
 	if (me.attackTimer <= 0) {
 		EnemyType::ProjectileInfo proj;
 		switch (me.state) {
@@ -225,6 +248,7 @@ void FireProjectile(Enemy& me) {
 			break;
 		case ES_HAPPY:
 			proj = me.type.happyProjectile;
+			amIFriendsWithThePlayer = true;
 			break;
 		default:
 			proj = me.type.neutralProjectile;
@@ -233,7 +257,6 @@ void FireProjectile(Enemy& me) {
 
 		Vector2 direction = me.sprite.position - (me.target.GetPosition());
 
-		bool amIFriendsWithThePlayer = me.state == ES_HAPPY;
 
 		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.sprite.position, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me, amIFriendsWithThePlayer);
 		me.attackTimer = me.type.attackRate;
@@ -252,18 +275,35 @@ void BecomeNeutral(Enemy& me) {
 
 	me.ChangeState(ES_NEUTRAL);
 }
+
+//Warning about this guy, it's like free damage. Make sure the context is appropriate!
 void DamageTarget(Enemy& me) {
-//now this gets tricky!!
-//hard code for now!!
+
+	if (!me.target) return;
+
 	if (me.attackTimer <= 0) {
-		me.attackTimer = 3;
+		me.attackTimer = me.type.attackRate;
 		
-		if (me.target.isPlayer) {
-			playerTakesDamage(*me.roomData->player);
+		if (me.target.isPlayer && me.state != ES_HAPPY) {
+			if (me.type.damage < 0.f) {
+				playerHealsDamage(*me.roomData->player);
+			}
+			else {
+				playerTakesDamage(*me.roomData->player);
+			}
 		}
+		me.target.DealDamage(me.type.damage);
 
 	}
 
+}
+
+void Wait(Enemy& me) {
+	
+	if (me.waitTimer <= 0.f) {
+		std::cout << me.type.name << "is waiting. \n";
+		me.waitTimer = 3;
+	}
 }
 
 void PullTarget(Enemy& me) {
@@ -271,6 +311,11 @@ void PullTarget(Enemy& me) {
 }
 void PushTarget(Enemy& me) {
 
+}
+
+void ClearTarget(Enemy& me) {
+	//Set target to be empty
+	me.target = Enemy::Target{};
 }
 
 //unused template functions
@@ -303,9 +348,14 @@ void InitCommands() {
     commands.reserve(30);
     flags.reserve(30);
 
-    flags = {
-        {"IsTouchingTarget",IsTouchingTarget},
+	flags = {
+		{"IsTouchingTarget",IsTouchingTarget},
 		{"IsNotFollowingPlayer", IsNotFollowingPlayer},
+		{"IsTargetInDetectionRadius", IsTargetInDetectionRadius},
+		{"IsWaitTimerUp", IsWaitTimerUp},
+		{"IsWanderTimerUp", IsWanderTimerUp},
+		{"IsWandering", IsWandering },
+		{ "IsWaiting" , IsWaiting },
 		{"default", DefaultFlag}
     };
 
@@ -329,7 +379,10 @@ void InitCommands() {
 		{"BecomeNeutral", BecomeNeutral},
 		{"DamageTarget", DamageTarget},
 		{"PullTarget", PullTarget},
-		{"PushTarget", PushTarget}
+		{"PushTarget", PushTarget},
+		{"Wait", Wait},
+		{"ClearTarget", ClearTarget}
+
 
     };
 }
@@ -337,10 +390,6 @@ void InitCommands() {
 
 //anonymous namespace for reasons
 namespace {
-    
-
-    
-   
     
 
 } //end anonymous namespace

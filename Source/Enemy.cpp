@@ -8,7 +8,7 @@
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
-	, wanderTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
+	, wanderTimer{}, waitTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
 {
@@ -19,7 +19,7 @@ Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSp
 
 Enemy::Target::Target() : 
 	position{nullptr}, initialPosition{}, isPlayer{false}, isActive{nullptr}
-	, speedMod{ nullptr }, dmgMod{ nullptr }, info{}
+	, speedMod{ nullptr }, dmgMod{ nullptr }, info{}, health{nullptr}
 { }
 
 Enemy::Target::~Target() {
@@ -33,6 +33,7 @@ Enemy::Target& Enemy::Target::operator=(Enemy& them) {
 	initialPosition = them.sprite.position;
 	isActive = &them.isActive;
 	isPlayer = false;
+	health = &them.currentHealth;
 	speedMod = &them.speedModifier;
 	dmgMod = &them.dmgModifier;
 	return *this;
@@ -44,6 +45,7 @@ Enemy::Target& Enemy::Target::operator=(Player& them) {
 	position = &them.sprite.position;
 	initialPosition = them.sprite.position;
 	speedMod = &them.speed;
+	health = nullptr;
 	dmgMod = nullptr;
 	return *this;
 }
@@ -56,22 +58,24 @@ Enemy::Target& Enemy::Target::operator=(Boss& them)
 	position = &them.sprite.position;
 	initialPosition = them.sprite.position;
 
-	//TODO
+	health = &them.currentHealth;
+	
 	speedMod = &them.speedModifier;
 	//The boss doesn't need a damage modifier
 	dmgMod = nullptr;
 	return *this;
 }
-
 Enemy::Target& Enemy::Target::operator=(Vector2 const& position)
 {
 	//by design, the target will be forever alive
-	*isActive = true;
+	static bool trueVar = true;
+	isActive = &trueVar;
 	isPlayer = false;
 	initialPosition = position;
 	this->position = &initialPosition;
 	//Keeping the target as dumb as possible.
 	info = 0.0f;
+	health = nullptr;
 	speedMod = &info;
 	dmgMod = &info;
 	return *this;
@@ -123,6 +127,14 @@ float Enemy::Target::GetDmgMod() const
 	return *dmgMod;
 }
 
+void Enemy::Target::DealDamage(float dmg)
+{
+
+	if (health) {
+		*health -= dmg;
+	}
+}
+
 Enemy::~Enemy() {
 	//AEGfxMeshFree(mesh);
 }
@@ -135,6 +147,12 @@ void Enemy::ChangeState(EnemyStates newstate)
 	case ES_HAPPY:
 		FriendSuccessAudio();
 		sprite.color = { 0.f,1.f,0.f,1.f };
+
+		//When I become a friend, the others in the room will start judging
+		for (Enemy* enemy : roomData->enemyList) {
+			if (enemy->type.name == type.name) continue; //Siblings do not judge.
+			enemy->AssessTraits(this->type.traits, false);
+		}
 
 		currentBehavior = enemyType.happy;
 		break;
@@ -181,13 +199,16 @@ void Enemy::Update(float dt) {
 
 	if (attackTimer > 0.f) 
 		attackTimer -= dt;
+
+	if (waitTimer > 0.f) 
+		waitTimer -= dt;
 }
 
 void Enemy::AssessTraits(Labels labels, bool giftCheck){
 		for (std::string thing : type.dislikes) {
 			std::cout << "I hate " << thing << " ";
 		}
-	if (giftCheck && HasCommonTrait(labels,type.likes)){
+	if (giftCheck && HasCommonTrait(labels,type.likes) && !HasCommonTrait(labels,type.dislikes)){
 		ChangeState(ES_HAPPY);
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
@@ -201,7 +222,8 @@ void Enemy::AssessTraits(Labels labels, bool giftCheck){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{}
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{},
+	happyProjectile{}, angryProjectile{}, neutralProjectile{}
 {
 }
 

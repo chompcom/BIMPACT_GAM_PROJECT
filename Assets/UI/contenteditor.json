@@ -54,6 +54,23 @@
         },
 
         {
+          "id": "btn_choose_existing",
+          "x": 0.24,
+          "y": 0.44,
+          "w": 0.15,
+          "h": 0.06,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.18,
+          "roundSegments": 8,
+          "text": "CHOOSE",
+          "textScale": 0.50,
+          "backgroundColor": [0.20, 0.20, 0.20, 1.0],
+          "textColor": [1.0, 1.0, 1.0, 1.0]
+        },
+
+        {
           "id": "btn_random",
           "x": 0.42,
           "y": 0.44,

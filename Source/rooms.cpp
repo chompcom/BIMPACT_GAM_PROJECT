@@ -192,9 +192,14 @@ namespace mapRooms
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
-			Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			//Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			//Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			//Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+
+			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* sauce = new Gift(allGiftTypes["HotSauce"], DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* spray = new Gift(allGiftTypes["Spray"], DataLoader::CreateTexture("Assets/shadow.png"));
+
 			gift->shadow.position = Vector2{ 0.f, -40.f };
 			sauce->shadow.position = Vector2{ 0.f, -40.f };
 			spray->shadow.position = Vector2{ 0.f, -40.f };
@@ -219,7 +224,8 @@ namespace mapRooms
 
 			if (!biomeNames.empty()) {
 				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
-				biome = biomeNames[randomBiomeIndex];
+				//biome = biomeNames[randomBiomeIndex];
+				biome = biomeNames[randomBiomeIndex] == "Start" ? "Normal" : biomeNames[randomBiomeIndex];
 			}
 			else {
 				biome = "Normal";
@@ -290,28 +296,35 @@ namespace mapRooms
 					Labels giftTraits{};
 
 					// Idk how should i set traits
-					if (giftDisplayName == "Spray")
-					{
-						giftTraits.insert("Clean");
-					}
-					else
-					{
-						// HotSauce / Trash default to Gross for now
-						giftTraits.insert("Gross");
-					}
+					//if (giftDisplayName == "Spray")
+					//{
+					//	giftTraits.insert("Clean");
+					//}
+					//else
+					//{
+					//	// HotSauce / Trash default to Gross for now
+					//	giftTraits.insert("Gross");
+					//}
 
-					Gift* gift = new Gift(
+					/*Gift* gift = new Gift(
 						giftDisplayName,
 						giftTraits,
 						DataLoader::CreateTexture(giftTexturePath),
 						DataLoader::CreateTexture("Assets/shadow.png"),
 						spawnPosition
+					);*/
+
+
+					Gift* gift = new Gift(
+						allGiftTypes[giftDisplayName],
+						DataLoader::CreateTexture("Assets/shadow.png"),
+						spawnPosition
 					);
 
 					gift->position = spawnPosition;
-					gift->sprite.position = spawnPosition;
+					gift->giftType.sprite.position = spawnPosition;
 					gift->shadow.position = spawnPosition - Vector2{ 0.0f, 40.0f };
-					gift->sprite.UpdateTransform();
+					gift->giftType.sprite.UpdateTransform();
 					gift->shadow.UpdateTransform();
 
 					currentRoomData.giftList.push_back(gift);
@@ -410,11 +423,11 @@ namespace mapRooms
 			}
 
 			// Spawn gifts
-			if (0 && currentRoomData.giftList.empty()) {
-				Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-				gift->shadow.position = Vector2{ 0.f, -40.f };
-				currentRoomData.giftList.push_back(gift);
-			}
+			//if (0 && currentRoomData.giftList.empty()) {
+			//	Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+			//	gift->shadow.position = Vector2{ 0.f, -40.f };
+			//	currentRoomData.giftList.push_back(gift);
+			//}
 		//}
 			// Gifts here (1 Gift per room for now)
 			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?

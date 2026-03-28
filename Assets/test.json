@@ -116,14 +116,63 @@
 			"attackRate": 5,
 			"likes": ["Hot"],
 			"dislikes": ["Wet"],
+			"happyProjectile":{
+				"damage": 25,
+				"radius":300,
+				"speed":0,
+				"lifetime":1,
+				"sprite":"Assets/fireball.png"
+			},
 			"angryProjectile": {
 				"damage":50,
 				"radius":200,
 				"speed":0,
-				"lifetime":0.5,
+				"lifetime": 1,
 				"sprite": "Assets/fireball.png"
 			},
-			"happy": [],
+			"happy": [
+				{ "context": "IsWaiting",
+					"actions":[
+						"ClearTarget"
+						,"MoveToTarget"
+					]
+				},
+				{
+					"context":"IsTouchingTarget",
+					"actions":[
+						"ClearTarget",
+						"FireProjectile",
+						"Wait"
+					]
+				},
+				{ "context": "IsTargetInDetectionRadius",
+				  "actions": [
+					"TargetEnemyInDetectionRadius",
+					"MoveToTarget"
+				  ]
+				},
+				{ "context": "IsNotFollowingPlayer",
+					"actions":[
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"		
+					]
+				},
+				{ "context": "IsWandering",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"Wander"
+					]
+				},
+
+				{"context":"default",
+				"actions":[ 
+					"FireProjectile",
+					"Wander"
+				]
+				}
+			],
 			"neutral": [
 				{ "context":"default",
 				"actions":[
@@ -178,12 +227,20 @@
 			"likes": ["Hot"],
 			"dislikes": ["Wet", "Gross"],
 			"happy": [
+				{ "context": "IsTargetInDetectionRadius",
+				  "actions" : [
+					"MoveToTarget",
+					"CircleMove",
+					"FireProjectile"
+				  ]
+				},
+
 				{ "context": "default",
 				   "actions": [
 					"TargetPlayer",
 					"MoveToTarget",
-					"TargetEnemyInDetectionRadius",
-					"FireProjectile"	
+					"ClearTarget",
+					"TargetEnemyInDetectionRadius"
 				]}
 			],
 			"neutral": [
@@ -211,6 +268,74 @@
 					"FireProjectile",
 					"CircleMove"
 				]}
+			]
+		},
+		{
+			"name": "Snowman",
+			"sprite": "Assets/Enemies/snowman.png",
+			"color": [
+				255,
+				255,
+				255,
+				255
+			],
+			"health": 100,
+			"damage": 10,
+			"speed": 0,
+			"detectionRadius": 300,
+			"safeRadius": 300,
+			"attackRate": 1.5,
+			"happyProjectile": {
+				"damage": 10,
+				"radius" : 50,
+				"speed": 500,
+				"lifetime" : 2,
+				"sprite" : "Assets/snowball.png"
+			},
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 200,
+				"lifetime": 2.5,
+				"sprite": "Assets/snowball.png"
+			},
+			"traits": ["Cold","Wet"],
+			"likes": ["Cold", "Wet"],
+			"dislikes": ["Hot"],
+			"happy": [
+				{ "context": "IsTargetInDetectionRadius",
+					"actions":[
+						"FireProjectile"
+					]
+				},
+				{ "context": "default",
+				   "actions": [
+					"ClearTarget",
+					"TargetEnemyInDetectionRadius"
+				]}
+			],
+			"neutral": [
+				{ "context": "IsTouchingTarget",
+					"actions":[
+						"BecomeAngry"
+					]
+				},
+				{ "context": "default",
+				   "actions": [
+					"TargetPlayer"
+				]}
+			],
+			"angry": [
+				{ "context": "IsTargetInDetectionRadius",
+					"actions":[
+						"FireProjectile"
+					]
+				},
+				{ "context": "default",
+				   "actions": [
+					"TargetPlayer"
+				]}
+
 			]
 		}
     ]
