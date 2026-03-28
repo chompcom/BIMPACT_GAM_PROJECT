@@ -1,5 +1,7 @@
 #include "TestScene.h"
 
+#include <algorithm>
+
 #include "AEEngine.h"
 #include "../Sprite.h"
 
@@ -271,6 +273,15 @@ void TestDraw()
 
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite(true);
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	for (Particle& particle : 
+	gameMap.GetCurrentRoom()->currentRoomData.particleSystem.particles) 
+	{
+		
+		if (particle.isActive)
+		particle.sprite.RenderSprite();	
+	}
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	// rock.sprite.RenderSprite();
 	// gift.sprite.RenderSprite();
 	// gift2.sprite.RenderSprite();
@@ -453,20 +464,7 @@ void TestUnload()
 
 	AEGfxDestroyFont(font);
 
-	// moved to free to prevent mem leaks
-	//// Dellocate enemy and gift assets
-	// for (Enemy *e: globalTransferData.enemyList) {
-	//	delete e;
-	// }
-
-	// for (Gift* g : globalTransferData.giftList) {
-	//	delete g;
-	// }
-
-	// for (Projectile* p : globalTransferData.projectileList) delete p;
-	//
-	// globalTransferData.player = nullptr;
-	// gameMap.DeleteMap();
+	
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
@@ -507,13 +505,6 @@ void TestUpdate(float dt)
 		// to test damage
 		if (player.health > 0)
 		{
-			/*if (AEInputCheckTriggered(AEVK_P))
-				playerTakesDamage(player);
-			if (AEInputCheckTriggered(AEVK_O))
-				playerHealsDamage(player);
-
-			if (AEInputCheckTriggered(AEVK_M))
-				PlayerInit(player);*/
 
 			checkIfAlmanacClicked(*almanacIcon, almanac);
 
@@ -526,20 +517,9 @@ void TestUpdate(float dt)
 			player.shadow.UpdateTransform();
 		}
 
-		//winUI.Update();
-
-		// Get previous pos
-		//Vector2 prevPos{ player.position.x, player.position.y };
 
 		//UpdatePlayer(player, dt); // Player update
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-
-		// Print Current Grid
-		//std::cout << "Grid Current: " << gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y) << "\n";
-		//for (int i = 0; i < 9; ++i) {
-		//	for (int j = 0; j < 12; ++j) std::cout << gameMap.GetCurrentRoom()->roomGrid.GetCell(j, i) << " ";
-		//	std::cout << '\n';
-		//}
 
 		// Game map update
 		gameMap.GetCurrentRoom()->Update(dt);
@@ -559,10 +539,6 @@ void TestUpdate(float dt)
 			
 		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
 			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
-		
-
-
-
 
 		// Test all collisions?
 
@@ -577,8 +553,6 @@ void TestUpdate(float dt)
 		checkIfAlmanacClicked(*almanacIcon, almanac);
 
 		MoveArrow(*arrowSprite, almanac, dt);
-
-		// std::cout << player.position.x << player.position.y;
 
 		// Update Enemies (carryData version is only for "Friends")
 		for (Enemy* e : roomData.enemyList)
@@ -744,7 +718,7 @@ void TestUpdate(float dt)
 		}
 
 		// Gifts and Enemy Check
-		for (Gift* gift : currentRoom->currentRoomData.giftList)
+		for (Gift*& gift : currentRoom->currentRoomData.giftList)
 		{
 			if (!(gift->velocity == Vector2()))
 			{
@@ -762,12 +736,26 @@ void TestUpdate(float dt)
 						}
 
 						e->AssessTraits(traitsCheck);
+						
+						//If the enemy becomes happy now, we shall delete the gift.
+						if (e->state == ES_HAPPY) {
+							delete gift;
+							gift = nullptr;
+							break;
+						}
 					}
 				}
 				//if (CollisionBoundary_Static(gift->sprite.position, gift->sprite.scale, 1200, 600))
 					//gift->velocity = -gift->velocity;
 			}
 		}
+		
+		//erase any nullptrs
+		std::vector<Gift*>& roomGiftListReference = currentRoom->currentRoomData.giftList;	
+		roomGiftListReference.erase(
+			std::remove(roomGiftListReference.begin(), roomGiftListReference.end(), nullptr),
+			roomGiftListReference.end());
+		
 
 		// 4) Transfer enemies to our carrylist if they are essentially happy
 		for (size_t i = 0; i < roomData.enemyList.size();)
@@ -809,13 +797,15 @@ void TestUpdate(float dt)
 			++i;
 		}
 
+		currentRoom->currentRoomData.particleSystem.UpdateParticles(dt);
+
 		// Room grid works! (To be removed)
 		// std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
 		// std::cout << "x: " << player.position.x << "y: " << player.position.y;
 
 		// Update game map
 		Vector2 positionResetTest = player.position;
-		gameMap.UpdateMap(player.position, playerHalfSize, testParticles, dt);
+		gameMap.UpdateMap(player.position, playerHalfSize, currentRoom->currentRoomData.particleSystem, dt);
 		/* IF player position is changed to other screen, reset enemies to player position */
 		if (player.position != positionResetTest)
 		{

@@ -272,7 +272,7 @@ namespace DataLoader {
 
 	AEGfxVertexList* GetMesh()
 	{
-		return GetOrCreateSquareMesh();
+		return squareMesh;
 	}
 
 	AEGfxVertexList* GetOrCreateSquareMesh()

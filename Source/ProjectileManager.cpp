@@ -1,5 +1,7 @@
 #include "ProjectileManager.h"
 
+#include "ParticleSystem.h"
+
 
 void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
 	sprite.position = pos;
@@ -135,8 +137,19 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         }
 
         if (hit || enemyHit) {
+            //generate death particles
+
+            float projSpeed = (*it)->GetVelocity().Length();
+            for (int i = 0; i < 360; i++) {
+                float radian = (float)i * (PI / 180.f);
+                Vector2 dir = Vector2(cosf(radian), -sinf(radian));
+            roomData.particleSystem.CreateParticles(2, 0.25f, dir * projSpeed, (*it)->GetPosition(),
+                Color{ 0.5f,0.5f,0.5f,1.f });
+
+            }
             delete* it;
             it = roomData.projectileList.erase(it);
+
         }
         else {
             ++it;

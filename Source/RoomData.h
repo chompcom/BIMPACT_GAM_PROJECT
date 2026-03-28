@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "Boss.h"
 #include "Grid.h"
+#include "ParticleSystem.h"
 
 class Enemy;
 class Boss;
@@ -14,12 +15,16 @@ class Boss;
 struct RoomData {
     public: // for now
 
+        //! Points to the player 
         Player* player;
+        //! Each room should handle their own particles
+        ParticleSystem particleSystem;
         std::vector<Enemy*> enemyList;
         std::vector<Gift*> giftList;
         std::vector<Projectile*> projectileList;
         Boss* boss;
         Grid grid;
+        
 
         RoomData();
 
