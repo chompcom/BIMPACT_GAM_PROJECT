@@ -251,8 +251,11 @@ namespace DataLoader {
 
 			for (Json::Value& name : theGuy["almanacEntries"]) 
 			{
-				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
-					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
+				EnemyType const& entryEnemyType = DataLoader::GetEnemyType(name["name"].asString());
+				AlmanacEntry tmp{entryEnemyType, name["description"].asString(), 
+					name["area"].asString(), 
+					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
+					//DataLoader::CreateTexture(name["spritePath"].asString())};
 				//std::cout << tmp.enemyType.name;
 				//std::cout << name["name"].asString();
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
