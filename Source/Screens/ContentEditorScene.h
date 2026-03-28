@@ -1,9 +1,13 @@
 #include <iostream>
 #include <fstream>
+//#include <filesystem>
 
 #include "../Grid.h"
 #include "Ui.h"
 #include "../GameStateManager.h"
+#include "../Utils/Utils.h"
+
+
 
 enum class ContentEditorTab
 {
@@ -28,6 +32,14 @@ struct ContentEditorState
 
 	std::string exportFileName{ "Custom" };
 	std::string statusMessage{ "Ready" };
+
+	// Existing CSV edit mode
+	bool isLoadPopupOpen{ false };				// For Popups
+	bool isEditingExistingFile{ false };		// Are we editing existing file
+	int existingCsvIndex{ 0 };					// Fileindex
+	std::vector<std::string> existingCsvPaths{};// Tbh im just gonan use one path
+	std::string currentEditingFilePath{};		// Current File Path to modify
+
 };
 
 

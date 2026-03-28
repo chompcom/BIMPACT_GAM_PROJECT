@@ -154,9 +154,19 @@ void TestInit()
 
 	// For pause screen;
 	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
-	UIElement *tipText = pauseUi.FindById("tip_text");
-	if (tipText)
-		tipText->text = pauseTipText;
+	//UIElement *tipText = pauseUi.FindById("tip_text");
+	//if (tipText)
+		//tipText->text = pauseTipText;
+	pauseUi.BindOnClick("btn_restart", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_RESTART); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	pauseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_MAINMENU); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
 
@@ -510,7 +520,7 @@ void TestUpdate(float dt)
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
-		if (AEInputCheckTriggered(AEVK_TAB))
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
 			gameState = PAUSED;
 		}
@@ -544,17 +554,89 @@ void TestUpdate(float dt)
 		RoomData& roomData = currentRoom->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
-
+		/*
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
 		if (curCell >= 0 && curCell != 0xffffff)
 			currentRoom->lastValidCell = curCell;
+		int prevCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(prevPos.x, prevPos.y);
 		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
-		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT)
-			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-			
-		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
-			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
+		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) {
+		player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+		if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
+			player.direction.x = 0.0f;
+			std::cout << "Collided left" << std::endl;
+		} else if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
+			//player.position.x = prevPos.x + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+			player.direction.x = 0.0f;
+			std::cout << "Collided Right" << std::endl;;
+		}
+			//if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
+			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x - currentRoom->roomGrid.GetWidth() * 0.5f + player.sprite.scale.x * 0.5f + 0.10f;
+			//}
+			//if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
+			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x + currentRoom->roomGrid.GetWidth() * 0.5f - player.sprite.scale.x * 0.5f - 0.10f;
+			//}
+		}
+		if ((colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)) {
+			//player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
+			//player.direction.y = 0.0f;	
+			//if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
+			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y - currentRoom->roomGrid.GetHeight() * 0.5f + player.sprite.scale.y * 0.5f + 0.10f;
+			//}
+			//if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
+			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y + currentRoom->roomGrid.GetHeight() * 0.5f - player.sprite.scale.y * 0.5f - 0.10f;
+			//	//sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
+			//}
+			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+			if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
+				std::cout << "Collided bottom" << std::endl;
+				player.direction.y = 0.0f;
+			}
+			else if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
+				std::cout << "Collided top" << std::endl;
+				//player.position.y = prevPos.y + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+				player.direction.y = 0.0f;
+			}
+		}
+		*/
+
+		// FOR DOOR
+		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
+		if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;
+
+		// TEST PLAYER COLLISION WITH MAP
+		Vector2 moveDelta = player.position - prevPos;
+		Vector2 moveDir = moveDelta.Normalized();
+		int curCell = currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y);
+		if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+
+		// Scale size 0.8f
+		float collisionScaleX = player.sprite.scale.x * 0.8f;
+		float collisionScaleY = player.sprite.scale.y * 0.8f;
+
+		int colRes = currentRoom->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, collisionScaleX, collisionScaleY, prevCell);
+
+		float gridWidth = currentRoom->roomGrid.GetTileWidth();
+		float gridHeight = currentRoom->roomGrid.GetTileHeight();
+		constexpr float skin = 0.10f;
+
+		if (prevCell >= 0)
+		{
+			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+			if ((colRes & COLLISION_LEFT) &&	moveDir.x < - EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
+			if ((colRes & COLLISION_RIGHT) &&	moveDir.x >   EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
+			if ((colRes & COLLISION_TOP) &&		moveDir.y >   EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
+			if ((colRes & COLLISION_BOTTOM) &&	moveDir.y < - EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
+		}
+
+		// sync sprite + shadow AFTER collision correction
+		player.sprite.position = player.position;
+		player.shadow.position = player.position - Vector2{ 0, 40 };
+
+		player.sprite.UpdateTransform();
+		player.shadow.UpdateTransform();
+
 
 		// Test all collisions?
 
@@ -681,7 +763,8 @@ void TestUpdate(float dt)
 						g->velocity.x /= 1.5f;		// ???
 					}
 					//g->velocity /= 1.1f;		// Dampen bounce
-					std::cout << tmp << '\n';
+					//std::cout << tmp << '\n';
+					//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
 				};
 				
 
@@ -844,6 +927,7 @@ void TestUpdate(float dt)
 				p->RemoveProjectile();
 			}
 		}
+		
 		if (AEInputCheckTriggered(AEVK_2)) {
 			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
 				, player.direction,
@@ -953,7 +1037,7 @@ void TestUpdate(float dt)
 	{
 		// When paused:
 		// - update only the pause UI
-		if (AEInputCheckTriggered(AEVK_TAB))
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
 			gameState = RUNNING;
 		}

@@ -11,6 +11,8 @@
 namespace
 {
 	UIManager contentEditorUi;
+	UIManager loadPopupUi;
+
 	s8 contentEditorFont = 0;
 	ContentEditorState contentEditorState{};
 
@@ -26,6 +28,85 @@ namespace
 	constexpr float obstacleThumbnailSize = 48.0f;
 
 	struct RectBounds {float left{}, right{}, top{}, bottom{};};
+
+	/*
+	
+	*/
+	std::string GetFileNameCSV(std::string const& path) {
+		return ExtractFileName(path, ".csv");
+	}
+
+	std::string ReadFromBiomeCsv(std::string const& filePath) {
+		std::ifstream ifs{ filePath };
+		if (!ifs.is_open()) return "";
+		
+		bool res = contentEditorState.roomGrid.LoadRoomCSV(filePath);
+		if (res) {
+			contentEditorState.isEditingExistingFile = true;
+		}
+
+		return "YAY";
+	}
+
+	void ScanCSVBiomes(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
+	{
+		outList.clear();	// Clear Lists
+
+		// Pattern Example: Assets\Rooms\Normal\*.png
+		std::string pattern = folder;
+		if (!pattern.empty() && pattern.back() != '\\' && pattern.back() != '/')
+			pattern += "\\";
+		pattern += patternAppend;
+
+		// Idk how this works truly winapi stuff
+		WIN32_FIND_DATAA data{};
+		HANDLE hFind = FindFirstFileA(pattern.c_str(), &data);
+		if (hFind == INVALID_HANDLE_VALUE)
+			return;
+
+		do
+		{
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)	// Skip directories, we are looking for files
+				continue;
+
+			// Full path to file
+			std::string fullPath = folder;
+			if (!fullPath.empty() && fullPath.back() != '\\' && fullPath.back() != '/')
+				fullPath += "\\";
+			fullPath += data.cFileName;
+
+			outList.push_back(fullPath);	// Accumulate Files
+		} while (FindNextFileA(hFind, &data));
+
+		FindClose(hFind);
+
+		std::sort(outList.begin(), outList.end());
+	}
+
+	void RefreshExistingCsvList()
+	{
+		contentEditorState.existingCsvPaths.clear();
+		contentEditorState.existingCsvIndex = 0;
+		std::string csvFolder{ ".\\Assets\\Levels\\Room_Data" };
+		ScanCSVBiomes(csvFolder, "*.csv", contentEditorState.existingCsvPaths);
+		std::sort(contentEditorState.existingCsvPaths.begin(), contentEditorState.existingCsvPaths.end());
+	}
+
+	void RefreshLoadPopupLabel()
+	{
+		UIElement* label = loadPopupUi.FindById("label_existing_file");
+		if (!label) return;
+
+		if (contentEditorState.existingCsvPaths.empty())
+		{
+			label->text = "No CSV files found";
+			return;
+		}
+
+		label->text =
+			GetFileNameCSV(contentEditorState.existingCsvPaths[contentEditorState.existingCsvIndex]);
+	}
+
 
 	Vector2 GetMouseWorldPosition()
 	{
@@ -267,6 +348,14 @@ namespace
 		{
 			biomePreviewImage->texturePath = Grid::GetPathNameBiome(GetSelectedBiomeName());
 		}
+
+		// EXPORT BUTTON / OVERWRITE BUTTON
+		UIElement* exportButton = contentEditorUi.FindById("btn_export");
+		if (exportButton)
+		{
+			exportButton->text =
+				contentEditorState.isEditingExistingFile ? "OVERWRITE" : "EXPORT";
+		}
 	}
 
 	bool ExportCurrentEditorRoomToCsv(std::string const& outputFilePath)
@@ -503,7 +592,7 @@ void ContentEditorLoad()
 				if (contentEditorState.selectedBiomeIndex < 0)
 				{
 					contentEditorState.selectedBiomeIndex =
-						static_cast<int>(contentEditorState.biomeNames.size()) - 1;
+						static_cast<int>(contentEditorState.biomeNames.size()) - 2;
 				}
 
 				RebuildObstaclePaletteForSelectedBiome();
@@ -527,7 +616,7 @@ void ContentEditorLoad()
 				contentEditorState.selectedBiomeIndex++;
 
 				if (contentEditorState.selectedBiomeIndex >=
-					static_cast<int>(contentEditorState.biomeNames.size()))
+					static_cast<int>(contentEditorState.biomeNames.size()) - 1)
 				{
 					contentEditorState.selectedBiomeIndex = 0;
 				}
@@ -552,39 +641,120 @@ void ContentEditorLoad()
 			UpdateContentEditorUi();
 		});
 
+	contentEditorUi.BindOnClick("btn_choose_existing", [](UIElement&)
+		{
+			RefreshExistingCsvList();
+
+			loadPopupUi.Clear();
+			loadPopupUi.SetFont(contentEditorFont);
+			loadPopupUi.LoadFromFilePopUp(
+				"Assets/UI/contenteditor_load_popup.json",
+				Vector2(0.0f, 0.0f),
+				Vector2(720.0f, 260.0f)
+			);
+
+			RefreshLoadPopupLabel();
+			contentEditorState.isLoadPopupOpen = true;
+		});
+
+	contentEditorUi.BindOnClick("btn_choose_existing", [](UIElement&)
+		{
+			RefreshExistingCsvList();
+
+			loadPopupUi.Clear();
+			loadPopupUi.SetFont(contentEditorFont);
+			loadPopupUi.LoadFromFilePopUp(
+				"Assets/UI/contenteditor_load_popup.json",
+				Vector2(0.0f, 0.0f),
+				Vector2(720.0f, 260.0f)
+			);
+
+			RefreshLoadPopupLabel();
+			contentEditorState.isLoadPopupOpen = true;
+		});
+
 	contentEditorUi.BindOnClick("btn_random", [](UIElement&)
 		{
 			RandomizeCurrentEditorRoomLayout();
 		});
 
+	//contentEditorUi.BindOnClick("btn_export", [](UIElement&)
+	//	{
+	//		std::size_t fileNumber = 1;
+
+	//		std::string outputFilePath =
+	//			".\\Assets\\Levels\\Room_Data\\" +
+	//			GetSelectedBiomeName() +
+	//			"_" +
+	//			contentEditorState.exportFileName +
+	//			"_" +
+	//			std::to_string(fileNumber) +
+	//			".csv";
+
+	//		while (FileExists(outputFilePath))
+	//		{
+	//			outputFilePath =
+	//				".\\Assets\\Levels\\Room_Data\\" +
+	//				GetSelectedBiomeName() +
+	//				"_" +
+	//				contentEditorState.exportFileName +
+	//				"_" +
+	//				std::to_string(++fileNumber) +
+	//				".csv";
+	//		}
+
+	//		if (ExportCurrentEditorRoomToCsv(outputFilePath))
+	//		{
+	//			contentEditorState.statusMessage = "Exported: " + outputFilePath;
+	//		}
+	//		else
+	//		{
+	//			contentEditorState.statusMessage = "Export failed";
+	//		}
+
+	//		UpdateContentEditorUi();
+	//	});
+
 	contentEditorUi.BindOnClick("btn_export", [](UIElement&)
 		{
-			std::size_t fileNumber = 1;
+			std::string outputFilePath{};
 
-			std::string outputFilePath =
-				".\\Assets\\Levels\\Room_Data\\" +
-				GetSelectedBiomeName() +
-				"_" +
-				contentEditorState.exportFileName +
-				"_" +
-				std::to_string(fileNumber) +
-				".csv";
-
-			while (FileExists(outputFilePath))
+			if (contentEditorState.isEditingExistingFile &&
+				!contentEditorState.currentEditingFilePath.empty())
 			{
+				outputFilePath = contentEditorState.currentEditingFilePath;
+			}
+			else
+			{
+				std::size_t fileNumber = 1;
+
 				outputFilePath =
 					".\\Assets\\Levels\\Room_Data\\" +
 					GetSelectedBiomeName() +
 					"_" +
 					contentEditorState.exportFileName +
 					"_" +
-					std::to_string(++fileNumber) +
+					std::to_string(fileNumber) +
 					".csv";
+
+				while (FileExists(outputFilePath))
+				{
+					outputFilePath =
+						".\\Assets\\Levels\\Room_Data\\" +
+						GetSelectedBiomeName() +
+						"_" +
+						contentEditorState.exportFileName +
+						"_" +
+						std::to_string(++fileNumber) +
+						".csv";
+				}
 			}
 
 			if (ExportCurrentEditorRoomToCsv(outputFilePath))
 			{
-				contentEditorState.statusMessage = "Exported: " + outputFilePath;
+				contentEditorState.statusMessage =
+					(contentEditorState.isEditingExistingFile ? "Overwrote: " : "Exported: ") +
+					outputFilePath;
 			}
 			else
 			{
@@ -602,6 +772,20 @@ void ContentEditorInit()
 void ContentEditorUpdate(float dt)
 {
 	UNREFERENCED_PARAMETER(dt);
+
+
+	if (contentEditorState.isLoadPopupOpen)
+	{
+		loadPopupUi.Update();
+
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		{
+			contentEditorState.isLoadPopupOpen = false;
+			loadPopupUi.Clear();
+		}
+
+		return;
+	}
 
 	contentEditorUi.Update();
 
@@ -677,7 +861,7 @@ void ContentEditorUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_M))
+	if (AEInputCheckTriggered(AEVK_ESCAPE))
 	{
 		ChangeState(GS_MAINMENU);
 	}
@@ -803,6 +987,28 @@ void ContentEditorDraw()
 
 	contentEditorUi.Draw();
 	DrawObstaclePaletteThumbnails();
+
+
+	// Popup existing file draw
+	if (contentEditorState.isLoadPopupOpen)
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f }
+		);
+		overlay.RenderSprite(true);
+
+		loadPopupUi.Draw();
+	}
 }
 
 void ContentEditorFree()

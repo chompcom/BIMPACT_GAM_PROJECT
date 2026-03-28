@@ -77,7 +77,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             fpUpdate(static_cast<float>(AEFrameRateControllerGetFrameTime()));
             fpDraw();
             AESysFrameEnd();
-            if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist()) {
+            if (/*AEInputCheckTriggered(AEVK_ESCAPE) ||*/ 0 == AESysDoesWindowExist()) {
                 //gGameRunning = 0;
                 next = GS_QUIT;
             }

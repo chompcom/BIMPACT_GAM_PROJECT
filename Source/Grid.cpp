@@ -738,8 +738,8 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 	//}
 
 	// Render player tiles 2 (take into account scaling)
-	float halfW = playerScale.x / 2.0f;
-	float halfH = playerScale.y / 2.0f;
+	float halfW = playerScale.x *0.8f*0.5f / 2.0f;
+	float halfH = playerScale.y* 0.8f * 0.5f / 2.0f;
 
 	int idxTL = WorldToCell(playerPos.x - halfW, playerPos.y + halfH);	// Top Left Corner
 	int idxTR = WorldToCell(playerPos.x + halfW, playerPos.y + halfH);	// Top Right Corner

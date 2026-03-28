@@ -1,0 +1,114 @@
+{
+  "elements": [
+    {
+      "id": "popup_root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+      "children": [
+        {
+          "id": "popup_background",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 1.0,
+          "h": 1.0,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.10,
+          "roundSegments": 8,
+          "backgroundColor": [0.92, 0.92, 0.92, 1.0]
+        },
+        {
+          "id": "label_popup_title",
+          "x": 0.0,
+          "y": 0.30,
+          "w": 0.80,
+          "h": 0.12,
+          "visible": true,
+          "text": "Choose Existing CSV",
+          "textScale": 0.70,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+        {
+          "id": "btn_prev_existing",
+          "x": -0.35,
+          "y": 0.00,
+          "w": 0.10,
+          "h": 0.12,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": false,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "text": "<",
+          "textScale": 0.80,
+          "textColor": [0.96, 0.45, 0.15, 1.0]
+        },
+        {
+          "id": "label_existing_file",
+          "x": 0.0,
+          "y": 0.00,
+          "w": 0.68,
+          "h": 0.14,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.08,
+          "roundSegments": 8,
+          "text": "No CSV files found",
+          "textScale": 0.45,
+          "backgroundColor": [0.80, 0.90, 0.95, 1.0],
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+        {
+          "id": "btn_next_existing",
+          "x": 0.35,
+          "y": 0.00,
+          "w": 0.10,
+          "h": 0.12,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": false,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "text": ">",
+          "textScale": 0.80,
+          "textColor": [0.96, 0.45, 0.15, 1.0]
+        },
+        {
+          "id": "btn_load_existing",
+          "x": -0.18,
+          "y": -0.28,
+          "w": 0.24,
+          "h": 0.16,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.12,
+          "roundSegments": 8,
+          "text": "LOAD",
+          "textScale": 0.55,
+          "backgroundColor": [0.96, 0.45, 0.15, 1.0],
+          "textColor": [1.0, 1.0, 1.0, 1.0]
+        },
+        {
+          "id": "btn_cancel_existing",
+          "x": 0.18,
+          "y": -0.28,
+          "w": 0.24,
+          "h": 0.16,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.12,
+          "roundSegments": 8,
+          "text": "CANCEL",
+          "textScale": 0.55,
+          "backgroundColor": [0.35, 0.35, 0.35, 1.0],
+          "textColor": [1.0, 1.0, 1.0, 1.0]
+        }
+      ]
+    }
+  ]
+}
