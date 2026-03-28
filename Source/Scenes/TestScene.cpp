@@ -52,7 +52,7 @@ Almanac almanac{};
 s8 font = 0;
 //Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 //static ProjectileManager projManager;
-Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 20000.f, 600.f, Vector2(0, 0)};
+Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 600.f, Vector2(0, 0)};
 
 EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
@@ -123,6 +123,8 @@ void TestLoad()
 	//// Too easy: 32702, 0xA341311Cu,
 
 	////gameMap.InitMap(globalTransferData, 0xA341311Cu);   // Seeded Run
+	//load the gift types if they arent loaded
+	if (allGiftTypes.empty()) LoadGiftTypes();
 }
 
 void TestInit()
@@ -220,7 +222,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : roomData.enemyList)
@@ -247,7 +249,7 @@ void TestDraw()
 			{
 				if (!g->pickUpState)
 					g->shadow.RenderSprite();
-				g->sprite.RenderSprite();
+				g->giftType.sprite.RenderSprite();
 			}
 		}
 		for (Enemy *e : carryData.enemyList)
@@ -424,6 +426,8 @@ void TestFree()
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 
+	
+
 	// if (gameMap.GetCurrentRoom())
 	// projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 }
@@ -477,6 +481,8 @@ void TestUnload()
 	loseUi.Clear();
 	loseUiInitialized = false;
 	// isPaused = false;
+
+	allGiftTypes.clear();
 }
 
 void TestUpdate(float dt)
@@ -542,20 +548,88 @@ void TestUpdate(float dt)
 		RoomData& roomData = currentRoom->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
-
+		/*
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
 		if (curCell >= 0 && curCell != 0xffffff)
 			currentRoom->lastValidCell = curCell;
+		int prevCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(prevPos.x, prevPos.y);
 		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
-		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT)
-			player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-			
-		if (colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)
-			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
-		
+		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) {
+		player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+		if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
+			player.direction.x = 0.0f;
+			std::cout << "Collided left" << std::endl;
+		} else if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
+			//player.position.x = prevPos.x + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+			player.direction.x = 0.0f;
+			std::cout << "Collided Right" << std::endl;;
+		}
+			//if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
+			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x - currentRoom->roomGrid.GetWidth() * 0.5f + player.sprite.scale.x * 0.5f + 0.10f;
+			//}
+			//if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
+			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x + currentRoom->roomGrid.GetWidth() * 0.5f - player.sprite.scale.x * 0.5f - 0.10f;
+			//}
+		}
+		if ((colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)) {
+			//player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
+			//player.direction.y = 0.0f;	
+			//if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
+			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y - currentRoom->roomGrid.GetHeight() * 0.5f + player.sprite.scale.y * 0.5f + 0.10f;
+			//}
+			//if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
+			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y + currentRoom->roomGrid.GetHeight() * 0.5f - player.sprite.scale.y * 0.5f - 0.10f;
+			//	//sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
+			//}
+			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+			if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
+				std::cout << "Collided bottom" << std::endl;
+				player.direction.y = 0.0f;
+			}
+			else if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
+				std::cout << "Collided top" << std::endl;
+				//player.position.y = prevPos.y + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
+				player.direction.y = 0.0f;
+			}
+		}
+		*/
 
+		// FOR DOOR
+		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
+		if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;
 
+		// TEST PLAYER COLLISION WITH MAP
+		Vector2 moveDelta = player.position - prevPos;
+		Vector2 moveDir = moveDelta.Normalized();
+		int curCell = currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y);
+		if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+
+		// Scale size 0.8f
+		float collisionScaleX = player.sprite.scale.x * 0.8f;
+		float collisionScaleY = player.sprite.scale.y * 0.8f;
+
+		int colRes = currentRoom->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, collisionScaleX, collisionScaleY,prevCell);
+
+		float gridWidth = currentRoom->roomGrid.GetTileWidth();
+		float gridHeight = currentRoom->roomGrid.GetTileHeight();
+		constexpr float skin = 0.10f;
+
+		if (prevCell >= 0)
+		{
+			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+			if ((colRes & COLLISION_LEFT) &&	moveDir.x < - EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
+			if ((colRes & COLLISION_RIGHT) &&	moveDir.x >   EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
+			if ((colRes & COLLISION_TOP) &&		moveDir.y >   EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
+			if ((colRes & COLLISION_BOTTOM) &&	moveDir.y < - EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
+		}
+
+		// sync sprite + shadow AFTER collision correction
+		player.sprite.position = player.position;
+		player.shadow.position = player.position - Vector2{ 0, 40 };
+
+		player.sprite.UpdateTransform();
+		player.shadow.UpdateTransform();
 
 
 		// Test all collisions?
@@ -641,7 +715,7 @@ void TestUpdate(float dt)
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 7500 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 1.2f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/7500 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*1.2f), prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
@@ -691,7 +765,7 @@ void TestUpdate(float dt)
 				
 
 
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -701,7 +775,7 @@ void TestUpdate(float dt)
 			{
 				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
-				g->sprite.UpdateTransform();
+				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 			}
 		}
@@ -746,10 +820,17 @@ void TestUpdate(float dt)
 				for (Enemy* e : currentRoom->currentRoomData.enemyList)
 				{
 					if (!e->isActive) continue;
-					if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, e->sprite.position, e->sprite.scale.x))
+					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
 						gift->velocity = -gift->velocity;
-						e->AssessTraits(gift->traits);
+
+						Labels traitsCheck = gift->giftType.traits;
+						//Include your friends in the traits check, because you can't friend those who judge yours
+						for (Enemy* friendly : carryData.enemyList){
+							traitsCheck.insert( friendly->type.traits.begin(), friendly->type.traits.end() );
+						}
+
+						e->AssessTraits(traitsCheck);
 					}
 				}
 				//if (CollisionBoundary_Static(gift->sprite.position, gift->sprite.scale, 1200, 600))
@@ -807,12 +888,17 @@ void TestUpdate(float dt)
 		/* IF player position is changed to other screen, reset enemies to player position */
 		if (player.position != positionResetTest)
 		{
+			for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+				enemy->ChangeState(ES_NEUTRAL);
+			}
 			for (Enemy* e : carryData.enemyList)
 			{
 				e->sprite.position = player.position;
 				e->roomData = &gameMap.GetCurrentRoom()->currentRoomData;
 				// assess friend traits when entering a new room!
+
 				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
+					
 					enemy->AssessTraits(e->type.traits, false);
 				}
 			}

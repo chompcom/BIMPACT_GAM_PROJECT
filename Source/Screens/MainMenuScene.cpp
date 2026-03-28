@@ -73,6 +73,8 @@ void MainMenuLoad()
 		{
 			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
 		});
+
+	
 }
 
 void MainMenuInit(){}

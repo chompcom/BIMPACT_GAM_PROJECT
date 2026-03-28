@@ -63,9 +63,9 @@
     "200": {
       "name": "GenericEnemyMarker",
       "blocked": false,
-      "asset": "",
+      "asset": "Assets/Rooms/Items/WhosthatEnemy.png",
       "spawnCategory": "enemy",
-      "spawnName": "Assets/Rooms/Items/WhosthatEnemy.png"
+      "spawnName": ""
     },
 
     "201": {
@@ -91,12 +91,19 @@
       "spawnCategory": "enemy",
       "spawnName": "THE OVEN"
     },
+    "204": {
+      "name": "SnowmanMarker",
+      "blocked": false,
+      "asset": "Assets/Enemies/snowman.png",
+      "spawnCategory": "enemy",
+      "spawnName": "Snowman"
+    },
     "500": {
       "name": "Generic_GiftMarker",
       "blocked": false,
-      "asset": "",
+      "asset": "Assets/Rooms/Items/Gifts.png",
       "spawnCategory":"gift",
-      "spawnName":"Assets/Rooms/Items/Gifts.png"
+      "spawnName":""
     },
     "501": {
       "name": "Hot sauce",
@@ -127,7 +134,7 @@
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Normal": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
   },
   "Green": {
@@ -135,7 +142,7 @@
     "imagePath":"Assets/Rooms/Normal/GREEN/Room2.png"
   },
   "Ice": {
-    "allowedTiles": [0,1,2,3,5,6,7,8,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,3,5,6,7,8,100,200,201,202,203,204,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/ICE/Room1.png"
   }
   }
