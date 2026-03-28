@@ -685,7 +685,8 @@ void TestUpdate(float dt)
 						g->velocity.x /= 1.5f;		// ???
 					}
 					//g->velocity /= 1.1f;		// Dampen bounce
-					std::cout << tmp << '\n';
+					//std::cout << tmp << '\n';
+					//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
 				};
 				
 
