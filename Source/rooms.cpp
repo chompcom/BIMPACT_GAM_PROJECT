@@ -224,7 +224,8 @@ namespace mapRooms
 
 			if (!biomeNames.empty()) {
 				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
-				biome = biomeNames[randomBiomeIndex];
+				//biome = biomeNames[randomBiomeIndex];
+				biome = biomeNames[randomBiomeIndex] == "Start" ? "Normal" : biomeNames[randomBiomeIndex];
 			}
 			else {
 				biome = "Normal";

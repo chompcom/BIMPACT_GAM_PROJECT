@@ -592,7 +592,7 @@ void ContentEditorLoad()
 				if (contentEditorState.selectedBiomeIndex < 0)
 				{
 					contentEditorState.selectedBiomeIndex =
-						static_cast<int>(contentEditorState.biomeNames.size()) - 1;
+						static_cast<int>(contentEditorState.biomeNames.size()) - 2;
 				}
 
 				RebuildObstaclePaletteForSelectedBiome();
@@ -616,7 +616,7 @@ void ContentEditorLoad()
 				contentEditorState.selectedBiomeIndex++;
 
 				if (contentEditorState.selectedBiomeIndex >=
-					static_cast<int>(contentEditorState.biomeNames.size()))
+					static_cast<int>(contentEditorState.biomeNames.size()) - 1)
 				{
 					contentEditorState.selectedBiomeIndex = 0;
 				}
@@ -861,7 +861,7 @@ void ContentEditorUpdate(float dt)
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_M))
+	if (AEInputCheckTriggered(AEVK_ESCAPE))
 	{
 		ChangeState(GS_MAINMENU);
 	}
