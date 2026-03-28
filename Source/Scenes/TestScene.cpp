@@ -609,7 +609,7 @@ void TestUpdate(float dt)
 		float collisionScaleX = player.sprite.scale.x * 0.8f;
 		float collisionScaleY = player.sprite.scale.y * 0.8f;
 
-		int colRes = currentRoom->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, collisionScaleX, collisionScaleY,prevCell);
+		int colRes = currentRoom->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, collisionScaleX, collisionScaleY, prevCell);
 
 		float gridWidth = currentRoom->roomGrid.GetTileWidth();
 		float gridHeight = currentRoom->roomGrid.GetTileHeight();

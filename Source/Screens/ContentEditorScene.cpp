@@ -88,7 +88,7 @@ namespace
 		contentEditorState.existingCsvPaths.clear();
 		contentEditorState.existingCsvIndex = 0;
 		std::string csvFolder{ ".\\Assets\\Levels\\Room_Data" };
-		ScanCSVBiomes(csvFolder, ".csv", contentEditorState.existingCsvPaths);
+		ScanCSVBiomes(csvFolder, "*.csv", contentEditorState.existingCsvPaths);
 		std::sort(contentEditorState.existingCsvPaths.begin(), contentEditorState.existingCsvPaths.end());
 	}
 
