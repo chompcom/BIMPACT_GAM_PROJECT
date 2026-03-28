@@ -2,7 +2,7 @@
 #include "ParticleSystem.h"
 #include "Loaders/DataLoader.h"
 
-Particle::Particle(AEGfxVertexList* particleMesh) : sprite{Sprite(particleMesh, Vector2{}, Vector2{50, 50})}
+Particle::Particle(AEGfxVertexList* particleMesh) : sprite{Sprite(particleMesh, Vector2{}, Vector2{25, 25})}
 {}
 
 ParticleSystem::ParticleSystem(AEGfxVertexList* particleMesh) {

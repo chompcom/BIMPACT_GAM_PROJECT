@@ -47,6 +47,21 @@ namespace {
 			tmp.speed      = og["speed"].asFloat();
 			tmp.lifetime   = og["lifetime"].asFloat();
 			tmp.spritePath = og["sprite"].asString();
+
+			if (!og["color"].isNull())
+			{
+				float maxVal = 255.f;
+				tmp.color.r = og["color"][0].asFloat();
+				tmp.color.g = og["color"][1].asFloat();
+				tmp.color.b = og["color"][2].asFloat();
+				tmp.color.a = og["color"][3].asFloat();
+				std::cout << "Color Loaded: " << tmp.color.r << " " << tmp.color.g << " " << tmp.color.b << "\n";
+				tmp.color.r /= maxVal;
+				tmp.color.g /= maxVal;
+				tmp.color.b /= maxVal;
+				tmp.color.a /= maxVal;
+
+			}
 			return true;
 		}
 		return false;

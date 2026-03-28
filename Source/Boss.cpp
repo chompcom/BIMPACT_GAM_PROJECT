@@ -2,10 +2,12 @@
 #include "Boss.h"
 #include "GameStateList.h"
 
+#include "ProjectileManager.h"
+
 extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
-	const RoomData& currentRoom, std::vector<AttackData> attackData)
+	 RoomData& currentRoom, std::vector<AttackData> attackData)
 	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
@@ -51,6 +53,7 @@ void Boss::CollideProjectile() {
 				currentHealth -= proj->GetDmg();
 				std::cout << "Taken Damage: " << proj->GetDmg();
 				std::cout << "Remaining Health: " << currentHealth;
+				ProjectileParticleExplode(roomData, *proj);
 				proj->RemoveProjectile();
 				invulnerableTimer = 1.0f;
 			}

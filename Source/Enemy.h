@@ -145,9 +145,10 @@ public:
 		float radius;
 		float speed;
 		float lifetime;
+		Color color;
 		std::string spritePath;
 
-		ProjectileInfo() : damage{}, radius{}, speed{}, lifetime{}, spritePath{} {}
+		ProjectileInfo() : damage{}, radius{}, speed{}, lifetime{}, spritePath{}, color{ 1.f,1.f,1.f,1.f } {}
 	}  happyProjectile, angryProjectile, neutralProjectile;
 
 

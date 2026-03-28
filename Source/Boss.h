@@ -31,10 +31,10 @@ class Boss {
 		std::unique_ptr<Boss_FSM> bossStateMachine;
 
 		//points to the room it should be inside, so that it knows whats going on inside!
-		const RoomData& roomData;
+		RoomData& roomData;
 
 		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
-			const RoomData& currentRoom, std::vector<AttackData> attackData);
+			RoomData& currentRoom, std::vector<AttackData> attackData);
 		~Boss();
 
 		void Update(Player& player, f32 dt);

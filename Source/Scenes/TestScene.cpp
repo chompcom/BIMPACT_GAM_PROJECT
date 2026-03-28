@@ -278,8 +278,24 @@ void TestDraw()
 	gameMap.GetCurrentRoom()->currentRoomData.particleSystem.particles) 
 	{
 		
-		if (particle.isActive)
-		particle.sprite.RenderSprite();	
+		if (particle.isActive) {
+			Sprite darker = particle.sprite;
+
+			float colorOffset = 0.3f;
+
+			darker.color.r -= colorOffset;
+			darker.color.g -= colorOffset;
+			darker.color.b -= colorOffset;
+
+			AEClamp(darker.color.r, 0.0f, 1.0f);
+			AEClamp(darker.color.g, 0.0f, 1.0f);
+			AEClamp(darker.color.b, 0.0f, 1.0f);
+
+			darker.scale *= 1.5f;
+			darker.UpdateTransform();
+			darker.RenderSprite();
+			particle.sprite.RenderSprite();	
+		}
 	}
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	// rock.sprite.RenderSprite();

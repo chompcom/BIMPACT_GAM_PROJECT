@@ -169,6 +169,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 		currentBehavior = enemyType.angry;
 		break;
 	}
+
 }
 
 void Enemy::Update(float dt) {

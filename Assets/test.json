@@ -107,6 +107,7 @@
 				"speed":0,
 				"lifetime":1,
 				"sprite":"Assets/fireball.png"
+				,"color": [ 255, 0, 167, 255 ]
 			},
 			"neutralProjectile": {
 				"damage":50,

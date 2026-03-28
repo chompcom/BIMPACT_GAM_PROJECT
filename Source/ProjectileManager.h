@@ -16,3 +16,4 @@
     void RenderProjectile(RoomData& roomData);
     void ProjectileClear(RoomData& roomData);
 
+    void ProjectileParticleExplode(RoomData& roomData, Projectile const& proj);

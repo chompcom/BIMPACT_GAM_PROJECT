@@ -349,7 +349,7 @@ void FireProjectile(Enemy& me) {
 		Vector2 direction = me.prevPos - (me.target.GetPosition());
 
 
-		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), {1.f,1.f,1.f,1.f}, &me, amIFriendsWithThePlayer);
+		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), proj.color, &me, amIFriendsWithThePlayer);
 		me.attackTimer = me.type.attackRate;
 		me.onceAttackTime = true;
 	}
