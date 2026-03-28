@@ -463,6 +463,7 @@ void TestUnload()
 	//
 	// globalTransferData.player = nullptr;
 	// gameMap.DeleteMap();
+	FreeAudio();
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
@@ -542,12 +543,14 @@ void TestUpdate(float dt)
 		RoomData& roomData = currentRoom->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
-
+		std::cout << currentRoom->biome << std::endl;
 		static mapRooms::Room* lastRoom = nullptr;
 		if (currentRoom != lastRoom)
 		{
 			lastRoom = currentRoom;
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
+			if (currentRoom->biome == "Ice") IceBiomeAudio();
+			if (currentRoom->biome == "Normal") BossBGMAudio();
 		}
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -644,39 +647,38 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
-				
+				Vector2 prevPosition = g->position;
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
 				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->sprite.scale.x, g->sprite.scale.x, g->sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->sprite.scale.y, g->sprite.scale.y, g->sprite.scale.y*4.0f), prevCell);
-				Vector2 prevPosition = g->position;
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
 					
 				// Collides but no velocity?
 				if (g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
-
+				float offset = 0.1f;
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
 					tmp += " LEFT ";
-					g->position.x = prevPosition.x;
+					g->position.x = prevPosition.x + offset;
 					g->velocity.x *= -1;	// Inverse x if left
 				}
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
-					g->position.x = prevPosition.x;
+					g->position.x = prevPosition.x + offset;
 					g->velocity.x *= -1;	// Inverse x if left
 				
 				}
 				if (res & COLLISION_TOP) {
 					std::cout << g->velocity.y;
 					tmp += " TOP ";
-					g->position.y = prevPosition.y;
+					g->position.y = prevPosition.y + offset;
 					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (res & COLLISION_BOTTOM) {
 					tmp += " BOTTOM ";
-					g->position.y = prevPosition.y;
-					g->velocity.y *= -1;	// Inverse y if top
+					g->position.y = prevPosition.y + offset;
+					g->velocity.y *=	-1;	// Inverse y if top
 				}
 				if (tmp.size() > 0) { 
 
