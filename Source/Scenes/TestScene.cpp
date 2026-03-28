@@ -152,9 +152,19 @@ void TestInit()
 
 	// For pause screen;
 	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
-	UIElement *tipText = pauseUi.FindById("tip_text");
-	if (tipText)
-		tipText->text = pauseTipText;
+	//UIElement *tipText = pauseUi.FindById("tip_text");
+	//if (tipText)
+		//tipText->text = pauseTipText;
+	pauseUi.BindOnClick("btn_restart", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_RESTART); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
+	pauseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_MAINMENU); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+		});
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
 
@@ -496,7 +506,7 @@ void TestUpdate(float dt)
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
-		if (AEInputCheckTriggered(AEVK_TAB))
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
 			gameState = PAUSED;
 		}
@@ -907,6 +917,7 @@ void TestUpdate(float dt)
 				p->RemoveProjectile();
 			}
 		}
+		
 		if (AEInputCheckTriggered(AEVK_2)) {
 			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
 				, player.direction,
@@ -1016,7 +1027,7 @@ void TestUpdate(float dt)
 	{
 		// When paused:
 		// - update only the pause UI
-		if (AEInputCheckTriggered(AEVK_TAB))
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
 			gameState = RUNNING;
 		}
