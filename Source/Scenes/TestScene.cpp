@@ -246,11 +246,8 @@ void TestDraw()
 		}
 		if (roomData.boss)
 		{
-			if (roomData.boss->currentHealth > 0)
-			{
-				roomData.boss->shadow.RenderSprite();
-				roomData.boss->sprite.RenderSprite();
-			}
+			roomData.boss->shadow.RenderSprite();
+			roomData.boss->sprite.RenderSprite();
 		}
 
 		for (Gift *g : carryData.giftList)
@@ -942,6 +939,7 @@ void TestUpdate(float dt)
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 		}
+
 
 		// Gifts and Enemy Check
 		for (Gift* gift : currentRoom->currentRoomData.giftList)
