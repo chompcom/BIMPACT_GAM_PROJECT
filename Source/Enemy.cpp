@@ -6,6 +6,9 @@
 #include <set>
 #include <map>
 #include <Grid.h>
+#include "Loaders/DataLoader.h"
+#include "Audio.h"
+
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
@@ -164,6 +167,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 		currentBehavior = enemyType.neutral;
 		break;
 	case ES_ANGRY:
+		PlayMobSound(type.angrySound);
 		this->attackTimer = 3 + ((AERandFloat() * 2.f) - 1.f);
 		sprite.color = { 1.f,0.f,0.f,1.f };
 		currentBehavior = enemyType.angry;

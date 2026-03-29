@@ -76,6 +76,10 @@ static bool winUiInitialized = false;
 static UIManager loseUi;
 static bool loseUiInitialized = false;
 
+static bool fightMusicPlaying = false;
+static bool loseAudioPlaying = false;
+static bool WinAudioPlaying = false;
+
 bool debugMode;
 
 void TestLoad()
@@ -115,7 +119,7 @@ void TestLoad()
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
 
-	InitAudio();
+	
 	// Global Data Here
 	// I moved these and the init map down to init so it'll reset when the game state is restarted
 
@@ -130,6 +134,10 @@ void TestLoad()
 
 void TestInit()
 {
+	InitAudio();
+	loseAudioPlaying = false;
+	WinAudioPlaying = false;
+	fightMusicPlaying = false;
 	PlayerInit(player);
 	AlmanacInit(almanac);
 
@@ -276,7 +284,7 @@ void TestDraw()
 			if (p)
 				p->RenderProjectile();
 	}
-
+	
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite(true);
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -459,27 +467,24 @@ void TestFree()
 	globalTransferData.player = nullptr;
 	gameMap.DeleteMap();
 
-	
-
-	// if (gameMap.GetCurrentRoom())
-	// projManager.Clear(gameMap.GetCurrentRoom()->currentRoomData);
 }
 
 void TestUnload()
 {
 	AEGfxMeshFree(sqmesh);
 
+	//#warning "there are icons being deleted, are we not using dataloader?"	
 	delete almanacIcon;
 	delete arrowSprite;
 	delete almanacLitUpIcon;
 
+	//#warning "GET RID OF THE TEST PNGS"
 	AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
 	AEGfxTextureUnload(shadowpng);
 	AEGfxTextureUnload(bulletpng);
 
 	AEGfxTextureUnload(heartpng);
-	// AEGfxTextureUnload(heartpng);
 	AEGfxTextureUnload(almanacpng);
 	AEGfxTextureUnload(almanacLitUppng);
 	AEGfxTextureUnload(arrowpng);
@@ -490,7 +495,7 @@ void TestUnload()
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
-	FreeAudio();
+	
 
 	pauseUi.Clear();
 	pauseUiInitialized = false;
@@ -507,11 +512,6 @@ void TestUnload()
 
 void TestUpdate(float dt)
 {
-	//if (player.health <= 0)
-	//{
-	//	//HandleGameOverInputs(gameOverButtons);
-	//	return;
-	//}
 
 	if (gameState == RUNNING)
 	{
@@ -538,7 +538,8 @@ void TestUpdate(float dt)
 			player.sprite.UpdateTransform();
 			player.shadow.UpdateTransform();
 		}
-		
+		UpdateMobAudioCD(dt);
+		//winUI.Update();
 
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
@@ -549,6 +550,40 @@ void TestUpdate(float dt)
 		RoomData& roomData = currentRoom->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
+
+		std::cout << currentRoom->biome << std::endl;
+		static mapRooms::Room* lastRoom = nullptr;
+		if (currentRoom != lastRoom)
+		{
+			lastRoom = currentRoom;
+			ResetBGM();
+			if (currentRoom->biome == "Green") ForestBiomeAudio();
+			if (currentRoom->biome == "Ice") IceBiomeAudio();
+			if (currentRoom->biome == "Normal");
+			if (roomData.boss) {
+				BossBGMAudio();
+				//return;
+
+			}
+		}
+
+		bool isAngry = false;
+		for (Enemy* e : roomData.enemyList) {
+			if (e && e->isActive && e->state == ES_ANGRY) {
+				isAngry = true;
+				break;
+			}
+		}
+		if (isAngry && !fightMusicPlaying) {
+			ResetBGM();
+			FightMusicAudio();
+			fightMusicPlaying = true;
+		}
+		else if (!isAngry && fightMusicPlaying) {
+			ResetBGM();
+			fightMusicPlaying = false;
+		}
+		if (!roomData.boss && !fightMusicPlaying) RandomBGMAudio(dt);
 
 		// FOR DOOR
 		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
@@ -637,12 +672,12 @@ void TestUpdate(float dt)
 			{
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
-					
+
 				// Collides but no velocity?
 				if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
 
@@ -654,7 +689,7 @@ void TestUpdate(float dt)
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
 					g->velocity.x *= -1;	// Inverse x if left
-				
+
 				}
 				if (res & COLLISION_TOP) {
 					std::cout << g->velocity.y;
@@ -665,7 +700,7 @@ void TestUpdate(float dt)
 					tmp += " BOTTOM ";
 					g->velocity.y *= -1;	// Inverse y if top
 				}
-				if (tmp.size() > 0) { 
+				if (tmp.size() > 0) {
 
 					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
 
@@ -685,7 +720,7 @@ void TestUpdate(float dt)
 					//std::cout << tmp << '\n';
 					//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
 				};
-				
+
 
 
 				g->giftType.sprite.UpdateTransform();
@@ -709,7 +744,8 @@ void TestUpdate(float dt)
 
 		if (roomData.boss)
 		{
-			Vector2 bossPrevPos = roomData.boss->sprite.position;
+		
+				Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
 
@@ -762,10 +798,12 @@ void TestUpdate(float dt)
 							gift = nullptr;
 							break;
 						}
+
+						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
+						// Ok, now gift shall snap to front of enemy while moving back
+						gift->position = e->sprite.position - (dirBtwnEnemyGift).Normalized() * gift->giftType.sprite.scale.x;
 					}
 				}
-				//if (CollisionBoundary_Static(gift->sprite.position, gift->sprite.scale, 1200, 600))
-					//gift->velocity = -gift->velocity;
 			}
 		}
 		
@@ -818,10 +856,6 @@ void TestUpdate(float dt)
 
 		currentRoom->currentRoomData.particleSystem.UpdateParticles(dt);
 
-		// Room grid works! (To be removed)
-		// std::cout << "Cell idx: " << currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y) << std::endl;
-		// std::cout << "x: " << player.position.x << "y: " << player.position.y;
-
 		// Update game map
 		Vector2 positionResetTest = player.position;
 		gameMap.UpdateMap(player.position, playerHalfSize, currentRoom->currentRoomData.particleSystem, dt);
@@ -847,118 +881,16 @@ void TestUpdate(float dt)
 				p->RemoveProjectile();
 			}
 		}
-		
-		if (AEInputCheckTriggered(AEVK_2)) {
-			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-				, player.direction,
-				100.0f, 7.0f, 10, Vector2(30, 30), Color{ 1, 0.3f, 0, 1 });
-		}
-		if (AEInputCheckTriggered(AEVK_3)) {
-			ShootScatter(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-				, player.direction,
-				500.f, 0.5f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
-		}
-		if (AEInputCheckTriggered(AEVK_4)) {
-			ShootBoomerang(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
-				, player.direction,
-				500.f, 2.0f, 10, Vector2(50, 50), Color{ 1, 0.3f, 0, 1 });
-		}
-		/*
-		if (AEInputCheckTriggered(AEVK_SPACE))
-			projManager.ShootFireball(roomData, player.position, player.direction,
-				500.f, 2.f, 10, Vector2(200, 200), Color{ 1, 0.3f, 0, 1 });
 
-			if (AEInputCheckTriggered(AEVK_Q))
-				projManager.ShootAOE(roomData, player.position, player.direction,
-					300.f, 2.f, 10, Vector2(50, 50), Color{ 1, 0, 0, 1 });
-
-			projManager.Update(roomData, dt);  // updates + cleans dead projectiles
-			*/
-
-			// testParticles.UpdateParticles(dt);
-
-			// Legacy: TO BE COPIED INTO ROOM COLLISION DETECTION CLASS (BUT THERE'S NOTHING YET EVEN???)
-			// for (Gift* gift : roomData.giftList) {
-			//	if (!(gift->velocity == Vector2())) {
-			//		if (AreSquaresIntersecting(gift->sprite.position, gift->sprite.scale.x, rock.sprite.position, rock.sprite.scale.x)) {
-			//			gift->velocity = -gift->velocity;
-			//			rock.AssessTraits(gift->traits);
-			//		}
-			//	}
-			//}
-
-			// std::vector<Gift*> things{ &gift,&gift2 };
-
-			// thing->position += Vector2(10,10) * dt;
-			// thing->UpdateTransform();
-
-			// rock.Update(dt);
-			// rock.target = player.sprite.position;
-
-			// UpdatePlayer(player, dt);
-			// player.sprite.UpdateTransform();
-			// UpdateGift(gift, player, dt);
-			// gift.sprite.UpdateTransform();
-			// UpdateGift(gift2, player, dt);
-			// gift2.sprite.UpdateTransform();
-
-			// thing->position += Vector2(10,10) * dt;
-			// thing->UpdateTransform();
-			/*
-			UpdateGift(gift,player,dt);
-			gift.sprite.UpdateTransform();
-			UpdateGift(gift2,player,dt);
-			gift2.sprite.UpdateTransform();
-			rock.Update(dt);
-			rock.target = player.sprite.position;
-
-			gameMap.GetCurrentRoom()->Update(dt);
-
-			std::vector<Gift*> things{ &gift,&gift2 };
-
-			for (Gift* gift : things) {
-				if (gift->velocity != Vector2(0,0)) {
-					for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-						if (CollisionIntersection_RectRect_Static(
-
-
-
-
-
-						{ gift->sprite.position - gift->sprite.scale / 2, gift->sprite.position + gift->sprite.scale / 2 },
-							AABB{ enemy->sprite.position - enemy->sprite.scale / 2, enemy->sprite.position + enemy->sprite.scale / 2})) {
-							gift->velocity = Vector2(0, 0);
-							enemy->AssessTraits(gift->traits);
-						}
-
-				}
-
-			}
-		}
-
-
-			Room {
-				roomdata* toBeTransfered;
-				roomdata currentRoomData;
-
-			}
-
-			gameMap.currentRoom.
-
-
-			//if its at a door, roomdata gets transferred
-
-
-
-
-			*/
 	}
 	else if (gameState == PAUSED)
 	{
+		PauseAllAudio();
 		// When paused:
 		// - update only the pause UI
 		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
+			ResumeAllAudio();
 			gameState = RUNNING;
 		}
 
@@ -966,10 +898,20 @@ void TestUpdate(float dt)
 	}
 	else if (gameState == WIN)
 	{
+		if (!WinAudioPlaying) {
+			StopAllAudio();
+			GameWinAudio();
+			WinAudioPlaying = true;
+		}
 		winUi.Update();
 	}
 	else if (gameState == LOSE)
 	{
+		if (!loseAudioPlaying) {		
+			StopAllAudio();
+			GameLoseAudio();
+			loseAudioPlaying = true;
+		}
 		loseUi.Update();
 	}
 

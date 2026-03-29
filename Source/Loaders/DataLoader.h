@@ -42,4 +42,7 @@ namespace DataLoader {
 	//returns the default type if not existent!
 	EnemyType const& GetEnemyType(std::string name);
 
+	AEAudio GetSound(std::string const& name);
+
+
 };

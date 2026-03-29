@@ -95,6 +95,9 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.shadow.position = player.position - Vector2{ 0, 40 };
 	}
 
+	static float footstepTimer = 0.0f; 
+	static float footstepDelay = 0.5f;
+
 	//if player is trying to move, set their direction
 	if (w || a || s || d)
 	{
@@ -102,6 +105,12 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//player.direction.x = float(d - a);
 		player.direction = Vector2{(d - a) ,(w - s)};
 
+		footstepTimer -= deltaTime;
+		if (footstepTimer <= 0.0f)
+		{
+			PlayerFootstepAudio();
+			footstepTimer = footstepDelay;
+		}
 		//If the player has no direction, set it to face down
 		if (player.direction == Vector2{ 0.f, 0.f }) player.direction = Vector2{ 0.f, -1.f };
 	}

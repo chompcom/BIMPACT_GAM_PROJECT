@@ -15,6 +15,7 @@ namespace
 
 void MainMenuLoad()
 {
+	InitMenuAudio();
 	// Font
 	uiFont = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 48);
 	ui.SetFont(uiFont);
@@ -78,7 +79,9 @@ void MainMenuLoad()
 	
 }
 
-void MainMenuInit(){}
+void MainMenuInit(){
+	MenuBGMAudio();
+}
 
 void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 {
@@ -102,6 +105,8 @@ void MainMenuFree(){}
 
 void MainMenuUnload()
 {
+	FreeMenuAudio();
+
 	ui.Clear();
 
 	if (uiFont)

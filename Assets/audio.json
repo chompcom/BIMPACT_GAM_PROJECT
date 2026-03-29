@@ -1,0 +1,189 @@
+{
+  "audio": {
+    "player": [
+      {
+        "name": "DmgTaken",
+        "path": "Assets/Audio/Player/DamageTaken.ogg"
+      },
+      {
+        "name": "Footstep_1",
+        "path": "Assets/Audio/Player/Footstep_1.ogg"
+      },
+      {
+        "name": "Footstep_2",
+        "path": "Assets/Audio/Player/Footstep_2.ogg"
+      },
+      {
+        "name": "Footstep_3",
+        "path": "Assets/Audio/Player/Footstep_3.ogg"
+      },
+      {
+        "name": "PickUp",
+        "path": "Assets/Audio/Player/PickUp.ogg"
+      },
+      {
+        "name": "Throw",
+        "path": "Assets/Audio/Player/Throw.ogg"
+      }
+    ],
+
+
+    "charging": [
+      {
+        "name": "ChargingThrow",
+        "path": "Assets/Audio/Player/ChargingThrow.ogg"
+      },
+      {
+        "name": "ChargingThrowMax",
+        "path": "Assets/Audio/Player/ChargingMax.ogg"
+      }
+    ],
+
+    "ui": [
+      {
+        "name": "ButtonSound",
+        "path": "Assets/Audio/UI/Button.ogg"
+      },
+      {
+        "name": "NewAlmanacEntry",
+        "path": "Assets/Audio/UI/NewEntry.ogg"
+      },
+      {
+        "name": "AlmanacSound",
+        "path": "Assets/Audio/UI/Almanac.ogg"
+      },
+      {
+        "name": "HoverSound",
+        "path": "Assets/Audio/UI/Hover.ogg"
+      },
+      {
+        "name": "LoseSound",
+        "path": "Assets/Audio/UI/Lose.ogg"
+      },
+      {
+        "name": "WinSound",
+        "path": "Assets/Audio/UI/Win.ogg"
+      }
+    ],
+
+
+    "mob": [
+      {
+        "name": "HydroAttackSound",
+        "path": "Assets/Audio/Mobs/HydroAttack.ogg"
+      },
+      {
+        "name": "FriendSuccess",
+        "path": "Assets/Audio/Mobs/Friend.ogg"
+      },
+      {
+        "name": "Roar",
+        "path": "Assets/Audio/Mobs/Roar.ogg"
+      },
+      {
+        "name": "SwordAttackSound",
+        "path": "Assets/Audio/Mobs/SwordAttack.ogg"
+      },
+      {
+        "name": "Tom_Whatever",
+        "path": "Assets/Audio/Mobs/Tom.ogg"
+      },
+      {
+        "name": "BoogerStick",
+        "path": "Assets/Audio/Mobs/BoogerStick.ogg"
+      },
+      {
+        "name": "ProjectileSound",
+        "path": "Assets/Audio/Mobs/Projectile.ogg"
+      },
+      {
+        "name": "FireballSound",
+        "path": "Assets/Audio/Mobs/Fireball.ogg"
+      },
+      {
+        "name": "RoundingProjectileSound",
+        "path": "Assets/Audio/Mobs/RoundingProjectile.ogg"
+      },
+      {
+        "name": "CrabAttack",
+        "path": "Assets/Audio/Mobs/CrabAttack.ogg"
+      },
+      {
+        "name": "Goblin",
+        "path": "Assets/Audio/Mobs/Goblin.ogg"
+      },
+      {
+        "name": "Poprocks",
+        "path": "Assets/Audio/Mobs/Poprocks.ogg"
+      },
+      {
+        "name": "Sponge",
+        "path": "Assets/Audio/Mobs/Sponge.ogg"
+      },
+      {
+        "name": "Melee",
+        "path": "Assets/Audio/Mobs/Melee.ogg"
+      },
+      {
+        "name": "Campfire",
+        "path": "Assets/Audio/Mobs/Campfire.ogg"
+      },
+      {
+        "name": "Oven",
+        "path": "Assets/Audio/Mobs/Oven.ogg"
+      }
+    ],
+
+
+    "room": [
+      {
+        "name": "DoorSound",
+        "path": "Assets/Audio/Room/Door.ogg"
+      },
+      {
+        "name": "ForestAudio",
+        "path": "Assets/Audio/Room/ForestBiome.ogg"
+      },
+      {
+        "name": "IceAudio",
+        "path": "Assets/Audio/Room/IceBiome.ogg"
+      },
+      {
+        "name": "FireAudio",
+        "path": "Assets/Audio/Room/FireBiome.ogg"
+      },
+      {
+        "name": "OceanAudio",
+        "path": "Assets/Audio/Room/OceanBiome.ogg"
+      },
+      {
+        "name": "BGM1",
+        "path": "Assets/Audio/Room/BGM1.ogg"
+      },
+      {
+        "name": "BGM2",
+        "path": "Assets/Audio/Room/BGM2.ogg"
+      },
+      {
+        "name": "BGM3",
+        "path": "Assets/Audio/Room/BGM3.ogg"
+      },
+      {
+        "name": "BossBGM",
+        "path": "Assets/Audio/Room/BossBGM.ogg"
+      },
+      {
+        "name": "FightMusic",
+        "path": "Assets/Audio/Room/Fight.ogg"
+      }
+    ],
+
+
+    "menu": [
+      {
+        "name": "MenuBGM",
+        "path": "Assets/Audio/Menu/MenuBGM.ogg"
+      }
+    ]
+  }
+}

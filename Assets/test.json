@@ -49,6 +49,7 @@
 
 		//Booger
 		{	"name": "Booger",
+			"angrySound": "BoogerStick",
 			"sprite": "Assets/Enemies/booger.png",
 			"health": 100,
 			"traits": ["Gross"],
@@ -123,11 +124,12 @@
 		},
 		//Pop rocks
 		{	"name": "Pop Rocks",
+			"angrySound": "Poprocks",
 			"sprite": "Assets/Enemies/poprocks.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"traits": ["Hot"],
-			"damage": 0,
+			"damage": 100,
 			"speed": 200,
 			"detectionRadius": 200,
 			"safeRadius": 200,
@@ -288,6 +290,7 @@
 		},
 		//The Oven
 		{	"name": "THE OVEN",
+			"angrySound": "Oven",
 			"sprite": "Assets/Enemies/oven.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
@@ -359,6 +362,7 @@
 		},
 		//snowman
 		{ "name": "Snowman",
+			"angrySound": "SnowmanAngrySound",
 			"sprite": "Assets/Enemies/snowman.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,

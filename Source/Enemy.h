@@ -40,7 +40,6 @@ class Enemy {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
-
 		bool isActive;
 
 		float speedModifier;
@@ -128,6 +127,7 @@ public:
 	float wanderTime;
 	//seconds you are waiting for
 	float waitTime;
+	std::string angrySound;
 	//! Radius used for "TargetInDetectionRadius"
 	f32 detectionRadius;
 	//! Radius used for "FollowingPlayer" or anything related to friendly range
