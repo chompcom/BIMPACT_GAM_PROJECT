@@ -33,6 +33,9 @@ class Boss_FSM {
 		f32 interval{};
 		BossStates initialState;
 		BossStates currentState;
+		AttackState attackPhase;
+		Vector2 target;
+		s16 counter;
 
 		Boss_FSM(Boss* Boss);
 
@@ -41,10 +44,6 @@ class Boss_FSM {
 
 class Boss1_FSM : public Boss_FSM {
 	public:
-		AttackState attackPhase;
-		Vector2 target;
-		s16 counter;
-
 		f32 walkSpeed{ 120 };
 		bool canWalk;
 

@@ -1205,6 +1205,8 @@ namespace mapRooms
 
 		if (!target) return false;	// again should not happen just a function safeguard
 
+		if (previousRoom->rmType == RoomType::Boss) previousRoom->currentRoomData.boss->ResetBoss();
+
 		currentRoom = target; // Room changed
 		StopAllAudio();
 		RoomEnterAudio();

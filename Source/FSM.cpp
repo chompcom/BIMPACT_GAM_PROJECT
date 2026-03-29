@@ -6,11 +6,12 @@
 #include "Sprite.h"
 #include <iostream>
 
-Boss_FSM::Boss_FSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE } {}
+Boss_FSM::Boss_FSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE }, 
+	attackPhase{ ATTACK_NIL }, target{}, counter{ 0 } {}
 
 Boss1_FSM::Boss1_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
 	f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag) 
-	: Boss_FSM(Boss), attackPhase{ ATTACK_NIL }, target{}, counter{0}, canWalk{true},
+	: Boss_FSM(Boss),  canWalk{true},
 	chargeDamage{ ChargeDamage }, chargeStartup{ ChargeStartup }, chargeInterval{ ChargeInterval }, chargeEndlag{ ChargeEndlag },
 	jumpDamage{ JumpDamage }, jumpStartup{ JumpStartup }, jumpInterval{ JumpInterval }, jumpEndlag{ JumpEndlag }
 {}
@@ -97,8 +98,8 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		std::cout << "Boss Charge Attack\n";
 		//direction = target - boss->sprite.position;
 
-		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale, boss->velocity * dt,
-			player.position, player.sprite.scale, player.GetVelocity() * dt, collisionTime)) {
+		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale * 0.8, boss->velocity * dt,
+			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			playerTakesDamage(player);
 		}
 
@@ -167,8 +168,8 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		
 		if (boss->sprite.position.y - target.y > 10) boss->invulnerableTimer = dt;
 		else {
-			if (CollisionIntersection_RectRect(target, boss->sprite.scale, Vector2{},
-				player.position, player.sprite.scale, player.GetVelocity(), collisionTime)) {
+			if (CollisionIntersection_RectRect(target, boss->sprite.scale * 0.8, Vector2{},
+				player.position, player.sprite.scale * 0.8, player.GetVelocity(), collisionTime)) {
 				playerTakesDamage(player);
 			}
 		}
