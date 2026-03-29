@@ -44,11 +44,13 @@ namespace {
 		//ShootProjectile(TexturedSprite{}, RoomData{}, Vector2, Vector2, float, float, int, Vector2, Color, void*, bool);
 
 
-		if (!me.target)
+		if (!me.target) {
+			std::cout << "No target to fire at" << AEFrameRateControllerGetFrameCount() <<"\n";
 			return;
+		}
 
 		bool amIFriendsWithThePlayer = false;
-		if (me.attackTimer <= 0)
+		if (me.attackTimer <= EPSILON)
 		{
 			EnemyType::ProjectileInfo proj;
 			switch (me.state)
@@ -67,7 +69,7 @@ namespace {
 
 			Vector2 direction = me.prevPos - (me.target.GetPosition());
 
-			shootProjFunc(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
+			shootProjFunc(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, static_cast<int>(me.dmgModifier * proj.damage), Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
 			me.attackTimer = me.type.attackRate;
 			me.onceAttackTime = true;
 		}
@@ -226,7 +228,7 @@ void ApplySlowToTarget(Enemy& me) {
 }
 
 void Wander(Enemy& me) {
-	if (me.wanderTimer <= 0.f) {
+	if (me.wanderTimer <= EPSILON) {
 		me.wanderTimer = 3.f;
 		me.onceWanderTime = true;
 		me.velocity = Vector2{};
@@ -382,7 +384,7 @@ void FireSpirally(Enemy& me) {
 		return;
 
 	bool amIFriendsWithThePlayer = false;
-	if (me.attackTimer <= 0)
+	if (me.attackTimer <= EPSILON)
 	{
 		EnemyType::ProjectileInfo proj;
 		switch (me.state)
@@ -401,7 +403,7 @@ void FireSpirally(Enemy& me) {
 
 		Vector2 direction = me.prevPos - (me.target.GetPosition());
 
-		ShootRounding(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
+		ShootRounding(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, static_cast<int>(me.dmgModifier * proj.damage), Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
 		me.attackTimer = me.type.attackRate;
 		me.onceAttackTime = true;
 	}
@@ -442,7 +444,7 @@ void DamageTarget(Enemy& me) {
 
 	if (!me.target) return;
 
-	if (me.attackTimer <= 0) {
+	if (me.attackTimer <= EPSILON) {
 		me.attackTimer = me.type.attackRate;
 		
 		if (me.target.isPlayer && me.state != ES_HAPPY) {
@@ -484,7 +486,7 @@ void TargetSelf(Enemy& me) {
 
 void Wait(Enemy& me) {
 	
-	if (me.waitTimer <= 0.f) {
+	if (me.waitTimer <= EPSILON) {
 		me.waitTimer = 3;
 		me.onceWaitTime = true;
 	}

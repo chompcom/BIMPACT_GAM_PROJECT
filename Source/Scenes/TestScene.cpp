@@ -54,7 +54,7 @@ Almanac almanac{};
 s8 font = 0;
 //Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 //static ProjectileManager projManager;
-Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 600.f, Vector2(0, 0)};
+Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
 
 EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
 Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
@@ -90,7 +90,6 @@ void TestLoad()
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
 	arrowpng = AEGfxTextureLoad("Assets/arrow.png");
-
 	gameOverDarkScreen = {sqmesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{0, 0, 0, 0.8f}};
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 

@@ -68,13 +68,13 @@ Enemy::Target& Enemy::Target::operator=(Boss& them)
 	dmgMod = nullptr;
 	return *this;
 }
-Enemy::Target& Enemy::Target::operator=(Vector2 const& position)
+Enemy::Target& Enemy::Target::operator=(Vector2 const& pos)
 {
 	//by design, the target will be forever alive
 	static bool trueVar = true;
 	isActive = &trueVar;
 	isPlayer = false;
-	initialPosition = position;
+	initialPosition = pos;
 	this->position = &initialPosition;
 	//Keeping the target as dumb as possible.
 	info = 0.0f;
