@@ -74,6 +74,10 @@ static bool winUiInitialized = false;
 static UIManager loseUi;
 static bool loseUiInitialized = false;
 
+static bool fightMusicPlaying = false;
+static bool loseAudioPlaying = false;
+static bool WinAudioPlaying = false;
+
 bool debugMode;
 
 void TestLoad()
@@ -114,7 +118,7 @@ void TestLoad()
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
 
-	InitAudio();
+	
 	// Global Data Here
 	// I moved these and the init map down to init so it'll reset when the game state is restarted
 
@@ -129,6 +133,10 @@ void TestLoad()
 
 void TestInit()
 {
+	InitAudio();
+	loseAudioPlaying = false;
+	WinAudioPlaying = false;
+	fightMusicPlaying = false;
 	PlayerInit(player);
 	AlmanacInit(almanac);
 
@@ -477,11 +485,13 @@ void TestUnload()
 	//
 	// globalTransferData.player = nullptr;
 	// gameMap.DeleteMap();
-	FreeAudio();
+	//FreeAudio();
+	
+	FreeAudio(); // Pls put this above data unload
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
-	FreeAudio();
+	
 
 	pauseUi.Clear();
 	pauseUiInitialized = false;
@@ -536,7 +546,7 @@ void TestUpdate(float dt)
 			player.sprite.UpdateTransform();
 			player.shadow.UpdateTransform();
 		}
-
+		UpdateMobAudioCD(dt);
 		//winUI.Update();
 
 		// Get previous pos
@@ -564,10 +574,34 @@ void TestUpdate(float dt)
 		if (currentRoom != lastRoom)
 		{
 			lastRoom = currentRoom;
+			ResetBGM();
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
 			if (currentRoom->biome == "Ice") IceBiomeAudio();
-			if (currentRoom->biome == "Normal") BossBGMAudio();
+			if (currentRoom->biome == "Normal");
+			if (roomData.boss) {
+				BossBGMAudio();
+				//return;
+			}
 		}
+
+		bool isAngry = false;
+		for (Enemy* e : roomData.enemyList) {
+			if (e && e->isActive && e->state == ES_ANGRY) {
+				isAngry = true;
+				break;
+			}
+		}
+		if (isAngry && !fightMusicPlaying) {
+			ResetBGM();
+			FightMusicAudio();
+			fightMusicPlaying = true;
+		}
+		else if (!isAngry && fightMusicPlaying) {
+			ResetBGM();
+			fightMusicPlaying = false;
+		}
+		if (!roomData.boss && !fightMusicPlaying) RandomBGMAudio(dt);
+
 		/*
 		// Test Player Collision with Map
 		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
@@ -732,41 +766,37 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
-				Vector2 prevPosition = g->position;
+
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 4.0f), prevCell);
 
 				// get angle lmao tan-1(opp / adj) 
 				//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
-					
+
 				// Collides but no velocity?
 				if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
 
 				std::string tmp{};
 				if (res & COLLISION_LEFT) {
 					tmp += " LEFT ";
-					g->position.x = prevPosition.x + offset;
 					g->velocity.x *= -1;	// Inverse x if left
 				}
 				if (res & COLLISION_RIGHT) {
 					tmp += " RIGHT ";
-					g->position.x = prevPosition.x + offset;
 					g->velocity.x *= -1;	// Inverse x if left
-				
+
 				}
 				if (res & COLLISION_TOP) {
 					std::cout << g->velocity.y;
 					tmp += " TOP ";
-					g->position.y = prevPosition.y + offset;
 					g->velocity.y *= -1;	// Inverse y if top
 				}
 				if (res & COLLISION_BOTTOM) {
 					tmp += " BOTTOM ";
-					g->position.y = prevPosition.y + offset;
-					g->velocity.y *=	-1;	// Inverse y if top
+					g->velocity.y *= -1;	// Inverse y if top
 				}
-				if (tmp.size() > 0) { 
+				if (tmp.size() > 0) {
 
 					//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
 
@@ -786,7 +816,7 @@ void TestUpdate(float dt)
 					//std::cout << tmp << '\n';
 					//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
 				};
-				
+
 
 
 				g->giftType.sprite.UpdateTransform();
@@ -810,7 +840,8 @@ void TestUpdate(float dt)
 
 		if (roomData.boss)
 		{
-			Vector2 bossPrevPos = roomData.boss->sprite.position;
+		
+				Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
 
@@ -931,7 +962,7 @@ void TestUpdate(float dt)
 				p->RemoveProjectile();
 			}
 		}
-		
+	/*
 		if (AEInputCheckTriggered(AEVK_2)) {
 			ShootRounding(DataLoader::CreateTexture("Assets/fireball.png"), roomData, { 30,30 }// player.position
 				, player.direction,
@@ -1039,10 +1070,12 @@ void TestUpdate(float dt)
 	}
 	else if (gameState == PAUSED)
 	{
+		PauseAllAudio();
 		// When paused:
 		// - update only the pause UI
 		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
+			ResumeAllAudio();
 			gameState = RUNNING;
 		}
 
@@ -1050,10 +1083,20 @@ void TestUpdate(float dt)
 	}
 	else if (gameState == WIN)
 	{
+		if (!WinAudioPlaying) {
+			StopAllAudio();
+			GameWinAudio();
+			WinAudioPlaying = true;
+		}
 		winUi.Update();
 	}
 	else if (gameState == LOSE)
 	{
+		if (!loseAudioPlaying) {		
+			StopAllAudio();
+			GameLoseAudio();
+			loseAudioPlaying = true;
+		}
 		loseUi.Update();
 	}
 

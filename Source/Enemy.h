@@ -40,7 +40,6 @@ class Enemy {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
-
 		bool isActive;
 
 		float speedModifier;
@@ -117,6 +116,7 @@ public:
 	f32 damage;
 	f32 speed;
 	float attackRate;
+	std::string angrySound;
 	//! Radius used for "Target___InDetectionRadius"
 	f32 detectionRadius;
 

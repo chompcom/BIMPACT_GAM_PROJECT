@@ -1,6 +1,6 @@
 #pragma once
 #include "AEEngine.h"
-
+#include <string>
 void InitAudio();
 void FreeAudio();
 void StopAllAudio();
@@ -18,6 +18,8 @@ void ButtonAudio();
 void AlmanacAudio();
 void HoverAudio();
 void GameLoseAudio();
+bool IsbuttonAudioState();
+void GameWinAudio();
 
 // Mob
 void HydroAttackAudio();
@@ -34,7 +36,11 @@ void GoblinAudio();
 void PoprocksAudio();
 void SpongeAudio();
 void MeleeAudio();
+void CampfireAudio();
+void OvenAudio();
 void StopMobAudio();
+void PlayMobSound(std::string const& soundName);
+void UpdateMobAudioCD(float dt);
 
 // Room
 void RoomEnterAudio();
@@ -50,6 +56,13 @@ void BGM2Audio();
 void BGM3Audio();
 void BossBGMAudio();
 void FightMusicAudio();
+void ResetBGM();
 
 // Menu
+void InitMenuAudio();
 void MenuBGMAudio();
+void FreeMenuAudio();
+
+
+void PauseAllAudio();
+void ResumeAllAudio();

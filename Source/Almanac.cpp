@@ -32,6 +32,7 @@ AlmanacEntry::AlmanacEntry(EnemyType enemyType, std::string description, std::st
 {
 
 }
+static bool almanacSound = false;
 
 //Loading the sprites for the almanac and setting their transforms
 void LoadAlmanacPages(Almanac & almanac)
@@ -348,8 +349,12 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 {
 	if (almanac.isOpen)
 	{ 
+		ResetBGM();
+		if (!almanacSound) {
+			AlmanacAudio();
+			almanacSound = true;
+		}
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-
 		//input for close
 		//test for close
 		//Sprite test1 {Sprite(removeLater, Vector2(577, 332), Vector2(72,92), Color{0.0,0.0,0.0,0.5})};
@@ -358,6 +363,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(577, 332), 72, 92))
 		{
 			almanac.isOpen = false;
+			almanacSound = false;
 			//std::cout << "current: " << almanac.currentPageNumber;
 		}
 
@@ -369,6 +375,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(583, -352), 74, 85))
 		{
 			if (almanac.currentPageNumber < almanac.maxPages) ++(almanac.currentPageNumber);
+			AlmanacAudio();
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
@@ -380,6 +387,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(486, -352), 74, 85))
 		{
 			if (almanac.currentPageNumber > 0) --(almanac.currentPageNumber);
+			AlmanacAudio();
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 

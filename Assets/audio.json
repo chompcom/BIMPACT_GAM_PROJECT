@@ -45,20 +45,24 @@
         "path": "Assets/Audio/UI/Button.ogg"
       },
       {
-        "name": "NewAlamancEntry",
+        "name": "NewAlmanacEntry",
         "path": "Assets/Audio/UI/NewEntry.ogg"
       },
       {
-        "name": "AlamanacSound",
-        "path": "Alamanac.ogg"
+        "name": "AlmanacSound",
+        "path": "Assets/Audio/UI/Almanac.ogg"
       },
       {
         "name": "HoverSound",
-        "path": "Hover.ogg"
+        "path": "Assets/Audio/UI/Hover.ogg"
       },
       {
         "name": "LoseSound",
-        "path": "Lose.ogg"
+        "path": "Assets/Audio/UI/Lose.ogg"
+      },
+      {
+        "name": "WinSound",
+        "path": "Assets/Audio/UI/Win.ogg"
       }
     ],
 
@@ -119,6 +123,14 @@
       {
         "name": "Melee",
         "path": "Assets/Audio/Mobs/Melee.ogg"
+      },
+      {
+        "name": "Campfire",
+        "path": "Assets/Audio/Mobs/Campfire.ogg"
+      },
+      {
+        "name": "Oven",
+        "path": "Assets/Audio/Mobs/Oven.ogg"
       }
     ],
 

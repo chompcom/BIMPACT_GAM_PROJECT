@@ -7,7 +7,6 @@
 #include <vector>
 
 static bool arrowGoingUp = false; //to check if the arrow should move up or down
-
 void renderPlayerLives(Player const & player, std::vector<TexturedSprite> healthIcons, s8 font)
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
@@ -29,7 +28,6 @@ void checkIfAlmanacClicked(TexturedSprite const& almanacSprite, Almanac & almana
 {
 	s32 cursorPositionX, cursorPositionY;
 	//AEInputGetCursorPosition(&cursorPositionX, &cursorPositionY);
-
 	if (AEInputCheckReleased(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
 	{
 		//std::cout << "click!\n";

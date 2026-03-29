@@ -187,6 +187,7 @@ namespace DataLoader {
 				tmp.spritePath = name["sprite"].asString();
 				tmp.health = name["health"].asFloat();
 				tmp.damage = name["damage"].asFloat();
+				tmp.angrySound = name["angrySound"].asString();
 				tmp.speed = name["speed"].asFloat();
 				tmp.detectionRadius = name["detectionRadius"].asFloat();
 				tmp.safeRadius = name["safeRadius"].asFloat();

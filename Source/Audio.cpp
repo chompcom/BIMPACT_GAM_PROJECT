@@ -1,7 +1,7 @@
 #include "Audio.h"
 #include "Loaders/DataLoader.h"
 
-// Player
+// Player grp
 AEAudioGroup PlayerAudio;
 AEAudio DmgTaken;
 AEAudio Footstep_1;
@@ -10,20 +10,21 @@ AEAudio Footstep_3;
 AEAudio PickUp;
 AEAudio Throw;
 
-// Charging
+// Charging grp
 AEAudioGroup ChargingAudio;
 AEAudio ChargingThrow;
 AEAudio ChargingThrowMax;
 
-// UI
+// UI grp
 AEAudioGroup UIAudio;
 AEAudio ButtonSound;
 AEAudio NewAlmanacEntry;
 AEAudio AlmanacSound;
 AEAudio HoverSound;
 AEAudio LoseSound;
+AEAudio WinSound;
 
-// Mob
+// Mob grp
 AEAudioGroup MobAudio;
 AEAudio HydroAttackSound;
 AEAudio FriendSuccess;
@@ -39,8 +40,10 @@ AEAudio Goblin;
 AEAudio Poprocks;
 AEAudio Sponge;
 AEAudio Melee;
+AEAudio Campfire;
+AEAudio Oven;
 
-// Room
+// Room grp
 AEAudioGroup RoomAudio;
 AEAudio DoorSound;
 AEAudio ForestAudio;
@@ -49,7 +52,7 @@ AEAudio FireAudio;
 AEAudio OceanAudio;
 
 
-// BGM
+// BGM grp
 AEAudioGroup BGMAudio;
 AEAudio BGM1;
 AEAudio BGM2;
@@ -57,17 +60,19 @@ AEAudio BGM3;
 AEAudio BossBGM;
 AEAudio FightMusic;
 
-// Menu
+// Menu grp
 AEAudioGroup MenuAudio;
 AEAudio MenuBGM;
 
 static float chargingTimer = 0.0f;
 static bool maxPlaying = false;
 static bool chargingStarted = false;
+static float mobSoundCooldown = 0.0f;
+static bool buttonAudioState = false;
 
 void InitAudio() {
-
-	// Player Group
+	buttonAudioState = true;
+	// Player grp
 	PlayerAudio = AEAudioCreateGroup();
 	DmgTaken = DataLoader::GetSound("DmgTaken");
 	Footstep_1 = DataLoader::GetSound("Footstep_1");
@@ -76,20 +81,21 @@ void InitAudio() {
 	PickUp = DataLoader::GetSound("PickUp");
 	Throw = DataLoader::GetSound("Throw");
 
-	// Charging Group
+	// Charging grp
 	ChargingAudio = AEAudioCreateGroup();
 	ChargingThrow = DataLoader::GetSound("ChargingThrow");
 	ChargingThrowMax = DataLoader::GetSound("ChargingThrowMax");
 
-	// UI Group
+	// UI grp
 	UIAudio = AEAudioCreateGroup();
 	ButtonSound = DataLoader::GetSound("ButtonSound");
 	NewAlmanacEntry = DataLoader::GetSound("NewAlmanacEntry");
 	AlmanacSound = DataLoader::GetSound("AlmanacSound");
 	HoverSound = DataLoader::GetSound("HoverSound");
 	LoseSound = DataLoader::GetSound("LoseSound");
+	WinSound = DataLoader::GetSound("WinSound");
 
-	// Mob Group
+	// Mob grp
 	MobAudio = AEAudioCreateGroup();
 	HydroAttackSound = DataLoader::GetSound("HydroAttackSound");
 	FriendSuccess = DataLoader::GetSound("FriendSuccess");
@@ -105,8 +111,10 @@ void InitAudio() {
 	Poprocks = DataLoader::GetSound("Poprocks");
 	Sponge = DataLoader::GetSound("Sponge");
 	Melee = DataLoader::GetSound("Melee");
+	Campfire = DataLoader::GetSound("Campfire");
+	Oven = DataLoader::GetSound("Oven");
 
-	// Room Group
+	// Room grp
 	RoomAudio = AEAudioCreateGroup();
 	DoorSound = DataLoader::GetSound("DoorSound");
 	ForestAudio = DataLoader::GetSound("ForestAudio");
@@ -123,8 +131,8 @@ void InitAudio() {
 	FightMusic = DataLoader::GetSound("FightMusic");
 
 	// Menu Group
-	MenuAudio = AEAudioCreateGroup();
-	MenuBGM = DataLoader::GetSound("MenuBGM");
+//	MenuAudio = AEAudioCreateGroup();
+//	MenuBGM = DataLoader::GetSound("MenuBGM");
 }
 
 void FreeAudio() { // Use before dataloader::unload pls
@@ -133,8 +141,9 @@ void FreeAudio() { // Use before dataloader::unload pls
 	AEAudioUnloadAudioGroup(UIAudio);
 	AEAudioUnloadAudioGroup(MobAudio);
 	AEAudioUnloadAudioGroup(RoomAudio);
-	AEAudioUnloadAudioGroup(MenuAudio);
+//	AEAudioUnloadAudioGroup(MenuAudio);
 	AEAudioUnloadAudioGroup(BGMAudio);
+	buttonAudioState = false;
 }
 
 // Player
@@ -182,20 +191,31 @@ void StopChargingAudio() {
 
 // UI
 void ButtonAudio() {
+	if (!buttonAudioState) return;
 	AEAudioPlay(ButtonSound, UIAudio, 1.0f, 1.0f, 0);
 }
 
 void AlmanacAudio() {
-	AEAudioPlay(NewAlmanacEntry, UIAudio, 1.0f, 1.0f, 0);
+	AEAudioPlay(AlmanacSound, UIAudio, 1.0f, 1.0f, 0);
 }
 
 void HoverAudio() {
+	if (!buttonAudioState) return;
 	AEAudioPlay(HoverSound, UIAudio, 1.0f, 1.0f, 0);
 }
 
 void GameLoseAudio() {
 	AEAudioPlay(LoseSound, UIAudio, 1.0f, 1.0f, 0);
 }
+
+void GameWinAudio() {
+	AEAudioPlay(WinSound, UIAudio, 1.0f, 1.0f, 0);
+}
+
+bool IsbuttonAudioState() {
+	return buttonAudioState;
+}
+
 
 // Mob
 void HydroAttackAudio() {
@@ -254,8 +274,24 @@ void MeleeAudio() {
 	AEAudioPlay(Melee, MobAudio, 1.0f, 1.0f, 0);
 }
 
+void CampfireAudio() {
+	AEAudioPlay(Campfire, MobAudio, 1.0f, 1.0f, 0);
+}
+void OvenAudio() {
+	AEAudioPlay(Oven, MobAudio, 1.0f, 1.0f, 0);
+}
 void StopMobAudio() {
 	AEAudioStopGroup(MobAudio);
+}
+
+void PlayMobSound(std::string const& soundName) {
+	if (soundName.empty() || mobSoundCooldown > 0.0f)	return;
+	AEAudioPlay(DataLoader::GetSound(soundName), MobAudio, 0.5f, 1.0f, 0);
+	mobSoundCooldown = 1.0f; // 1 sec cooldown so that sound dont spam lel
+}
+
+void UpdateMobAudioCD(float dt) {
+	if (mobSoundCooldown > 0.0f) mobSoundCooldown -= dt;
 }
 
 // Room
@@ -296,7 +332,7 @@ void BossBGMAudio() {
 }
 
 void FightMusicAudio() {
-	AEAudioPlay(FightMusic, BGMAudio, 0.5f, 1.0f, -1);
+	AEAudioPlay(FightMusic, BGMAudio, 0.8f, 1.0f, -1);
 }
 
 static float bgmTimer = 0.0f;
@@ -308,18 +344,54 @@ void RandomBGMAudio(float dt) {
 		AEAudioStopGroup(BGMAudio);
 
 		int pick = rand() % 3;
-		if (pick == 0)      AEAudioPlay(BGM1, BGMAudio, 0.5f, 1.0f, 0);
-		else if (pick == 1) AEAudioPlay(BGM2, BGMAudio, 0.5f, 1.0f, 0);
-		else                AEAudioPlay(BGM3, BGMAudio, 0.5f, 1.0f, 0);
+		if (pick == 0)      AEAudioPlay(BGM1, BGMAudio, 0.2f, 1.0f, 0);
+		else if (pick == 1) AEAudioPlay(BGM2, BGMAudio, 0.2f, 1.0f, 0);
+		else                AEAudioPlay(BGM3, BGMAudio, 0.2f, 1.0f, 0);
 
 		bgmTimer = 0.0f;
-		bgmInterval = 10.0f + (rand() % 6);
+		bgmInterval = 12.0f;
 	}
+}
+void ResetBGM() {
+//	AEAudioStopGroup(RoomAudio);
+	AEAudioStopGroup(BGMAudio);
 }
 
 // Menu
+void InitMenuAudio() {	
+	buttonAudioState = true;
+	MenuAudio = AEAudioCreateGroup();
+	MenuBGM = AEAudioLoadSound("Assets/Audio/Menu/MenuBGM.ogg");
+	UIAudio = AEAudioCreateGroup();
+
+	// Button sound or else no button sound for main menu for some reason?? data no load? 
+	Json::Value audioJson = DataLoader::LoadJsonFile("Assets/audio.json");
+	for (Json::Value& val : audioJson["audio"]["ui"]) {
+		std::string name = val["name"].asString();
+		if (name == "ButtonSound") {
+			ButtonSound = AEAudioLoadSound(val["path"].asString().c_str());
+		}
+		else if (name == "HoverSound") {
+			HoverSound = AEAudioLoadSound(val["path"].asString().c_str());
+		}
+	} 
+	/*DataLoader::Load();
+    ButtonSound = DataLoader::GetSound("ButtonSound");
+    HoverSound  = DataLoader::GetSound("HoverSound");
+	*/
+}
 void MenuBGMAudio() {
-	AEAudioPlay(MenuBGM, MenuAudio, 0.5f, 1.0f, -1);
+	AEAudioPlay(MenuBGM, MenuAudio, 0.5f, 1.0f, 0);
+}
+void FreeMenuAudio() {
+	AEAudioStopGroup(MenuAudio);
+	AEAudioUnloadAudioGroup(MenuAudio);
+
+	AEAudioStopGroup(UIAudio);
+	AEAudioUnloadAudioGroup(UIAudio);
+
+
+	buttonAudioState = false;
 }
 
 void StopAllAudio() {
@@ -328,9 +400,28 @@ void StopAllAudio() {
 	AEAudioStopGroup(UIAudio);
 	AEAudioStopGroup(MobAudio);
 	AEAudioStopGroup(RoomAudio);
-	AEAudioStopGroup(MenuAudio);
+	//AEAudioStopGroup(MenuAudio);
+	AEAudioStopGroup(BGMAudio);
 
 	chargingTimer = 0.0f;
 	maxPlaying = false;
 	chargingStarted = false;
+}
+
+void PauseAllAudio() {
+	AEAudioPauseGroup(PlayerAudio);
+	AEAudioPauseGroup(ChargingAudio);
+	AEAudioPauseGroup(UIAudio);
+	AEAudioPauseGroup(MobAudio);
+	AEAudioPauseGroup(RoomAudio);
+	AEAudioPauseGroup(BGMAudio);
+}
+
+void ResumeAllAudio() {
+	AEAudioResumeGroup(PlayerAudio);
+	AEAudioResumeGroup(ChargingAudio);
+	AEAudioResumeGroup(UIAudio);
+	AEAudioResumeGroup(MobAudio);
+	AEAudioResumeGroup(RoomAudio);
+	AEAudioResumeGroup(BGMAudio);
 }
