@@ -344,8 +344,7 @@ namespace mapRooms
 
 					if (isGenericEnemyMarker(currentTileId))
 					{
-						TileType const* randomEnemyMarker =
-							findRandomSpecificMarkerForBiome("enemy");
+						TileType const* randomEnemyMarker = findRandomSpecificMarkerForBiome("enemy");
 
 						if (randomEnemyMarker && !randomEnemyMarker->spawnName.empty())
 						{
