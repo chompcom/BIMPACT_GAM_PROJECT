@@ -33,7 +33,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
     }
 }
 
-void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,float rot, void* source, bool isFriend) {
+void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend, float rot) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;

@@ -34,9 +34,16 @@ namespace {
 		return (enemy.state == ES_ANGRY || HasCommonTrait(me.type.dislikes, enemy.type.traits));
 	}
 
-	template <typename Function>
-	void FireSomething(Enemy &me, Function shootProjFunc)
+	
+	using FireFunc = void(TexturedSprite, RoomData&, Vector2, Vector2, float, float, int, Vector2, Color, void*, bool);
+
+	//template <typename FireFunc>
+	void FireSomething(Enemy &me, FireFunc shootProjFunc)
 	{
+
+		//ShootProjectile(TexturedSprite{}, RoomData{}, Vector2, Vector2, float, float, int, Vector2, Color, void*, bool);
+
+
 		if (!me.target)
 			return;
 
@@ -371,7 +378,33 @@ void FireScatter(Enemy& me) {
 }
 
 void FireSpirally(Enemy& me) {
-	FireSomething(me, ShootRounding);
+	if (!me.target)
+		return;
+
+	bool amIFriendsWithThePlayer = false;
+	if (me.attackTimer <= 0)
+	{
+		EnemyType::ProjectileInfo proj;
+		switch (me.state)
+		{
+		case ES_ANGRY:
+			proj = me.type.angryProjectile;
+			break;
+		case ES_HAPPY:
+			proj = me.type.happyProjectile;
+			amIFriendsWithThePlayer = true;
+			break;
+		default:
+			proj = me.type.neutralProjectile;
+			break;
+		}
+
+		Vector2 direction = me.prevPos - (me.target.GetPosition());
+
+		ShootRounding(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
+		me.attackTimer = me.type.attackRate;
+		me.onceAttackTime = true;
+	}
 }
 void DVDMove(Enemy& me) {
 	if (me.velocity.LengthSq() <= EPSILON) {
