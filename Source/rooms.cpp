@@ -1016,7 +1016,7 @@ namespace mapRooms
 					TexturedSprite tex = DataLoader::CreateTexture(tile->asset);
 
 					tex.position = pos;
-					tex.scale = Vector2{ grid.GetTileWidth(), grid.GetTileHeight() };
+					tex.scale = Vector2{ grid.GetTileWidth(), grid.GetTileHeight()};
 					tex.UpdateTransform();
 					tex.RenderSprite();
 
