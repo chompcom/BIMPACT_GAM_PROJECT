@@ -12,15 +12,8 @@ Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSpri
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	if (enemyName == "Boss 1") {
-		std::cout << "true\n";
 		bossStateMachine = std::make_unique<Boss1_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
 			attackData[1].attackDamage, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag);
-		std::cout << typeid(bossStateMachine).name() << '\n';
-	}
-	if (enemyName == "Boss 2") {
-		std::cout << "true\n";
-		bossStateMachine = std::make_unique<Boss2_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
-			attackData[1].attackDamage, 0.0f, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag);
 		std::cout << typeid(bossStateMachine).name() << '\n';
 	}
 }
@@ -60,5 +53,16 @@ void Boss::CollideProjectile() {
 		}
 
 	}
+}
+
+void Boss::ResetBoss() {
+	currentHealth = health;
+	sprite.position = Vector2{};
+	shadow.position = Vector2{ 0, -35 };
+
+	bossStateMachine->currentState = bossStateMachine->initialState;
+	bossStateMachine->attackPhase = ATTACK_NIL;
+	bossStateMachine->interval = 0.0f;
+	bossStateMachine->counter = 0;
 }
 

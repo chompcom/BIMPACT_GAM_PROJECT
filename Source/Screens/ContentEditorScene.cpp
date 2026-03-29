@@ -1,12 +1,6 @@
 #include "ContentEditorScene.h"
 
-#include <cstdlib>
-#include <fstream>
 
-#include "AEEngine.h"
-#include "../Sprite.h"
-#include "../Loaders/DataLoader.h"
-#include "../GameStateList.h"
 
 namespace
 {
@@ -27,26 +21,16 @@ namespace
 	constexpr float obstacleThumbnailGapY = 70.0f;
 	constexpr float obstacleThumbnailSize = 48.0f;
 
+	std::string saveDirectory{ ".\\Assets\\Levels\\Room_Data\\" };
+
 	struct RectBounds {float left{}, right{}, top{}, bottom{};};
 
-	/*
-	
-	*/
+
 	std::string GetFileNameCSV(std::string const& path) {
 		return ExtractFileName(path, ".csv");
 	}
 
-	std::string ReadFromBiomeCsv(std::string const& filePath) {
-		std::ifstream ifs{ filePath };
-		if (!ifs.is_open()) return "";
-		
-		bool res = contentEditorState.roomGrid.LoadRoomCSV(filePath);
-		if (res) {
-			contentEditorState.isEditingExistingFile = true;
-		}
 
-		return "YAY";
-	}
 
 	void ScanCSVBiomes(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
 	{
@@ -86,12 +70,13 @@ namespace
 	void RefreshExistingCsvList()
 	{
 		contentEditorState.existingCsvPaths.clear();
-		contentEditorState.existingCsvIndex = 0;
+		//contentEditorState.existingCsvIndex = 0;
 		std::string csvFolder{ ".\\Assets\\Levels\\Room_Data" };
 		ScanCSVBiomes(csvFolder, "*.csv", contentEditorState.existingCsvPaths);
 		std::sort(contentEditorState.existingCsvPaths.begin(), contentEditorState.existingCsvPaths.end());
 	}
 
+	// popup de text
 	void RefreshLoadPopupLabel()
 	{
 		UIElement* label = loadPopupUi.FindById("label_existing_file");
@@ -103,8 +88,9 @@ namespace
 			return;
 		}
 
-		label->text =
-			GetFileNameCSV(contentEditorState.existingCsvPaths[contentEditorState.existingCsvIndex]);
+		// Filename only, relative path may be better?
+		//label->text = ExtractFileName(contentEditorState.existingCsvPaths[contentEditorState.existingCsvIndex]); // Filename only, more professional...
+		label->text = contentEditorState.existingCsvPaths[contentEditorState.existingCsvIndex];	// Relative path, got vetoed by groupmates so HAHAH...
 	}
 
 
@@ -140,7 +126,7 @@ namespace
 		}
 	}
 
-	// 
+	
 	void RebuildObstaclePaletteForSelectedBiome()
 	{
 		contentEditorState.obstaclePalette.clear();
@@ -161,6 +147,7 @@ namespace
 		contentEditorState.currentObstaclePalettePage = 0;
 		contentEditorState.selectedTileId = (!contentEditorState.obstaclePalette.empty()) ? (contentEditorState.selectedTileId = contentEditorState.obstaclePalette[0]->id) : (0);
 	}
+
 
 	void RemoveTilesNotAllowedForSelectedBiome()
 	{
@@ -358,6 +345,37 @@ namespace
 		}
 	}
 
+
+	bool ReadFromBiomeCsv(std::string const& filePath) {
+		if (!contentEditorState.roomGrid.LoadRoomCSV(filePath))
+		{
+			return false;
+		}
+
+		std::string loadedBiome = ExtractFileName(filePath, ".csv");
+		loadedBiome = loadedBiome.substr(0, loadedBiome.find_first_of('_'));
+
+		if (loadedBiome.empty()) return false;
+
+		for (int i = 0; i < static_cast<int>(contentEditorState.biomeNames.size()); ++i)
+		{
+			if (contentEditorState.biomeNames[i] == loadedBiome)
+			{
+				contentEditorState.selectedBiomeIndex = i;
+				break;
+			}
+		}
+
+		contentEditorState.currentEditingFilePath = filePath;
+		contentEditorState.isEditingExistingFile = true;
+		contentEditorState.currentTab = ContentEditorTab::Obstacles;
+		contentEditorState.statusMessage = "Loaded: " + GetFileNameCSV(filePath);
+
+		RebuildObstaclePaletteForSelectedBiome();
+		UpdateContentEditorUi();
+		return true;
+	}
+
 	bool ExportCurrentEditorRoomToCsv(std::string const& outputFilePath)
 	{
 		std::ofstream outputFile(outputFilePath);
@@ -542,7 +560,7 @@ void ContentEditorLoad()
 	contentEditorUi.LoadFromFile("Assets/UI/contenteditor.json");
 
 	// Load one valid room CSV first so width/height already exist
-	contentEditorState.roomGrid.LoadRoomCSV(".\\Assets\\Levels\\Room_Data\\Normal_1.csv");
+	contentEditorState.roomGrid.LoadRoomCSV(saveDirectory + "Normal_1.csv");
 	ClearEditorRoomGrid();
 
 	contentEditorState.biomeNames = Grid::GetAllBiomes();
@@ -655,65 +673,62 @@ void ContentEditorLoad()
 
 			RefreshLoadPopupLabel();
 			contentEditorState.isLoadPopupOpen = true;
-		});
 
-	contentEditorUi.BindOnClick("btn_choose_existing", [](UIElement&)
-		{
-			RefreshExistingCsvList();
+			// Popup buttons only exist after popup JSON is loaded,
+			// so bind them here.
+			loadPopupUi.BindOnClick("btn_prev_existing", [](UIElement&)
+				{
+					if (contentEditorState.existingCsvPaths.empty()) return;
 
-			loadPopupUi.Clear();
-			loadPopupUi.SetFont(contentEditorFont);
-			loadPopupUi.LoadFromFilePopUp(
-				"Assets/UI/contenteditor_load_popup.json",
-				Vector2(0.0f, 0.0f),
-				Vector2(720.0f, 260.0f)
-			);
+					contentEditorState.existingCsvIndex--;
+					if (contentEditorState.existingCsvIndex < 0)
+					{
+						contentEditorState.existingCsvIndex =
+							static_cast<int>(contentEditorState.existingCsvPaths.size()) - 1;
+					}
 
-			RefreshLoadPopupLabel();
-			contentEditorState.isLoadPopupOpen = true;
+					RefreshLoadPopupLabel();
+				});
+
+			loadPopupUi.BindOnClick("btn_next_existing", [](UIElement&)
+				{
+					if (contentEditorState.existingCsvPaths.empty()) return;
+
+					contentEditorState.existingCsvIndex++;
+					if (contentEditorState.existingCsvIndex >=
+						static_cast<int>(contentEditorState.existingCsvPaths.size()))
+					{
+						contentEditorState.existingCsvIndex = 0;
+					}
+
+					RefreshLoadPopupLabel();
+				});
+
+			loadPopupUi.BindOnClick("btn_cancel_existing", [](UIElement&)
+				{
+					//contentEditorState.isLoadPopupOpen = false;
+					//loadPopupUi.Clear();
+					contentEditorState.pendingClosePopUp = true; // prevent crashes...
+				});
+
+			loadPopupUi.BindOnClick("btn_load_existing", [](UIElement&)
+				{
+					if (contentEditorState.existingCsvPaths.empty())
+					{
+						contentEditorState.statusMessage = "No CSV files found";
+						UpdateContentEditorUi();
+						contentEditorState.pendingClosePopUp = true;
+						return;
+					}
+
+					contentEditorState.pendingLoadSelectedCSV = true;
+				});
 		});
 
 	contentEditorUi.BindOnClick("btn_random", [](UIElement&)
 		{
 			RandomizeCurrentEditorRoomLayout();
 		});
-
-	//contentEditorUi.BindOnClick("btn_export", [](UIElement&)
-	//	{
-	//		std::size_t fileNumber = 1;
-
-	//		std::string outputFilePath =
-	//			".\\Assets\\Levels\\Room_Data\\" +
-	//			GetSelectedBiomeName() +
-	//			"_" +
-	//			contentEditorState.exportFileName +
-	//			"_" +
-	//			std::to_string(fileNumber) +
-	//			".csv";
-
-	//		while (FileExists(outputFilePath))
-	//		{
-	//			outputFilePath =
-	//				".\\Assets\\Levels\\Room_Data\\" +
-	//				GetSelectedBiomeName() +
-	//				"_" +
-	//				contentEditorState.exportFileName +
-	//				"_" +
-	//				std::to_string(++fileNumber) +
-	//				".csv";
-	//		}
-
-	//		if (ExportCurrentEditorRoomToCsv(outputFilePath))
-	//		{
-	//			contentEditorState.statusMessage = "Exported: " + outputFilePath;
-	//		}
-	//		else
-	//		{
-	//			contentEditorState.statusMessage = "Export failed";
-	//		}
-
-	//		UpdateContentEditorUi();
-	//	});
 
 	contentEditorUi.BindOnClick("btn_export", [](UIElement&)
 		{
@@ -729,7 +744,7 @@ void ContentEditorLoad()
 				std::size_t fileNumber = 1;
 
 				outputFilePath =
-					".\\Assets\\Levels\\Room_Data\\" +
+					saveDirectory +
 					GetSelectedBiomeName() +
 					"_" +
 					contentEditorState.exportFileName +
@@ -740,7 +755,7 @@ void ContentEditorLoad()
 				while (FileExists(outputFilePath))
 				{
 					outputFilePath =
-						".\\Assets\\Levels\\Room_Data\\" +
+						saveDirectory +
 						GetSelectedBiomeName() +
 						"_" +
 						contentEditorState.exportFileName +
@@ -780,6 +795,33 @@ void ContentEditorUpdate(float dt)
 
 		if (AEInputCheckTriggered(AEVK_ESCAPE))
 		{
+			contentEditorState.pendingClosePopUp = true;
+		}
+
+		// Do destructive popup actions only after Update() is done
+		if (contentEditorState.pendingLoadSelectedCSV)
+		{
+			contentEditorState.pendingLoadSelectedCSV = false;
+
+			if (!contentEditorState.existingCsvPaths.empty())
+			{
+				std::string chosenPath = contentEditorState.existingCsvPaths[contentEditorState.existingCsvIndex];
+
+
+
+				if (!ReadFromBiomeCsv(chosenPath))
+				{
+					contentEditorState.statusMessage = "Failed to load CSV";
+					UpdateContentEditorUi();
+				}
+			}
+
+			contentEditorState.pendingClosePopUp = true;
+		}
+
+		if (contentEditorState.pendingClosePopUp)
+		{
+			contentEditorState.pendingClosePopUp = false;
 			contentEditorState.isLoadPopupOpen = false;
 			loadPopupUi.Clear();
 		}
@@ -828,7 +870,7 @@ void ContentEditorUpdate(float dt)
 					contentEditorState.obstaclePalette[paletteIndex]->id;
 
 				contentEditorState.statusMessage =
-					"Selected tile id: " + std::to_string(contentEditorState.selectedTileId);
+					"Selected tile name: " + contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name; // std::to_string(contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name);
 
 				UpdateContentEditorUi();
 				return;
@@ -847,24 +889,17 @@ void ContentEditorUpdate(float dt)
 		int clickedColumn =
 			contentEditorState.hoveredCellIndex % contentEditorState.roomGrid.GetWidth();
 
-		if (AEInputCheckCurr(AEVK_LBUTTON))
-		{
-			contentEditorState.roomGrid.SetCell(
-				clickedRow,
-				clickedColumn,
-				contentEditorState.selectedTileId
-			);
-		}
-		else if (AEInputCheckCurr(AEVK_RBUTTON))
-		{
-			contentEditorState.roomGrid.SetCell(clickedRow, clickedColumn, 0);
-		}
+		// Add stuff
+		if (AEInputCheckCurr(AEVK_LBUTTON)) contentEditorState.roomGrid.SetCell(clickedRow, clickedColumn, contentEditorState.selectedTileId);
+		
+		// Remove stuff
+		else if (AEInputCheckCurr(AEVK_RBUTTON)) contentEditorState.roomGrid.SetCell(clickedRow, clickedColumn, 0);
+		
 	}
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE))
-	{
-		ChangeState(GS_MAINMENU);
-	}
+	// Idek who did this but thanks, escape back instead of explicit 'back' button
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) ChangeState(GS_MAINMENU);
+	
 }
 
 void ContentEditorDraw()

@@ -6,6 +6,14 @@
 #include "Ui.h"
 #include "../GameStateManager.h"
 #include "../Utils/Utils.h"
+#include "../Sprite.h"
+#include "../Loaders/DataLoader.h"
+#include "../GameStateList.h"
+
+#include "AEEngine.h"
+
+#include <cstdlib>
+#include <fstream>
 
 
 
@@ -17,6 +25,8 @@ enum class ContentEditorTab
 
 struct ContentEditorState
 {
+
+
 	Grid roomGrid{};
 
 	ContentEditorTab currentTab{ ContentEditorTab::Biomes };
@@ -39,6 +49,9 @@ struct ContentEditorState
 	int existingCsvIndex{ 0 };					// Fileindex
 	std::vector<std::string> existingCsvPaths{};// Tbh im just gonan use one path
 	std::string currentEditingFilePath{};		// Current File Path to modify
+
+	// Patch some bugs???
+	bool pendingClosePopUp{ false }, pendingLoadSelectedCSV{ false };
 
 };
 
