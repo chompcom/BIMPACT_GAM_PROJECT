@@ -19,7 +19,8 @@ class Boss {
 		std::string name;
 		f32 health;
 		f32 damage;
-		TexturedSprite sprite;
+		//TexturedSprite sprite;
+		AnimatedSprite sprite;
 		TexturedSprite shadow;
 		f32 currentHealth;
 		bool isActive; // For checking if its alive

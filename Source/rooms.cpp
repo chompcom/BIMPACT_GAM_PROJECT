@@ -439,9 +439,17 @@ namespace mapRooms
 		// Boss Init
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
+
+			currentRoomData.boss->sprite.SetAnimation({ "idle", 4 });
+			currentRoomData.boss->sprite.SetAnimation({ "walk", 4 });
+			currentRoomData.boss->sprite.SetAnimation({ "run", 4 });
+			currentRoomData.boss->sprite.SetAnimation({ "runAttack", 4 });
+			currentRoomData.boss->sprite.SetAnimation({ "attack", 3 });
+
 
 			// Initialize Default Grid (Should be all zero ig)
 			biome = "Normal"; // or keep previously chosen biome if you want

@@ -21,7 +21,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 	//Vector2 direction{};
 	switch (currentState) {
 		case BOSS_IDLE:
-			boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
+			//boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
 			std::cout << "Boss Idle\n";
 			interval += dt;
 			if (interval >= 1.0f && canWalk) {
@@ -31,6 +31,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					chargeDirection = target - boss->sprite.position;
 					boss->velocity = chargeDirection.Normalized() * walkSpeed * boss->speedModifier;
+					boss->sprite.GetAnimation("walk");
 					currentState = BOSS_WALK;
 				}
 			}
@@ -45,6 +46,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				else {
 					currentState = BOSS_CHARGE;
 					attackPhase = ATTACK_CHARGE;
+					boss->sprite.GetAnimation("runAttack");
 					counter++;
 				}
 			}
@@ -60,6 +62,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				boss->collideWall ) {
 				boss->velocity = {};
 				//boss->collideWall = false;
+				boss->sprite.GetAnimation("idle");
 				currentState = BOSS_IDLE;
 			}
 
@@ -78,7 +81,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 	//Vector2 direction{};
 	float collisionTime{ 0.0f };
-	boss->sprite.color = Color{ 1.0f, 0.0f, 0.0f, 1.0f };
+	//boss->sprite.color = Color{ 1.0f, 0.0f, 0.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Charge Starting\n";
@@ -142,7 +145,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 	//Vector2 direction{};
 	float collisionTime{ 0.0f };
-	boss->sprite.color = Color{ 0.0f, 0.0f, 1.0f, 1.0f };
+	//boss->sprite.color = Color{ 0.0f, 0.0f, 1.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Jump Starting\n";
@@ -185,6 +188,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		interval += dt;
 		if (interval >= jumpEndlag) {
 			interval = 0.0f;
+			boss->sprite.GetAnimation("idle");
 			currentState = BOSS_IDLE;
 		}
 
