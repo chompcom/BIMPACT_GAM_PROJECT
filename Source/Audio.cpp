@@ -312,7 +312,7 @@ void FireBiomeAudio() {
 }
 
 void OceanBiomeAudio() {
-	AEAudioPlay(OceanAudio, RoomAudio, 0.5f, 2.0f, -1);
+	AEAudioPlay(OceanAudio, RoomAudio, 0.25f, 2.0f, -1);
 }
 
 void BGM1Audio() {

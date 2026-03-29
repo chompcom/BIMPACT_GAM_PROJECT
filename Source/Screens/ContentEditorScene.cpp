@@ -35,7 +35,6 @@ namespace
 	void ScanCSVBiomes(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
 	{
 		outList.clear();	// Clear Lists
-
 		// Pattern Example: Assets\Rooms\Normal\*.png
 		std::string pattern = folder;
 		if (!pattern.empty() && pattern.back() != '\\' && pattern.back() != '/')
