@@ -191,6 +191,12 @@ namespace DataLoader {
 				tmp.detectionRadius = name["detectionRadius"].asFloat();
 				tmp.safeRadius = name["safeRadius"].asFloat();
 				tmp.attackRate = name["attackRate"].asFloat();
+				if (!name["wanderTime"].isNull()) {
+					tmp.wanderTime = name["wanderTime"].asFloat();
+				}
+				if (!name["waitTime"].isNull()) {
+					tmp.waitTime = name["waitTime"].asFloat();
+				}
 
 				if (name["traits"]) {
 					for (Json::Value& traitStr : name["traits"]) {

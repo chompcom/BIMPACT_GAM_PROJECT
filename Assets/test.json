@@ -1,23 +1,55 @@
 {
     "enemies":
     [
+		// This default is just for everyone to know what are the stuff
 		{	"name": "Default",
 			"sprite": "Assets/poprocks.png",
-			"color": [ 255, 255, 255, 255 ],
+			"health": 0,
 			"damage": 0,
 			"speed": 0,
 			"detectionRadius": 0,
 			"safeRadius": 0,
+			"attackRate":0,
+			"wanderTime": 3, //defaults to 3 if not included
+			"waitTime": 3,//defaults to 3 if not included
 			"traits": [],
 			"likes": [],
 			"dislikes": [],
-			"happy": [],
+			//ok to omit. projectile info is same for happy neutral and angry
+			"happyProjectile":{
+				"damage":0,
+				"radius":0,
+				"speed":0,
+				"lifetime":0,
+				"sprite":"Assets/Enemies/poprocks.png",
+				"color":[255,255,255,255]
+			},
+			"angryProjectile":{},
+			"neutralProjectile":{},
+			"happy": [
+				//anatomy of a behaviour:
+				//Contexts are checked in the order they are placed in the list
+				{ "context":"IsWaiting",
+				  "actions":[
+				  ]
+				},
+				{ 
+					"context":"default", //boolean check
+					"actions":[
+					] //list of actions in order
+				}
+			],
 			"neutral": [],
 			"angry": []
 		},
+		
+
+
+		//Start enemies
+
+		//Booger
 		{	"name": "Booger",
 			"sprite": "Assets/Enemies/booger.png",
-			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"traits": ["Gross"],
 			"damage": 0,
@@ -89,6 +121,7 @@
 				}
 			]
 		},
+		//Pop rocks
 		{	"name": "Pop Rocks",
 			"sprite": "Assets/Enemies/poprocks.png",
 			"color": [ 255, 255, 255, 255 ],
@@ -141,7 +174,6 @@
 				{
 					"context":"OnceWaitTimerIsUp",
 					"actions":[
-						//Player must be targeted to guarantee projectile fire
 						"TargetPlayer",
 						"FireProjectile"
 					]
@@ -254,6 +286,7 @@
 				}
 			]
 		},
+		//The Oven
 		{	"name": "THE OVEN",
 			"sprite": "Assets/Enemies/oven.png",
 			"color": [ 255, 255, 255, 255 ],
@@ -324,6 +357,7 @@
 				]}
 			]
 		},
+		//snowman
 		{ "name": "Snowman",
 			"sprite": "Assets/Enemies/snowman.png",
 			"color": [ 255, 255, 255, 255 ],
@@ -387,12 +421,13 @@
 			]
 		}
 		,
+		//Soap
 		{ "name": "Soap",
 			"sprite": "Assets/Enemies/soap.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"damage": 10,
-			"speed": 300,
+			"speed": 100,
 			"detectionRadius": 300,
 			"safeRadius": 300,
 			"attackRate": 1,

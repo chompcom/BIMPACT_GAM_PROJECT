@@ -122,16 +122,16 @@ public:
 	f32 health;
 	f32 damage;
 	f32 speed;
+	//rate at which attacks are done (seconds to wait)
 	float attackRate;
-	//! Radius used for "Target___InDetectionRadius"
+	//seconds you are wandering in one direction
+	float wanderTime;
+	//seconds you are waiting for
+	float waitTime;
+	//! Radius used for "TargetInDetectionRadius"
 	f32 detectionRadius;
-
 	//! Radius used for "FollowingPlayer" or anything related to friendly range
 	f32 safeRadius;
-
-	//! 
-
-
 	Labels traits;
 	Labels likes;
 	Labels dislikes;
@@ -139,6 +139,7 @@ public:
 	FSM happy;
 	FSM angry;
 	FSM neutral;
+
 
 	struct ProjectileInfo {
 		float damage;

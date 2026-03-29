@@ -229,7 +229,7 @@ void Enemy::Update(float dt) {
 		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
 	}
 	this->collisionResolution = collisionRes;
-	if (collisionRes && !acknowledgeCollision) acknowledgeCollision = true;
+	if (collisionRes) acknowledgeCollision = !acknowledgeCollision;
 	//After i update my movement, i reset back the speed modifier but keep the sign
 	speedModifier = speedModifier / abs(speedModifier);
 	sprite.UpdateTransform();
@@ -254,7 +254,7 @@ void Enemy::AssessTraits(Labels labels, bool giftCheck){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{},
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{}, wanderTime{3.f}, waitTime{3.f},
 	happyProjectile{}, angryProjectile{}, neutralProjectile{}
 {
 }

@@ -29,21 +29,42 @@ using FlagList = std::unordered_map<std::string, FlagCheck>;
 
 // ******************************
 namespace {
-	Vector2 PathFind(Vector2 const& pos, Vector2 const& end, Grid const& grid) {
-		//BFS I suppose
-
-		//snap to cell
-		
-		UNREFERENCED_PARAMETER(pos);
-		UNREFERENCED_PARAMETER(grid);
-
-		return Vector2{};
-	}
-
-	bool CheckIfHated(Enemy const& me, Enemy const& enemy) {
+	bool CheckIfHated(Enemy const &me, Enemy const &enemy)
+	{
 		return (enemy.state == ES_ANGRY || HasCommonTrait(me.type.dislikes, enemy.type.traits));
 	}
 
+	template <typename Function>
+	void FireSomething(Enemy &me, Function shootProjFunc)
+	{
+		if (!me.target)
+			return;
+
+		bool amIFriendsWithThePlayer = false;
+		if (me.attackTimer <= 0)
+		{
+			EnemyType::ProjectileInfo proj;
+			switch (me.state)
+			{
+			case ES_ANGRY:
+				proj = me.type.angryProjectile;
+				break;
+			case ES_HAPPY:
+				proj = me.type.happyProjectile;
+				amIFriendsWithThePlayer = true;
+				break;
+			default:
+				proj = me.type.neutralProjectile;
+				break;
+			}
+
+			Vector2 direction = me.prevPos - (me.target.GetPosition());
+
+			shootProjFunc(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
+			me.attackTimer = me.type.attackRate;
+			me.onceAttackTime = true;
+		}
+	}
 }
 
 
@@ -91,11 +112,18 @@ bool IsNotFollowingPlayer(Enemy& me) {
 	}
 }
 
+bool IsFollowingPlayer(Enemy& me) {
+	return !IsNotFollowingPlayer(me);
+}
+
 bool IsTargetInDetectionRadius(Enemy& me) {
 	if (!me.target) return false;
 
 	return (AreCirclesIntersecting(me.prevPos, me.type.detectionRadius,
 		me.target.GetPosition(), 0));
+}
+bool IsTargetNotInDetectionRadius(Enemy& me) {
+	return !IsTargetInDetectionRadius(me);
 }
 
 bool IsWanderTimerUp(Enemy& me) {
@@ -126,15 +154,15 @@ bool OnceWaitTimerIsUp(Enemy& me) {
 }
 
 bool IsWaiting(Enemy& me) {
-	if (me.waitTimer > 0.f) {
-		std::cout << me.type.name << " is really waiting!\n";
-
-	}
 	return me.waitTimer > 0.f;
 }
 
 bool IsAttackOnCooldown(Enemy& me) {
 	return me.attackTimer > EPSILON;
+}
+
+bool IsNotTargeting(Enemy& me) {
+	return !me.target;
 }
 
 //By right, attacks automatically are on attack cooldown so placing 
@@ -151,8 +179,12 @@ bool OnceAttackCooldownUp(Enemy& me) {
 }
 
 bool IsHittingWall(Enemy& me) {
-	int tmp{ me.collisionResolution };
-	return tmp;
+	return me.collisionResolution;
+}
+
+//as weird as this one is, it's actually quite straight forward
+bool IsOnEvenBounce(Enemy& me) {
+	return me.acknowledgeCollision;
 }
 
 // ***************************************
@@ -210,7 +242,6 @@ void CircleMove(Enemy& me) {
 	Vector2 direction{ (me.target.GetPosition() - me.prevPos)};
 	direction = Vector2{direction.y, -direction.x}; //the perpendicular
 	if (me.acknowledgeCollision) {
-		me.acknowledgeCollision = false;
 		direction = -direction;
 	}
 	me.velocity = direction;
@@ -328,43 +359,48 @@ void TargetCorner(Enemy& me) {
 	me.target.initialPosition = Vector2(100,100);
 }
 void FireProjectile(Enemy& me) {
+	FireSomething(me, ShootProjectile);
+}
 
-	if (!me.target) return;
-		bool amIFriendsWithThePlayer = false;
-	if (me.attackTimer <= 0) {
-		EnemyType::ProjectileInfo proj;
-		switch (me.state) {
-		case ES_ANGRY:
-			proj = me.type.angryProjectile;
-			break;
-		case ES_HAPPY:
-			proj = me.type.happyProjectile;
-			amIFriendsWithThePlayer = true;
-			break;
-		default:
-			proj = me.type.neutralProjectile;
-			break;
-		}
+void FireBoomerang(Enemy& me) {
+	FireSomething(me, ShootBoomerang);
+}
 
-		Vector2 direction = me.prevPos - (me.target.GetPosition());
+void FireScatter(Enemy& me) {
+	FireSomething(me, ShootScatter);
+}
 
-
-		ShootProjectile(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, me.dmgModifier * proj.damage, Vector2(proj.radius,proj.radius), proj.color, &me, amIFriendsWithThePlayer);
-		me.attackTimer = me.type.attackRate;
-		me.onceAttackTime = true;
-	}
+void FireSpirally(Enemy& me) {
+	FireSomething(me, ShootRounding);
 }
 void DVDMove(Enemy& me) {
-	//UNREFERENCED_PARAMETER(me);
+	if (me.velocity.LengthSq() <= EPSILON) {
+		me.velocity = Vector2( cosf(AERandFloat() * 2.f * PI), -sinf(AERandFloat() * 2.f * PI) ); 
+	}
+	//yeah otherwise just take whatever velocity i alr had and run with it.
+	if (me.collisionResolution & COLLISION_TOP ||
+		me.collisionResolution & COLLISION_BOTTOM)
+		me.velocity.y = -me.velocity.y;
+	
+	if (me.collisionResolution & COLLISION_LEFT ||
+		me.collisionResolution & COLLISION_RIGHT)
+		me.velocity.x = -me.velocity.x;
 }
+// bounce against enemies
 void DVDBounce(Enemy& me) {
+
+	if (!me.target) return; //there's no reason to bounce without a target to bounce off of.
+	
+
+	//i don't really feel like doing much square related math
+
+	me.velocity = ( me.prevPos - me.target.GetPosition());
 
 }
 void BecomeAngry(Enemy& me) {
 	me.ChangeState(ES_ANGRY);
 }
 void BecomeNeutral(Enemy& me) {
-
 	me.ChangeState(ES_NEUTRAL);
 }
 
@@ -385,7 +421,6 @@ void DamageTarget(Enemy& me) {
 			}
 		}
 		me.target.DealDamage(me.type.damage);
-
 	}
 
 }
@@ -395,6 +430,19 @@ void InvertVelocity(Enemy& me) {
 	std::cout << "Velocity Inverted" << std::endl;
 	me.speedModifier *= -1.f;
 	
+}
+
+//dangerous, handle with care
+void DizzyTarget(Enemy& me) {
+	if (!me.target) return;
+	//specifically make them go backwards
+	me.target.GetSpeedMod() = me.target.GetSpeedMod() > 0.f ? me.target.GetSpeedMod() * -1.f : me.target.GetSpeedMod();
+}
+//not dangerous, handle without care
+void UndizzyTarget(Enemy& me) {
+	if (!me.target) return;
+	//specifically make them go forwards
+	me.target.GetSpeedMod() = me.target.GetSpeedMod() < 0.f ? me.target.GetSpeedMod() * -1.f : me.target.GetSpeedMod();
 }
 
 void TargetSelf(Enemy& me) {
@@ -407,13 +455,6 @@ void Wait(Enemy& me) {
 		me.waitTimer = 3;
 		me.onceWaitTime = true;
 	}
-}
-
-void PullTarget(Enemy& me) {
-
-}
-void PushTarget(Enemy& me) {
-
 }
 
 void ChargeAtTarget(Enemy& me) {
@@ -434,11 +475,13 @@ void ClearTarget(Enemy& me) {
 
 //unused template functions
 bool DefaultFlag(Enemy& me){
-	return true;
+	return me.isActive;
 }
 
 void DefaultAction(Enemy& me) {
-
+	std::cerr << me.type.name << " has called a default action which should not happen ever!\n";
+	std::cerr << "Did you misspell an action?\n";
+	return;
 }
 
 
@@ -447,6 +490,10 @@ void DefaultAction(Enemy& me) {
 static CommandList commands;
 static FlagList flags;
 Command GetCommand(std::string name) {
+	if (commands.find(name) == commands.end()) {
+		std::cerr << "ERROR! " << name << " didn't load properly! Likely misspelling.\n";
+		return commands["default"];
+	}
     return commands[name];
 }
 
@@ -465,7 +512,9 @@ void InitCommands() {
 	flags = {
 		{"IsTouchingTarget",IsTouchingTarget},
 		{"IsNotFollowingPlayer", IsNotFollowingPlayer},
+		{"IsFollowingPlayer", IsFollowingPlayer},
 		{"IsTargetInDetectionRadius", IsTargetInDetectionRadius},
+		{"IsTargetNotInDetectionRadius", IsTargetNotInDetectionRadius},
 		{"IsWaitTimerUp", IsWaitTimerUp},
 		{"OnceWaitTimerIsUp", OnceWaitTimerIsUp}, 
 		{"IsWanderTimerUp", IsWanderTimerUp},
@@ -476,6 +525,8 @@ void InitCommands() {
 		{"IsAttackCooldownUp", IsAttackOnCooldown},
 		{"OnceAttackCooldownUp", OnceAttackCooldownUp}, 
 		{"IsHittingWall", IsHittingWall}, 
+		{"IsNotTargeting",IsNotTargeting},
+		{"IsOnEvenBounce", IsOnEvenBounce},
 		{"default", DefaultFlag}
     };
 
@@ -496,21 +547,24 @@ void InitCommands() {
 		{"TargetMiddle", TargetMiddle},
 		{"TargetCorner", TargetCorner},
 		{"FireProjectile", FireProjectile},
+		{"FireBoomerang", FireBoomerang},
+		{"FireScatter", FireScatter},
+		{"FireSpirally", FireSpirally},
 		{"DVDMove", DVDMove},
 		{"DVDBounce", DVDBounce},
 		{"BecomeAngry", BecomeAngry},
 		{"BecomeNeutral", BecomeNeutral},
 		{"DamageTarget", DamageTarget},
-		{"PullTarget", PullTarget},
-		{"PushTarget", PushTarget},
 		{"Wait", Wait},
 		{"ClearTarget", ClearTarget},
 		{"TargetSelf", TargetSelf},
 		{"ChargeAtTarget", ChargeAtTarget},
 		{"TargetNearestThing", TargetNearestThing},
-		{"InvertVelocity", InvertVelocity}
+		{"InvertVelocity", InvertVelocity},
+		{"DizzyTarget", DizzyTarget},
+		{"UndizzyTarget", UndizzyTarget},
 
-
+		{"default", DefaultAction} //This should Never be called!
     };
 }
 
