@@ -538,9 +538,8 @@ void TestUpdate(float dt)
 			player.sprite.UpdateTransform();
 			player.shadow.UpdateTransform();
 		}
+		
 
-
-		//UpdatePlayer(player, dt); // Player update
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
 		// Game map update
@@ -550,52 +549,6 @@ void TestUpdate(float dt)
 		RoomData& roomData = currentRoom->currentRoomData;
 		RoomData& carryData = gameMap.GetTransferData();
 
-		/*
-		// Test Player Collision with Map
-		int curCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(player.position.x, player.position.y);
-		if (curCell >= 0 && curCell != 0xffffff)
-			currentRoom->lastValidCell = curCell;
-		int prevCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(prevPos.x, prevPos.y);
-		int colRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(player.position.x, player.position.y, player.sprite.scale.x * 0.8f, player.sprite.scale.y * 0.8f, curCell);
-		if (colRes & COLLISION_LEFT || colRes & COLLISION_RIGHT) {
-		player.position.x = prevPos.x + (((colRes&COLLISION_LEFT)?(+1):(-1))*(currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-		if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
-			player.direction.x = 0.0f;
-			std::cout << "Collided left" << std::endl;
-		} else if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
-			//player.position.x = prevPos.x + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-			player.direction.x = 0.0f;
-			std::cout << "Collided Right" << std::endl;;
-		}
-			//if (colRes & COLLISION_LEFT && player.direction.Normalized().x < -EPSILON) {
-			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x - currentRoom->roomGrid.GetWidth() * 0.5f + player.sprite.scale.x * 0.5f + 0.10f;
-			//}
-			//if (colRes & COLLISION_RIGHT && player.direction.Normalized().x > EPSILON) {
-			//	player.position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x + currentRoom->roomGrid.GetWidth() * 0.5f - player.sprite.scale.x * 0.5f - 0.10f;
-			//}
-		}
-		if ((colRes & COLLISION_TOP || colRes & COLLISION_BOTTOM)) {
-			//player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.0001f)); // Test for y collision
-			//player.direction.y = 0.0f;	
-			//if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
-			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y - currentRoom->roomGrid.GetHeight() * 0.5f + player.sprite.scale.y * 0.5f + 0.10f;
-			//}
-			//if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
-			//	player.position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y + currentRoom->roomGrid.GetHeight() * 0.5f - player.sprite.scale.y * 0.5f - 0.10f;
-			//	//sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
-			//}
-			player.position.y = prevPos.y + (((colRes & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-			if (colRes & COLLISION_BOTTOM && player.direction.Normalized().y < -EPSILON) {
-				std::cout << "Collided bottom" << std::endl;
-				player.direction.y = 0.0f;
-			}
-			else if (colRes & COLLISION_TOP && player.direction.Normalized().y > EPSILON) {
-				std::cout << "Collided top" << std::endl;
-				//player.position.y = prevPos.y + (((colRes & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.0001f)); // Test for x collision
-				player.direction.y = 0.0f;
-			}
-		}
-		*/
 
 		// FOR DOOR
 		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
@@ -633,15 +586,6 @@ void TestUpdate(float dt)
 		player.sprite.UpdateTransform();
 		player.shadow.UpdateTransform();
 
-
-		// Test all collisions?
-
-		// Vector2 playerHalfSize = player.sprite.scale * 0.5f;
-
-		// Finally reflect changes?
-		player.sprite.UpdateTransform();
-		player.shadow.UpdateTransform();
-
 		// Game Map Update was here
 
 		checkIfAlmanacClicked(*almanacIcon, almanac);
@@ -653,9 +597,7 @@ void TestUpdate(float dt)
 		{
 			if (e)
 			{
-				// e->target.position = *player.sprite.position;
 				e->Update(dt);
-				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, currentRoom->roomGrid.GetBoundary().x * 0.99f, currentRoom->roomGrid.GetBoundary().y * 0.99f)) e->velocity = -e->velocity;
 			}
 		}
 
@@ -681,37 +623,18 @@ void TestUpdate(float dt)
 					}
 				}
 
-				// Test Player Collision with Map
-				/*int enemyCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(e->sprite.position.x, e->sprite.position.y);
-				if (enemyCurCell >= 0 && enemyCurCell != 0xffffff)
-					currentRoom->lastValidCell = enemyCurCell;
-				int enemyColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(e->sprite.position.x, e->sprite.position.y, e->sprite.scale.x, e->sprite.scale.y, enemyCurCell);
-				if (enemyColRes & COLLISION_LEFT || enemyColRes & COLLISION_RIGHT) {
-					e->sprite.position.x = e->prevPos.x; // Test for x collision
-					e->shadow.position.x = e->prevPos.x;
-					e->velocity = -e->velocity;
-				}
-				if (enemyColRes & COLLISION_TOP || enemyColRes & COLLISION_BOTTOM) {
-					e->sprite.position.y = e->prevPos.y; // Test for y collision
-					e->shadow.position.y = e->prevPos.y;
-					e->velocity = -e->velocity;
-				}*/
-				if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1400, 700))
-					e->velocity = -e->velocity;
+			
+				//if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 800))
+					//e->velocity = -e->velocity;
 			}
 		}
-		//static float accumulatedTime = 0;
-		//accumulatedTime += dt;
-		
 
-		
 
 		// Update Gifts (Must update both sides)
 		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
-				//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
 				
 				int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however

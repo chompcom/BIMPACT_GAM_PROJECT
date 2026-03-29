@@ -238,7 +238,7 @@ void Wander(Enemy& me) {
 		float randy = AERandFloat() * 2 - 1;
 		me.velocity = Vector2{randx, randy};
 	}
-	if (CollisionBoundary_Static(me.prevPos, me.sprite.scale, 1600, 900))
+	if (me.collisionResolution)
 		me.velocity = -me.velocity;
 
 	
@@ -410,16 +410,63 @@ void FireSpirally(Enemy& me) {
 }
 void DVDMove(Enemy& me) {
 	if (me.velocity.LengthSq() <= EPSILON) {
-		me.velocity = Vector2( cosf(AERandFloat() * 2.f * PI), -sinf(AERandFloat() * 2.f * PI) ); 
+		me.velocity = Vector2(cosf(AERandFloat() * 2.f * PI), -sinf(AERandFloat() * 2.f * PI));
 	}
-	//yeah otherwise just take whatever velocity i alr had and run with it.
-	if (me.collisionResolution & COLLISION_TOP ||
-		me.collisionResolution & COLLISION_BOTTOM)
-		me.velocity.y = -me.velocity.y;
+
+	if (me.collisionResolution) {
+
+		//yeah otherwise just take whatever velocity i alr had and run with it.
+		if (me.collisionResolution & COLLISION_TOP) {
+
+			me.velocity.y = -1.f;
+
+		}
+
+		if (me.collisionResolution & COLLISION_BOTTOM) {
+
+			me.velocity.y = 1.f;
+
+		}
+
+		if (me.collisionResolution & COLLISION_LEFT)
+		{
+
+			me.velocity.x = 1.f;
+
+		}
+		if (me.collisionResolution & COLLISION_RIGHT) {
+
 	
-	if (me.collisionResolution & COLLISION_LEFT ||
-		me.collisionResolution & COLLISION_RIGHT)
-		me.velocity.x = -me.velocity.x;
+			me.velocity.x = -1.f;
+		}
+
+		float width = me.roomData->grid.GetWidth() * me.roomData->grid.GetTileWidth();
+		float height = me.roomData->grid.GetHeight() * me.roomData->grid.GetTileHeight();
+
+		//door bs
+		if (CollisionBoundary_Static(me.prevPos, me.sprite.scale, width, height)) {
+
+			if (me.prevPos.x < -EPSILON) {
+				//left wall
+				me.velocity.x = 1.f;
+			}
+			if (me.prevPos.x > EPSILON) {
+				//right wall
+				me.velocity.x = -1.f;
+			}
+			if (me.prevPos.y < -EPSILON) {
+				//bot wall
+				me.velocity.y = 1.f;
+			}
+			if (me.prevPos.y > EPSILON) {
+				//tob wall
+				me.velocity.y = -1.f;
+			}
+		}
+
+
+
+	}
 }
 // bounce against enemies
 void DVDBounce(Enemy& me) {

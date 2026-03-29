@@ -216,6 +216,9 @@ void Enemy::Update(float dt) {
 	float gridWidth = roomData->grid.GetTileWidth();
 	float gridHeight = roomData->grid.GetTileHeight();
 
+	//I really hate hotspot collision
+	// Anyways, this whole portion of the code is interacting with grid
+
 	if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x > EPSILON) {
 		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x + gridWidth*0.5f - sprite.scale.x*0.5f - 0.10f;
 	}
@@ -228,7 +231,25 @@ void Enemy::Update(float dt) {
 	if ( collisionRes & COLLISION_TOP && velocity.Normalized().y > EPSILON) {
 		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
 	}
+
+	//I take half of grid boundary because that's the position of each side
+	Vector2 roomBounds = roomData->grid.GetBoundary() * 0.98f * 0.5f;
+
+	if (CollisionBoundary_Static(sprite.position, sprite.scale, roomData->grid.GetBoundary().x * 0.99f, roomData->grid.GetBoundary().y * 0.99f)) {
+
+		collisionRes |= (sprite.position.x - sprite.scale.x * 0.5f) <= -roomBounds.x ? COLLISION_LEFT : 0;
+		if (collisionRes & COLLISION_LEFT && velocity.Normalized().x > EPSILON) sprite.position.x = -roomBounds.x + sprite.scale.x * 0.5f;
+		collisionRes |= (sprite.position.x + sprite.scale.x * 0.5f) >= roomBounds.x ? COLLISION_RIGHT : 0;
+		if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x < -EPSILON) sprite.position.x = roomBounds.x - sprite.scale.x * 0.5f;
+		collisionRes |= (sprite.position.y + sprite.scale.y*0.5f) >= roomBounds.y ? COLLISION_TOP : 0;
+		if (collisionRes & COLLISION_TOP && velocity.Normalized().y < -EPSILON) sprite.position.y = roomBounds.y - sprite.scale.y * 0.5f;
+		collisionRes |= (sprite.position.y - sprite.scale.y*0.5f) <= -roomBounds.y ? COLLISION_BOTTOM : 0;
+		if (collisionRes & COLLISION_BOTTOM && velocity.Normalized().y > EPSILON) sprite.position.y = -roomBounds.y + sprite.scale.y * 0.5f;
+	}
+
 	this->collisionResolution = collisionRes;
+
+
 	if (collisionRes) acknowledgeCollision = !acknowledgeCollision;
 	//After i update my movement, i reset back the speed modifier but keep the sign
 	speedModifier = speedModifier / abs(speedModifier);
