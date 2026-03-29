@@ -39,6 +39,7 @@ class Boss {
 
 		void Update(Player& player, f32 dt);
 		void CollideProjectile();
+		void CollideGift();
 
 		void ResetBoss();
 };
