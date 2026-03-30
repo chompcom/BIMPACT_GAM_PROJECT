@@ -37,17 +37,25 @@ class TexturedSprite : public Sprite {
 		void RenderSprite(bool changeAlpha = false, f32 uv_offsetX = 0.f, f32 uv_offsetY = 0.f);
 };
 
+struct AnimationInfo {
+	std::string name;
+	s32 start_row;
+	s32 start_col;
+	s32 no_frames;
+	f32 frame_duration{ 0.25f };
+};
+
 class AnimatedSprite : public TexturedSprite {
 	public:
-		const u32 spritesheet_rows = 5;
-		const u32 spritesheet_cols = 8;
-		const f32 sprite_uv_width = 1.f / spritesheet_cols;
-		const f32 sprite_uv_height = 1.f / spritesheet_rows;
+		u32 spritesheet_rows = 3;
+		u32 spritesheet_cols = 3;
+		f32 sprite_uv_width = 1.f / spritesheet_cols;
+		f32 sprite_uv_height = 1.f / spritesheet_rows;
 
 		f32 animation_timer = 0.f;
-		f32 animation_duration_per_frame = 0.25f;
+		//f32 animation_duration_per_frame = 0.25f;
 
-		u32 current_animation_index = 0;
+		//std::pair<u32, u32> current_animation_index = { 0, 0 };
 		u32 current_sprite_index = 0;
 
 		f32 current_sprite_uv_offset_x;
@@ -56,13 +64,14 @@ class AnimatedSprite : public TexturedSprite {
 		f32 initial_offsetX;
 		f32 initial_offsetY;
 
-		std::vector<std::pair<std::string, s32>> animations;
+		std::vector<AnimationInfo> animations;
+		AnimationInfo currentAnimation;
 
 
 		//AnimatedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor = Color{ 1.0f,1.0f,1.0f,1.0f }, f32 initial_offsetX, f32 initial_offsetY);
-		AnimatedSprite(TexturedSprite texturedSprite, float initial_offsetX, float initial_offsetY);
+		AnimatedSprite(TexturedSprite texturedSprite, f32 initial_offsetX = 0.f, f32 initial_offsetY = 0.f);
 
-		void SetAnimation(std::pair<std::string, s32> animationInfo);
+		void SetAnimation(AnimationInfo animationInfo);
 		void GetAnimation(std::string animationName);
 		void UpdateAnimation(f32 dt);
 

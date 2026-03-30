@@ -438,20 +438,31 @@ namespace mapRooms
 
 		// Boss Init
 		if (rmType == RoomType::Boss) {
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+			//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
+			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 1.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.f, 0.f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png"), 0.f, 0.f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 
-			currentRoomData.boss->sprite.SetAnimation({ "idle", 4 });
+			/*currentRoomData.boss->sprite.SetAnimation({"idle", 4});
 			currentRoomData.boss->sprite.SetAnimation({ "walk", 4 });
 			currentRoomData.boss->sprite.SetAnimation({ "run", 4 });
 			currentRoomData.boss->sprite.SetAnimation({ "runAttack", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "attack", 3 });
+			currentRoomData.boss->sprite.SetAnimation({ "attack", 3 });*/
+
+			currentRoomData.boss->sprite.SetAnimation({ "Idle", 0, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run Start", 1, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run", 1, 0, 3 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run End", 1, 2, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump Start", 2, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump", 2, 1, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump End", 2, 2, 1 });
+
+			currentRoomData.boss->sprite.GetAnimation("Idle");
 
 
 			// Initialize Default Grid (Should be all zero ig)

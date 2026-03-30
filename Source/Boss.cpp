@@ -30,7 +30,7 @@ void Boss::Update(Player& player, f32 dt) {
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 		speedModifier = 1.0f;
-		std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
+		//std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
 		std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
 	}
 	else {
@@ -80,6 +80,7 @@ void Boss::CollideGift() {
 void Boss::ResetBoss() {
 	currentHealth = health;
 	sprite.position = Vector2{};
+	sprite.GetAnimation("Idle");
 	shadow.position = Vector2{ 0, -35 };
 
 	bossStateMachine->currentState = bossStateMachine->initialState;

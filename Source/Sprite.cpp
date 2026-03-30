@@ -74,38 +74,39 @@ void TexturedSprite::RenderSprite(bool changeAlpha, f32 uv_offsetX, f32 uv_offse
 
 }*/
 
-AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, float initial_offsetX, float initial_offsetY)
+AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, f32 initial_offsetX, f32 initial_offsetY)
 	: TexturedSprite{texturedSprite}, current_sprite_uv_offset_x{initial_offsetX}, initial_offsetX{initial_offsetX}, current_sprite_uv_offset_y{initial_offsetY}, initial_offsetY{initial_offsetY} {
 
 }
 
-void AnimatedSprite::SetAnimation(std::pair<std::string, s32> animationInfo) {
+void AnimatedSprite::SetAnimation(AnimationInfo animationInfo) {
 	animations.push_back(animationInfo);
 }
 
 void AnimatedSprite::GetAnimation(std::string animationName) {
 	for (s32 i{}; i < animations.size(); ++i) {
-		if (animations[i].first == animationName) {
-			current_animation_index = i;
+		if (animations[i].name == animationName) {
+			currentAnimation = animations[i];
 			break;
 		}
 	}
 }
 
 void AnimatedSprite::UpdateAnimation(f32 dt) {
-	animation_timer += dt;
-	if (animation_timer >= animation_duration_per_frame) {
-		animation_timer = 0;
+	//if (currentAnimation.no_frames > 1) {
+		animation_timer += dt;
+		if (animation_timer >= currentAnimation.frame_duration) {
+			animation_timer = 0;
 
-		current_sprite_index = ++current_sprite_index % animations[current_animation_index].second;
+			current_sprite_index = ++current_sprite_index % currentAnimation.no_frames;
 
-		u32 current_sprite_row = current_animation_index;
-		u32 current_sprite_col = current_sprite_index;
+			u32 current_sprite_row = currentAnimation.start_row;
+			u32 current_sprite_col = currentAnimation.start_col + current_sprite_index;
 
-		current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
-		current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
-
-	}
+			current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
+			current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
+		}
+	//}
 }
 
 AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {
