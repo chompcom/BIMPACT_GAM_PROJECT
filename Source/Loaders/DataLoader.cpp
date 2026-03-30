@@ -47,6 +47,21 @@ namespace {
 			tmp.speed      = og["speed"].asFloat();
 			tmp.lifetime   = og["lifetime"].asFloat();
 			tmp.spritePath = og["sprite"].asString();
+
+			if (!og["color"].isNull())
+			{
+				float maxVal = 255.f;
+				tmp.color.r = og["color"][0].asFloat();
+				tmp.color.g = og["color"][1].asFloat();
+				tmp.color.b = og["color"][2].asFloat();
+				tmp.color.a = og["color"][3].asFloat();
+				std::cout << "Color Loaded: " << tmp.color.r << " " << tmp.color.g << " " << tmp.color.b << "\n";
+				tmp.color.r /= maxVal;
+				tmp.color.g /= maxVal;
+				tmp.color.b /= maxVal;
+				tmp.color.a /= maxVal;
+
+			}
 			return true;
 		}
 		return false;
@@ -99,8 +114,11 @@ namespace DataLoader {
 	static EnemyTypeList enemyTypes{};
 
 	static std::vector<AlmanacEntry> almanacEntries{};
-
 	static Json::Value theGuy;
+
+	using SoundList = std::unordered_map<std::string, AEAudio>;
+	using SoundPair = std::pair<std::string, AEAudio>;
+	static SoundList sounds{};
 
 	// Sorry Josiah the mesh was a rabbit hole ~ MJ
 	using RoundRectMeshList = std::unordered_map<std::string, AEGfxVertexList*>;	// For Rrect mesh cache
@@ -138,6 +156,15 @@ namespace DataLoader {
 		return false;
 	}
 
+	AEAudio GetSound(std::string const& name)
+	{
+		SoundList::const_iterator finder = sounds.find(name);
+		if (finder == sounds.end()) {
+			std::cout << "Sound not found: " << name << std::endl;
+			return AEAudio{};
+		}
+		return finder->second;
+	}
 
 
 	void Load() {
@@ -148,10 +175,13 @@ namespace DataLoader {
 		enemyTypes.reserve(5);
 		roundRectMeshes.reserve(8);
 
-		std::ifstream enemyFile{"Assets/test.json"};
+		std::ifstream enemyFile{ "Assets/test.json" };
 		InitCommands();
 		//std::ifstream ifs{"Assets/test.json"};
 		std::ifstream almanacFile{ "Assets/almanac.json" };
+
+		std::ifstream audioFile{ "Assets/audio.json" };
+
 
 		if (enemyFile.is_open()) {
 			std::cout << "ok there's something!" << std::endl;
@@ -163,7 +193,7 @@ namespace DataLoader {
 			enemyTypes.reserve(theGuy["enemies"].size());
 
 			for (Json::Value& name : theGuy["enemies"]) {
-				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {}};
+				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };
 
 				AddBehaviours(tmp, name, "happy");
 				AddBehaviours(tmp, name, "angry");
@@ -172,15 +202,22 @@ namespace DataLoader {
 				tmp.spritePath = name["sprite"].asString();
 				tmp.health = name["health"].asFloat();
 				tmp.damage = name["damage"].asFloat();
+				tmp.angrySound = name["angrySound"].asString();
 				tmp.speed = name["speed"].asFloat();
 				tmp.detectionRadius = name["detectionRadius"].asFloat();
 				tmp.safeRadius = name["safeRadius"].asFloat();
 				tmp.attackRate = name["attackRate"].asFloat();
+				if (!name["wanderTime"].isNull()) {
+					tmp.wanderTime = name["wanderTime"].asFloat();
+				}
+				if (!name["waitTime"].isNull()) {
+					tmp.waitTime = name["waitTime"].asFloat();
+				}
 
 				if (name["traits"]) {
 					for (Json::Value& traitStr : name["traits"]) {
 						tmp.traits.insert(traitStr.asString());
-						
+
 					}
 				}
 
@@ -194,6 +231,16 @@ namespace DataLoader {
 					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
 				}
 
+				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
+				{
+					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+				}
+
+				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
+				{
+					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+				}
+
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
 				}
@@ -202,7 +249,7 @@ namespace DataLoader {
 					tmp.dislikes.insert(thing.asString());
 				}
 
-	
+
 
 				enemyTypes.insert({
 					name["name"].asString(),
@@ -214,7 +261,7 @@ namespace DataLoader {
 				//std::cout << "name: " << name["name"] << std::endl;
 
 			}
-			
+
 			for (EnemyPair const& type : enemyTypes) {
 				std::cout << type.first << std::endl;
 			}
@@ -229,20 +276,47 @@ namespace DataLoader {
 			almanacFile >> theGuy;
 			almanacEntries.reserve(theGuy["almanacEntries"].size());
 
-			for (Json::Value& name : theGuy["almanacEntries"]) 
+			for (Json::Value& name : theGuy["almanacEntries"])
 			{
-				AlmanacEntry tmp{DataLoader::GetEnemyType(name["name"].asString()), name["description"].asString(), 
-					name["area"].asString(), DataLoader::CreateTexture(name["spritePath"].asString())};
+				EnemyType const& entryEnemyType = DataLoader::GetEnemyType(name["name"].asString());
+				AlmanacEntry tmp{entryEnemyType, name["description"].asString(), 
+					name["area"].asString(), 
+					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
+					//DataLoader::CreateTexture(name["spritePath"].asString())};
 				//std::cout << tmp.enemyType.name;
 				//std::cout << name["name"].asString();
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
-				
+
 
 				almanacEntries.push_back(tmp);
 				std::cout << "name: " << name["name"] << std::endl;
 			}
 
+		}
+
+		if (audioFile.is_open()) {
+			Json::Value audioJson;
+			audioFile >> audioJson;
+
+			for (Json::Value& val : audioJson["audio"]["player"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
+			for (Json::Value& val : audioJson["audio"]["charging"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
+			for (Json::Value& val : audioJson["audio"]["ui"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
+			for (Json::Value& val : audioJson["audio"]["mob"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
+			for (Json::Value& val : audioJson["audio"]["room"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
+			for (Json::Value& val : audioJson["audio"]["menu"]) {
+				sounds.insert({ val["name"].asString(), AEAudioLoadSound(val["path"].asString().c_str()) });
+			}
 		}
 	}
 
@@ -267,7 +341,7 @@ namespace DataLoader {
 
 	AEGfxVertexList* GetMesh()
 	{
-		return GetOrCreateSquareMesh();
+		return squareMesh;
 	}
 
 	AEGfxVertexList* GetOrCreateSquareMesh()
@@ -438,8 +512,15 @@ namespace DataLoader {
 		}
 		roundRectMeshes.clear();
 
+		FreeAudio(); 
+		for (SoundPair AllSounds : sounds) {
+			AEAudioUnloadAudio(AllSounds.second);
+		}
+		sounds.clear();
+
 		if (squareMesh) { AEGfxMeshFree(squareMesh); squareMesh = nullptr; };
 		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
 	}
+
 
 } //end DataLoader

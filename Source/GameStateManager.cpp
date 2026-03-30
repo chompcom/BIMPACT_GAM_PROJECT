@@ -15,7 +15,8 @@ Update fpUpdate = nullptr;
 void GSM_Initialize(int startingState)
 {
 	current = previous = next = startingState;
-
+	DataLoader::Load();
+	InitAudio();
 	//some additional code
 	printf("GSM:Initialize\n");
 }

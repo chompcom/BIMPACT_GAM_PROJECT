@@ -1,45 +1,68 @@
+#pragma once
 #include "AEEngine.h"
+#include <string>
 void InitAudio();
 void FreeAudio();
+void StopAllAudio();
 
 // Player
 void PlayerDmgAudio();
 void PlayerFootstepAudio();
 void PlayerPickUpAudio();
 void PlayerThrowAudio();
+void ChargingThrowAudio(float dt);
+void StopChargingAudio();
 
 // UI
 void ButtonAudio();
 void AlmanacAudio();
+void HoverAudio();
+void GameLoseAudio();
+bool IsbuttonAudioState();
+void GameWinAudio();
 
 // Mob
 void HydroAttackAudio();
 void FriendSuccessAudio();
-void RoarAudio(); // for angry dragon
+void RoarAudio();
 void SwordAttackAudio();
 void TomWhateverAudio();
 void BoogerStickAudio();
 void ProjectileAudio();
 void FireballAudio();
-void ChargingThrowAudio(float dt);
-void StopChargingAudio();
-void StopMobAudio();
 void RoundingProjectileAudio();
-
+void CrabAttackAudio();
+void GoblinAudio();
+void PoprocksAudio();
+void SpongeAudio();
+void MeleeAudio();
+void CampfireAudio();
+void OvenAudio();
+void StopMobAudio();
+void PlayMobSound(std::string const& soundName);
+void UpdateMobAudioCD(float dt);
 
 // Room
 void RoomEnterAudio();
-
-// Background
-
-void MainMenuAudio();
-void FireBiomeAudio();
-void WaterBiomeAudio();
 void ForestBiomeAudio();
-void AlmanacBGAudio();
-void GameOverAudio();
-void WinAudio();
+void IceBiomeAudio();
+void FireBiomeAudio();
+void OceanBiomeAudio();
+
+// BGM
+void RandomBGMAudio(float dt);
+void BGM1Audio();
+void BGM2Audio();
+void BGM3Audio();
+void BossBGMAudio();
+void FightMusicAudio();
+void ResetBGM();
+
+// Menu
+void InitMenuAudio();
+void MenuBGMAudio();
+void FreeMenuAudio();
 
 
-void StopAllAudio();
-
+void PauseAllAudio();
+void ResumeAllAudio();

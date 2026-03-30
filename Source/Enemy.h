@@ -40,7 +40,6 @@ class Enemy {
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
-
 		bool isActive;
 
 		float speedModifier;
@@ -50,10 +49,14 @@ class Enemy {
 		Vector2 prevPos;
 
 		float wanderTimer;
+		bool onceWanderTime;
 		float waitTimer;
+		bool onceWaitTime;
 		float attackTimer;
+		bool onceAttackTime;
 
 		//Target contains information about the target so you can do things to it
+		//Object itself returns whether it is active or not
 		struct Target {
 			Vector2 initialPosition; //!< The position when the target was found
 
@@ -81,7 +84,6 @@ class Enemy {
 			float GetSpeedMod() const;
 			float& GetDmgMod();
 			float GetDmgMod() const;
-
 			void DealDamage(float dmg);
 
 			private: //We keep these private because I don't want to accidentally change them.
@@ -99,6 +101,9 @@ class Enemy {
 		RoomData* roomData;
 
 		FSM currentBehavior;
+		int collisionResolution;
+
+		bool acknowledgeCollision;
 
 		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
@@ -116,16 +121,17 @@ public:
 	f32 health;
 	f32 damage;
 	f32 speed;
+	//rate at which attacks are done (seconds to wait)
 	float attackRate;
-	//! Radius used for "Target___InDetectionRadius"
+	//seconds you are wandering in one direction
+	float wanderTime;
+	//seconds you are waiting for
+	float waitTime;
+	std::string angrySound;
+	//! Radius used for "TargetInDetectionRadius"
 	f32 detectionRadius;
-
 	//! Radius used for "FollowingPlayer" or anything related to friendly range
 	f32 safeRadius;
-
-	//! 
-
-
 	Labels traits;
 	Labels likes;
 	Labels dislikes;
@@ -134,14 +140,16 @@ public:
 	FSM angry;
 	FSM neutral;
 
+
 	struct ProjectileInfo {
 		float damage;
 		float radius;
 		float speed;
 		float lifetime;
+		Color color;
 		std::string spritePath;
 
-		ProjectileInfo() : damage{}, radius{}, speed{}, lifetime{}, spritePath{} {}
+		ProjectileInfo() : damage{}, radius{}, speed{}, lifetime{}, spritePath{}, color{ 1.f,1.f,1.f,1.f } {}
 	}  happyProjectile, angryProjectile, neutralProjectile;
 
 

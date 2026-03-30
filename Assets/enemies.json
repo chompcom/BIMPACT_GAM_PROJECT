@@ -14,16 +14,17 @@
 		},
 		{
 			"name": "Ice",
+			"angrySound": "IceAngrySound",
 			"sprite": "Assets/ice.png",
 			"happy": {
 				"IsTouchingTarget": [
 					"ApplySlowToTarget"
 				],
-				"IsTargetInSightRadius":[
+				"IsTargetInSightRadius": [
 					"MoveToTarget",
 					"SafeDistancePlayer"
 				],
-				"default":[
+				"default": [
 					"TargetPlayer",
 					"TargetEnemyInDetectionRadius",
 					"Wander"
@@ -44,7 +45,7 @@
 				"IsTouchingTarget": [
 					"ApplySlowToTarget"
 				],
-				"default":[
+				"default": [
 					"TargetPlayer",
 					"Wander"
 				]
@@ -54,6 +55,7 @@
 
 		{
 			"name": "Campfire",
+      "angrySound": "Campfire",
 			"attackRate": 1,
 			"happyProjectile": {
 				"sprite" : "Assets/fire.png"
@@ -87,6 +89,7 @@
 			
 		{
 			"name": "Booger",
+      "angrySound": "BoogerStick",
 			"sprite": "Assets/booger.png",
 			"color": [255,255,255,255],
 			"damage": 0,
@@ -131,7 +134,8 @@
 			}
 		},
 		{
-			"name" : "Snowman",
+			"name": "Snowman",
+			"angrySound": "SnowmanAngrySound",
 			"entry": "This frosty guy just stands around being happy. Don't touch him unnecessarily or your feet may just get piled by snowballs the next time you see him.",
 			"likes": ["Cold"],
 			"neutral": { 
@@ -162,7 +166,8 @@
 
 		},
 		{
-			"name":"THE OVEN",
+			"name": "THE OVEN",
+			"angrySound": "Oven",
 			"neutral":{
 				"WanderTimerDone":[
 					"ShootProjectile"
@@ -199,6 +204,7 @@
 		},
 		{
 			"name":"Teeny Tiny Dragon",
+      "angrySound": "Roar",
 			"neutral":{
 				"IsTouchingTarget":[
 					"ApplySlowToTarget",
@@ -236,6 +242,7 @@
 		},
 		{
 			"name": "Pop Rocks",
+			"angrySound": "Poprocks",
 			"neutral":{
 				"IsTargetInSightRadius":[
 					"ShootProjectile"
@@ -275,6 +282,7 @@
 		},
 		{
 			"name": "Bouncy Spikes",
+			"angrySound": "Melee",
 			"neutral": { 
 				"IsTouchingTarget": [
 					"DamageTarget",
@@ -307,7 +315,8 @@
 			}
 		},
 		{
-			"name":"Goblin Knight",
+			"name": "Goblin Knight",
+			"angrySound": "Goblin",
 			"angry":{
 				"IsTargetInSightRadius":[
 					"TargetPlayer",
