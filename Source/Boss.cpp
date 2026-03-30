@@ -13,7 +13,8 @@ Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSpri
 {
 	if (enemyName == "Boss 1") {
 		bossStateMachine = std::make_unique<Boss1_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
-			attackData[1].attackDamage, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag);
+			attackData[1].attackDamage, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag,
+			attackData[2].attackDamage, attackData[2].attackStartup, attackData[2].attackInterval, attackData[2].attackEndlag);
 		std::cout << typeid(bossStateMachine).name() << '\n';
 	}
 }
