@@ -551,6 +551,7 @@ namespace DataLoader {
 		if (squareMesh) { AEGfxMeshFree(squareMesh); squareMesh = nullptr; };
 		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
 		for (AEGfxVertexList* mesh : animatedMeshes) AEGfxMeshFree(mesh);
+		animatedMeshes.clear();
 		//if (animatedMesh) { AEGfxMeshFree(animatedMesh); animatedMesh = nullptr; };
 		
 	}
