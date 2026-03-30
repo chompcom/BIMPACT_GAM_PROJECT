@@ -6,6 +6,7 @@
 #include "Scenes/TestScene.h"
 #include "Screens/MainMenuScene.h"
 #include "Screens/ContentEditorScene.h"
+#include "Screens/Credits.h"
 
 int current = 0, previous = 0, next = 0;
 
@@ -57,6 +58,14 @@ void GSM_Update()
 		fpFree = ContentEditorFree;
 		fpDraw = ContentEditorDraw;
 		fpUpdate = ContentEditorUpdate;
+		break;
+	case GS_CREDITS:
+		fpLoad = CreditsLoad;
+		fpUnload = CreditsUnload;
+		fpInitialize = CreditsInit;
+		fpFree = CreditsFree;
+		fpDraw = CreditsDraw;
+		fpUpdate = CreditsUpdate;
 		break;
 	default:
 		break;

@@ -422,12 +422,43 @@ void UIManager::DrawElement(UIElement const& element) const
 		//system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
 
 		//img.mesh = DataLoader::GetOrCreateSquareMesh();
+
+		// Color
+		//img.color = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		//AEGfxSetColorToAdd(img.color.r, img.color.g, img.color.b, img.color.a);
+		//AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
+
+		//img.RenderSprite(true);  // ALPHA MAKES NO SENSE
+
+		// ALPHA NOW WORKS NICELY??? Maybe i did not understand the docs previously enough
+		//AEGfxTextureSet(img.texture, 0.0f, 0.0f);
+		////AEGfxSetColorToMultiply(img.color.r, img.color.g, img.color.b, 1.0f);	// SET ALPHA TO 1.0F FIRST
+		////AEGfxSetColorToAdd(0.f, 0.f, 0.f, img.color.a);							// ALPHA IS THEN ADDED
+		//AEGfxSetTransform(img.transform.m);
+		//AEGfxMeshDraw(img.mesh, AE_GFX_MDM_TRIANGLES);
+		//
+
+		// Position and transformation
 		img.position = element.resolvedPos;
 		img.scale = element.resolvedSize;
-		img.color = Color{ 1.f, 1.f, 1.f, 1.f };
 		img.UpdateTransform();
-		img.RenderSprite();  // ALPHA MAKES NO SENSE
-		
+
+		// Set all back settings
+		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);		// V IMPORTANT
+
+		// COLOR AND ALPHA
+		img.color = Color{ element.backgroundColor.r, element.backgroundColor.g, element.backgroundColor.b, element.backgroundColor.a};
+		AEGfxTextureSet(img.texture, 0.0f, 0.0f);
+		AEGfxSetColorToMultiply(img.color.r, img.color.g, img.color.b, img.color.a);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+		AEGfxSetTransform(img.transform.m);
+		AEGfxMeshDraw(img.mesh, AE_GFX_MDM_TRIANGLES);
+
+		// SET IT BACK TO BLEND MODE FOR OTHER SEQUENCES
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
 	}
 
 	// For text rendering

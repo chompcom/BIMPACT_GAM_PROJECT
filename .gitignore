@@ -20,5 +20,21 @@ bin
 Debug
 Release
 
+# #IGNORE BIN AND ITS SUB
+# bin/* 
+
+# # UNIGNORE PARENT
+# !bin/Debug*/*
+# !bin/Release*/*
+
+# # IGNORE EVERYTHING INSIDE
+# bin/Debug*/*
+# bin/Release*/*
+
+# except assets
+# !bin/Debug*/Assets/
+# !bin/Release*/Assets/
+
+
 !packages/JsonCpp.Windows.1.9.2/build/native/x64/Debug
 !packages/JsonCpp.Windows.1.9.2/build/native/x64/Release

@@ -1,0 +1,53 @@
+{
+  "elements": [
+    {
+      "id": "root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+      "children": [
+        {
+            "id": "creds1",
+            "x": 0.0,
+            "y": 0.0,
+            "w": 1.0,
+            "h": 1.0,
+            "visible": true,
+            "drawBackground": true,
+            "borderRadiusRatio": 0.0,
+            "roundSegments": 8,
+            "backgroundColor": [ 1.0, 1.0, 1.0, 1.0 ],
+            "texture": "Assets/Credits/Credits1.png"
+        },
+        {
+            "id": "creds2",
+            "x": 0.0,
+            "y": -1.0,
+            "w": 1.0,
+            "h": 1.0,
+            "visible": true,
+            "drawBackground": true,
+            "borderRadiusRatio": 0.0,
+            "roundSegments": 8,
+            "backgroundColor": [ 1.0, 1.0, 1.0, 1.0 ],
+            "texture": "Assets/Credits/Credits2.png"
+        },
+        {
+            "id": "creds3",
+            "x": 0.0,
+            "y": -2.0,
+            "w": 1.0,
+            "h": 1.0,
+            "visible": true,
+            "drawBackground": true,
+            "borderRadiusRatio": 0.0,
+            "roundSegments": 8,
+            "backgroundColor": [ 1.0, 1.0, 1.0, 1.0 ],
+            "texture": "Assets/Credits/Credits3.png"
+        }
+        ]
+    }
+    ]
+}

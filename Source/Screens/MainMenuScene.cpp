@@ -45,6 +45,11 @@ void MainMenuLoad()
 			ChangeState(GS_QUIT);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
 		});
 
+	ui.BindOnClick("btn_credits", [](UIElement& self) {
+		UNREFERENCED_PARAMETER(self);
+		ChangeState(GS_CREDITS);
+		});
+
 	// Optional hover effects
 	ui.BindOnHover("btn_start", [](UIElement& self)
 		{
@@ -62,6 +67,16 @@ void MainMenuLoad()
 		});
 
 	ui.BindOnHoverExit("btn_editor", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
+		});
+
+	ui.BindOnHover("btn_credits", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 0.6f, 0.6f, 0.6f, 1.0f };
+		});
+
+	ui.BindOnHoverExit("btn_credits", [](UIElement& self)
 		{
 			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
 		});

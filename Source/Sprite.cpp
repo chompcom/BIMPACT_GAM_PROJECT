@@ -53,7 +53,7 @@ void Sprite::RenderSprite(bool changeAlpha) {
 	}
 	else 
 	{
-		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 	}
 	//AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
 	AEGfxSetTransform(transform.m);
