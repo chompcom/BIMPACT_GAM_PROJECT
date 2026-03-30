@@ -114,7 +114,7 @@ void TestLoad()
 
 	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
 	almanacLitUpIcon = new TexturedSprite(sqmesh, almanacLitUppng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{1.0, 1.0, 1.0, 0.0});
+	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -180.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
@@ -323,9 +323,12 @@ void TestDraw()
 	renderPlayerLives(player, healthIcons, font);
 	//(*almanacIcon).RenderSprite();
 
-	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite);
+	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite, player);
 
 	RenderAlmanacPages(almanac, font);
+
+	//REMOVE LATERR!!!!!
+	//AlmanacInputs(almanac, sqmesh);
 
 	// RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
 
@@ -527,20 +530,30 @@ void TestUpdate(float dt)
 		// Get previous pos
 		Vector2 prevPos{ player.position.x, player.position.y };
 
-		// to test damage
-		if (player.health > 0)
-		{
+		//// to test damage
+		//if (player.health > 0)
+		//{
+		//	//this has to be above checkIfAlmanacClicked or the arrows will bug
+		//	AlmanacInputs(almanac);
+		//	checkIfAlmanacClicked(*almanacIcon, almanac);
 
-			checkIfAlmanacClicked(*almanacIcon, almanac);
+		//	// for now,
+		//	//  Player update
+		//	UpdatePlayer(player, dt);
+		//	player.sprite.UpdateTransform();
+		//	player.shadow.UpdateTransform();
+		//}
 
-			AlmanacInputs(almanac);
+		//this has to be above checkIfAlmanacClicked or the arrows will bug
+		AlmanacInputs(almanac);
+		checkIfAlmanacClicked(*almanacIcon, almanac);
 
-			// for now,
-			//  Player update
-			UpdatePlayer(player, dt);
-			player.sprite.UpdateTransform();
-			player.shadow.UpdateTransform();
-		}
+		// for now,
+		//  Player update
+		UpdatePlayer(player, dt);
+		//player.sprite.UpdateTransform();
+		//player.shadow.UpdateTransform();
+
 		UpdateMobAudioCD(dt);
 		//winUI.Update();
 
@@ -627,7 +640,7 @@ void TestUpdate(float dt)
 
 		// Game Map Update was here
 
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+		//checkIfAlmanacClicked(*almanacIcon, almanac);
 
 		MoveArrow(*arrowSprite, almanac, dt);
 

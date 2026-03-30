@@ -8,4 +8,4 @@ void checkIfAlmanacClicked(TexturedSprite const& almanacSprite, Almanac & almana
 
 void MoveArrow(TexturedSprite& arrowSprite, Almanac& almanac, f32 deltaTime);
 
-void RenderAlmanacIcon(Almanac& almanac, TexturedSprite& almanacSprite, TexturedSprite& almanacLitUpSprite, TexturedSprite& arrowSprite);
+void RenderAlmanacIcon(Almanac& almanac, TexturedSprite& almanacSprite, TexturedSprite& almanacLitUpSprite, TexturedSprite& arrowSprite, Player& player);

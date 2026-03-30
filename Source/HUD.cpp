@@ -28,7 +28,7 @@ void checkIfAlmanacClicked(TexturedSprite const& almanacSprite, Almanac & almana
 {
 	s32 cursorPositionX, cursorPositionY;
 	//AEInputGetCursorPosition(&cursorPositionX, &cursorPositionY);
-	if (AEInputCheckReleased(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
+	if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
 	{
 		//std::cout << "click!\n";
 		almanac.isOpen = true;
@@ -43,12 +43,12 @@ void MoveArrow(TexturedSprite& arrowSprite, Almanac& almanac, f32 deltaTime)
 		if (arrowGoingUp)
 		{
 			arrowSprite.position.y += deltaTime * 50.f;
-			if (arrowSprite.position.y > -190) arrowGoingUp = false;
+			if (arrowSprite.position.y > -170) arrowGoingUp = false;
 		}
 		else
 		{
 			arrowSprite.position.y -= deltaTime * 50.f;
-			if (arrowSprite.position.y < -210) arrowGoingUp = true;
+			if (arrowSprite.position.y < -190) arrowGoingUp = true;
 		}
 		arrowSprite.UpdateTransform();
 		//std::cout << arrowSprite.position.y  << "\n";
@@ -56,9 +56,9 @@ void MoveArrow(TexturedSprite& arrowSprite, Almanac& almanac, f32 deltaTime)
 
 }
 
-void RenderAlmanacIcon(Almanac& almanac, TexturedSprite & almanacSprite, TexturedSprite& almanacLitUpSprite, TexturedSprite & arrowSprite)
+void RenderAlmanacIcon(Almanac& almanac, TexturedSprite & almanacSprite, TexturedSprite& almanacLitUpSprite, TexturedSprite & arrowSprite, Player & player)
 {
-	if (IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x) && !almanac.isOpen) almanacLitUpSprite.RenderSprite();
+	if (IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x) && !almanac.isOpen && player.health > 0) almanacLitUpSprite.RenderSprite();
 	else almanacSprite.RenderSprite();
 
 	if (!almanac.hasBeenOpened)
