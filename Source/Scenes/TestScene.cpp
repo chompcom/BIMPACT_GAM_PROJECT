@@ -871,7 +871,7 @@ void TestUpdate(float dt)
 		if (roomData.boss)
 		{
 		
-				Vector2 bossPrevPos = roomData.boss->sprite.position;
+			Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
 			roomData.boss->sprite.UpdateAnimation(dt);
@@ -895,6 +895,37 @@ void TestUpdate(float dt)
 				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
 				roomData.boss->collideWall = true;
 			}
+
+			/*// FOR DOOR
+			int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
+			if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;
+
+			// TEST PLAYER COLLISION WITH MAP
+			Vector2 moveDelta = roomData.boss->sprite.position - bossPrevPos;
+			Vector2 moveDir = moveDelta.Normalized();
+			int curCell = currentRoom->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
+			if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+
+			// Scale size 0.8f
+			float collisionScaleX = roomData.boss->sprite.scale.x * 0.8f;
+			float collisionScaleY = roomData.boss->sprite.scale.y * 0.8f;
+
+			int colRes = currentRoom->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, collisionScaleX, collisionScaleY, prevCell);
+
+			float gridWidth = currentRoom->roomGrid.GetTileWidth();
+			float gridHeight = currentRoom->roomGrid.GetTileHeight();
+			constexpr float skin = 0.10f;
+
+			if (prevCell >= 0)
+			{
+				Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
+				if ((colRes & COLLISION_LEFT) && moveDir.x < -EPSILON)	roomData.boss->sprite.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
+				if ((colRes & COLLISION_RIGHT) && moveDir.x > EPSILON)	roomData.boss->sprite.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
+				if ((colRes & COLLISION_TOP) && moveDir.y > EPSILON)	roomData.boss->sprite.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
+				if ((colRes & COLLISION_BOTTOM) && moveDir.y < -EPSILON)	roomData.boss->sprite.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
+
+				if (colRes) roomData.boss->collideWall = true;
+			}*/
 
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
