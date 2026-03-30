@@ -135,24 +135,24 @@
 			"name": "Bouncy Spikes",
 			"description": "Pointy and Bouncy!",
 			"area": "normal",
-			"spritePath": "Assets/pattyfish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/bouncySpikes.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Goblin Knight",
 			"description": "Don't bother them!",
 			"area": "normal",
-			"spritePath": "Assets/pattyfish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/goblinKnight.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Tom",
 			"description": "A chill guy",
 			"area": "normal",
-			"spritePath": "Assets/pattyfish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/tom.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
@@ -160,20 +160,20 @@
 			"description": "Very sticky",
 			"area": "plant",
 			"spritePath": "Assets/Enemies/booger.png",
-			"xPictureScale": 110,
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Flytrap",
 			"description": "Very hungry",
 			"area": "plant",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/flytrap.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
-			"name": "Chameleon",
-			"description": "Hard to spot",
+			"name": "DELETE THIS",
+			"description": "DELETE THIS",
 			"area": "plant",
 			"spritePath": "Assets/veggiefish.png",
 			"xPictureScale": 110,
@@ -183,48 +183,48 @@
 			"name": "Soap",
 			"description": "Slows with its bubbles",
 			"area": "ocean",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/soap.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Sponge",
 			"description": "Absorbant",
 			"area": "ocean",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/sponge.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Crab Chef",
 			"description": "Its pincers hurt",
 			"area": "ocean",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/crabChef.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Ice",
 			"description": "Immbolises a single enemy",
 			"area": "cold",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/ice.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Snowman",
 			"description": "Watch out for its snowballs!",
 			"area": "cold",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/snowman.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Campfire",
 			"description": "Warms anyone nearby",
 			"area": "hot",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
+			"spritePath": "Assets/Enemies/campfire.png",
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
@@ -232,16 +232,16 @@
 			"description": "Bakes warm pastries",
 			"area": "hot",
 			"spritePath": "Assets/Enemies/oven.png",
-			"xPictureScale": 110,
+			"xPictureScale": 100,
 			"yPictureScale": 100
 		},
 		{
 			"name": "Teensy Tiny Dragon",
 			"description": "Awww! How cute!",
 			"area": "hot",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
-			"yPictureScale": 100
+			"spritePath": "Assets/Enemies/tinyDragon.png",
+			"xPictureScale": 50,
+			"yPictureScale": 50
 		}
 	]
 
