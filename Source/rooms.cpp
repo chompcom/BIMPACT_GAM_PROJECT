@@ -439,8 +439,8 @@ namespace mapRooms
 		// Boss Init
 		if (rmType == RoomType::Boss) {
 			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/Enemies/Boss/chimeraBossChargeAttack.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/Enemies/Boss/chimeraBossChargeAttack.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 
