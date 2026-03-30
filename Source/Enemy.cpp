@@ -5,12 +5,18 @@
 #include "BoundaryCollision.h"
 #include <set>
 #include <map>
+#include <Grid.h>
+#include "Loaders/DataLoader.h"
+#include "Audio.h"
+
 
 Enemy::Enemy(const EnemyType& enemyType,  TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
 	, wanderTimer{}, waitTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
+	, onceWanderTime{false}, onceAttackTime{false}, onceWaitTime{false} 
+	, collisionResolution{}, acknowledgeCollision{false}
 {
 		ChangeState(initialState);
 }
@@ -65,13 +71,13 @@ Enemy::Target& Enemy::Target::operator=(Boss& them)
 	dmgMod = nullptr;
 	return *this;
 }
-Enemy::Target& Enemy::Target::operator=(Vector2 const& position)
+Enemy::Target& Enemy::Target::operator=(Vector2 const& pos)
 {
 	//by design, the target will be forever alive
 	static bool trueVar = true;
 	isActive = &trueVar;
 	isPlayer = false;
-	initialPosition = position;
+	initialPosition = pos;
 	this->position = &initialPosition;
 	//Keeping the target as dumb as possible.
 	info = 0.0f;
@@ -161,11 +167,13 @@ void Enemy::ChangeState(EnemyStates newstate)
 		currentBehavior = enemyType.neutral;
 		break;
 	case ES_ANGRY:
-		this->attackTimer = type.attackRate + ((AERandFloat() * 2.f) - 1.f);
+		PlayMobSound(type.angrySound);
+		this->attackTimer = 3 + ((AERandFloat() * 2.f) - 1.f);
 		sprite.color = { 1.f,0.f,0.f,1.f };
 		currentBehavior = enemyType.angry;
 		break;
 	}
+
 }
 
 void Enemy::Update(float dt) {
@@ -188,20 +196,69 @@ void Enemy::Update(float dt) {
 	//update movement here
 	prevPos = sprite.position;
 	sprite.position += velocity.Normalized() * type.speed * dt * speedModifier;
-	speedModifier = 1.0f;
-	sprite.UpdateTransform();
 	
-	shadow.position = sprite.position;
+	shadow.position = sprite.position - Vector2(0,40);
 	shadow.UpdateTransform();
 
-	if (wanderTimer > 0.f) 
+	if (wanderTimer > EPSILON) {
 		wanderTimer -= dt;
+	} 
 
-	if (attackTimer > 0.f) 
+	if (attackTimer > EPSILON) {
 		attackTimer -= dt;
+	}
 
-	if (waitTimer > 0.f) 
+	if (waitTimer > EPSILON) {
 		waitTimer -= dt;
+	}
+
+	//do collision resolution
+	int prevCell = roomData->grid.WorldToCell(sprite.position.x, sprite.position.y);
+	int collisionRes = roomData->grid.CheckMapGridCollision(sprite.position.x, sprite.position.y, sprite.scale.x, sprite.scale.y, prevCell);
+	//gonna try to make it dynamic..
+
+	float gridWidth = roomData->grid.GetTileWidth();
+	float gridHeight = roomData->grid.GetTileHeight();
+
+	//I really hate hotspot collision
+	// Anyways, this whole portion of the code is interacting with grid
+
+	if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x > EPSILON) {
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x + gridWidth*0.5f - sprite.scale.x*0.5f - 0.10f;
+	}
+	if (collisionRes & COLLISION_LEFT && velocity.Normalized().x < -EPSILON) {
+		sprite.position.x = roomData->grid.CellToWorldCenter(prevCell).x - gridWidth * 0.5f + sprite.scale.x * 0.5f + 0.10f;
+	}
+	if (collisionRes & COLLISION_BOTTOM && velocity.Normalized().y < -EPSILON) {
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y - gridHeight * 0.5f + sprite.scale.y * 0.5f + 0.10f;
+	}
+	if ( collisionRes & COLLISION_TOP && velocity.Normalized().y > EPSILON) {
+		sprite.position.y = roomData->grid.CellToWorldCenter(prevCell).y + gridHeight * 0.5f - sprite.scale.y * 0.5f - 0.10f;
+	}
+
+	//I take half of grid boundary because that's the position of each side
+	Vector2 roomBounds = roomData->grid.GetBoundary() * 0.98f * 0.5f;
+
+	if (CollisionBoundary_Static(sprite.position, sprite.scale, roomData->grid.GetBoundary().x * 0.99f, roomData->grid.GetBoundary().y * 0.99f)) {
+
+		collisionRes |= (sprite.position.x - sprite.scale.x * 0.5f) <= -roomBounds.x ? COLLISION_LEFT : 0;
+		if (collisionRes & COLLISION_LEFT && velocity.Normalized().x > EPSILON) sprite.position.x = -roomBounds.x + sprite.scale.x * 0.5f;
+		collisionRes |= (sprite.position.x + sprite.scale.x * 0.5f) >= roomBounds.x ? COLLISION_RIGHT : 0;
+		if (collisionRes & COLLISION_RIGHT && velocity.Normalized().x < -EPSILON) sprite.position.x = roomBounds.x - sprite.scale.x * 0.5f;
+		collisionRes |= (sprite.position.y + sprite.scale.y*0.5f) >= roomBounds.y ? COLLISION_TOP : 0;
+		if (collisionRes & COLLISION_TOP && velocity.Normalized().y < -EPSILON) sprite.position.y = roomBounds.y - sprite.scale.y * 0.5f;
+		collisionRes |= (sprite.position.y - sprite.scale.y*0.5f) <= -roomBounds.y ? COLLISION_BOTTOM : 0;
+		if (collisionRes & COLLISION_BOTTOM && velocity.Normalized().y > EPSILON) sprite.position.y = -roomBounds.y + sprite.scale.y * 0.5f;
+	}
+
+	this->collisionResolution = collisionRes;
+
+
+	if (collisionRes) acknowledgeCollision = !acknowledgeCollision;
+	//After i update my movement, i reset back the speed modifier but keep the sign
+	speedModifier = speedModifier / abs(speedModifier);
+	sprite.UpdateTransform();
+
 }
 
 void Enemy::AssessTraits(Labels labels, bool giftCheck){
@@ -222,7 +279,7 @@ void Enemy::AssessTraits(Labels labels, bool giftCheck){
 
 EnemyType::EnemyType(std::string name, f32 health, f32 damage, const Labels& traits,
 	const Labels& likes, const Labels& dislikes)
-	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{},
+	: name{ name }, health{ health }, damage{ damage }, traits{ traits }, likes{ likes }, dislikes{ dislikes }, neutral{}, angry{}, happy{}, detectionRadius{}, safeRadius{}, speed{}, attackRate{}, wanderTime{3.f}, waitTime{3.f},
 	happyProjectile{}, angryProjectile{}, neutralProjectile{}
 {
 }

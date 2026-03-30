@@ -4,6 +4,14 @@
 #include <unordered_map>
 #include "Enemy.h"
 #include "Almanac.h"
+//
+//enum BookmarkPages{
+//	TUTORIAL = 0,
+//	MAIN = 0,
+//	NORMAL = 1,
+//	PLANT = 5,
+//	OCEAN = 8
+//};
 
 class AlmanacEntry {
 public:

@@ -44,6 +44,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 	u8 w{ AEInputCheckCurr(AEVK_W) }, a{ AEInputCheckCurr(AEVK_A) },
 		s{ AEInputCheckCurr(AEVK_S) }, d{ AEInputCheckCurr(AEVK_D) };
 
+	player.isTargetable = true;
 	//Let player blink if invulnerable
 	if (player.invulnerableTimer > 0.f)
 	{
@@ -68,7 +69,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.fadingIn = false;
 		player.sprite.color.a = 1.f;
 	}
-	player.isTargetable = true;
+
 	//set the player's pick up to false if there is still time in the pickUpCooldown
 	if (player.pickUpCooldown > 0.f)
 	{
@@ -94,6 +95,9 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		player.shadow.position = player.position - Vector2{ 0, 40 };
 	}
 
+	static float footstepTimer = 0.0f; 
+	static float footstepDelay = 0.5f;
+
 	//if player is trying to move, set their direction
 	if (w || a || s || d)
 	{
@@ -101,6 +105,12 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//player.direction.x = float(d - a);
 		player.direction = Vector2{(d - a) ,(w - s)};
 
+		footstepTimer -= deltaTime;
+		if (footstepTimer <= 0.0f)
+		{
+			PlayerFootstepAudio();
+			footstepTimer = footstepDelay;
+		}
 		//If the player has no direction, set it to face down
 		if (player.direction == Vector2{ 0.f, 0.f }) player.direction = Vector2{ 0.f, -1.f };
 	}
@@ -161,7 +171,7 @@ void playerTakesDamage(Player& player)
 
 		if (player.health <= 0) gameState = LOSE;
 
-		assert("Invulntimer is not correct!!");
+
 		player.invulnerableTimer = 1.f;
 	}
 }
@@ -190,7 +200,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 	player.throwState = false;
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
-	player.baseSpeed = 400.f;
+	player.baseSpeed = 575.f;
 	player.throwForce = 0.f;
 	player.pickUpCooldown = 0.f;
 	player.invulnerableTimer = 0.f;

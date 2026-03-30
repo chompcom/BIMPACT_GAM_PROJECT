@@ -1,5 +1,7 @@
 #include "ProjectileManager.h"
 
+#include "ParticleSystem.h"
+
 
 void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
 	sprite.position = pos;
@@ -31,7 +33,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
     }
 }
 
-void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,float rot, void* source, bool isFriend) {
+void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend, float rot) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
@@ -112,7 +114,6 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
                     guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst)
                     ) {
                     guy->currentHealth -= (*it)->GetDmg();
-                    std::cout << (*it)->GetSource() << " HIT " << guy << "!!\n";
                     enemyHit = true;
 
                 }
@@ -135,8 +136,11 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         }
 
         if (hit || enemyHit) {
+            
+            ProjectileParticleExplode(roomData, *(*it));
             delete* it;
             it = roomData.projectileList.erase(it);
+
         }
         else {
             ++it;
@@ -152,4 +156,35 @@ void RenderProjectile(RoomData& roomData) {
 void ProjectileClear(RoomData& roomData) {
     for (Projectile* p : roomData.projectileList) delete p;
     roomData.projectileList.clear();
+}
+
+void ProjectileParticleExplode(RoomData& roomData, Projectile const& projectile)
+{
+    //generate death particles
+
+    float projSpeed = projectile.GetVelocity().Length();
+    projSpeed = projSpeed <= EPSILON ? 500.f : projSpeed;
+
+
+    int numRotations = (rand() % 10) + 6;
+    float particleSize = 2500.f;
+    int massOfProj = static_cast<int>((projectile.GetScale().x * projectile.GetScale().x) / particleSize) / numRotations;
+    massOfProj = massOfProj <= 0 ? 1 : massOfProj;
+    std::cout << massOfProj << " mass\n";
+    for (int i = 0; i < numRotations; i++) {
+        float degree = static_cast<float>(i) / static_cast<float>(numRotations) * 360.f;
+
+        for (int pi = 0; pi < (massOfProj); pi++) {
+
+            float randDegree = degree + (AERandFloat() * 30.f) - 15.f;
+
+            float radian = randDegree * (PI / 180.f);
+            Vector2 dir = Vector2(cosf(radian), -sinf(radian));
+            roomData.particleSystem.CreateParticles(1, 0.5f, dir * projSpeed, projectile.GetPosition() + dir * projectile.GetScale().x * AERandFloat() * 0.25f,
+               projectile.GetSprite().color);
+
+        }
+        //Add some randomness
+
+    }
 }

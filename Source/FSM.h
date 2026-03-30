@@ -13,18 +13,15 @@ enum BossStates {
 	BOSS_IDLE,
 	BOSS_WALK,
 	BOSS_CHARGE,
-	BOSS_JUMP,
-	BOSS_SHOOT,
-	BOSS_THROW,
-
+	BOSS_FOLLOW,
+	BOSS_JUMP
 };
 
 enum AttackState {
 	ATTACK_NIL,
 	ATTACK_CHARGE,
 	ATTACK_ATTACK,
-	ATTACK_COOLDOWN,
-
+	ATTACK_COOLDOWN
 };
 
 class Boss_FSM {
@@ -61,10 +58,19 @@ class Boss1_FSM : public Boss_FSM {
 		f32 jumpInterval;
 		f32 jumpEndlag;
 
+		Vector2 followDirection{ 0, 1 };
+		f32 followSpeed{ 240 };
+		f32 followDamage;
+		f32 followStartup;
+		f32 followInterval;
+		f32 followEndlag;
+
 		Boss1_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
-			f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag);
+			f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
+			f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag);
 
 		void Update(Player& player, f32 dt) override;
 		void ChargeAttack(Player& player, f32 dt);
 		void JumpAttack(Player& player, f32 dt);
+		void FollowAttack(Player& player, f32 dt);
 };

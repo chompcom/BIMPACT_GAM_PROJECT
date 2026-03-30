@@ -15,6 +15,7 @@ namespace
 
 void MainMenuLoad()
 {
+	InitMenuAudio();
 	// Font
 	uiFont = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 48);
 	ui.SetFont(uiFont);
@@ -30,6 +31,7 @@ void MainMenuLoad()
 			UNREFERENCED_PARAMETER(self);
 			ChangeState(GS_LEVEL1);
 		});
+
 
 	ui.BindOnClick("btn_editor", [](UIElement& self)
 		{
@@ -92,7 +94,9 @@ void MainMenuLoad()
 	
 }
 
-void MainMenuInit(){}
+void MainMenuInit(){
+	MenuBGMAudio();
+}
 
 void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 {
@@ -116,6 +120,8 @@ void MainMenuFree(){}
 
 void MainMenuUnload()
 {
+	FreeMenuAudio();
+
 	ui.Clear();
 
 	if (uiFont)

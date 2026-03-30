@@ -1,18 +1,44 @@
 IsTouchingTarget
-	target is touching the enemy within the sprite scale
-IsNotTouchingTarget
-	target is not touching me
-IsTargetInDetectionRadius
-	target is within detectionRadius
-IsTargetNotInDetectionRadius
-	target is not within detectionRadius
-IsFollowingPlayer
-	target is within safeRadius
+	returns true if target's sprite is touching enemy's sprite
 IsNotFollowingPlayer
-	target is outside safeRadius
-IsTargetInLOS
-	target is in line of sight (line not blocked by wall)
-IsTargetNotInLOS
-	target is not in line of sight
-WanderTimerDone
-	when the timer started by "wander" is done
+	returns true if player is not within safeRadius
+IsFollowingPlayer
+	returns true if player is within safeRadius
+IsTargetInDetectionRadius
+	returns true if target is within detectionRadius
+IsTargetNotInDetectionRadius
+	returns true if target is not within detectionRadius
+IsWaitTimerUp
+	returns true when the wait timer is below zero.
+	This will be the case until you call "Wait" again.
+OnceWaitTimerIsUp
+	returns true only when the wait timer reaches zero.
+	It will only be assessed again once "Wait" is called and the timer runs out.
+IsWanderTimerUp
+	returns true when the wander timer is below zero.
+	This will be the case until you call "Wander" again.
+OnceWanderTimerIsUp
+	returns true only when the wander timer reaches zero.
+	It will only be assessed again once "Wander" is called and the timer runs out.
+IsWandering
+	returns true when the wander timer is still active
+IsWaiting
+	returns true when the wait timer is still active
+IsAttackOnCooldown
+	returns true after the enemy performs an attack (via FireProjectile to DamageTarget)
+	the duration of its cooldown is based on attackRate.
+IsAttackCooldownUp
+	returns true when the enemy is available to fire again.
+	An attack must be called before or during this context, or else it will not assess other contexts further down the chain
+OnceAttackCooldownUp
+	returns true only once the enemy has reduced its attack cooldown to zero.
+	It will only be assessed again once an attack is called again and had its cooldown reduced.
+IsHittingWall
+	returns true when a wall is hit.
+IsOnEvenBounce
+	returns true when the enemy hits a wall.
+	When it hits another wall, it returns false.
+	This repeating pattern is useful for changing behaviour after hitting a wall.
+IsNotTargeting
+	returns true when the enemy is not targeting anything
+	(be it having killed an entity, or through calling "ClearTarget")

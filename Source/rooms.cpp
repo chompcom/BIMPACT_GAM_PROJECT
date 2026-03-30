@@ -438,8 +438,9 @@ namespace mapRooms
 
 		// Boss Init
 		if (rmType == RoomType::Boss) {
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
 			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/Enemies/Boss/chimeraBossChargeAttack.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 
@@ -451,6 +452,9 @@ namespace mapRooms
 			PatchDoorCells();
 		}
 		
+		//Setting grid to roomGrid
+		currentRoomData.grid = roomGrid;
+
 	} 
 	void Room::Update(float dt) {
 		//for (Enemy* i : currentRoomData.enemyList) {
@@ -557,11 +561,29 @@ namespace mapRooms
 		std::string const greenDir	= "Assets/Rooms/Normal/GREEN";
 		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
 		std::string const bossDir	= "Assets/Rooms/Boss";
+		std::string const oceanDir	= "Assets/Rooms/Normal/OCEAN";
 
+		std::string filePath = "Assets/Levels/Room_Data/TilesInfo.json";
+		Json::Value tilesInfo = DataLoader::LoadJsonFile(filePath);
+
+		std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
+		system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
+
+
+
+		Json::Value::Members biomeNames = tilesInfo["biomes"].getMemberNames();
+		for (Json::String name : biomeNames) {
+			std::string imagePath = tilesInfo["biomes"][name]["imageDir"].asString();
+			Config::ScanPngFolderWin32( imagePath, biomeRoomFiles[name]);
+		}
+		/*
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
 		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
 		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);
+		Config::ScanPngFolderWin32(oceanDir,    biomeRoomFiles["Ocean"]);
+		*/
+
 		Config::ScanPngFolderWin32(bossDir,		bossRoomFiles);
 
 		// Not up yet... There should be a neater way via json lol
@@ -735,8 +757,8 @@ namespace mapRooms
 	// https://en.wikipedia.org/wiki/File:Depth-First_Search_Animation.ogv explains how DFS works
 	void Map::GenerateRooms() {
 
-		int MinRooms = min(3, gridSize * gridSize - 1);
-		int MaxRooms = max(3, gridSize * gridSize - 1);
+		int MinRooms = min(4, gridSize * gridSize - 1);
+		int MaxRooms = max(4, gridSize * gridSize - 1);
 
 		int roomsVisit = RandInt(MinRooms, MaxRooms);	// Set How many rooms to make available
 		

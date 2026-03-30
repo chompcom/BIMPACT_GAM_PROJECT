@@ -1,42 +1,71 @@
+WalkLeft
+	velocity set to left
+WalkRight
+	velocity set to right
 ApplySlowToTarget
-	applies slow speed modifier
-
+	target speedModifier set to 0.2f
 MoveToTarget
-	move to target
-SafeDistancePlayer
-	keep away from player at safeRadius
-TargetPlayer
-	set target to player
-TargetRandomEnemy
-	set target to a random enemy in list
-TargetEnemyInDetectionRadius
-	find the closest enemy in detectionRadius and target them
+	sets velocity pointing to target
 Wander
-	activate wander timer and move in a random direction
-TargetMiddle
-	target the middle thing
-TargetCorner
-	move to the nearest corner if not already in corner
-ShootProjectile
-	shoots a projectile at the rate given by attackRate
+	if the wandertimer is up, sets the wandertimer to wanderTime and
+	sets velocity to a random direction
+	will also set a random velocity when player is still
 CircleMove
-	move in a circle around target
+	moves in a circle around the target, bouncing off any walls too.
+TargetEnemyInDetectionRadius
+	sets target to a hated enemy in radius 
+TargetEnemyInDetectionRadiusDumb
+	sets target to any enemy in radius
+TargetPlayer
+	sets player to be the target
+SafeDistancePlayer
+	sets velocity to be away from the player
+TargetRandomEnemy
+	targets a random hated enemy in the room. targets bosses only when there's no enemies 
+TargetRandomEnemyDumb
+	targets any random enemy in the room. targets bosses only when there's no enemies 
+TargetMiddle
+	sets target to the middle position. Used for movement or interesting detection
+TargetCorner
+	sets target to top right corner for now
+FireProjectile
+	fires a projectile at target. 
+	Projectile is based on enemy state and their respective projectile.
+FireBoomerang
+	fires a boomeranging projectile
+FireScatter
+	fires a projectile that scatters into smaller projectiles
+FireSpirally
+	fires a projectile that spirals  
 DVDMove
-	move like the dvd logo (bounce around)
+	moves around the room like a DVD logo
+	uses previous velocity, otherwise will pick a random direction
 DVDBounce
-	do a bounce "off" the target
+	sets velocity to opposite of target, sort of like a bounce
 BecomeAngry
-	change state to angry
+	changes enemy state to angry
 BecomeNeutral
-	change state to neutral
+	changes enemy state to neutral
 DamageTarget
-	straight up damage the target at an attack rate. Be careful with this one.
-PullTarget
-	"pull" target towards self like a gravity. Strength based on strength.
-PushTarget
-	"push" target away from self. Strength based on strength.
-
-
-//later
-AttackAnim
-	plays attack animation
+	damage the target based on enemy Damage every attack rate cycle
+	Warning: This has infinite range. Utitlise contexts wisely to balance.
+Wait
+	Sets wait timer to waitTime time. By default is 3 seconds.
+	Wait is just a timer, use IsWaiting context to use it for special operations (like waiting)
+ClearTarget
+	no longer targets anything.
+TargetSelf
+	target the enemy itself. Useful for slow or dumb projectiles.
+ChargeAtTarget
+	set velocity towards target's initial position when target was set.
+	you typically do not want to reset your target while the charge is occuring.
+TargetNearestThing
+	Targets the nearest entity regardless of race, language or religion
+InvertVelocity
+	Inverses the enemy's speedModifier.
+	Take note that the inverse is permanent until inverted again.	
+DizzyTarget
+	Sets Target's speedModifier to negative.
+	Take note that the modifier is permanent until Undizzied 
+UndizzyTarget
+	Sets Target's speedModifier to positive.

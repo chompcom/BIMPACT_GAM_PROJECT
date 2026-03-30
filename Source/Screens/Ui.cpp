@@ -267,12 +267,18 @@ void UIManager::UpdateElement(UIElement& element, Vector2 const& mouseWorld, boo
 	if (element.visible && element.clickable) isHovered = IsPointInside(element, mouseWorld);
 	element.hovered = isHovered;
 	
-	if (!wasHovered && element.hovered && element.onHover) element.onHover(element);	// Execute onhover function
+	if (!wasHovered && element.hovered) {
+		HoverAudio();
+		if(element.onHover)
+		element.onHover(element);	// Execute onhover function
+	}
 	else if (wasHovered && !element.hovered && element.onHoverExit) element.onHoverExit(element);	// Execute onhover exit function
 	
 	// If element is hovered over and mouse is triggered
-	if (element.hovered && mouseTriggered && element.onClick) element.onClick(element);
-	
+	if (element.hovered && mouseTriggered && element.onClick) {
+		ButtonAudio();
+		element.onClick(element);
+	}
 	// Update children recursively
 	for (std::unique_ptr<UIElement>& child : element.children)
 	{
