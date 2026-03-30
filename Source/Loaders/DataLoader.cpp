@@ -105,7 +105,7 @@ namespace DataLoader {
 
 	static AEGfxVertexList* squareMesh = nullptr;
 	static AEGfxVertexList* animatedMesh = nullptr;
-	//static std::vector<AEGfxVertexList*> animatedMeshes;
+	static std::vector<AEGfxVertexList*> animatedMeshes;
 
 	using TextureList = std::unordered_map<std::string, AEGfxTexture*>;
 	using TexturePair = std::pair<std::string, AEGfxTexture*>;
@@ -172,7 +172,7 @@ namespace DataLoader {
 	void Load() {
 		squareMesh = CreateSquareMesh();
 		circleMesh = CreateCircleMesh();
-		animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
+		//animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
 
 		textures.reserve(5);
 		enemyTypes.reserve(5);
@@ -377,10 +377,12 @@ namespace DataLoader {
 
 	AEGfxVertexList* GetOrCreateAnimatedMesh(f32 offsetX, f32 offsetY)
 	{
-		if (!animatedMesh) animatedMesh = CreateSquareMesh(offsetX, offsetY);
+		//if (!animatedMesh) animatedMesh = CreateSquareMesh(offsetX, offsetY);
 		//AEGfxVertexList* animatedMesh = CreateSquareMesh(offsetX, offsetY);
-		//animatedMeshes.push_back(animatedMesh);
-		return animatedMesh;
+		animatedMesh = CreateSquareMesh(1.f / offsetX, 1.f / offsetY);
+		animatedMeshes.push_back(animatedMesh);
+		//return animatedMesh;
+		return animatedMeshes.back();
 	}
 
 
@@ -548,8 +550,9 @@ namespace DataLoader {
 
 		if (squareMesh) { AEGfxMeshFree(squareMesh); squareMesh = nullptr; };
 		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
-		if (animatedMesh) { AEGfxMeshFree(animatedMesh); animatedMesh = nullptr; };
-		//for (AEGfxVertexList* mesh : animatedMeshes) AEGfxMeshFree(mesh);
+		for (AEGfxVertexList* mesh : animatedMeshes) AEGfxMeshFree(mesh);
+		//if (animatedMesh) { AEGfxMeshFree(animatedMesh); animatedMesh = nullptr; };
+		
 	}
 
 

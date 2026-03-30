@@ -47,10 +47,10 @@ struct AnimationInfo {
 
 class AnimatedSprite : public TexturedSprite {
 	public:
-		u32 spritesheet_rows = 3;
-		u32 spritesheet_cols = 3;
-		f32 sprite_uv_width = 1.f / spritesheet_cols;
-		f32 sprite_uv_height = 1.f / spritesheet_rows;
+		u32 spritesheet_rows;// = 3;
+		u32 spritesheet_cols;// = 3;
+		f32 sprite_uv_width;// = 1.f / spritesheet_cols;
+		f32 sprite_uv_height;// = 1.f / spritesheet_rows;
 
 		f32 animation_timer = 0.f;
 		//f32 animation_duration_per_frame = 0.25f;
@@ -69,7 +69,7 @@ class AnimatedSprite : public TexturedSprite {
 
 
 		//AnimatedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor = Color{ 1.0f,1.0f,1.0f,1.0f }, f32 initial_offsetX, f32 initial_offsetY);
-		AnimatedSprite(TexturedSprite texturedSprite, f32 initial_offsetX = 0.f, f32 initial_offsetY = 0.f);
+		AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows = 1, u32 spritesheetCols = 1, f32 initial_offsetX = 0.f, f32 initial_offsetY = 0.f);
 
 		void SetAnimation(AnimationInfo animationInfo);
 		void GetAnimation(std::string animationName);

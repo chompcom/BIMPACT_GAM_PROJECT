@@ -36,7 +36,7 @@ struct RoomData;
 class Enemy {
 	public:
 		const EnemyType& type;
-		TexturedSprite sprite;
+		AnimatedSprite sprite;
 		TexturedSprite shadow;
 		f32 currentHealth;
 		EnemyStates state;
@@ -105,7 +105,7 @@ class Enemy {
 
 		bool acknowledgeCollision;
 
-		Enemy(const EnemyType& enemyType, TexturedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+		Enemy(const EnemyType& enemyType, AnimatedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
 
 		void Update(float dt);

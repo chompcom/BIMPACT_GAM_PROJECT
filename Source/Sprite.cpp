@@ -74,8 +74,9 @@ void TexturedSprite::RenderSprite(bool changeAlpha, f32 uv_offsetX, f32 uv_offse
 
 }*/
 
-AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, f32 initial_offsetX, f32 initial_offsetY)
-	: TexturedSprite{texturedSprite}, current_sprite_uv_offset_x{initial_offsetX}, initial_offsetX{initial_offsetX}, current_sprite_uv_offset_y{initial_offsetY}, initial_offsetY{initial_offsetY} {
+AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows, u32 spritesheetCols, f32 initial_offsetX, f32 initial_offsetY)
+	: TexturedSprite{texturedSprite}, spritesheet_rows{spritesheetRows}, spritesheet_cols{spritesheetCols}, sprite_uv_width{1.f/spritesheetCols}, sprite_uv_height{1.f/spritesheetRows},
+	current_sprite_uv_offset_x{initial_offsetX}, initial_offsetX{initial_offsetX}, current_sprite_uv_offset_y{initial_offsetY}, initial_offsetY{initial_offsetY} {
 
 }
 
