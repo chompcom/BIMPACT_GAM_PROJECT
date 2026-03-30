@@ -94,7 +94,7 @@
         },
 
         {
-          "id": "btn_settings",
+          "id": "btn_credits",
           "x": 0.28,
           "y": -0.18,
           "w": 0.30,
@@ -104,7 +104,7 @@
           "drawBackground": true,
           "borderRadiusRatio": 0.14,
           "roundSegments": 8,
-          "text": "SETTINGS",
+          "text": "CREDITS",
           "textScale": 1,
            "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
           "textColor": [0.8, 0.8, 0.8, 1.0]
