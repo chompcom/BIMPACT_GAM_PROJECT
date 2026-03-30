@@ -453,7 +453,7 @@
 		{
 			"name": "Soap",
 			"angrySound": "Soap",
-			"sprite": "Assets/Enemies/soap.png",
+			"sprite": "Assets/Enemies/tom.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"damage": 10,
@@ -534,9 +534,9 @@
 				"lifetime": 3,
 				"sprite": "Assets/snowball.png"
 			},
-			"traits": [ "Clean" ],
-			"likes": [ "Clean", "Wet" ],
-			"dislikes": [ ],
+			"traits": [ "Cold" , "Wet" ],
+			"likes": [ "Cold", "Wet" ],
+			"dislikes": ["Hot" ],
 			"happy": [
 				{
 					"context": "IsNotFollowingPlayer",
