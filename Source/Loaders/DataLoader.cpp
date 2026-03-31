@@ -104,6 +104,8 @@ namespace {
 namespace DataLoader {
 
 	static AEGfxVertexList* squareMesh = nullptr;
+	static AEGfxVertexList* animatedMesh = nullptr;
+	static std::vector<AEGfxVertexList*> animatedMeshes;
 
 	using TextureList = std::unordered_map<std::string, AEGfxTexture*>;
 	using TexturePair = std::pair<std::string, AEGfxTexture*>;
@@ -170,6 +172,7 @@ namespace DataLoader {
 	void Load() {
 		squareMesh = CreateSquareMesh();
 		circleMesh = CreateCircleMesh();
+		//animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
 
 		textures.reserve(5);
 		enemyTypes.reserve(5);
@@ -336,7 +339,23 @@ namespace DataLoader {
 
 		// Ehh not CHECKING if squaremesh exist??? idk man
 		// return TexturedSprite(squareMesh,           textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
+		//return TexturedSprite(GetOrCreateSquareMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 		return TexturedSprite(GetOrCreateSquareMesh(), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
+	}
+
+	TexturedSprite CreateAnimatedTexture(std::string filename, f32 offsetX, f32 offsetY)
+	{
+		TextureList::const_iterator finder = textures.find(filename);
+		if (finder == textures.end()) {
+			//couldn't find it
+			textures.insert(TexturePair{ filename, AEGfxTextureLoad(filename.c_str()) });
+		}
+		//(textures.find(filename))->second
+
+		// Ehh not CHECKING if squaremesh exist??? idk man
+		// return TexturedSprite(squareMesh,           textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
+		//return TexturedSprite(GetOrCreateSquareMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
+		return TexturedSprite(GetOrCreateAnimatedMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 	}
 
 	AEGfxVertexList* GetMesh()
@@ -355,6 +374,17 @@ namespace DataLoader {
 		if (!circleMesh) circleMesh = CreateCircleMesh();
 		return circleMesh;
 	}
+
+	AEGfxVertexList* GetOrCreateAnimatedMesh(f32 offsetX, f32 offsetY)
+	{
+		//if (!animatedMesh) animatedMesh = CreateSquareMesh(offsetX, offsetY);
+		//AEGfxVertexList* animatedMesh = CreateSquareMesh(offsetX, offsetY);
+		animatedMesh = CreateSquareMesh(1.f / offsetX, 1.f / offsetY);
+		animatedMeshes.push_back(animatedMesh);
+		//return animatedMesh;
+		return animatedMeshes.back();
+	}
+
 
 
 	/*!
@@ -520,6 +550,10 @@ namespace DataLoader {
 
 		if (squareMesh) { AEGfxMeshFree(squareMesh); squareMesh = nullptr; };
 		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
+		for (AEGfxVertexList* mesh : animatedMeshes) AEGfxMeshFree(mesh);
+		animatedMeshes.clear();
+		//if (animatedMesh) { AEGfxMeshFree(animatedMesh); animatedMesh = nullptr; };
+		
 	}
 
 

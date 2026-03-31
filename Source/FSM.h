@@ -44,7 +44,7 @@ class Boss1_FSM : public Boss_FSM {
 		f32 walkSpeed{ 120 };
 		bool canWalk;
 
-		Vector2 chargeDirection{ 0, 1 };
+		//Vector2 chargeDirection{ 0, 1 };
 		f32 chargeSpeed{ 300 };
 		f32 chargeDamage;
 		f32 chargeStartup;
@@ -58,7 +58,7 @@ class Boss1_FSM : public Boss_FSM {
 		f32 jumpInterval;
 		f32 jumpEndlag;
 
-		Vector2 followDirection{ 0, 1 };
+		//Vector2 followDirection{ 0, 1 };
 		f32 followSpeed{ 240 };
 		f32 followDamage;
 		f32 followStartup;

@@ -23,7 +23,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 	//Vector2 direction{};
 	switch (currentState) {
 		case BOSS_IDLE:
-			boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
+			//boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
 			std::cout << "Boss Idle\n";
 			interval += dt;
 			if (interval >= 1.0f && canWalk) {
@@ -31,8 +31,9 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				if (AERandFloat() >= 0.75f) {
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
-					chargeDirection = target - boss->sprite.position;
-					boss->velocity = chargeDirection.Normalized() * walkSpeed * boss->speedModifier;
+					boss->direction = (target - boss->sprite.position).Normalized();
+					boss->velocity = boss->direction * walkSpeed * boss->speedModifier;
+					boss->sprite.GetAnimation("Run");
 					currentState = BOSS_WALK;
 				}
 			}
@@ -42,11 +43,13 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				if (counter == 2) {
 					currentState = BOSS_JUMP;
 					attackPhase = ATTACK_CHARGE;
+					boss->sprite.GetAnimation("Jump Start");
 					counter = 0;
 				}
 				else {
 					currentState = AERandFloat() >= 0.25f ? BOSS_CHARGE : BOSS_FOLLOW;
 					attackPhase = ATTACK_CHARGE;
+					//boss->sprite.GetAnimation("Run Start");
 					counter++;
 				}
 			}
@@ -62,6 +65,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				boss->collideWall ) {
 				boss->velocity = {};
 				//boss->collideWall = false;
+				boss->sprite.GetAnimation("Idle");
 				currentState = BOSS_IDLE;
 			}
 
@@ -84,17 +88,19 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 	//Vector2 direction{};
 	float collisionTime{ 0.0f };
-	boss->sprite.color = Color{ 1.0f, 0.0f, 0.0f, 1.0f };
+	//boss->sprite.color = Color{ 1.0f, 0.0f, 0.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Charge Starting\n";
 		target = player.position;
+		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
 		if (interval >= chargeStartup) {
 			interval = 0.0f;
-			chargeDirection = target - boss->sprite.position;
-			boss->velocity = chargeDirection.Normalized() * chargeSpeed * boss->speedModifier;
+			//boss->direction = (target - boss->sprite.position).Normalized();
+			boss->velocity = boss->direction * chargeSpeed * boss->speedModifier;
+			boss->sprite.GetAnimation("Run");
 			attackPhase = ATTACK_ATTACK;
 		}
 
@@ -119,6 +125,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 			interval = 0.0f;
 			boss->velocity = Vector2{};
 			//boss->collideWall = false;
+			boss->sprite.GetAnimation("Idle");
 			attackPhase = ATTACK_COOLDOWN;
 		}
 
@@ -148,7 +155,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 	//Vector2 direction{};
 	float collisionTime{ 0.0f };
-	boss->sprite.color = Color{ 0.0f, 0.0f, 1.0f, 1.0f };
+	//boss->sprite.color = Color{ 0.0f, 0.0f, 1.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Jump Starting\n";
@@ -157,10 +164,16 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		interval += dt;
 		if (interval >= 0.25f * jumpStartup) {
 			boss->invulnerableTimer = dt;
+			boss->sprite.GetAnimation("Jump");
 			boss->sprite.position += Vector2{ 0, 1 } * jumpSpeed * dt;
 		}
+		else {
+			boss->direction = (target - boss->sprite.position).Normalized();
+		}
+
 		if (interval >= jumpStartup) {
 			interval = 0.0f;
+			boss->sprite.GetAnimation("Jump End");
 			attackPhase = ATTACK_ATTACK;
 		}
 
@@ -181,6 +194,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		}
 		if (interval >= jumpInterval) {
 			interval = 0.0f;
+			boss->sprite.GetAnimation("Jump Start");
 			attackPhase = ATTACK_COOLDOWN;
 		}
 
@@ -191,6 +205,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		interval += dt;
 		if (interval >= jumpEndlag) {
 			interval = 0.0f;
+			boss->sprite.GetAnimation("Idle");
 			currentState = BOSS_IDLE;
 		}
 
@@ -201,17 +216,19 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 	//Vector2 direction{};
 	float collisionTime{ 0.0f };
-	boss->sprite.color = Color{ 1.0f, 1.0f, 0.0f, 1.0f };
+	//boss->sprite.color = Color{ 1.0f, 1.0f, 0.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Follow Starting\n";
-		//target = player.position;
+		target = player.position;
+		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
 		if (interval >= chargeStartup) {
 			interval = 0.0f;
 			//chargeDirection = target - boss->sprite.position;
 			//boss->velocity = chargeDirection.Normalized() * chargeSpeed * boss->speedModifier;
+			boss->sprite.GetAnimation("Run");
 			attackPhase = ATTACK_ATTACK;
 		}
 
@@ -221,8 +238,8 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		std::cout << "Boss Follow Attack\n";
 		//direction = target - boss->sprite.position;
 		target = player.position;
-		followDirection = target - boss->sprite.position;
-		boss->velocity = followDirection.Normalized() * followSpeed * boss->speedModifier;
+		boss->direction = (target - boss->sprite.position).Normalized();
+		boss->velocity = boss->direction * followSpeed * boss->speedModifier;
 
 		boss->sprite.position += boss->velocity * dt;
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
@@ -232,6 +249,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 			playerTakesDamage(player);
 			interval = 0.0f;
 			boss->velocity = Vector2{};
+			boss->sprite.GetAnimation("Idle");
 			attackPhase = ATTACK_COOLDOWN;
 		}
 
@@ -242,6 +260,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 			interval = 0.0f;
 			boss->velocity = Vector2{};
 			//boss->collideWall = false;
+			boss->sprite.GetAnimation("Idle");
 			attackPhase = ATTACK_COOLDOWN;
 		}
 

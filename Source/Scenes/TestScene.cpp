@@ -264,7 +264,7 @@ void TestDraw()
 			if (roomData.boss->currentHealth > 0)
 			{
 				roomData.boss->shadow.RenderSprite();
-				roomData.boss->sprite.RenderSprite();
+				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
 			}
 		}
 
@@ -892,6 +892,8 @@ void TestUpdate(float dt)
 			Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
+			//std::cout << roomData.boss->sprite.current_animation_index << roomData.boss->sprite.current_sprite_index << '\n';
+			std::cout << roomData.boss->sprite.current_sprite_uv_offset_x << roomData.boss->sprite.current_sprite_uv_offset_y << '\n';
 
 			roomData.boss->collideWall = false;
 
@@ -942,8 +944,16 @@ void TestUpdate(float dt)
 				if (colRes) roomData.boss->collideWall = true;
 			}*/
 
+			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
+			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
+
+			if (roomData.boss->direction.x < 0) roomData.boss->sprite.scale = { -100, 100 };
+			else roomData.boss->sprite.scale = { 100, 100 };
+
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
+
+			roomData.boss->sprite.UpdateAnimation(dt);
 		}
 
 		// Gifts and Enemy Check

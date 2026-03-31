@@ -6,9 +6,9 @@
 
 extern LV_STATES gameState;
 
-Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
+Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite, 
 	 RoomData& currentRoom, std::vector<AttackData> attackData)
-	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite},
+	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite}, //hpBar{hpBarSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	if (enemyName == "Boss 1") {
@@ -30,6 +30,8 @@ void Boss::Update(Player& player, f32 dt) {
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 		speedModifier = 1.0f;
+		//std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
+		std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
 	}
 	else {
 		isActive = false;
@@ -45,9 +47,10 @@ void Boss::CollideProjectile() {
 		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
 			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
-				currentHealth -= proj->GetDmg();
-				std::cout << "Taken Damage: " << proj->GetDmg();
-				std::cout << "Remaining Health: " << currentHealth;
+				//currentHealth -= proj->GetDmg();
+				//std::cout << "Taken Damage: " << proj->GetDmg();
+				//std::cout << "Remaining Health: " << currentHealth;
+				DamageBoss(proj->GetDmg());
 				ProjectileParticleExplode(roomData, *proj);
 				proj->RemoveProjectile();
 				invulnerableTimer = 1.0f;
@@ -65,9 +68,10 @@ void Boss::CollideGift() {
 		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
-				currentHealth -= 1;
-				std::cout << "Taken Damage: " << 1;
-				std::cout << "Remaining Health: " << currentHealth;
+				//currentHealth -= 1;
+				//std::cout << "Taken Damage: " << 1;
+				//std::cout << "Remaining Health: " << currentHealth;
+				DamageBoss(1);
 				gift->velocity = -gift->velocity;
 			}
 		}
@@ -75,9 +79,15 @@ void Boss::CollideGift() {
 	}
 }
 
+void Boss::DamageBoss(s32 dmg) {
+	currentHealth -= dmg;
+	//hpBar.scale.x = (currentHealth / health) * 10.f;
+}
+
 void Boss::ResetBoss() {
 	currentHealth = health;
 	sprite.position = Vector2{};
+	sprite.GetAnimation("Idle");
 	shadow.position = Vector2{ 0, -35 };
 
 	bossStateMachine->currentState = bossStateMachine->initialState;
