@@ -939,6 +939,12 @@ void TestUpdate(float dt)
 				if (colRes) roomData.boss->collideWall = true;
 			}*/
 
+			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
+			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
+
+			if (roomData.boss->direction.x < 0) roomData.boss->sprite.scale = { -100, 100 };
+			else roomData.boss->sprite.scale = { 100, 100 };
+
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 

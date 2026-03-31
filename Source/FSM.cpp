@@ -31,8 +31,8 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				if (AERandFloat() >= 0.75f) {
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
-					chargeDirection = target - boss->sprite.position;
-					boss->velocity = chargeDirection.Normalized() * walkSpeed * boss->speedModifier;
+					boss->direction = (target - boss->sprite.position).Normalized();
+					boss->velocity = boss->direction * walkSpeed * boss->speedModifier;
 					boss->sprite.GetAnimation("Run");
 					currentState = BOSS_WALK;
 				}
@@ -93,12 +93,13 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Charge Starting\n";
 		target = player.position;
+		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
 		if (interval >= chargeStartup) {
 			interval = 0.0f;
-			chargeDirection = target - boss->sprite.position;
-			boss->velocity = chargeDirection.Normalized() * chargeSpeed * boss->speedModifier;
+			//boss->direction = (target - boss->sprite.position).Normalized();
+			boss->velocity = boss->direction * chargeSpeed * boss->speedModifier;
 			boss->sprite.GetAnimation("Run");
 			attackPhase = ATTACK_ATTACK;
 		}
@@ -166,6 +167,10 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 			boss->sprite.GetAnimation("Jump");
 			boss->sprite.position += Vector2{ 0, 1 } * jumpSpeed * dt;
 		}
+		else {
+			boss->direction = (target - boss->sprite.position).Normalized();
+		}
+
 		if (interval >= jumpStartup) {
 			interval = 0.0f;
 			boss->sprite.GetAnimation("Jump End");
@@ -215,7 +220,8 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		std::cout << "Boss Follow Starting\n";
-		//target = player.position;
+		target = player.position;
+		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
 		if (interval >= chargeStartup) {
@@ -232,8 +238,8 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		std::cout << "Boss Follow Attack\n";
 		//direction = target - boss->sprite.position;
 		target = player.position;
-		followDirection = target - boss->sprite.position;
-		boss->velocity = followDirection.Normalized() * followSpeed * boss->speedModifier;
+		boss->direction = (target - boss->sprite.position).Normalized();
+		boss->velocity = boss->direction * followSpeed * boss->speedModifier;
 
 		boss->sprite.position += boss->velocity * dt;
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
