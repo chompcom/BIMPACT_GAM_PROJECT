@@ -64,12 +64,53 @@ TexturedSprite::TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* sprite
 	: Sprite(spriteMesh, spritePosition, spriteScale, spriteColor), texture{ spriteTexture } {
 }
 
-void TexturedSprite::RenderSprite(bool changeAlpha) {
-		AEGfxTextureSet(texture, 0.f, 0.f);
+void TexturedSprite::RenderSprite(bool changeAlpha, f32 uv_offsetX, f32 uv_offsetY) {
+		AEGfxTextureSet(texture, uv_offsetX, uv_offsetY);
 		Sprite::RenderSprite(changeAlpha);
 }
 
-AEGfxVertexList* CreateSquareMesh() {
+/*AnimatedSprite::AnimatedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor, f32 initial_offsetX, f32 initial_offsetY)
+	: TexturedSprite(spriteMesh, spriteTexture, spritePosition, spriteScale, spriteColor), current_sprite_uv_offset_x{ initial_offsetX }, current_sprite_uv_offset_y{ initial_offsetY } {
+
+}*/
+
+AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows, u32 spritesheetCols, f32 initial_offsetX, f32 initial_offsetY)
+	: TexturedSprite{texturedSprite}, spritesheet_rows{spritesheetRows}, spritesheet_cols{spritesheetCols}, sprite_uv_width{1.f/spritesheetCols}, sprite_uv_height{1.f/spritesheetRows},
+	current_sprite_uv_offset_x{initial_offsetX}, initial_offsetX{initial_offsetX}, current_sprite_uv_offset_y{initial_offsetY}, initial_offsetY{initial_offsetY} {
+
+}
+
+void AnimatedSprite::SetAnimation(AnimationInfo animationInfo) {
+	animations.push_back(animationInfo);
+}
+
+void AnimatedSprite::GetAnimation(std::string animationName) {
+	for (s32 i{}; i < animations.size(); ++i) {
+		if (animations[i].name == animationName) {
+			currentAnimation = animations[i];
+			break;
+		}
+	}
+}
+
+void AnimatedSprite::UpdateAnimation(f32 dt) {
+	//if (currentAnimation.no_frames > 1) {
+		animation_timer += dt;
+		if (animation_timer >= currentAnimation.frame_duration) {
+			animation_timer = 0;
+
+			current_sprite_index = ++current_sprite_index % currentAnimation.no_frames;
+
+			u32 current_sprite_row = currentAnimation.start_row;
+			u32 current_sprite_col = currentAnimation.start_col + current_sprite_index;
+
+			current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
+			current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
+		}
+	//}
+}
+
+AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {
 		// Informing the library that we're about to start adding triangles
 		AEGfxMeshStart();
 
@@ -77,13 +118,13 @@ AEGfxVertexList* CreateSquareMesh() {
 		// Color parameters represent colours as ARGB
 		// UV coordinates to read from loaded textures
 		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,  // bottom-left: red
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: green
+			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, sprite_uv_height,  // bottom-left: red
+			0.5f, -0.5f, 0xFFFFFFFF, sprite_uv_width, sprite_uv_height,   // bottom-right: green
 			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: blue
 
 		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,   // bottom-right: green
-			0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,    // top-right: white
+			0.5f, -0.5f, 0xFFFFFFFF, sprite_uv_width, sprite_uv_height,   // bottom-right: green
+			0.5f, 0.5f, 0xFFFFFFFF, sprite_uv_width, 0.0f,    // top-right: white
 			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: blue
 
 		// Saving the mesh (list of triangles) in pMesh

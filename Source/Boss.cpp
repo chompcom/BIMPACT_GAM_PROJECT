@@ -6,7 +6,7 @@
 
 extern LV_STATES gameState;
 
-Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
+Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, 
 	 RoomData& currentRoom, std::vector<AttackData> attackData)
 	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
@@ -30,6 +30,8 @@ void Boss::Update(Player& player, f32 dt) {
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 		speedModifier = 1.0f;
+		//std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
+		std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
 	}
 	else {
 		isActive = false;
@@ -78,6 +80,7 @@ void Boss::CollideGift() {
 void Boss::ResetBoss() {
 	currentHealth = health;
 	sprite.position = Vector2{};
+	sprite.GetAnimation("Idle");
 	shadow.position = Vector2{ 0, -35 };
 
 	bossStateMachine->currentState = bossStateMachine->initialState;

@@ -19,7 +19,8 @@ class Boss {
 		std::string name;
 		f32 health;
 		f32 damage;
-		TexturedSprite sprite;
+		//TexturedSprite sprite;
+		AnimatedSprite sprite;
 		TexturedSprite shadow;
 		f32 currentHealth;
 		bool isActive; // For checking if its alive
@@ -33,7 +34,7 @@ class Boss {
 		//points to the room it should be inside, so that it knows whats going on inside!
 		RoomData& roomData;
 
-		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
+		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, 
 			RoomData& currentRoom, std::vector<AttackData> attackData);
 		~Boss();
 
