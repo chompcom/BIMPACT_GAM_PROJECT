@@ -19,7 +19,6 @@
     <ClCompile Include="..\Source\Collision.cpp" />
     <ClCompile Include="..\Source\Enemy.cpp" />
     <ClCompile Include="..\Source\FSM.cpp" />
-    <ClCompile Include="..\Source\GameOver.cpp" />
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\HUD.cpp" />
@@ -36,6 +35,7 @@
     <ClCompile Include="..\Source\Screens\ContentEditorScene.cpp" />
     <ClCompile Include="..\Source\Screens\Credits.cpp" />
     <ClCompile Include="..\Source\Screens\MainMenuScene.cpp" />
+    <ClCompile Include="..\Source\Screens\Tutorial.cpp" />
     <ClCompile Include="..\Source\Screens\Ui.cpp" />
     <ClCompile Include="..\Source\Sprite.cpp" />
     <ClCompile Include="..\Source\Traits.cpp" />
@@ -51,7 +51,6 @@
     <ClInclude Include="..\Source\Behaviour\Behaviours.h" />
     <ClInclude Include="..\Source\Enemy.h" />
     <ClInclude Include="..\Source\FSM.h" />
-    <ClInclude Include="..\Source\GameOver.h" />
     <ClInclude Include="..\Source\GameStateList.h" />
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
@@ -69,6 +68,7 @@
     <ClInclude Include="..\Source\Screens\ContentEditorScene.h" />
     <ClInclude Include="..\Source\Screens\Credits.h" />
     <ClInclude Include="..\Source\Screens\MainMenuScene.h" />
+    <ClInclude Include="..\Source\Screens\Tutorial.h" />
     <ClInclude Include="..\Source\Screens\Ui.h" />
     <ClInclude Include="..\Source\Sprite.h" />
     <ClInclude Include="..\Source\Traits.h" />

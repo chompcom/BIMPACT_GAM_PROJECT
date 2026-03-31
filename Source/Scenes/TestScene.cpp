@@ -20,7 +20,9 @@
 #include "../Almanac.h"
 #include "ParticleSystem.h"
 #include "../Screens/Ui.h"
-#include "../GameOver.h"
+#include "GameStateList.h"
+#include "GameStateManager.h"
+#include "../Screens/Tutorial.h"
 
 AEGfxVertexList *sqmesh = nullptr;
 
@@ -75,6 +77,8 @@ static bool winUiInitialized = false;
 
 static UIManager loseUi;
 static bool loseUiInitialized = false;
+
+static UIManager tutorialUi;
 
 static bool fightMusicPlaying = false;
 static bool loseAudioPlaying = false;
@@ -205,6 +209,8 @@ void TestInit()
 	loseUiInitialized = true;
 	loseUi.SetFont(font);
 
+	InitTutorial();
+
 	gameState = RUNNING;
 	debugMode = false;
 }
@@ -327,10 +333,7 @@ void TestDraw()
 
 	RenderAlmanacPages(almanac, font);
 
-	//REMOVE LATERR!!!!!
-	//AlmanacInputs(almanac, sqmesh);
-
-	// RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
+	RenderTutorial();
 
 #if 0
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -514,6 +517,8 @@ void TestUnload()
 	// isPaused = false;
 
 	allGiftTypes.clear();
+
+	TutorialUnload();
 }
 
 void TestUpdate(float dt)
@@ -547,7 +552,7 @@ void TestUpdate(float dt)
 		//this has to be above checkIfAlmanacClicked or the arrows will bug
 		AlmanacInputs(almanac);
 		checkIfAlmanacClicked(*almanacIcon, almanac);
-
+		TutorialInput();
 		// for now,
 		//  Player update
 		UpdatePlayer(player, dt);
