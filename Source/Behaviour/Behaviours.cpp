@@ -361,11 +361,14 @@ void TargetNearestThing(Enemy& me) {
 }
 
 void TargetMiddle(Enemy& me) {
-	me.target.initialPosition = Vector2();
+	//when i did this it doesnt work?
+	//me.target.initialPosition = Vector2();
+	me.target = Vector2();
 }
 void TargetCorner(Enemy& me) {
 
-	me.target.initialPosition = Vector2(100,100);
+	//me.target.initialPosition = Vector2(100,100);
+	me.target = Vector2(100, 100);
 }
 void FireProjectile(Enemy& me) {
 	FireSomething(me, ShootProjectile);
@@ -555,6 +558,11 @@ void ClearTarget(Enemy& me) {
 	me.target = Enemy::Target{};
 }
 
+void StopMoving(Enemy& me) {
+	//Set target to be empty
+	me.velocity = Vector2();
+}
+
 //unused template functions
 bool DefaultFlag(Enemy& me){
 	return me.isActive;
@@ -645,6 +653,7 @@ void InitCommands() {
 		{"InvertVelocity", InvertVelocity},
 		{"DizzyTarget", DizzyTarget},
 		{"UndizzyTarget", UndizzyTarget},
+		{"StopMoving", StopMoving},
 
 		{"default", DefaultAction} //This should Never be called!
     };
