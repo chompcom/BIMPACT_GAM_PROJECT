@@ -178,7 +178,7 @@ namespace mapRooms
 
 		//rmType = RoomType::Normal;
 
-		std::cout << static_cast<int>(this->rmType) << '\n';
+		//std::cout << static_cast<int>(this->rmType) << '\n';
 
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
@@ -393,7 +393,7 @@ namespace mapRooms
 		}
 
 
-			std::cout << "Display Room Init of " << biome << "\n";
+			//std::cout << "Display Room Init of " << biome << "\n";
 			//roomGrid.
 			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
 			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
@@ -444,10 +444,14 @@ namespace mapRooms
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 1.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), 
+				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
+
 			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
 			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
+			//currentRoomData.boss->hpBar.position = Vector2{ 0.f, 300.f };
+			//currentRoomData.boss->hpBar.scale = Vector2{ 1000.f, 10.f };
 
 			/*currentRoomData.boss->sprite.SetAnimation({"idle", 4});
 			currentRoomData.boss->sprite.SetAnimation({ "walk", 4 });

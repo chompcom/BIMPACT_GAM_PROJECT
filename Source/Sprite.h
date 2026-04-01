@@ -19,7 +19,7 @@ class Sprite {
 		Color color;
 
 		Sprite();
-		Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor = Color{0.0f,0.0f,0.0f,1.0f});
+		Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition = Vector2{}, Vector2 spriteScale = Vector2{1, 1}, Color spriteColor = Color{0.0f,0.0f,0.0f,1.0f});
 
 		void UpdateTransform();
 

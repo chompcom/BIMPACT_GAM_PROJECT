@@ -4,6 +4,7 @@
 #include "RoomData.h"
 #include "FSM.h"
 #include "Player.h"
+#include "Screens/Ui.h"
 
 struct RoomData;
 
@@ -30,6 +31,9 @@ class Boss {
 		f32 speedModifier{ 1.0f };
 		f32 invulnerableTimer{ 0.f };
 		bool collideWall{ false };
+
+		UIManager healthbar;
+		bool healthbarInitialized{ false };
 		
 		std::unique_ptr<Boss_FSM> bossStateMachine;
 
@@ -37,7 +41,7 @@ class Boss {
 		RoomData& roomData;
 
 		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite,
-			RoomData& currentRoom, std::vector<AttackData> attackData);
+			RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos = {0, 350}, Vector2 size = {1000, 30});
 		~Boss();
 
 		void Update(Player& player, f32 dt);

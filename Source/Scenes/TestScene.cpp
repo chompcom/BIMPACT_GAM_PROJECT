@@ -159,7 +159,7 @@ void TestInit()
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
-	std::cout << "Current Seed: " << curSeed << "\n";
+	//std::cout << "Current Seed: " << curSeed << "\n";
 
 	testParticles = ParticleSystem(sqmesh);
 
@@ -320,7 +320,16 @@ void TestDraw()
 			particle.sprite.RenderSprite();	
 		}
 	}
+	
+
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	if (gameMap.GetCurrentRoom()->currentRoomData.boss) {//gameMap.GetCurrentRoom()->currentRoomData.boss->hpBar.RenderSprite();
+		if (gameMap.GetCurrentRoom()->currentRoomData.boss->healthbarInitialized) {
+			//std::cout << "true\n";
+			gameMap.GetCurrentRoom()->currentRoomData.boss->healthbar.Draw();
+		}
+	}
 	// rock.sprite.RenderSprite();
 	// gift.sprite.RenderSprite();
 	// gift2.sprite.RenderSprite();
@@ -572,7 +581,7 @@ void TestUpdate(float dt)
 		RoomData& carryData = gameMap.GetTransferData();
 
 
-		std::cout << currentRoom->biome << std::endl;
+		//std::cout << currentRoom->biome << std::endl;
 		static mapRooms::Room* lastRoom = nullptr;
 		if (currentRoom != lastRoom)
 		{
@@ -893,7 +902,7 @@ void TestUpdate(float dt)
 
 			roomData.boss->Update(player, dt);
 			//std::cout << roomData.boss->sprite.current_animation_index << roomData.boss->sprite.current_sprite_index << '\n';
-			std::cout << roomData.boss->sprite.current_sprite_uv_offset_x << roomData.boss->sprite.current_sprite_uv_offset_y << '\n';
+			//std::cout << roomData.boss->sprite.current_sprite_uv_offset_x << roomData.boss->sprite.current_sprite_uv_offset_y << '\n';
 
 			roomData.boss->collideWall = false;
 
@@ -952,6 +961,7 @@ void TestUpdate(float dt)
 
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
+			//roomData.boss->hpBar.UpdateTransform();
 
 			roomData.boss->sprite.UpdateAnimation(dt);
 		}

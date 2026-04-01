@@ -24,7 +24,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 	switch (currentState) {
 		case BOSS_IDLE:
 			//boss->sprite.color = Color{ 0.0f, 1.0f, 0.0f, 1.0f };
-			std::cout << "Boss Idle\n";
+			//std::cout << "Boss Idle\n";
 			interval += dt;
 			if (interval >= 1.0f && canWalk) {
 				canWalk = false;
@@ -55,7 +55,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 			}
 			break;
 		case BOSS_WALK:
-			std::cout << "Boss Walk\n";
+			//std::cout << "Boss Walk\n";
 			
 			boss->sprite.position += boss->velocity * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
@@ -71,15 +71,15 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 
 			break;
 		case BOSS_CHARGE:
-			std::cout << "Boss Charge\n";
+			//std::cout << "Boss Charge\n";
 			ChargeAttack(player, dt);
 			break;
 		case BOSS_JUMP:
-			std::cout << "Boss Jump\n";
+			//std::cout << "Boss Jump\n";
 			JumpAttack(player, dt);
 			break;
 		case BOSS_FOLLOW:
-			std::cout << "Boss Follow\n";
+			//std::cout << "Boss Follow\n";
 			FollowAttack(player, dt);
 			break;
 	}
@@ -91,7 +91,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 	//boss->sprite.color = Color{ 1.0f, 0.0f, 0.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
-		std::cout << "Boss Charge Starting\n";
+		//std::cout << "Boss Charge Starting\n";
 		target = player.position;
 		boss->direction = (target - boss->sprite.position).Normalized();
 
@@ -107,7 +107,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_ATTACK:
-		std::cout << "Boss Charge Attack\n";
+		//std::cout << "Boss Charge Attack\n";
 		//direction = target - boss->sprite.position;
 
 		boss->sprite.position += boss->velocity * dt;
@@ -132,7 +132,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_COOLDOWN:
-		std::cout << "Boss Charge Ending\n";
+		//std::cout << "Boss Charge Ending\n";
 		interval += dt;
 		if (interval >= chargeEndlag) {
 			if (AERandFloat() >= 0.5f && additionalCharges < 2) {
@@ -158,7 +158,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 	//boss->sprite.color = Color{ 0.0f, 0.0f, 1.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
-		std::cout << "Boss Jump Starting\n";
+		//std::cout << "Boss Jump Starting\n";
 		target = player.position;
 
 		interval += dt;
@@ -180,7 +180,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_ATTACK:
-		std::cout << "Boss Jump Attack\n";
+		//std::cout << "Boss Jump Attack\n";
 		interval += dt;
 		boss->sprite.position = Vector2{ target.x, target.y + jumpSpeed * jumpInterval } + Vector2{ 0, -1 } * jumpSpeed * interval;
 		boss->shadow.position = Vector2{ target.x, target.y - 35 };
@@ -201,7 +201,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_COOLDOWN:
-		std::cout << "Boss Jump Ending\n";
+		//std::cout << "Boss Jump Ending\n";
 		interval += dt;
 		if (interval >= jumpEndlag) {
 			interval = 0.0f;
@@ -219,7 +219,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 	//boss->sprite.color = Color{ 1.0f, 1.0f, 0.0f, 1.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
-		std::cout << "Boss Follow Starting\n";
+		//std::cout << "Boss Follow Starting\n";
 		target = player.position;
 		boss->direction = (target - boss->sprite.position).Normalized();
 
@@ -235,7 +235,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_ATTACK:
-		std::cout << "Boss Follow Attack\n";
+		//std::cout << "Boss Follow Attack\n";
 		//direction = target - boss->sprite.position;
 		target = player.position;
 		boss->direction = (target - boss->sprite.position).Normalized();
@@ -267,7 +267,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		break;
 
 	case ATTACK_COOLDOWN:
-		std::cout << "Boss Follow Ending\n";
+		//std::cout << "Boss Follow Ending\n";
 		interval += dt;
 		if (interval >= followEndlag) {
 				interval = 0.0f;

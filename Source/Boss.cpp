@@ -7,15 +7,23 @@
 extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite, 
-	 RoomData& currentRoom, std::vector<AttackData> attackData)
+	 RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos, Vector2 size)
 	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite}, //hpBar{hpBarSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
-	if (enemyName == "Boss 1") {
+	healthbarInitialized = healthbar.LoadFromFilePopUp(filePath, pos, size);
+	UIElement *bossName = healthbar.FindById("boss_name");
+	if (bossName)
+		bossName->text = enemyName;
+	healthbar.SetFont(font);
+	//std::cout << healthbarInitialized << '\n';
+
+
+	if (enemyName == "Chimera") {
 		bossStateMachine = std::make_unique<Boss1_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
 			attackData[1].attackDamage, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag,
 			attackData[2].attackDamage, attackData[2].attackStartup, attackData[2].attackInterval, attackData[2].attackEndlag);
-		std::cout << typeid(bossStateMachine).name() << '\n';
+		//std::cout << typeid(bossStateMachine).name() << '\n';
 	}
 }
 
@@ -31,12 +39,13 @@ void Boss::Update(Player& player, f32 dt) {
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 		speedModifier = 1.0f;
 		//std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
-		std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
+		//std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
 	}
 	else {
 		isActive = false;
 		gameState = WIN;
 	}
+	healthbar.Update();
 }
 
 void Boss::CollideProjectile() {
@@ -81,7 +90,17 @@ void Boss::CollideGift() {
 
 void Boss::DamageBoss(s32 dmg) {
 	currentHealth -= dmg;
-	//hpBar.scale.x = (currentHealth / health) * 10.f;
+	if (currentHealth < 0) currentHealth = 0;
+	
+	if (healthbarInitialized) {
+		UIElement* healthUI = healthbar.FindById("foreground");
+		if (healthUI) {
+			healthUI->sizeRatio.x = (currentHealth / health); //* 1000.f;
+			healthUI->localPos.x = -0.5f + (currentHealth / health) * 0.5f;
+		}
+	}
+	//hpBar.scale.x = (currentHealth / health) * 1000.f;
+	//hpBar.position.x = -500.f + (currentHealth / health) * 500.f;
 }
 
 void Boss::ResetBoss() {
@@ -94,5 +113,13 @@ void Boss::ResetBoss() {
 	bossStateMachine->attackPhase = ATTACK_NIL;
 	bossStateMachine->interval = 0.0f;
 	bossStateMachine->counter = 0;
+
+	if (healthbarInitialized) {
+		UIElement* healthUI = healthbar.FindById("foreground");
+		if (healthUI) {
+			healthUI->sizeRatio.x = 1.f;
+			healthUI->localPos.x = 0.f;
+		}
+	}
 }
 
