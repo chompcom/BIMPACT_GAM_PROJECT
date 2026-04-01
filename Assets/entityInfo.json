@@ -1,0 +1,18 @@
+{
+    "player":{
+        "maxHearts":3,
+        "sprite":"Assets/player.png",
+        "throwStrength":2500,
+        //between 0 and 1
+        "throwShakeModifier":0.25,
+        "throwMin":2000,
+        "throwMax":10000,
+        "pickUpCooldown":3,
+        "invulnTimer":2,
+        "speed":275
+    },
+
+    "boss":{
+        
+    }
+}

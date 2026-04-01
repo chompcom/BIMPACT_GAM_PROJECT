@@ -6,6 +6,8 @@
 #include "Collision.h"
 #include <iostream>
 #include "GameStateList.h"
+#include <fstream>
+#include "json/json.h"
 
 extern LV_STATES gameState;
 
@@ -24,6 +26,8 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	throwState{ false },
 	heldGift{ nullptr },
 	throwForce{ 0.f },
+	throwMin{}, throwMax{},
+	throwShakeModifier{},
 	pickUpCooldown{ 0.f },
 	invulnerableTimer{ 0.f },
 	isTargetable { true },
@@ -130,13 +134,13 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//Calculate the player's throwing force
 		player.throwState = true;
 		player.throwForce += deltaTime * player.throwStrength;
-		player.throwForce = AEClamp(player.throwForce, 2000.f, 10000.f);
+		player.throwForce = AEClamp(player.throwForce, player.throwMin, player.throwMax);
 
 		//Shake the gift
 		Vector2 shakeVector{ (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 , 
 			(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 };
 
-		shakeVector = shakeVector.Normalized() * (player.throwForce / 700.f);
+		shakeVector = shakeVector.Normalized() * (player.throwForce * player.throwShakeModifier);
 		(*player.heldGift).giftType.sprite.position += shakeVector;
 
 	}
@@ -183,6 +187,17 @@ void playerHealsDamage(Player& player)
 
 void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 {
+
+	std::ifstream ifs{"entityinfo.json"};
+	if (!ifs) {
+		std::cout << "Could not load entityInfo.json!" << std::endl;
+	}
+	Json::Value source;
+	ifs >> source;
+
+	//set source to player
+	source = source["player"];
+
 	//put down gift
 	if (player.heldGift)
 	{
@@ -195,15 +210,19 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 		player.heldGift = nullptr;
 	}
 
-	player.health = 3;
+	player.health = source["maxHearts"].asFloat();
 	player.pickUpState = false;
 	player.throwState = false;
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
-	player.baseSpeed = 575.f;
+	player.baseSpeed = source["speed"].asFloat();
+	player.throwStrength = source["throwStrength"].asFloat();
+	player.throwShakeModifier = source["throwShakeModifier"].asFloat();
+	player.throwMin = source["throwMin"].asFloat();
+	player.throwMax = source["throwMax"].asFloat();
 	player.throwForce = 0.f;
 	player.pickUpCooldown = 0.f;
-	player.invulnerableTimer = 0.f;
+	player.invulnerableTimer = source["invulnTimer"].asFloat();
 }
 
 

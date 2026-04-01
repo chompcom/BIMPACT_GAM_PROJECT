@@ -443,6 +443,10 @@ void TestDraw()
 			break;
 		}
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
+		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
 }

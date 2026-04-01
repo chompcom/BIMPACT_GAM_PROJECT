@@ -1,0 +1,23 @@
+{
+    "Chimera_FSM": {
+        "charge": {
+            "speed":300,
+            "startup":2,
+            "interval":2,
+            "endLag":3
+        },
+        "jump": {
+            "speed":540,
+            "startup":2,
+            "interval":2,
+            "endLag":3
+        },
+        "follow": {
+            "speed":240,
+            "startup":2,
+            "interval":2,
+            "endLag":3
+        }
+
+    }
+}

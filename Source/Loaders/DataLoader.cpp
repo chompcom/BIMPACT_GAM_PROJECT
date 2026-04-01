@@ -11,6 +11,8 @@
 
 #include "Behaviour/Behaviours.h"
 #include <vector>
+#include "Boss.h"
+#include "FSM.h"
 
 
 //Helper function space!!
@@ -129,6 +131,8 @@ namespace DataLoader {
 	static AEGfxVertexList *circleMesh{ nullptr };			// For square and circle mesh
 	static RoundRectMeshList roundRectMeshes{};										// For rrect unit mesh
 
+	static std::vector< std::unique_ptr<Boss_FSM>> bossStateMachines;
+
 	// Loan Json From File into Json::Value object
 	Json::Value LoadJsonFile(std::string const& file) {
 		Json::Value res;
@@ -170,6 +174,7 @@ namespace DataLoader {
 
 
 	void Load() {
+		std::cout << "****************** Starting load ******************\n";
 		squareMesh = CreateSquareMesh();
 		circleMesh = CreateCircleMesh();
 		//animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
