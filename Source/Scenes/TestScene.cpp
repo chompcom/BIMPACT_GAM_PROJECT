@@ -808,22 +808,83 @@ void TestUpdate(float dt)
 
 			roomData.boss->collideWall = false;
 
-			// Test Player Collision with Map
+			// Test Player Collision with Map			
+			int prevCellBoss = roomData.grid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
+
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
 			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x, roomData.boss->sprite.scale.y, bossCurCell);
-			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
-				roomData.boss->shadow.position.x = bossPrevPos.x;
+		/*	if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+			//	roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
+				roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCell).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f - 0.10f;
+			//	roomData.boss->shadow.position.x = bossPrevPos.x;
 				roomData.boss->collideWall = true;
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+			//	roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
+				roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCell).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f + 0.10f;
+				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
 				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
 				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
+			*/
+			if (bossColRes & COLLISION_LEFT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				//	roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
+				roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f + 0.10f;
+				//	roomData.boss->shadow.position.x = bossPrevPos.x;
+				roomData.boss->collideWall = true;
+			}
+			if (bossColRes & COLLISION_RIGHT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				//	roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
+				roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f - 0.10f;
+				//	roomData.boss->shadow.position.x = bossPrevPos.x;
+				roomData.boss->collideWall = true;
+			}
+			if (bossColRes & COLLISION_TOP && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				//	roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
+				std::cout << "BOSS COLLIDE TOP" << std::endl;
+				roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f - 0.10f;
+				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->collideWall = true;
+			}
+			if ( bossColRes & COLLISION_BOTTOM && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+				//	roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
+				std::cout << "BOSS COLLIDE BOTTOM" << std::endl;
+				roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f + 0.10f;
+				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->collideWall = true;
+			}
+			int collisionResBoss = roomData.grid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x, roomData.boss->sprite.scale.y, prevCellBoss);
+			//gonna try to make it dynamic..
 
+			float gridWidth = roomData.grid.GetTileWidth();
+			float gridHeight = roomData.grid.GetTileHeight();
+			if (CollisionBoundary_Static(roomData.boss->sprite.position, roomData.boss->sprite.scale, roomData.grid.GetBoundary().x * 0.99f, roomData.grid.GetBoundary().y * 0.99f)) {
+
+				if (collisionResBoss & COLLISION_RIGHT) {
+					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f - 0.10f;
+
+					roomData.boss->collideWall = true;
+				}
+				if (collisionResBoss & COLLISION_LEFT) {
+					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x - gridWidth * 0.5f + roomData.boss->sprite.scale.x * 0.5f + 0.10f;
+					roomData.boss->collideWall = true;
+
+				}
+				if (collisionResBoss & COLLISION_BOTTOM) {
+					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f + 0.10f;
+					roomData.boss->collideWall = true;
+
+				}
+				if (collisionResBoss & COLLISION_TOP) {
+					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y + gridHeight * 0.5f - roomData.boss->sprite.scale.y * 0.5f - 0.10f;
+					roomData.boss->collideWall = true;
+
+				}
+			}
+			std::cout << roomData.boss->collideWall << std::endl;
 			/*// FOR DOOR
 			int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
 			if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;

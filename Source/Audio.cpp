@@ -23,6 +23,7 @@ AEAudio AlmanacSound;
 AEAudio HoverSound;
 AEAudio LoseSound;
 AEAudio WinSound;
+AEAudio BigPageFlipAlmanac;
 
 // Mob grp
 AEAudioGroup MobAudio;
@@ -94,6 +95,8 @@ void InitAudio() {
 	HoverSound = DataLoader::GetSound("HoverSound");
 	LoseSound = DataLoader::GetSound("LoseSound");
 	WinSound = DataLoader::GetSound("WinSound");
+	BigPageFlipAlmanac = DataLoader::GetSound("BigPageFlip");
+
 
 	// Mob grp
 	MobAudio = AEAudioCreateGroup();
@@ -101,7 +104,7 @@ void InitAudio() {
 	FriendSuccess = DataLoader::GetSound("FriendSuccess");
 	Roar = DataLoader::GetSound("Roar");
 	SwordAttackSound = DataLoader::GetSound("SwordAttackSound");
-	Tom_Whatever = DataLoader::GetSound("Tom_Whatever");
+	Tom_Whatever = DataLoader::GetSound("Tom");
 	BoogerStick = DataLoader::GetSound("BoogerStick");
 	ProjectileSound = DataLoader::GetSound("ProjectileSound");
 	FireballSound = DataLoader::GetSound("FireballSound");
@@ -212,6 +215,10 @@ void GameWinAudio() {
 	AEAudioPlay(WinSound, UIAudio, 1.0f, 1.0f, 0);
 }
 
+void BigPageFlip() {
+	AEAudioPlay(BigPageFlipAlmanac, UIAudio, 0.5f, 1.0f, 0);
+}
+
 bool IsbuttonAudioState() {
 	return buttonAudioState;
 }
@@ -312,7 +319,7 @@ void FireBiomeAudio() {
 }
 
 void OceanBiomeAudio() {
-	AEAudioPlay(OceanAudio, RoomAudio, 0.25f, 2.0f, -1);
+	AEAudioPlay(OceanAudio, RoomAudio, 0.1f, 2.0f, -1);
 }
 
 void BGM1Audio() {

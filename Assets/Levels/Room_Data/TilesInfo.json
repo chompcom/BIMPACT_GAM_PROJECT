@@ -98,6 +98,27 @@
             "spawnCategory": "enemy",
             "spawnName": "Snowman"
         },
+        "205": {
+            "name": "TomMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/tom.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Tom"
+        },
+        "206": {
+            "name": "TinyDragonMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/tinyDragon.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Tiny Dragon"
+        },
+        "207": {
+            "name": "CrabChefMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/crabChef.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Crab Chef"
+        },
         "208": {
             "name": "CampfireMarker",
             "blocked": false,
@@ -143,7 +164,7 @@
     },
   //NOTE TO SELF IN CASE I FORGET: CAMPFIRE DOES NOT BELONG IN NORMAL!!! AM PUTTING HERE FOR NOW COS NO HOT BIOME YET!!!
   "Normal": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,204,208,500,501,502,503],
+    "allowedTiles": [0,1,2,100,200,201,202,203,204,205,206,208,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
     ,"imageDir":"Assets/Rooms/Normal/NORMAL"
   },
@@ -158,7 +179,7 @@
     ,"imageDir":"Assets/Rooms/Normal/ICE"
   },
   "Ocean": {
-    "allowedTiles": [0,1,3,100,200,500,501,502,503],
+    "allowedTiles": [0,1,3,100,200,207,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/OCEAN/Room1.png"
     ,"imageDir":"Assets/Rooms/Normal/OCEAN"
   }

@@ -69,6 +69,9 @@ namespace {
 
 			Vector2 direction = me.prevPos - (me.target.GetPosition());
 
+			//hacky thing to make player collide with healing projectiles
+			if (proj.damage < 0.0f) amIFriendsWithThePlayer = false;
+
 			shootProjFunc(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, -direction.Normalized(), proj.speed, proj.lifetime, static_cast<int>(me.dmgModifier * proj.damage), Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
 			me.attackTimer = me.type.attackRate;
 			me.onceAttackTime = true;
@@ -374,6 +377,36 @@ void FireProjectile(Enemy& me) {
 	FireSomething(me, ShootProjectile);
 }
 
+void FireAOE(Enemy& me) {
+	if (!me.target)
+		return;
+
+	bool amIFriendsWithThePlayer = false;
+	if (me.attackTimer <= EPSILON)
+	{
+		EnemyType::ProjectileInfo proj;
+		switch (me.state)
+		{
+		case ES_ANGRY:
+			proj = me.type.angryProjectile;
+			break;
+		case ES_HAPPY:
+			proj = me.type.happyProjectile;
+			amIFriendsWithThePlayer = true;
+			break;
+		default:
+			proj = me.type.neutralProjectile;
+			break;
+		}
+
+		Vector2 direction = me.prevPos - (me.target.GetPosition());
+
+		ShootAOE(DataLoader::CreateTexture(proj.spritePath), *me.roomData, me.prevPos, proj.speed, proj.lifetime, static_cast<int>(me.dmgModifier * proj.damage), Vector2(proj.radius, proj.radius), proj.color, &me, amIFriendsWithThePlayer);
+		me.attackTimer = me.type.attackRate;
+		me.onceAttackTime = true;
+	}
+}
+
 void FireBoomerang(Enemy& me) {
 	FireSomething(me, ShootBoomerang);
 }
@@ -497,11 +530,11 @@ void DamageTarget(Enemy& me) {
 	if (me.attackTimer <= EPSILON) {
 		me.attackTimer = me.type.attackRate;
 		
-		if (me.target.isPlayer && me.state != ES_HAPPY) {
+		if (me.target.isPlayer) {
 			if (me.type.damage < 0.f) {
 				playerHealsDamage(*me.roomData->player);
 			}
-			else {
+			else if (me.state != ES_HAPPY) {
 				playerTakesDamage(*me.roomData->player);
 			}
 		}
@@ -547,10 +580,15 @@ void ChargeAtTarget(Enemy& me) {
 		//again, don't move if we don't have a position to go to
 		me.velocity = Vector2();
 		return;
-	} 
+	}
+	me.speedModifier *= 2.0f;
 	me.velocity += me.target.initialPosition - me.prevPos;
 	me.velocity = me.velocity.Normalized() * me.speedModifier;
-
+	float pos;
+	if (
+		CollisionIntersection_RectRect(me.prevPos, me.sprite.scale, me.velocity, me.target.initialPosition, Vector2(1, 1), Vector2(), pos)
+		) me.target = Enemy::Target();
+	std::cout << me.velocity.x << " " << me.velocity.y << std::endl;
 }
 
 void ClearTarget(Enemy& me) {
@@ -654,6 +692,7 @@ void InitCommands() {
 		{"DizzyTarget", DizzyTarget},
 		{"UndizzyTarget", UndizzyTarget},
 		{"StopMoving", StopMoving},
+		{"FireAOE", FireAOE},
 
 		{"default", DefaultAction} //This should Never be called!
     };
