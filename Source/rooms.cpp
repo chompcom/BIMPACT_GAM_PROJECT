@@ -438,23 +438,56 @@ namespace mapRooms
 		
 
 		// Boss Init
-		if (rmType == RoomType::Boss) {
-			//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 1.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
+			if (rmType == RoomType::Boss) {
+				//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+
+				Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
+
+				Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
+
+				std::vector<AttackData>attackData = {
+				{
+					5.0f,
+					fsm["charge"]["startup"].asFloat(),
+					fsm["charge"]["interval"].asFloat(),
+					fsm["charge"]["endLag"].asFloat()
+				}, 
+			{		
+				10.0f, 
+				fsm["jump"]["startup"].asFloat(),
+				fsm["jump"]["interval"].asFloat(),
+				fsm["jump"]["endLag"].asFloat()
+			},
+			{
+				5.0f, 
+				fsm["follow"]["startup"].asFloat(),
+				fsm["follow"]["interval"].asFloat(),
+				fsm["follow"]["endLag"].asFloat()
+			} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+
+			
+			
+			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
 			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
 			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
 
-			/*currentRoomData.boss->sprite.SetAnimation({"idle", 4});
-			currentRoomData.boss->sprite.SetAnimation({ "walk", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "run", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "runAttack", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "attack", 3 });*/
+			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 
+			for (Json::String animation : animationSource.getMemberNames()) {
+				currentRoomData.boss->sprite.SetAnimation({
+					animation,
+					animationSource[animation]["startRow"].asInt(),
+					animationSource[animation]["startCol"].asInt(),
+					animationSource[animation]["endFrame"].asInt()
+					});
+			}
+
+
+			/*
 			currentRoomData.boss->sprite.SetAnimation({ "Idle", 0, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Run Start", 1, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Run", 1, 0, 3 });
@@ -462,7 +495,7 @@ namespace mapRooms
 			currentRoomData.boss->sprite.SetAnimation({ "Jump Start", 2, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Jump", 2, 1, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Jump End", 2, 2, 1 });
-
+			*/
 			currentRoomData.boss->sprite.GetAnimation("Idle");
 
 

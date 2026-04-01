@@ -4,7 +4,7 @@
         "sprite":"Assets/player.png",
         "throwStrength":2500,
         //between 0 and 1
-        "throwShakeModifier":0.25,
+        "throwShakeModifier":0.0025,
         "throwMin":2000,
         "throwMax":10000,
         "pickUpCooldown":3,
@@ -13,6 +13,53 @@
     },
 
     "boss":{
-        
+        "name":"Chimera",
+       "FSM": "Chimera_FSM",
+       "health": 100,
+       "scale": 100,
+       "sprite":"Assets/Enemies/Boss/chimeraSheet.png",
+       "spriteInfo": {
+            "rows":3,
+            "columns":3,
+            "animationInfo": {
+                "Idle": {
+                    "startRow":0,
+                    "startCol":0,
+                    "endFrame":1
+                },
+                "Run Start": {
+                    "startRow":1,
+                    "startCol":0,
+                    "endFrame":1
+                },
+                "Run": {
+                    "startRow":1,
+                    "startCol":0,
+                    "endFrame":3
+                },
+                "Run End": {
+                    "startRow":1,
+                    "startCol":2,
+                    "endFrame":1
+                },
+                "Jump Start": {
+                    "startRow":2,
+                    "startCol":0,
+                    "endFrame":1
+                },
+                "Jump": {
+                    "startRow":2,
+                    "startCol":1,
+                    "endFrame":1
+                },
+                "Jump End": {
+                    "startRow":2,
+                    "startCol":2,
+                    "endFrame":1
+                }
+        }
+
+        }
     }
+
 }

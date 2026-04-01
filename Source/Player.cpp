@@ -6,8 +6,7 @@
 #include "Collision.h"
 #include <iostream>
 #include "GameStateList.h"
-#include <fstream>
-#include "json/json.h"
+#include "Loaders/DataLoader.h"
 
 extern LV_STATES gameState;
 
@@ -17,9 +16,9 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	sprite{ playerSprite },
 	shadow{ shadowSprite },
 	throwStrength{ throwStrength },
-	speed{ 1.f }, 
-	baseSpeed{ _speed},
-	health { 3 },
+	speed{ 1.f },
+	baseSpeed{ _speed },
+	health{ 3 },
 	position{ position },
 	direction{ direction },
 	pickUpState{ false },
@@ -30,6 +29,7 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	throwShakeModifier{},
 	pickUpCooldown{ 0.f },
 	invulnerableTimer{ 0.f },
+	baseInvulnerable{ 0.f },
 	isTargetable { true },
 	fadingIn{ false }
 {
@@ -176,7 +176,7 @@ void playerTakesDamage(Player& player)
 		if (player.health <= 0) gameState = LOSE;
 
 
-		player.invulnerableTimer = 1.f;
+		player.invulnerableTimer = player.baseInvulnerable;
 	}
 }
 
@@ -188,15 +188,9 @@ void playerHealsDamage(Player& player)
 void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 {
 
-	std::ifstream ifs{"entityinfo.json"};
-	if (!ifs) {
-		std::cout << "Could not load entityInfo.json!" << std::endl;
-	}
-	Json::Value source;
-	ifs >> source;
+	Json::Value source = DataLoader::LoadJsonFile("Assets/entityInfo.json")["player"];
 
-	//set source to player
-	source = source["player"];
+	
 
 	//put down gift
 	if (player.heldGift)
@@ -210,6 +204,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 		player.heldGift = nullptr;
 	}
 
+
 	player.health = source["maxHearts"].asFloat();
 	player.pickUpState = false;
 	player.throwState = false;
@@ -221,8 +216,10 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 	player.throwMin = source["throwMin"].asFloat();
 	player.throwMax = source["throwMax"].asFloat();
 	player.throwForce = 0.f;
+
 	player.pickUpCooldown = 0.f;
-	player.invulnerableTimer = source["invulnTimer"].asFloat();
+	player.invulnerableTimer = 0.f;
+	player.baseInvulnerable = source["invulnTimer"].asFloat();
 }
 
 

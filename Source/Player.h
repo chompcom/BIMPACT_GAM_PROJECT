@@ -25,6 +25,7 @@ public:
 	f32 throwShakeModifier; //modify how much the force will be reflected in the shake
 	f32 pickUpCooldown; //counter for when the player can pick up a gift
 	f32 invulnerableTimer;
+	f32 baseInvulnerable;
 	bool isTargetable; //When invulntimer is > 0, this is false
 	bool fadingIn;
 	
