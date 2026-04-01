@@ -153,7 +153,7 @@ void TestInit()
 	globalTransferData.player = &player;
 
 	// square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
@@ -983,8 +983,8 @@ void TestUpdate(float dt)
 					if (!e->isActive) continue;
 					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
-						gift->velocity = -gift->velocity;
-
+						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
+						gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
 						Labels traitsCheck = gift->giftType.traits;
 						//Include your friends in the traits check, because you can't friend those who judge yours
 						for (Enemy* friendly : carryData.enemyList){
@@ -1000,7 +1000,6 @@ void TestUpdate(float dt)
 							break;
 						}
 
-						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
 						// Ok, now gift shall snap to front of enemy while moving back
 						gift->position = e->sprite.position - (dirBtwnEnemyGift).Normalized() * gift->giftType.sprite.scale.x;
 					}

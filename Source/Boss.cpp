@@ -72,16 +72,19 @@ void Boss::CollideProjectile() {
 void Boss::CollideGift() {
 	float collisionTime{ 0.0f };
 	for (Gift* gift : roomData.giftList) {
-		if (gift->velocity == Vector2{}) continue;
+		if (gift->velocity.LengthSq() <= EPSILON) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+		if (CollisionIntersection_RectRect(sprite.position, Vector2(abs(sprite.scale.x), abs(sprite.scale.y)), velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= 1;
 				//std::cout << "Taken Damage: " << 1;
 				//std::cout << "Remaining Health: " << currentHealth;
 				DamageBoss(1);
-				gift->velocity = -gift->velocity;
+				//gift->velocity = -gift->velocity;
+				Vector2 dirBtwnEnemyGift = sprite.position - gift->position;
+				gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
+				invulnerableTimer = 0.5f;
 			}
 		}
 
