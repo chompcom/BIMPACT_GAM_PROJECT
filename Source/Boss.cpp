@@ -8,7 +8,7 @@ extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite, 
 	 RoomData& currentRoom, std::vector<AttackData> attackData)
-	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite}, //hpBar{hpBarSprite},
+	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{ shadowSprite }, shadowOffset{}, //hpBar{hpBarSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	if (enemyName == "Boss 1") {
@@ -88,7 +88,7 @@ void Boss::ResetBoss() {
 	currentHealth = health;
 	sprite.position = Vector2{};
 	sprite.GetAnimation("Idle");
-	shadow.position = Vector2{ 0, -35 };
+	shadow.position = Vector2{ 0, -shadowOffset};
 
 	bossStateMachine->currentState = bossStateMachine->initialState;
 	bossStateMachine->attackPhase = ATTACK_NIL;

@@ -3,7 +3,6 @@
         "maxHearts":3,
         "sprite":"Assets/player.png",
         "throwStrength":2500,
-        //between 0 and 1
         "throwShakeModifier":0.0025,
         "throwMin":2000,
         "throwMax":10000,
@@ -16,7 +15,8 @@
         "name":"Chimera",
        "FSM": "Chimera_FSM",
        "health": 100,
-       "scale": 100,
+       "scale": 300,
+       "shadowPctg": 0.45,
        "sprite":"Assets/Enemies/Boss/chimeraSheet.png",
        "spriteInfo": {
             "rows":3,

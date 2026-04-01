@@ -531,7 +531,7 @@ void TestUpdate(float dt)
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
-		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || AEInputCheckTriggered(AEVK_TAB))
 		{
 			gameState = PAUSED;
 		}
@@ -913,7 +913,7 @@ void TestUpdate(float dt)
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
-				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
 
@@ -951,8 +951,11 @@ void TestUpdate(float dt)
 			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
 			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
 
-			if (roomData.boss->direction.x < 0) roomData.boss->sprite.scale = { -100, 100 };
-			else roomData.boss->sprite.scale = { 100, 100 };
+			if (roomData.boss->direction.x < 0.f) 
+				roomData.boss->sprite.scale = { -abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			else {
+				roomData.boss->sprite.scale = { abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			}
 
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();

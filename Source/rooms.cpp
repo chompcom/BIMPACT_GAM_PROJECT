@@ -449,19 +449,19 @@ namespace mapRooms
 
 				std::vector<AttackData>attackData = {
 				{
-					5.0f,
+					fsm["charge"]["speed"].asFloat(),
 					fsm["charge"]["startup"].asFloat(),
 					fsm["charge"]["interval"].asFloat(),
 					fsm["charge"]["endLag"].asFloat()
 				}, 
 			{		
-				10.0f, 
+				fsm["jump"]["speed"].asFloat(),
 				fsm["jump"]["startup"].asFloat(),
 				fsm["jump"]["interval"].asFloat(),
 				fsm["jump"]["endLag"].asFloat()
 			},
 			{
-				5.0f, 
+				fsm["follow"]["speed"].asFloat(),
 				fsm["follow"]["startup"].asFloat(),
 				fsm["follow"]["interval"].asFloat(),
 				fsm["follow"]["endLag"].asFloat()
@@ -470,10 +470,12 @@ namespace mapRooms
 			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 
 			
-			
 			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
+			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
+
+			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
 			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
-			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
+			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
 
 			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 
