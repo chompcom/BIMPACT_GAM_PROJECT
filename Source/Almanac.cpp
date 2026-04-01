@@ -487,93 +487,97 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 			}
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
-
-		//inputs for area bookmarks
-		std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
-		std::vector<int> bookmarkPages{0,1,5,8,11,13,16};
-		//note: goes from bottom to top
-		for (int i{ 0 }; i < 6; ++i)
 		{
-			//test for area bookmarks
-			//Sprite test {Sprite(removeLater, Vector2(683, (68 * i) - 47), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-			//test.UpdateTransform();
-			//test.RenderSprite(true);
-
-			if (almanac.currentArea != allAreas[5 - i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
-				IsCursorInRect(Vector2(683, (68 * i) - 47), 75, 57))
+			//inputs for area bookmarks
+			std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
+			std::vector<int> bookmarkPages{ 0,1,5,8,11,13,16 };
+			//note: goes from bottom to top
+			for (int i{ 0 }; i < 6; ++i)
 			{
-				almanac.currentPageNumber = bookmarkPages[5 - i];
-				BigPageFlip();
-				//std::cout << "current: " << almanac.currentPageNumber << "\n";
-			}
-		}
-		//input for the help bookmark
-		//Sprite test{ Sprite(removeLater, Vector2(683, 293), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//test.UpdateTransform();
-		//test.RenderSprite(true);
-		if (almanac.currentArea != "help" && AEInputCheckTriggered(AEVK_LBUTTON) &&
-			IsCursorInRect(Vector2(683, 293), 75, 57))
-		{
-			BigPageFlip();
-		//	almanac.currentPageNumber = 16;
-			almanac.currentPageNumber = 0;
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		}
-
-		//inputs for area bookmarks
-		std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot"};
-		std::vector<int> bookmarkPages{3,4,8,11,14,16};
-		for (int i{ 0 }; i < 6; ++i)
-		{
-			//test for area bookmarks
-			//Sprite test {Sprite(removeLater, Vector2(683, -(68 * i) + 201), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-			//test.UpdateTransform();
-			//test.RenderSprite(true);
-
-			if (almanac.currentArea != allAreas[i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
-				IsCursorInRect(Vector2(683, -(68 * i) + 201), 75, 57))
-			{
-				almanac.currentPageNumber = bookmarkPages[i];
-				//std::cout << "current: " << almanac.currentPageNumber << "\n";
-			}
-		}
-
-		//input for the boss bookmark
-		//Sprite test{ Sprite(removeLater, Vector2(683, - 208), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//test.UpdateTransform();
-		//test.RenderSprite(true);
-		if (almanac.currentArea != "boss" && AEInputCheckTriggered(AEVK_LBUTTON) &&
-			IsCursorInRect(Vector2(683, -208), 75, 57))
-		{
-			almanac.currentPageNumber = 18;
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		}
-
-
-
-		//inputs for main page enemy buttons 
-		if (3 == almanac.currentPageNumber)
-		{
-			//for (int i{ 0 }; i < almanac.maxPages; ++i)
-			for (int i{ 0 }; i < 15; ++i)
-			{
-				//test for main page enemy buttons
-				//Sprite test { (i < 6) ?
-				//Sprite(removeLater, Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) :
-				//Sprite(removeLater, Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) };
+				//test for area bookmarks
+				//Sprite test {Sprite(removeLater, Vector2(683, (68 * i) - 47), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
 				//test.UpdateTransform();
 				//test.RenderSprite(true);
 
-				if (AEInputCheckTriggered(AEVK_LBUTTON) && ((i < 6) ?
-					IsCursorInRect(Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), 160, 160) :
-					IsCursorInRect(Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), 160, 160)))
+				if (almanac.currentArea != allAreas[5 - i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
+					IsCursorInRect(Vector2(683, (68 * i) - 47), 75, 57))
 				{
-					almanac.currentPageNumber = i + 4;
-					std::cout << "current: " << almanac.currentPageNumber << "\n";
+					almanac.currentPageNumber = bookmarkPages[5 - i];
+				//	BigPageFlip();
+					//std::cout << "current: " << almanac.currentPageNumber << "\n";
+				}
+			}
+			//input for the help bookmark
+			//Sprite test{ Sprite(removeLater, Vector2(683, 293), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
+			//test.UpdateTransform();
+			//test.RenderSprite(true);
+			if (almanac.currentArea != "help" && AEInputCheckTriggered(AEVK_LBUTTON) &&
+				IsCursorInRect(Vector2(683, 293), 75, 57))
+			{
+				BigPageFlip();
+				//	almanac.currentPageNumber = 16;
+				almanac.currentPageNumber = 0;
+				//std::cout << "current: " << almanac.currentPageNumber << "\n";
+			}
+		}
+		{
+			//inputs for area bookmarks
+			std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
+			std::vector<int> bookmarkPages{ 3,4,8,11,14,16 };
+			for (int i{ 0 }; i < 6; ++i)
+			{
+				//test for area bookmarks
+				//Sprite test {Sprite(removeLater, Vector2(683, -(68 * i) + 201), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
+				//test.UpdateTransform();
+				//test.RenderSprite(true);
+
+				if (almanac.currentArea != allAreas[i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
+					IsCursorInRect(Vector2(683, -(68 * i) + 201), 75, 57))
+				{
+					BigPageFlip();
+					almanac.currentPageNumber = bookmarkPages[i];
+					//std::cout << "current: " << almanac.currentPageNumber << "\n";
+				}
+			}
+
+			//input for the boss bookmark
+			//Sprite test{ Sprite(removeLater, Vector2(683, - 208), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
+			//test.UpdateTransform();
+			//test.RenderSprite(true);
+			if (almanac.currentArea != "boss" && AEInputCheckTriggered(AEVK_LBUTTON) &&
+				IsCursorInRect(Vector2(683, -208), 75, 57))
+			{
+				BigPageFlip();
+				almanac.currentPageNumber = 18;
+				//std::cout << "current: " << almanac.currentPageNumber << "\n";
+			}
+
+
+
+			//inputs for main page enemy buttons 
+			if (3 == almanac.currentPageNumber)
+			{
+				//for (int i{ 0 }; i < almanac.maxPages; ++i)
+				for (int i{ 0 }; i < 15; ++i)
+				{
+					//test for main page enemy buttons
+					//Sprite test { (i < 6) ?
+					//Sprite(removeLater, Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) :
+					//Sprite(removeLater, Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) };
+					//test.UpdateTransform();
+					//test.RenderSprite(true);
+
+					if (AEInputCheckTriggered(AEVK_LBUTTON) && ((i < 6) ?
+						IsCursorInRect(Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), 160, 160) :
+						IsCursorInRect(Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), 160, 160)))
+					{
+						//std::cout << "TRIGGERED";
+						almanac.currentPageNumber = i + 4;
+						std::cout << "current: " << almanac.currentPageNumber << "\n";
+					}
 				}
 			}
 		}
-
 		//set current are depending on page number / current entry
 		almanac.currentArea = (almanac.currentPageNumber > 3 && almanac.currentPageNumber < 20)
 			? almanac.entries[almanac.currentPageNumber - 4].area :
