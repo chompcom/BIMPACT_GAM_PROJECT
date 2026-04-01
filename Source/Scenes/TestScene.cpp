@@ -153,7 +153,7 @@ void TestInit()
 	globalTransferData.player = &player;
 
 	// square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
@@ -452,6 +452,10 @@ void TestDraw()
 			break;
 		}
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
+		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
 }
@@ -536,7 +540,7 @@ void TestUpdate(float dt)
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
-		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || AEInputCheckTriggered(AEVK_TAB))
 		{
 			gameState = PAUSED;
 		}
@@ -696,114 +700,12 @@ void TestUpdate(float dt)
 		}
 
 
-		// Update Gifts (Must update both sides)
-		//for (Gift* g : roomData.giftList)
-		//{
-		//	if (g)
-		//	{
-		//		//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
-		//		
-		//		int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-		//		Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//		UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-		//		int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
-
-		//		// get angle lmao tan-1(opp / adj) 
-		//		//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
-		//			
-		//		// Collides but no velocity?
-		//		//if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
-		//		if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) {
-		//			g->velocity = Vector2{ 1.0f, 1.0f };
-
-
-		//			g->position.x = prevCellCenter.x + (res & COLLISION_LEFT) ? (gridWidth * 0.5f - (g->giftType.sprite.scale.x) * 0.5f - skin) : (-gridWidth * 0.5f + (g->giftType.sprite.scale.x) * 0.5f + skin);
-		//			g->position.y = prevCellCenter.y + (res & COLLISION_TOP) ?  (gridHeight * 0.5f - (g->giftType.sprite.scale.y) * 0.5f - skin) : (-gridHeight * 0.5f + (g->giftType.sprite.scale.y) * 0.5f + skin);
-
-		//			g->velocity = Vector2{ 0.0f, 0.0f };
-
-		//			g->giftType.sprite.UpdateTransform();
-		//			g->shadow.UpdateTransform();
-		//			continue;
-		//		}
-		//		else if (res && fabs(g->velocity.Normalized().Length()) < 0.1f) {
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) g->velocity.x = 0.0f ;
-		//			if (res & COLLISION_BOTTOM || res & COLLISION_TOP) g->velocity.y = 0.0f;
-		//		}
-
-
-		//		std::string tmp{};
-		//		if (res & COLLISION_LEFT) {
-		//			tmp += " LEFT ";
-		//			g->velocity.x *= -1;	// Inverse x if left
-		//		}
-		//		else if (res & COLLISION_RIGHT) {
-		//			tmp += " RIGHT ";
-		//			g->velocity.x *= -1;	// Inverse x if right
-		//		
-		//		}
-		//		if (res & COLLISION_TOP) {
-		//			std::cout << g->velocity.y;
-		//			tmp += " TOP ";
-		//			g->velocity.y *= -1;	// Inverse y if top
-		//		}
-		//		else if (res & COLLISION_BOTTOM) {
-		//			tmp += " BOTTOM ";
-		//			g->velocity.y *= -1;	// Inverse y if bottom
-		//		}
-		//		if (tmp.size() > 0) {
-
-
-		//			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-		//			float gridWidth = currentRoom->roomGrid.GetTileWidth();
-		//			float gridHeight = currentRoom->roomGrid.GetTileHeight();
-		//			float collisionScaleX = g->giftType.sprite.scale.x;
-		//			float collisionScaleY = g->giftType.sprite.scale.y;
-		//			constexpr float skin = 0.10f;
-
-		//			//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) {
-
-		//				if ((res & COLLISION_LEFT) && g->velocity.x < -EPSILON) g->position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-		//				if ((res & COLLISION_RIGHT) && g->velocity.x > EPSILON) g->position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-
-		//				g->velocity.y /= 1.5f;		// ???
-		//				g->velocity.x /= 1.1f;		// Dampen bounce
-
-		//				//g->position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x;
-		//				//g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
-		//			}
-		//			else if (res & COLLISION_TOP || res & COLLISION_BOTTOM) {
-		//				//g->position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y;
-		//				//g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
-		//				
-		//				if ((res & COLLISION_BOTTOM) && g->velocity.y < -EPSILON) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
-		//				if ((res & COLLISION_TOP) &&    g->velocity.y > EPSILON)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
-		//				
-		//				g->velocity.y /= 1.1f;		// Dampen bounce
-		//				g->velocity.x /= 1.5f;		// ???
-		//			}
-		//			//g->velocity /= 1.1f;		// Dampen bounce
-		//			//std::cout << tmp << '\n';
-		//			//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
-		//		};
-		//		
-
-
-		//		g->giftType.sprite.UpdateTransform();
-		//		g->shadow.UpdateTransform();
-		//	}
-		//}
-
-
 		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
 				Vector2 prevGiftPos = g->position;
-				int prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
+				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
 
 				float gridWidth = currentRoom->roomGrid.GetTileWidth();
 				float gridHeight = currentRoom->roomGrid.GetTileHeight();
@@ -918,7 +820,7 @@ void TestUpdate(float dt)
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
-				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
 
@@ -956,8 +858,11 @@ void TestUpdate(float dt)
 			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
 			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
 
-			if (roomData.boss->direction.x < 0) roomData.boss->sprite.scale = { -100, 100 };
-			else roomData.boss->sprite.scale = { 100, 100 };
+			if (roomData.boss->direction.x < 0.f) 
+				roomData.boss->sprite.scale = { -abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			else {
+				roomData.boss->sprite.scale = { abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			}
 
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
@@ -976,8 +881,8 @@ void TestUpdate(float dt)
 					if (!e->isActive) continue;
 					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
-						gift->velocity = -gift->velocity;
-
+						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
+						gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
 						Labels traitsCheck = gift->giftType.traits;
 						//Include your friends in the traits check, because you can't friend those who judge yours
 						for (Enemy* friendly : carryData.enemyList){
@@ -993,7 +898,6 @@ void TestUpdate(float dt)
 							break;
 						}
 
-						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
 						// Ok, now gift shall snap to front of enemy while moving back
 						gift->position = e->sprite.position - (dirBtwnEnemyGift).Normalized() * gift->giftType.sprite.scale.x;
 					}

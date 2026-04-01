@@ -13,9 +13,10 @@ Boss1_FSM::Boss1_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 Charge
 	f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
 	f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag)
 	: Boss_FSM(Boss),  canWalk{true},
-	chargeDamage{ ChargeDamage }, chargeStartup{ ChargeStartup }, chargeInterval{ ChargeInterval }, chargeEndlag{ ChargeEndlag },
-	jumpDamage{ JumpDamage }, jumpStartup{ JumpStartup }, jumpInterval{ JumpInterval }, jumpEndlag{ JumpEndlag },
-	followDamage{ FollowDamage }, followStartup{ FollowStartup }, followInterval{ FollowInterval }, followEndlag{ FollowEndlag }
+	chargeDamage{ 1.f }, chargeStartup{ ChargeStartup }, chargeInterval{ ChargeInterval }, chargeEndlag{ ChargeEndlag },
+	jumpDamage{ 1.f }, jumpStartup{ JumpStartup }, jumpInterval{ JumpInterval }, jumpEndlag{ JumpEndlag },
+	followDamage{ 1.f }, followStartup{ FollowStartup }, followInterval{ FollowInterval }, followEndlag{ FollowEndlag }
+	,chargeSpeed{ ChargeDamage}, followSpeed{FollowDamage}, jumpSpeed{JumpDamage}
 {}
 
 void Boss1_FSM::Update(Player& player, f32 dt) {
@@ -58,7 +59,7 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 			//std::cout << "Boss Walk\n";
 			
 			boss->sprite.position += boss->velocity * dt;
-			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
+			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 
 			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
 				//CollisionBoundary_Static(boss->sprite.position, boss->sprite.scale, 1600, 900)) {
@@ -111,7 +112,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 		//direction = target - boss->sprite.position;
 
 		boss->sprite.position += boss->velocity * dt;
-		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
+		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 
 		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale * 0.8, boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
@@ -183,8 +184,8 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		//std::cout << "Boss Jump Attack\n";
 		interval += dt;
 		boss->sprite.position = Vector2{ target.x, target.y + jumpSpeed * jumpInterval } + Vector2{ 0, -1 } * jumpSpeed * interval;
-		boss->shadow.position = Vector2{ target.x, target.y - 35 };
-		
+		boss->shadow.position = Vector2{ target.x, target.y - boss->shadowOffset};
+
 		if (boss->sprite.position.y - target.y > 10) boss->invulnerableTimer = dt;
 		else {
 			if (CollisionIntersection_RectRect(target, boss->sprite.scale * 0.8, Vector2{},
@@ -242,7 +243,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		boss->velocity = boss->direction * followSpeed * boss->speedModifier;
 
 		boss->sprite.position += boss->velocity * dt;
-		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - 35 };
+		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 
 		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale * 0.8, boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {

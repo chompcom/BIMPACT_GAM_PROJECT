@@ -190,7 +190,7 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 		{
 			text = "- Evil";
 			//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-			AEGfxPrint(font, text, 0.055f, 0.555, 0.8f, r, g, b, 1.f);
+			AEGfxPrint(font, text, 0.055f, 0.555f, 0.8f, r, g, b, 1.f);
 
 			text = "- Nothing";
 			//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
@@ -226,9 +226,9 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	else if (3 == almanac.currentPageNumber)
 	{
 		const char* text{ "Enemies" };
-		f32 textWidth, textHeight;
+		//f32 textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 2.f, &textWidth, &textHeight);
-		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 + 0.6f, 2.f, r, g, b, 1.f);
+		AEGfxPrint(font, text, -textWidth / 2.f - 0.4f, -textHeight / 2.f + 0.6f, 2.f, r, g, b, 1.f);
 
 		//const char* text{ "Tutorial" };
 		//f32 textWidth, textHeight;
@@ -306,7 +306,7 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	else if (2 == almanac.currentPageNumber)
 	{
 		const char* text{ "Some enemies might not like" };
-		f32 textWidth, textHeight;
+		textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 - 0.22f, 1.f, r, g, b, 1.f);
 

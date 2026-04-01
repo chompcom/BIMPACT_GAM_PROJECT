@@ -8,7 +8,7 @@ extern LV_STATES gameState;
 
 Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite, 
 	 RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos, Vector2 size)
-	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{shadowSprite}, //hpBar{hpBarSprite},
+	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{ shadowSprite }, shadowOffset{}, //hpBar{hpBarSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	healthbarInitialized = healthbar.LoadFromFilePopUp(filePath, pos, size);
@@ -72,16 +72,19 @@ void Boss::CollideProjectile() {
 void Boss::CollideGift() {
 	float collisionTime{ 0.0f };
 	for (Gift* gift : roomData.giftList) {
-		if (gift->velocity == Vector2{}) continue;
+		if (gift->velocity.LengthSq() <= EPSILON) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+		if (CollisionIntersection_RectRect(sprite.position, Vector2(abs(sprite.scale.x), abs(sprite.scale.y)), velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= 1;
 				//std::cout << "Taken Damage: " << 1;
 				//std::cout << "Remaining Health: " << currentHealth;
 				DamageBoss(1);
-				gift->velocity = -gift->velocity;
+				//gift->velocity = -gift->velocity;
+				Vector2 dirBtwnEnemyGift = sprite.position - gift->position;
+				gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
+				invulnerableTimer = 0.5f;
 			}
 		}
 
@@ -107,7 +110,7 @@ void Boss::ResetBoss() {
 	currentHealth = health;
 	sprite.position = Vector2{};
 	sprite.GetAnimation("Idle");
-	shadow.position = Vector2{ 0, -35 };
+	shadow.position = Vector2{ 0, -shadowOffset};
 
 	bossStateMachine->currentState = bossStateMachine->initialState;
 	bossStateMachine->attackPhase = ATTACK_NIL;

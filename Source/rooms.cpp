@@ -178,6 +178,8 @@ namespace mapRooms
 
 		//rmType = RoomType::Normal;
 
+		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount()  <<  " ****************\n";
+
 		//std::cout << static_cast<int>(this->rmType) << '\n';
 
 		if (this->rmType == RoomType::Empty) {
@@ -438,27 +440,60 @@ namespace mapRooms
 		
 
 		// Boss Init
-		if (rmType == RoomType::Boss) {
-			//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 1.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
+			if (rmType == RoomType::Boss) {
+				//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+
+				Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
+
+				Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
+
+				std::vector<AttackData>attackData = {
+				{
+					fsm["charge"]["speed"].asFloat(),
+					fsm["charge"]["startup"].asFloat(),
+					fsm["charge"]["interval"].asFloat(),
+					fsm["charge"]["endLag"].asFloat()
+				}, 
+			{		
+				fsm["jump"]["speed"].asFloat(),
+				fsm["jump"]["startup"].asFloat(),
+				fsm["jump"]["interval"].asFloat(),
+				fsm["jump"]["endLag"].asFloat()
+			},
+			{
+				fsm["follow"]["speed"].asFloat(),
+				fsm["follow"]["startup"].asFloat(),
+				fsm["follow"]["interval"].asFloat(),
+				fsm["follow"]["endLag"].asFloat()
+			} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), 
 				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
-			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
+
+			
+			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
+			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
+
+			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
 			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
-			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
-			//currentRoomData.boss->hpBar.position = Vector2{ 0.f, 300.f };
-			//currentRoomData.boss->hpBar.scale = Vector2{ 1000.f, 10.f };
+			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
 
-			/*currentRoomData.boss->sprite.SetAnimation({"idle", 4});
-			currentRoomData.boss->sprite.SetAnimation({ "walk", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "run", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "runAttack", 4 });
-			currentRoomData.boss->sprite.SetAnimation({ "attack", 3 });*/
+			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 
+			for (Json::String animation : animationSource.getMemberNames()) {
+				currentRoomData.boss->sprite.SetAnimation({
+					animation,
+					animationSource[animation]["startRow"].asInt(),
+					animationSource[animation]["startCol"].asInt(),
+					animationSource[animation]["endFrame"].asInt()
+					});
+			}
+
+
+			/*
 			currentRoomData.boss->sprite.SetAnimation({ "Idle", 0, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Run Start", 1, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Run", 1, 0, 3 });
@@ -466,7 +501,7 @@ namespace mapRooms
 			currentRoomData.boss->sprite.SetAnimation({ "Jump Start", 2, 0, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Jump", 2, 1, 1 });
 			currentRoomData.boss->sprite.SetAnimation({ "Jump End", 2, 2, 1 });
-
+			*/
 			currentRoomData.boss->sprite.GetAnimation("Idle");
 
 

@@ -23,6 +23,7 @@ class Boss {
 		//TexturedSprite sprite;
 		AnimatedSprite sprite;
 		TexturedSprite shadow;
+		float shadowOffset;
 		//Sprite hpBar;
 		f32 currentHealth;
 		bool isActive; // For checking if its alive

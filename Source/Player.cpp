@@ -6,6 +6,7 @@
 #include "Collision.h"
 #include <iostream>
 #include "GameStateList.h"
+#include "Loaders/DataLoader.h"
 
 extern LV_STATES gameState;
 
@@ -15,17 +16,20 @@ Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 thr
 	sprite{ playerSprite },
 	shadow{ shadowSprite },
 	throwStrength{ throwStrength },
-	speed{ 1.f }, 
-	baseSpeed{ _speed},
-	health { 3 },
+	speed{ 1.f },
+	baseSpeed{ _speed },
+	health{ 3 },
 	position{ position },
 	direction{ direction },
 	pickUpState{ false },
 	throwState{ false },
 	heldGift{ nullptr },
 	throwForce{ 0.f },
+	throwMin{}, throwMax{},
+	throwShakeModifier{},
 	pickUpCooldown{ 0.f },
 	invulnerableTimer{ 0.f },
+	baseInvulnerable{ 0.f },
 	isTargetable { true },
 	fadingIn{ false }
 {
@@ -130,13 +134,13 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 		//Calculate the player's throwing force
 		player.throwState = true;
 		player.throwForce += deltaTime * player.throwStrength;
-		player.throwForce = AEClamp(player.throwForce, 2000.f, 10000.f);
+		player.throwForce = AEClamp(player.throwForce, player.throwMin, player.throwMax);
 
 		//Shake the gift
 		Vector2 shakeVector{ (static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 , 
 			(static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1 };
 
-		shakeVector = shakeVector.Normalized() * (player.throwForce / 700.f);
+		shakeVector = shakeVector.Normalized() * (player.throwForce * player.throwShakeModifier);
 		(*player.heldGift).giftType.sprite.position += shakeVector;
 
 	}
@@ -172,7 +176,7 @@ void playerTakesDamage(Player& player)
 		if (player.health <= 0) gameState = LOSE;
 
 
-		player.invulnerableTimer = 1.f;
+		player.invulnerableTimer = player.baseInvulnerable;
 	}
 }
 
@@ -183,6 +187,11 @@ void playerHealsDamage(Player& player)
 
 void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 {
+
+	Json::Value source = DataLoader::LoadJsonFile("Assets/entityInfo.json")["player"];
+
+	
+
 	//put down gift
 	if (player.heldGift)
 	{
@@ -195,15 +204,23 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 		player.heldGift = nullptr;
 	}
 
-	player.health = 3;
+	player.health = source["maxHearts"].asInt();
 	player.pickUpState = false;
 	player.throwState = false;
+	player.sprite = DataLoader::CreateTexture(source["sprite"].asString());
+	player.sprite.scale = Vector2(1, 1) * source["scale"].asFloat();
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
-	player.baseSpeed = 575.f;
+	player.baseSpeed = source["speed"].asFloat();
+	player.throwStrength = source["throwStrength"].asFloat();
+	player.throwShakeModifier = source["throwShakeModifier"].asFloat();
+	player.throwMin = source["throwMin"].asFloat();
+	player.throwMax = source["throwMax"].asFloat();
 	player.throwForce = 0.f;
+
 	player.pickUpCooldown = 0.f;
 	player.invulnerableTimer = 0.f;
+	player.baseInvulnerable = source["invulnTimer"].asFloat();
 }
 
 

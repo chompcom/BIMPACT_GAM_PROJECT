@@ -447,7 +447,7 @@ void DVDMove(Enemy& me) {
 		float height = me.roomData->grid.GetHeight() * me.roomData->grid.GetTileHeight();
 
 		//door bs
-		if (CollisionBoundary_Static(me.prevPos, me.sprite.scale, width, height)) {
+		if (CollisionBoundary_Static(me.prevPos, me.sprite.scale, (int)width, (int)height)) {
 
 			if (me.prevPos.x < -EPSILON) {
 				//left wall
