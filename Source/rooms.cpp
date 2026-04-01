@@ -178,7 +178,9 @@ namespace mapRooms
 
 		//rmType = RoomType::Normal;
 
-		std::cout << static_cast<int>(this->rmType) << '\n';
+		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount()  <<  " ****************\n";
+
+		//std::cout << static_cast<int>(this->rmType) << '\n';
 
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
@@ -393,7 +395,7 @@ namespace mapRooms
 		}
 
 
-			std::cout << "Display Room Init of " << biome << "\n";
+			//std::cout << "Display Room Init of " << biome << "\n";
 			//roomGrid.
 			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
 			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
@@ -467,7 +469,9 @@ namespace mapRooms
 				fsm["follow"]["endLag"].asFloat()
 			} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), 
+				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
+
 
 			
 			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
