@@ -26,7 +26,6 @@ void renderPlayerLives(Player const & player, std::vector<TexturedSprite> health
 
 void checkIfAlmanacClicked(TexturedSprite const& almanacSprite, Almanac & almanac)
 {
-	s32 cursorPositionX, cursorPositionY;
 	//AEInputGetCursorPosition(&cursorPositionX, &cursorPositionY);
 	if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInSquare(almanacSprite.position, almanacSprite.scale.x))
 	{

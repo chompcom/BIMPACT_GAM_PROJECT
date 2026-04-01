@@ -2,6 +2,7 @@
     "player":{
         "maxHearts":3,
         "sprite":"Assets/player.png",
+        "scale": 100,
         "throwStrength":2500,
         "throwShakeModifier":0.0025,
         "throwMin":2000,

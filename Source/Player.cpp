@@ -204,10 +204,11 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 		player.heldGift = nullptr;
 	}
 
-
-	player.health = source["maxHearts"].asFloat();
+	player.health = source["maxHearts"].asInt();
 	player.pickUpState = false;
 	player.throwState = false;
+	player.sprite = DataLoader::CreateTexture(source["sprite"].asString());
+	player.sprite.scale = Vector2(1, 1) * source["scale"].asFloat();
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
 	player.baseSpeed = source["speed"].asFloat();

@@ -700,114 +700,12 @@ void TestUpdate(float dt)
 		}
 
 
-		// Update Gifts (Must update both sides)
-		//for (Gift* g : roomData.giftList)
-		//{
-		//	if (g)
-		//	{
-		//		//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
-		//		
-		//		int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-		//		Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//		UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-		//		int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
-
-		//		// get angle lmao tan-1(opp / adj) 
-		//		//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
-		//			
-		//		// Collides but no velocity?
-		//		//if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
-		//		if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) {
-		//			g->velocity = Vector2{ 1.0f, 1.0f };
-
-
-		//			g->position.x = prevCellCenter.x + (res & COLLISION_LEFT) ? (gridWidth * 0.5f - (g->giftType.sprite.scale.x) * 0.5f - skin) : (-gridWidth * 0.5f + (g->giftType.sprite.scale.x) * 0.5f + skin);
-		//			g->position.y = prevCellCenter.y + (res & COLLISION_TOP) ?  (gridHeight * 0.5f - (g->giftType.sprite.scale.y) * 0.5f - skin) : (-gridHeight * 0.5f + (g->giftType.sprite.scale.y) * 0.5f + skin);
-
-		//			g->velocity = Vector2{ 0.0f, 0.0f };
-
-		//			g->giftType.sprite.UpdateTransform();
-		//			g->shadow.UpdateTransform();
-		//			continue;
-		//		}
-		//		else if (res && fabs(g->velocity.Normalized().Length()) < 0.1f) {
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) g->velocity.x = 0.0f ;
-		//			if (res & COLLISION_BOTTOM || res & COLLISION_TOP) g->velocity.y = 0.0f;
-		//		}
-
-
-		//		std::string tmp{};
-		//		if (res & COLLISION_LEFT) {
-		//			tmp += " LEFT ";
-		//			g->velocity.x *= -1;	// Inverse x if left
-		//		}
-		//		else if (res & COLLISION_RIGHT) {
-		//			tmp += " RIGHT ";
-		//			g->velocity.x *= -1;	// Inverse x if right
-		//		
-		//		}
-		//		if (res & COLLISION_TOP) {
-		//			std::cout << g->velocity.y;
-		//			tmp += " TOP ";
-		//			g->velocity.y *= -1;	// Inverse y if top
-		//		}
-		//		else if (res & COLLISION_BOTTOM) {
-		//			tmp += " BOTTOM ";
-		//			g->velocity.y *= -1;	// Inverse y if bottom
-		//		}
-		//		if (tmp.size() > 0) {
-
-
-		//			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-		//			float gridWidth = currentRoom->roomGrid.GetTileWidth();
-		//			float gridHeight = currentRoom->roomGrid.GetTileHeight();
-		//			float collisionScaleX = g->giftType.sprite.scale.x;
-		//			float collisionScaleY = g->giftType.sprite.scale.y;
-		//			constexpr float skin = 0.10f;
-
-		//			//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) {
-
-		//				if ((res & COLLISION_LEFT) && g->velocity.x < -EPSILON) g->position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-		//				if ((res & COLLISION_RIGHT) && g->velocity.x > EPSILON) g->position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-
-		//				g->velocity.y /= 1.5f;		// ???
-		//				g->velocity.x /= 1.1f;		// Dampen bounce
-
-		//				//g->position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x;
-		//				//g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
-		//			}
-		//			else if (res & COLLISION_TOP || res & COLLISION_BOTTOM) {
-		//				//g->position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y;
-		//				//g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
-		//				
-		//				if ((res & COLLISION_BOTTOM) && g->velocity.y < -EPSILON) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
-		//				if ((res & COLLISION_TOP) &&    g->velocity.y > EPSILON)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
-		//				
-		//				g->velocity.y /= 1.1f;		// Dampen bounce
-		//				g->velocity.x /= 1.5f;		// ???
-		//			}
-		//			//g->velocity /= 1.1f;		// Dampen bounce
-		//			//std::cout << tmp << '\n';
-		//			//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
-		//		};
-		//		
-
-
-		//		g->giftType.sprite.UpdateTransform();
-		//		g->shadow.UpdateTransform();
-		//	}
-		//}
-
-
 		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
 				Vector2 prevGiftPos = g->position;
-				int prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
+				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
 
 				float gridWidth = currentRoom->roomGrid.GetTileWidth();
 				float gridHeight = currentRoom->roomGrid.GetTileHeight();
