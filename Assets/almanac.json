@@ -172,14 +172,6 @@
 			"yPictureScale": 100
 		},
 		{
-			"name": "DELETE THIS",
-			"description": "DELETE THIS",
-			"area": "plant",
-			"spritePath": "Assets/veggiefish.png",
-			"xPictureScale": 110,
-			"yPictureScale": 100
-		},
-		{
 			"name": "Soap",
 			"description": "Slows with its bubbles",
 			"area": "ocean",
@@ -242,6 +234,14 @@
 			"spritePath": "Assets/Enemies/tinyDragon.png",
 			"xPictureScale": 50,
 			"yPictureScale": 50
+		},
+		{
+			"name": "Chimera",
+			"description": "Pure evil",
+			"area": "boss",
+			"spritePath": "Assets/Enemies/Boss/chimeraBoss.png",
+			"xPictureScale": 100,
+			"yPictureScale": 100
 		}
 	]
 

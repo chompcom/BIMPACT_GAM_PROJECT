@@ -22,11 +22,12 @@ namespace DataLoader {
 	AEGfxVertexList* GetMesh();
 
 	TexturedSprite CreateTexture(std::string filename);
-
+	TexturedSprite CreateAnimatedTexture(std::string filename, f32 offsetX = 1.0f, f32 offsetY = 1.0f);
 
 	// New procedural mesh getters for UI
 	AEGfxVertexList* GetOrCreateSquareMesh();
 	AEGfxVertexList* GetOrCreateCircleMesh();
+	AEGfxVertexList* GetOrCreateAnimatedMesh(f32 offsetX, f32 offsetY);
 
 	// Creates or retrieve cached unit rrect mesh.
 	AEGfxVertexList* GetOrCreateRoundRectMesh(f32 radiusRatio, int segments);

@@ -178,7 +178,9 @@ namespace mapRooms
 
 		//rmType = RoomType::Normal;
 
-		std::cout << static_cast<int>(this->rmType) << '\n';
+		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount()  <<  " ****************\n";
+
+		//std::cout << static_cast<int>(this->rmType) << '\n';
 
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
@@ -271,7 +273,8 @@ namespace mapRooms
 
 					Enemy* enemy = new Enemy(
 						enemyType,
-						DataLoader::CreateTexture(enemyType.spritePath),
+						//DataLoader::CreateTexture(enemyType.spritePath),
+						DataLoader::CreateAnimatedTexture(enemyType.spritePath),
 						DataLoader::CreateTexture("Assets/shadow.png")
 					);
 
@@ -392,7 +395,7 @@ namespace mapRooms
 		}
 
 
-			std::cout << "Display Room Init of " << biome << "\n";
+			//std::cout << "Display Room Init of " << biome << "\n";
 			//roomGrid.
 			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
 			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
@@ -412,7 +415,7 @@ namespace mapRooms
 
 			// Spawn enemies
 			if (0 && currentRoomData.enemyList.empty()) {
-				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
 				for (Enemy* i : currentRoomData.enemyList) {
 					i->shadow.position = Vector2{ 0.f, -35.f };
 					i->shadow.UpdateTransform();
@@ -437,12 +440,70 @@ namespace mapRooms
 		
 
 		// Boss Init
-		if (rmType == RoomType::Boss) {
-			std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f}, {5.0f, 1.5f, 4.0f, 1.5f} };
-			currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/Enemies/Boss/chimeraBossChargeAttack.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss->sprite.scale = Vector2{ 100.0f, 100.0f };
-			currentRoomData.boss->shadow.position = Vector2{ 0.f, -35.f };
+			if (rmType == RoomType::Boss) {
+				//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+
+				Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
+
+				Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
+
+				std::vector<AttackData>attackData = {
+				{
+					fsm["charge"]["speed"].asFloat(),
+					fsm["charge"]["startup"].asFloat(),
+					fsm["charge"]["interval"].asFloat(),
+					fsm["charge"]["endLag"].asFloat()
+				}, 
+			{		
+				fsm["jump"]["speed"].asFloat(),
+				fsm["jump"]["startup"].asFloat(),
+				fsm["jump"]["interval"].asFloat(),
+				fsm["jump"]["endLag"].asFloat()
+			},
+			{
+				fsm["follow"]["speed"].asFloat(),
+				fsm["follow"]["startup"].asFloat(),
+				fsm["follow"]["interval"].asFloat(),
+				fsm["follow"]["endLag"].asFloat()
+			} };
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), 
+				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
+
+
+			
+			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
+			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
+
+			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
+			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
+			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
+
+			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
+
+			for (Json::String animation : animationSource.getMemberNames()) {
+				currentRoomData.boss->sprite.SetAnimation({
+					animation,
+					animationSource[animation]["startRow"].asInt(),
+					animationSource[animation]["startCol"].asInt(),
+					animationSource[animation]["endFrame"].asInt()
+					});
+			}
+
+
+			/*
+			currentRoomData.boss->sprite.SetAnimation({ "Idle", 0, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run Start", 1, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run", 1, 0, 3 });
+			currentRoomData.boss->sprite.SetAnimation({ "Run End", 1, 2, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump Start", 2, 0, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump", 2, 1, 1 });
+			currentRoomData.boss->sprite.SetAnimation({ "Jump End", 2, 2, 1 });
+			*/
+			currentRoomData.boss->sprite.GetAnimation("Idle");
+
 
 			// Initialize Default Grid (Should be all zero ig)
 			biome = "Normal"; // or keep previously chosen biome if you want

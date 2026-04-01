@@ -28,7 +28,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
 		sprite.color = color;
 
         Vector2 velocity = shotDir * speed;  // uses shotDir
-        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage,0.0f, source);
+        Projectile* aoe = new Projectile(sprite, AOE, velocity, lifetime, damage,0.0f, source, isFriend);
         roomData.projectileList.push_back(aoe);
     }
 }
@@ -42,7 +42,7 @@ void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vecto
 
   //  Vector2 swirlVel = (dir * speed) + (perpendicularVel * speed * 50.0f);
 
-    Projectile* rounding = new Projectile(sprite, ROUNDING, dir * speed, lifetime, damage,rot,source);
+    Projectile* rounding = new Projectile(sprite, ROUNDING, dir * speed, lifetime, damage,rot,source, isFriend);
     roomData.projectileList.push_back(rounding);
     RoundingProjectileAudio();
 }
@@ -53,7 +53,7 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     sprite.color = color;
 
     //sprite.direction = dir;
-    Projectile* scatter = new Projectile(sprite, SCATTER, dir * speed, lifetime, damage,0.0f, source);
+    Projectile* scatter = new Projectile(sprite, SCATTER, dir * speed, lifetime, damage,0.0f, source, isFriend);
     scatter->isScatter = true;
     roomData.projectileList.push_back(scatter);  
     
@@ -63,7 +63,7 @@ void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vect
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
-    Projectile* boomerang = new Projectile(sprite, BOOMERANG, dir * speed, lifetime, damage, 30.0f, source);
+    Projectile* boomerang = new Projectile(sprite, BOOMERANG, dir * speed, lifetime, damage, 30.0f, source, isFriend);
     roomData.projectileList.push_back(boomerang);
 
 }
@@ -122,7 +122,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         else {
 
             //deliberate assignment
-            if (hit = CollisionIntersection_RectRect(
+            if  (hit = CollisionIntersection_RectRect(
                 (*it)->GetPosition(),
                 (*it)->GetScale(),
                 (*it)->GetVelocity(),

@@ -1,0 +1,49 @@
+{
+  "elements": [
+    {
+      "id": "root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+      "children": [
+        {
+          "id": "background",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 1.0,
+          "h": 1.0,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.25,
+          "roundSegments": 64,
+          "backgroundColor": [0.75, 0.0, 0.0, 1.0]
+        },
+        {
+          "id": "foreground",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 1.0,
+          "h": 1.0,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.25,
+          "roundSegments": 64,
+          "backgroundColor": [1.0, 0.0, 0.0, 1.0]
+        },
+        {
+          "id": "boss_name",
+          "x": 0.0,
+          "y": -1.5,
+          "w": 0.8,
+          "h": 0.08,
+          "visible": true,
+          "text": "Placeholder",
+          "textScale": 0.45,
+          "textColor": [0.45, 0.45, 0.45, 1.0]
+        }
+      ]
+    }
+  ]
+}

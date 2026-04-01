@@ -4,6 +4,7 @@
 #include "RoomData.h"
 #include "FSM.h"
 #include "Player.h"
+#include "Screens/Ui.h"
 
 struct RoomData;
 
@@ -19,27 +20,36 @@ class Boss {
 		std::string name;
 		f32 health;
 		f32 damage;
-		TexturedSprite sprite;
+		//TexturedSprite sprite;
+		AnimatedSprite sprite;
 		TexturedSprite shadow;
+		float shadowOffset;
+		//Sprite hpBar;
 		f32 currentHealth;
 		bool isActive; // For checking if its alive
+		Vector2 direction{};
 		Vector2 velocity{};
 		f32 speedModifier{ 1.0f };
 		f32 invulnerableTimer{ 0.f };
 		bool collideWall{ false };
+
+		UIManager healthbar;
+		bool healthbarInitialized{ false };
 		
 		std::unique_ptr<Boss_FSM> bossStateMachine;
 
 		//points to the room it should be inside, so that it knows whats going on inside!
 		RoomData& roomData;
 
-		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, TexturedSprite enemySprite, TexturedSprite shadowSprite, 
-			RoomData& currentRoom, std::vector<AttackData> attackData);
+		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite,
+			RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos = {0, 350}, Vector2 size = {1000, 30});
 		~Boss();
 
 		void Update(Player& player, f32 dt);
 		void CollideProjectile();
 		void CollideGift();
+
+		void DamageBoss(s32 damage);
 
 		void ResetBoss();
 };
