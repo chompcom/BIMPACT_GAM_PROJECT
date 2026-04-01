@@ -20,6 +20,7 @@ void HoverAudio();
 void GameLoseAudio();
 bool IsbuttonAudioState();
 void GameWinAudio();
+void BigPageFlip();
 
 // Mob
 void HydroAttackAudio();

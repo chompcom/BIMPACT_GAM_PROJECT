@@ -151,7 +151,8 @@ void Enemy::ChangeState(EnemyStates newstate)
 	switch (newstate)
 	{
 	case ES_HAPPY:
-		FriendSuccessAudio();
+		FriendSuccessAudio();		
+		if (type.name == "Tom") TomWhateverAudio();
 		sprite.color = { 0.f,1.f,0.f,1.f };
 
 		//When I become a friend, the others in the room will start judging
@@ -173,6 +174,7 @@ void Enemy::ChangeState(EnemyStates newstate)
 		currentBehavior = enemyType.angry;
 		break;
 	}
+	this->target = Target{};
 
 }
 

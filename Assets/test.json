@@ -453,7 +453,7 @@
 		{
 			"name": "Soap",
 			"angrySound": "Soap",
-			"sprite": "Assets/Enemies/tom.png",
+			"sprite": "Assets/Enemies/soap.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"damage": 10,
@@ -506,8 +506,7 @@
 			],
 			"angry": [
 			]
-		}
-		,
+		},
 		//Tom
 		{
 			"name": "Tom",
@@ -515,34 +514,111 @@
 			"sprite": "Assets/Enemies/tom.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
-			"damage": 10,
+			"damage": -50,
 			"speed": 100,
 			"detectionRadius": 300,
 			"safeRadius": 300,
-			"attackRate": 1,
+			"attackRate": 8,
 			"happyProjectile": {
-				"damage": 10,
-				"radius": 50,
-				"speed": 1,
+				"damage": -50,
+				"radius": 100,
+				"speed": 100,
 				"lifetime": 3,
-				"sprite": "Assets/snowball.png"
+				"sprite": "Assets/pattyfish.png"
 			},
 			"angryProjectile": {
-				"damage": 20,
+				"damage": -50,
 				"radius": 50,
 				"speed": 1,
 				"lifetime": 3,
-				"sprite": "Assets/snowball.png"
+				"sprite": "Assets/pattyfish.png"
 			},
-			"traits": [ "Cold" , "Wet" ],
-			"likes": [ "Cold", "Wet" ],
-			"dislikes": ["Hot" ],
+			"traits": [],
+			"likes": [ "Cold", "Hot", "Clean", "Wet", "Gross" ],
+			"dislikes": [],
 			"happy": [
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"FireProjectile"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"ClearTarget",
+						"TargetPlayer"
+							
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+
+				}
+			]
+		},
+		// Tiny Dragon
+		{
+			"name": "Tiny Dragon",
+			"angrySound": "Roar",
+			"sprite": "Assets/Enemies/tinyDragon.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 50,
+			"speed": 100,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 1.5,
+			"happyProjectile": {
+				"damage": 5,
+				"radius": 250,
+				"speed": 200,
+				"lifetime": 5,
+				"sprite": "Assets/fireball.png"
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 120,
+				"speed": 100,
+				"lifetime": 2,
+				"sprite": "Assets/fireball.png"
+			},
+			"traits": [ "Hot" ],
+			"likes": [ "Hot" ],
+			"dislikes": [ "Cold", "Clean" ],
+			"happy": [
+
 				{
 					"context": "IsNotFollowingPlayer",
 					"actions": [
 						"TargetPlayer",
 						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"MoveToTarget",
+						"CircleMove",
 						"FireProjectile"
 					]
 				},
@@ -550,22 +626,124 @@
 					"context": "default",
 					"actions": [
 						"ClearTarget",
-						"MoveToTarget"
+						"TargetEnemyInDetectionRadius"
 					]
 				}
 			],
 			"neutral": [
 				{
-					"context": "IsWaiting",
+					"context": "default",
 					"actions": [
-						"ClearTarget",
-						"MoveToTarget"
+						"TargetPlayer",
+						"Wander"
 					]
 				}
 			],
 			"angry": [
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"FireScatter"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+
+			]
+		},
+		// Crab Chef
+		{
+			"name": "Crab Chef",
+			"angrySound": "CrabAttack",
+			"sprite": "Assets/Enemies/crabChef.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 30,
+			"speed": 100,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 2.5,
+			"happyProjectile": {
+				"damage": 30,
+				"radius": 50,
+				"speed": 100,
+				"lifetime": 3,
+				"sprite": "Assets/pattyfish.png"
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 120,
+				"speed": 100,
+				"lifetime": 2,
+				"sprite": "Assets/pattyfish.png"
+			},
+			"traits": [ "Wet" ],
+			"likes": [ "Cold" , "Wet" ],
+			"dislikes": [ "Hot" ],
+			"happy": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"ChargeAtTarget"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"ChargeAtTarget"
+					]
+				}
 			]
 		}
 	]
 }
+
     

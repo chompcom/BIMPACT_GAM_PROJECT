@@ -131,6 +131,10 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
                 Vector2{ 0, 0 },
                 tFirst
             )) {
+                if ((*it)->GetDmg() < 0.f) {
+                    playerHealsDamage(player);
+                }
+                else 
                 playerTakesDamage(player);
             }
         }

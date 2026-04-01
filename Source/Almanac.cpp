@@ -374,8 +374,10 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		//test2.RenderSprite(true);
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(583, -352), 74, 85))
 		{
-			if (almanac.currentPageNumber < almanac.maxPages) ++(almanac.currentPageNumber);
-			AlmanacAudio();
+			if (almanac.currentPageNumber < almanac.maxPages) {
+				++(almanac.currentPageNumber);
+				AlmanacAudio();
+			}
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
@@ -386,8 +388,10 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		//test3.RenderSprite(true);
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(486, -352), 74, 85))
 		{
-			if (almanac.currentPageNumber > 0) --(almanac.currentPageNumber);
-			AlmanacAudio();
+			if (almanac.currentPageNumber > 0) {
+				--(almanac.currentPageNumber);
+				AlmanacAudio();
+			}
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
@@ -406,6 +410,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 				IsCursorInRect(Vector2(683, (68 * i) - 47), 75, 57))
 			{
 				almanac.currentPageNumber = bookmarkPages[5 - i];
+				BigPageFlip();
 				//std::cout << "current: " << almanac.currentPageNumber << "\n";
 			}
 		}
@@ -416,6 +421,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		if (almanac.currentArea != "help" && AEInputCheckTriggered(AEVK_LBUTTON) &&
 			IsCursorInRect(Vector2(683, -235), 75, 57))
 		{
+			BigPageFlip();
 			almanac.currentPageNumber = 16;
 			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}

@@ -63,6 +63,10 @@
       {
         "name": "WinSound",
         "path": "Assets/Audio/UI/Win.ogg"
+      },
+      {
+        "name": "BigPageFlip",
+        "path": "Assets/Audio/UI/BigPageFlip.ogg"
       }
     ],
 
@@ -85,7 +89,7 @@
         "path": "Assets/Audio/Mobs/SwordAttack.ogg"
       },
       {
-        "name": "Tom_Whatever",
+        "name": "Tom",
         "path": "Assets/Audio/Mobs/Tom.ogg"
       },
       {
