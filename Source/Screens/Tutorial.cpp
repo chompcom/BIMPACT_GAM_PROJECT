@@ -6,6 +6,7 @@
 #include "../Screens/Ui.h"
 #include "../GameStateManager.h"
 #include "../GameStateList.h"
+#include "../Loaders/DataLoader.h"
 
 namespace
 {
@@ -36,7 +37,7 @@ void RenderTutorial()
 {
 	if (showTutorial)
 	{
-		std::cout << "Harikitte kou!!";
+		//std::cout << "Harikitte kou!!";
 		tutorialUi.Update();
 		tutorialUi.Draw();
 	}
