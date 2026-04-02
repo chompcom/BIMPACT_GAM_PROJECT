@@ -364,7 +364,7 @@ void TargetNearestThing(Enemy& me) {
 }
 
 void TargetMiddle(Enemy& me) {
-	//when i did this it doesnt work?
+	//when the commented out version was used it doesnt work? i think?
 	//me.target.initialPosition = Vector2();
 	me.target = Vector2();
 }

@@ -752,49 +752,44 @@
 			"damage": 2,
 			"speed": 60,
 			"detectionRadius": 100,
-			"safeRadius": 300,
-			"attackRate": 1,
+			"safeRadius": 100,
+			"attackRate": 1.5,
 
 			"happyProjectile": {
 				"damage": 2,
 				"radius": 300,
-				"speed": 1,
+				"speed": 0,
 				"lifetime": 2,
-				"sprite": "Assets/fireball.png"
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 255, 255, 20 ]
 			},
 			"angryProjectile": {
 				"damage": 2,
 				"radius": 300,
-				"speed": 1,
+				"speed": 0,
 				"lifetime": 2,
-				"sprite": "Assets/fireball.png"
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 255, 255, 20 ]
 			},
 
-			"traits": [ "Hot", "Friendly" ],
-			"likes": [ "Hot", "Friendly" ],
+			"traits": [ "Hot" ],
+			"likes": [ "Hot" ],
 			"dislikes": [ "Gross", "Wet" ],
-			//they just fire projectile for now, since Brandon said hes adding an AOE
 			"happy": [
 				{
 					"context": "IsTargetInDetectionRadius",
 					"actions": [
 						"StopMoving",
-						"FireProjectile"
+						"FireAOE"
 					]
 				},
 				{
 					"context": "IsNotTargeting",
 					"actions": [
-						"TargetRandomEnemy",
+						"TargetMiddle",
 						"MoveToTarget"
 					]
-				},
-				{
-					"context": "IsHittingWall",
-					"actions": [
-						"StopMoving"
-					]
-				},
+				}, 
 				{
 					"context": "default",
 					"actions": [
@@ -803,15 +798,27 @@
 				}
 			],
 			"neutral": [
+
+				{
+					"context": "IsFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"ApplySlowToTarget",
+						"TargetMiddle"
+
+					]
+				},
 				{
 					"context": "IsTargetInDetectionRadius",
 					"actions": [
 						"StopMoving"
+
 					]
 				},
 				{
 					"context": "default",
 					"actions": [
+						"ClearTarget",
 						"TargetMiddle",
 						"MoveToTarget"
 					]
@@ -823,7 +830,7 @@
 					"actions": [
 						"StopMoving",
 						"TargetPlayer",
-						"FireProjectile",
+						"FireAOE",
 						"ClearTarget"
 					]
 				},
@@ -847,28 +854,60 @@
 			"sprite": "Assets/Enemies/flytrap.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
-			"damage": 10,
-			"speed": 60,
-			"detectionRadius": 5,
+			"damage": 20,
+			"speed": 120,
+			"detectionRadius": 800,
 			"safeRadius": 300,
-			"attackRate": 1,
+			"attackRate": 4,
 
-			"traits": [ "Idiotic" ],
-			"likes": [ "Wet", "Sweet" ],
-			"dislikes": [ "Hot" ],
+			"happyProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 0.5,
+				"sprite": "Assets/bite.png"
+			},
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 0.5,
+				"sprite": "Assets/bite.png"
+			},
+
+			"traits": [ "Gross" ],
+			"likes": [ "Wet", "Gross" ],
+			"dislikes": [ "Hot", "Cold" ],
 			//Lunge at nearby target
+			//Use projectile instead of DamageTarget so the attack is more visible
 			"happy": [
+
 				{
-					"context": "IsTargetInDetectionRadius",
+					"context": "IsTouchingTarget",
 					"actions": [
-						"DamageTarget"
+						"FireProjectile"
+					]
+				},
+
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"StopMoving",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"StopMoving",
+						"TargetEnemyInDetectionRadius"
 					]
 				},
 				{
 					"context": "default",
 					"actions": [
-						"TargetRandomEnemy",
-						"ChargeAtTarget"
+						"MoveToTarget",
+						"ClearTarget"
 					]
 				}
 			],
@@ -882,22 +921,38 @@
 				{
 					"context": "default",
 					"actions": [
-						"StopMoving"
+						"StopMoving",
+						"TargetPlayer"
 					]
 				}
 			],
 			"angry": [
 				{
-					"context": "IsTargetInDetectionRadius",
+					"context": "IsTouchingTarget",
 					"actions": [
-						"DamageTarget"
+						"FireProjectile",
+						"ClearTarget"
 					]
 				},
+
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"StopMoving"
+					]
+				},
+
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"TargetPlayer"
+					]
+				},
+
 				{
 					"context": "default",
 					"actions": [
-						"TargetPlayer",
-						"ChargeAtTarget"
+						"MoveToTarget"
 					]
 				}
 			]
