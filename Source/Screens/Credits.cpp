@@ -23,12 +23,12 @@ constexpr float speed = 0.25f;
 
 void CreditsUpdate(float dt = AEFrameRateControllerGetFrameTime()) {
 
-	// SCROLL HEIAN ERA TECHNIQUE
-	credsUI.FindById("creds1")->localPos.y += (speed * dt);
-	credsUI.FindById("creds2")->localPos.y += (speed * dt);
-	credsUI.FindById("creds3")->localPos.y += (speed * dt);
-
+	// SCROLL HEIAN ERA TECHNIQUE 
+	credsUI.FindById("creds1")->parent->localPos.y += (speed * dt);
 	credsUI.Update();
+
+	// ESCAPE goes back to GS_MAINMENU
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) ChangeState(GS_MAINMENU);
 }
 
 

@@ -98,7 +98,7 @@ private:
 
 	// Padding-html like to account for in the grid system 
 	// (Top right bottom left)
-	Padding pad = Padding{ 116, 139, 115, 131 };
+	Padding pad = Padding{ 112, 124, 102, 137};
 	int padding[4]{ pad.top, pad.right, pad.bottom, pad.left};
 	
 	

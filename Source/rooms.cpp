@@ -566,8 +566,8 @@ namespace mapRooms
 		std::string filePath = "Assets/Levels/Room_Data/TilesInfo.json";
 		Json::Value tilesInfo = DataLoader::LoadJsonFile(filePath);
 
-		std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
-		system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
+		//std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
+		//system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
 
 
 
@@ -679,7 +679,8 @@ namespace mapRooms
 		LoadRoomArtLists();
 		AssignRoomArt();
 
-		doorTex = GetOrLoadTexture("Assets/Door/door.png");
+		const char* doorPath = "Assets/Door/door.png";
+		doorTex = GetOrLoadTexture(doorPath);
 
 		// Somehow assign startX and startY into starting room coordinates value
 		currentRoom = GetRoom(startX, startY);
@@ -1122,18 +1123,23 @@ namespace mapRooms
 		const float winMaxY = AEGfxGetWinMaxY();
 
 		// Size of doors
-		const float doorW = 280.0f;
-		const float doorH = 220.0f;
-		const float edgeOffset = 35.0f;	// Offset from screen
+
+		
+
+		//const float doorW = this->currentRoom->roomGrid.GetTileWidth() * 2 + 35.0f;
+		const float doorW = 145.0f;
+		const float doorH = 169.0f;
+		const float edgeOffset = 63.0f;	// Offset from screen 
 
 		// Render Door Up Asset
 		if (currentRoom->up)
 		{
-			float offsetUp = 0.75f;
+			float offsetUp = 0.725f;
+			float extraOffset = 4.5f;
 			AEMtx33 scale, rot, trans, temp, finalMtx;
 			AEMtx33Scale(&scale, doorW, doorH * offsetUp);
 			AEMtx33Rot(&rot, 0.0f);	// Up is 0 rad
-			AEMtx33Trans(&trans, 0.0f, winMaxY - edgeOffset);
+			AEMtx33Trans(&trans, 0.0f, winMaxY - edgeOffset + extraOffset);
 
 			AEMtx33Concat(&temp, &rot, &scale);
 			AEMtx33Concat(&finalMtx, &trans, &temp);
@@ -1146,11 +1152,12 @@ namespace mapRooms
 		if (currentRoom->down)
 		{
 			// DOOR is not perfecion...
-			float offsetDown = 0.75f;
+			float offsetDown = 0.625f;	// scale
+			float extraOffset = 10.0f; // trans
 			AEMtx33 scale, rot, trans, temp, finalMtx;
 			AEMtx33Scale(&scale, doorW, doorH * offsetDown);
 			AEMtx33Rot(&rot, PI);	// Down is 180 from top = PI
-			AEMtx33Trans(&trans, 0.0f, winMinY + edgeOffset);
+			AEMtx33Trans(&trans, 0.0f, winMinY + edgeOffset - extraOffset);
 
 			AEMtx33Concat(&temp, &rot, &scale);
 			AEMtx33Concat(&finalMtx, &trans, &temp);
@@ -1163,11 +1170,12 @@ namespace mapRooms
 		if (currentRoom->left)
 		{
 			// DOOR is not perfecion...
-			float offsetLeft = 0.92f;
+			float offsetLeft = 0.875f;
+			float extraOffset = 8.75f;
 			AEMtx33 scale, rot, trans, temp, finalMtx;
 			AEMtx33Scale(&scale, doorW, doorH * offsetLeft);
 			AEMtx33Rot(&rot, PI * 0.5f); // Left is 90 deg counterclockwise -> PI / 2
-			AEMtx33Trans(&trans, winMinX + edgeOffset, 0.0f);
+			AEMtx33Trans(&trans, winMinX + edgeOffset + extraOffset, 0.0f);
 
 			AEMtx33Concat(&temp, &rot, &scale);
 			AEMtx33Concat(&finalMtx, &trans, &temp);
@@ -1180,11 +1188,12 @@ namespace mapRooms
 		if (currentRoom->right)
 		{
 			// DOOR is not perfecion...
-			float offsetRight = 0.99f;
+			float offsetRight = 0.780f;
+			float extraOffset = 0.0f;
 			AEMtx33 scale, rot, trans, temp, finalMtx;
 			AEMtx33Scale(&scale, doorW, doorH * offsetRight);
 			AEMtx33Rot(&rot, -PI * 0.5f); // Right is 90 deg clockwise or 270 counterclockwise -> - (PI / 2) OR (2PI * (3/4))
-			AEMtx33Trans(&trans, winMaxX - edgeOffset, 0.0f);
+			AEMtx33Trans(&trans, winMaxX - edgeOffset + extraOffset, 0.0f);
 
 			// T * (R * S)
 			AEMtx33Concat(&temp, &rot, &scale);
