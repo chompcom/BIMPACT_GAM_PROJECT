@@ -20,7 +20,9 @@
 #include "../Almanac.h"
 #include "ParticleSystem.h"
 #include "../Screens/Ui.h"
-#include "../GameOver.h"
+#include "GameStateList.h"
+#include "GameStateManager.h"
+#include "../Screens/Tutorial.h"
 
 AEGfxVertexList *sqmesh = nullptr;
 
@@ -76,6 +78,8 @@ static bool winUiInitialized = false;
 static UIManager loseUi;
 static bool loseUiInitialized = false;
 
+static UIManager tutorialUi;
+
 static bool fightMusicPlaying = false;
 static bool loseAudioPlaying = false;
 static bool WinAudioPlaying = false;
@@ -114,7 +118,7 @@ void TestLoad()
 
 	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
 	almanacLitUpIcon = new TexturedSprite(sqmesh, almanacLitUppng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -200.f), Vector2(64, 64), Color{1.0, 1.0, 1.0, 0.0});
+	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -180.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
@@ -149,13 +153,13 @@ void TestInit()
 	globalTransferData.player = &player;
 
 	// square seed: 0xA341311Cu
-	gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
+	//gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
 
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
-	std::cout << "Current Seed: " << curSeed << "\n";
+	//std::cout << "Current Seed: " << curSeed << "\n";
 
 	testParticles = ParticleSystem(sqmesh);
 
@@ -204,6 +208,8 @@ void TestInit()
 					   });
 	loseUiInitialized = true;
 	loseUi.SetFont(font);
+
+	InitTutorial();
 
 	gameState = RUNNING;
 	debugMode = false;
@@ -258,7 +264,7 @@ void TestDraw()
 			if (roomData.boss->currentHealth > 0)
 			{
 				roomData.boss->shadow.RenderSprite();
-				roomData.boss->sprite.RenderSprite();
+				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
 			}
 		}
 
@@ -314,7 +320,16 @@ void TestDraw()
 			particle.sprite.RenderSprite();	
 		}
 	}
+	
+
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	if (gameMap.GetCurrentRoom()->currentRoomData.boss) {//gameMap.GetCurrentRoom()->currentRoomData.boss->hpBar.RenderSprite();
+		if (gameMap.GetCurrentRoom()->currentRoomData.boss->healthbarInitialized) {
+			//std::cout << "true\n";
+			gameMap.GetCurrentRoom()->currentRoomData.boss->healthbar.Draw();
+		}
+	}
 	// rock.sprite.RenderSprite();
 	// gift.sprite.RenderSprite();
 	// gift2.sprite.RenderSprite();
@@ -323,11 +338,11 @@ void TestDraw()
 	renderPlayerLives(player, healthIcons, font);
 	//(*almanacIcon).RenderSprite();
 
-	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite);
+	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite, player);
 
 	RenderAlmanacPages(almanac, font);
 
-	// RenderGameOverScreen(font, gameOverButtons, gameOverDarkScreen, player);
+	RenderTutorial();
 
 #if 0
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
@@ -437,6 +452,10 @@ void TestDraw()
 			break;
 		}
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
+		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
 }
@@ -511,6 +530,8 @@ void TestUnload()
 	// isPaused = false;
 
 	allGiftTypes.clear();
+
+	TutorialUnload();
 }
 
 void TestUpdate(float dt)
@@ -519,7 +540,7 @@ void TestUpdate(float dt)
 	if (gameState == RUNNING)
 	{
 		// Pause toggle
-		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		if (AEInputCheckTriggered(AEVK_ESCAPE) || AEInputCheckTriggered(AEVK_TAB))
 		{
 			gameState = PAUSED;
 		}
@@ -527,20 +548,30 @@ void TestUpdate(float dt)
 		// Get previous pos
 		Vector2 prevPos{ player.position.x, player.position.y };
 
-		// to test damage
-		if (player.health > 0)
-		{
+		//// to test damage
+		//if (player.health > 0)
+		//{
+		//	//this has to be above checkIfAlmanacClicked or the arrows will bug
+		//	AlmanacInputs(almanac);
+		//	checkIfAlmanacClicked(*almanacIcon, almanac);
 
-			checkIfAlmanacClicked(*almanacIcon, almanac);
+		//	// for now,
+		//	//  Player update
+		//	UpdatePlayer(player, dt);
+		//	player.sprite.UpdateTransform();
+		//	player.shadow.UpdateTransform();
+		//}
 
-			AlmanacInputs(almanac);
+		//this has to be above checkIfAlmanacClicked or the arrows will bug
+		AlmanacInputs(almanac);
+		checkIfAlmanacClicked(*almanacIcon, almanac);
+		TutorialInput();
+		// for now,
+		//  Player update
+		UpdatePlayer(player, dt);
+		//player.sprite.UpdateTransform();
+		//player.shadow.UpdateTransform();
 
-			// for now,
-			//  Player update
-			UpdatePlayer(player, dt);
-			player.sprite.UpdateTransform();
-			player.shadow.UpdateTransform();
-		}
 		UpdateMobAudioCD(dt);
 		//winUI.Update();
 
@@ -554,7 +585,7 @@ void TestUpdate(float dt)
 		RoomData& carryData = gameMap.GetTransferData();
 
 
-		std::cout << currentRoom->biome << std::endl;
+		//std::cout << currentRoom->biome << std::endl;
 		static mapRooms::Room* lastRoom = nullptr;
 		if (currentRoom != lastRoom)
 		{
@@ -627,7 +658,7 @@ void TestUpdate(float dt)
 
 		// Game Map Update was here
 
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+		//checkIfAlmanacClicked(*almanacIcon, almanac);
 
 		MoveArrow(*arrowSprite, almanac, dt);
 
@@ -669,114 +700,12 @@ void TestUpdate(float dt)
 		}
 
 
-		// Update Gifts (Must update both sides)
-		//for (Gift* g : roomData.giftList)
-		//{
-		//	if (g)
-		//	{
-		//		//std::cout << currentRoom->roomGrid.GetBoundary().x << " " << currentRoom->roomGrid.GetBoundary().y << std::endl;
-		//		
-		//		int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-		//		Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//		UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary()*0.99f, currentRoom);	// A weird quirk would be standing v close to wall and throwing gifts however
-		//		int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, AEClamp(sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y) / 2000 * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 4.0f), AEClamp(sqrtf(g->velocity.x*g->velocity.x + g->velocity.y*g->velocity.y)/2000 * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y*4.0f), prevCell);
-
-		//		// get angle lmao tan-1(opp / adj) 
-		//		//float theta = tanf(g->velocity.y / g->velocity.x); its 45 deg issok just bounce it accordingly?
-		//			
-		//		// Collides but no velocity?
-		//		//if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) g->velocity = Vector2{ 1.0f, 1.0f };
-		//		if (res && g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y == 0) {
-		//			g->velocity = Vector2{ 1.0f, 1.0f };
-
-
-		//			g->position.x = prevCellCenter.x + (res & COLLISION_LEFT) ? (gridWidth * 0.5f - (g->giftType.sprite.scale.x) * 0.5f - skin) : (-gridWidth * 0.5f + (g->giftType.sprite.scale.x) * 0.5f + skin);
-		//			g->position.y = prevCellCenter.y + (res & COLLISION_TOP) ?  (gridHeight * 0.5f - (g->giftType.sprite.scale.y) * 0.5f - skin) : (-gridHeight * 0.5f + (g->giftType.sprite.scale.y) * 0.5f + skin);
-
-		//			g->velocity = Vector2{ 0.0f, 0.0f };
-
-		//			g->giftType.sprite.UpdateTransform();
-		//			g->shadow.UpdateTransform();
-		//			continue;
-		//		}
-		//		else if (res && fabs(g->velocity.Normalized().Length()) < 0.1f) {
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) g->velocity.x = 0.0f ;
-		//			if (res & COLLISION_BOTTOM || res & COLLISION_TOP) g->velocity.y = 0.0f;
-		//		}
-
-
-		//		std::string tmp{};
-		//		if (res & COLLISION_LEFT) {
-		//			tmp += " LEFT ";
-		//			g->velocity.x *= -1;	// Inverse x if left
-		//		}
-		//		else if (res & COLLISION_RIGHT) {
-		//			tmp += " RIGHT ";
-		//			g->velocity.x *= -1;	// Inverse x if right
-		//		
-		//		}
-		//		if (res & COLLISION_TOP) {
-		//			std::cout << g->velocity.y;
-		//			tmp += " TOP ";
-		//			g->velocity.y *= -1;	// Inverse y if top
-		//		}
-		//		else if (res & COLLISION_BOTTOM) {
-		//			tmp += " BOTTOM ";
-		//			g->velocity.y *= -1;	// Inverse y if bottom
-		//		}
-		//		if (tmp.size() > 0) {
-
-
-		//			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-		//			float gridWidth = currentRoom->roomGrid.GetTileWidth();
-		//			float gridHeight = currentRoom->roomGrid.GetTileHeight();
-		//			float collisionScaleX = g->giftType.sprite.scale.x;
-		//			float collisionScaleY = g->giftType.sprite.scale.y;
-		//			constexpr float skin = 0.10f;
-
-		//			//g->position = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-
-		//			if (res & COLLISION_LEFT || res & COLLISION_RIGHT) {
-
-		//				if ((res & COLLISION_LEFT) && g->velocity.x < -EPSILON) g->position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-		//				if ((res & COLLISION_RIGHT) && g->velocity.x > EPSILON) g->position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-
-		//				g->velocity.y /= 1.5f;		// ???
-		//				g->velocity.x /= 1.1f;		// Dampen bounce
-
-		//				//g->position.x = currentRoom->roomGrid.CellToWorldCenter(prevCell).x;
-		//				//g->position.x = g->position.x + (((res & COLLISION_LEFT) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileWidth() * 0.1f));
-		//			}
-		//			else if (res & COLLISION_TOP || res & COLLISION_BOTTOM) {
-		//				//g->position.y = currentRoom->roomGrid.CellToWorldCenter(prevCell).y;
-		//				//g->position.y = g->position.y + (((res & COLLISION_BOTTOM) ? (+1) : (-1)) * (currentRoom->roomGrid.GetTileHeight() * 0.1f));
-		//				
-		//				if ((res & COLLISION_BOTTOM) && g->velocity.y < -EPSILON) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
-		//				if ((res & COLLISION_TOP) &&    g->velocity.y > EPSILON)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
-		//				
-		//				g->velocity.y /= 1.1f;		// Dampen bounce
-		//				g->velocity.x /= 1.5f;		// ???
-		//			}
-		//			//g->velocity /= 1.1f;		// Dampen bounce
-		//			//std::cout << tmp << '\n';
-		//			//std::cout << "Height: " << currentRoom->roomGrid.GetTileHeight() << " | Width: " << currentRoom->roomGrid.GetTileWidth() << std::endl;
-		//		};
-		//		
-
-
-		//		g->giftType.sprite.UpdateTransform();
-		//		g->shadow.UpdateTransform();
-		//	}
-		//}
-
-
 		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
 				Vector2 prevGiftPos = g->position;
-				int prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
+				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
 
 				float gridWidth = currentRoom->roomGrid.GetTileWidth();
 				float gridHeight = currentRoom->roomGrid.GetTileHeight();
@@ -874,6 +803,8 @@ void TestUpdate(float dt)
 			Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
+			//std::cout << roomData.boss->sprite.current_animation_index << roomData.boss->sprite.current_sprite_index << '\n';
+			//std::cout << roomData.boss->sprite.current_sprite_uv_offset_x << roomData.boss->sprite.current_sprite_uv_offset_y << '\n';
 
 			roomData.boss->collideWall = false;
 
@@ -889,7 +820,7 @@ void TestUpdate(float dt)
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
-				roomData.boss->shadow.position.y = bossPrevPos.y - 35;
+				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
 
@@ -924,8 +855,20 @@ void TestUpdate(float dt)
 				if (colRes) roomData.boss->collideWall = true;
 			}*/
 
+			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
+			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
+
+			if (roomData.boss->direction.x < 0.f) 
+				roomData.boss->sprite.scale = { -abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			else {
+				roomData.boss->sprite.scale = { abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
+			}
+
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
+			//roomData.boss->hpBar.UpdateTransform();
+
+			roomData.boss->sprite.UpdateAnimation(dt);
 		}
 
 		// Gifts and Enemy Check
@@ -938,8 +881,8 @@ void TestUpdate(float dt)
 					if (!e->isActive) continue;
 					if (AreSquaresIntersecting(gift->giftType.sprite.position, gift->giftType.sprite.scale.x, e->sprite.position, e->sprite.scale.x))
 					{
-						gift->velocity = -gift->velocity;
-
+						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
+						gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
 						Labels traitsCheck = gift->giftType.traits;
 						//Include your friends in the traits check, because you can't friend those who judge yours
 						for (Enemy* friendly : carryData.enemyList){
@@ -955,7 +898,6 @@ void TestUpdate(float dt)
 							break;
 						}
 
-						Vector2 dirBtwnEnemyGift = e->sprite.position - gift->position;
 						// Ok, now gift shall snap to front of enemy while moving back
 						gift->position = e->sprite.position - (dirBtwnEnemyGift).Normalized() * gift->giftType.sprite.scale.x;
 					}

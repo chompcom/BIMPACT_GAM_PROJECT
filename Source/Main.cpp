@@ -56,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     //GSM_Initialize(GS_LEVEL1);
     GSM_Initialize(GS_MAINMENU);
     // Game Loop
-    //_CrtSetBreakAlloc(551);
+    //_CrtSetBreakAlloc(4752);
     while (/*gGameRunning && */current != GS_QUIT)
     {
         if (current != GS_RESTART) {

@@ -64,6 +64,7 @@ Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, Vector2 position) :
 //this is just to test throwing
 void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries, mapRooms::Room* curRoom)
 {
+	UNREFERENCED_PARAMETER(curRoom);
 	//if player and gift are intersecting, pick up the gift
 	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
 		AABB{ gift.position - gift.giftType.sprite.scale / 2, gift.position + gift.giftType.sprite.scale / 2 }) && !player.pickUpState)
@@ -87,7 +88,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 
 		int collideFlags = 0x00;
 
-		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, boundaries.x, boundaries.y, collideFlags)) {
+		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, (int)boundaries.x, (int)boundaries.y, collideFlags)) {
 			// Left and Right collision inverse x
 			if (collideFlags & 0x00000003) {
 				gift.velocity.x *= -1;

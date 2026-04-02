@@ -21,7 +21,7 @@
 #include <cmath>
 
 #include "AEEngine.h"
-#include "Loaders/DataLoader.h"
+//#include "Loaders/DataLoader.h"
 #include "../Utils/Vector2.hpp"
 #include "../Sprite.h"
 

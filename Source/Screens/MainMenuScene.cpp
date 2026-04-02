@@ -6,6 +6,7 @@
 #include "../Screens/Ui.h"
 #include "../GameStateManager.h"
 #include "../GameStateList.h"
+#include "../Loaders/DataLoader.h"
 
 namespace
 {

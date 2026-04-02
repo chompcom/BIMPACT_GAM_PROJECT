@@ -1,0 +1,96 @@
+{
+  "elements": [
+    {
+      "id": "root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+        "children": [
+            {
+                "id": "bg",
+                "x": 0.0,
+                "y": 0.0,
+                "w": 1.0,
+                "h": 1.0,
+                "visible": true,
+                "drawBackground": false,
+                "borderRadiusRatio": 0.0,
+                "roundSegments": 8,
+                "backgroundColor": [ 1.0, 1.0, 1.0, 1.0 ],
+                "texture": "Assets/tutorial.png"
+            },
+
+            {
+                "id": "gifts",
+                "x": -0.18,
+                "y": -0.23,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Gifts!",
+                "textScale": 1.2,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            },
+
+            {
+                "id": "minimap",
+                "x": -0.28,
+                "y": 0.41,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Minimap",
+                "textScale": 1.2,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            },
+
+            {
+                "id": "health",
+                "x": -0.4,
+                "y": -0.3,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Your health",
+                "textScale": 1.2,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            },
+            {
+                "id": "almanac",
+                "x": 0.25,
+                "y": -0.31,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Your almanac",
+                "textScale": 1.2,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            },
+            {
+                "id": "tutorial_text1",
+                "x": 0.0,
+                "y": 0.32,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Click or move to close",
+                "textScale": 1.5,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            },
+            {
+                "id": "tutorial_text2",
+                "x": 0.0,
+                "y": 0.24,
+                "w": 0.42,
+                "h": 0.08,
+                "visible": true,
+                "text": "Find and defeat the boss to win!",
+                "textScale": 1.5,
+                "textColor": [ 1.0, 1.0, 1.0, 1.0 ]
+            }
+        ]
+    }
+  ]
+}
