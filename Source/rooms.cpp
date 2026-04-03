@@ -1153,7 +1153,7 @@ namespace mapRooms
 			else if (rm.rmType == RoomType::Boss)  c = Color{ 0.9f, 0.2f, 0.2f, 0.90f };				// Red
 			else c = Color{ 0.6f, 0.6f, 0.6f, 0.85f };													// Normal
 
-			if (this->currentRoom == &(const_cast<Room&>(rm))) c = Color{ 0.2f, 0.4f, 1.0f, 0.95f };	// Blue for current room?
+			if (this->currentRoom == &(const_cast<Room&>(rm))) c = Color{ 1.0f, 1.0f, 0.4f, 0.95f };	// Blue for current room?
 			else if ((rm.visited)) c = Color{ c.r * 0.5f, c.g * 0.5f , c.b * 0.5f, 0.55f };				// Dimmed color on map if room is visited
 
 			float px = startXPixel + curX * (cell + gap) + (cell / 2.0f);								// Essentially minX + 30 + current X (e.g., 0) * (total cell space) + half cell (for center)
