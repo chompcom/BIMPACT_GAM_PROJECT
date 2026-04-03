@@ -198,9 +198,9 @@ namespace mapRooms
 			//Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
 			//Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
 
-			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"));
-			Gift* sauce = new Gift(allGiftTypes["HotSauce"], DataLoader::CreateTexture("Assets/shadow.png"));
-			Gift* spray = new Gift(allGiftTypes["Spray"], DataLoader::CreateTexture("Assets/shadow.png"));
+			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
+			Gift* sauce = new Gift(allGiftTypes["HotSauce"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
+			Gift* spray = new Gift(allGiftTypes["Spray"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
 
 			gift->shadow.position = Vector2{ 0.f, -40.f };
 			sauce->shadow.position = Vector2{ 0.f, -40.f };
@@ -275,7 +275,8 @@ namespace mapRooms
 						enemyType,
 						//DataLoader::CreateTexture(enemyType.spritePath),
 						DataLoader::CreateAnimatedTexture(enemyType.spritePath),
-						DataLoader::CreateTexture("Assets/shadow.png")
+						DataLoader::CreateTexture("Assets/shadow.png"),
+						DataLoader::CreateTexture("Assets/hitbox.png")
 					);
 
 					enemy->sprite.position = spawnPosition;
@@ -321,6 +322,7 @@ namespace mapRooms
 					Gift* gift = new Gift(
 						allGiftTypes[giftDisplayName],
 						DataLoader::CreateTexture("Assets/shadow.png"),
+						DataLoader::CreateTexture("Assets/hitbox.png"),
 						spawnPosition
 					);
 
@@ -415,7 +417,7 @@ namespace mapRooms
 
 			// Spawn enemies
 			if (0 && currentRoomData.enemyList.empty()) {
-				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png")));
 				for (Enemy* i : currentRoomData.enemyList) {
 					i->shadow.position = Vector2{ 0.f, -35.f };
 					i->shadow.UpdateTransform();
@@ -469,7 +471,7 @@ namespace mapRooms
 				fsm["follow"]["endLag"].asFloat()
 			} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), 
+			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
 				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
 
@@ -478,8 +480,10 @@ namespace mapRooms
 			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
 
 			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
-			//currentRoomData.boss->shadow.scale = Vector2{ 175.0f, 125.0f };
+			currentRoomData.boss->shadow.scale = Vector2{ currentRoomData.boss->sprite.scale.x, currentRoomData.boss->sprite.scale.y / 2 };
 			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
+
+			currentRoomData.boss->hitbox.scale = currentRoomData.boss->sprite.scale;
 
 			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 

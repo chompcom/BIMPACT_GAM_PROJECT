@@ -35,6 +35,7 @@ public:
 	//TexturedSprite sprite;
 	GiftType giftType;
 	TexturedSprite shadow;
+	TexturedSprite hitbox;
 	Vector2 position;
 	Vector2 velocity;
 	bool pickUpState; //true if the gift is currently picked up
@@ -42,7 +43,7 @@ public:
 
 	//constructor
 	//Gift(std::string name, Labels traits, TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position = Vector2{ 0.f, 0.f });
-	Gift(GiftType giftType, TexturedSprite shadowSprite, Vector2 position = Vector2{ 0.f, 0.f });
+	Gift(GiftType giftType, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, Vector2 position = Vector2{ 0.f, 0.f });
 
 	//Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position = Vector2{ 0.f, 0.f });
 };

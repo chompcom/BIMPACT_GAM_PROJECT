@@ -50,9 +50,10 @@ GiftType::GiftType(std::string _name, Labels _traits, TexturedSprite _sprite) :
 {
 }
 
-Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, Vector2 position) :
+Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, Vector2 position) :
 	giftType{ giftType },
 	shadow{ shadowSprite },
+	hitbox{hitboxSprite},
 	position{ position },
 	velocity{ Vector2 {0.f, 0.f} },
 	pickUpState{ false },
