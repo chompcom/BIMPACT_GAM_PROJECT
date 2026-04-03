@@ -10,9 +10,9 @@
 #include "Audio.h"
 
 
-Enemy::Enemy(const EnemyType& enemyType,  AnimatedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState)
+Enemy::Enemy(const EnemyType& enemyType,  AnimatedSprite enemySprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, EnemyStates initialState)
 	: type{ enemyType }, sprite{ enemySprite }, currentHealth {enemyType.health}, state{ initialState }, currentBehavior{}, target{}
-	, wanderTimer{}, waitTimer{}, shadow{ shadowSprite }, prevPos{ enemySprite.position }
+	, wanderTimer{}, waitTimer{}, shadow{ shadowSprite }, hitbox{hitboxSprite}, prevPos {enemySprite.position}
 	,speedModifier{1.f}, dmgModifier{1.f}
 	,attackTimer{}, isActive{true}
 	, onceWanderTime{false}, onceAttackTime{false}, onceWaitTime{false} 

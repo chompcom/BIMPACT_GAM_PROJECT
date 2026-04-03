@@ -38,6 +38,7 @@ class Enemy {
 		const EnemyType& type;
 		AnimatedSprite sprite;
 		TexturedSprite shadow;
+		TexturedSprite hitbox;
 		f32 currentHealth;
 		EnemyStates state;
 		bool isActive;
@@ -105,7 +106,7 @@ class Enemy {
 
 		bool acknowledgeCollision;
 
-		Enemy(const EnemyType& enemyType, AnimatedSprite enemySprite, TexturedSprite shadowSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
+		Enemy(const EnemyType& enemyType, AnimatedSprite enemySprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, EnemyStates initialState = EnemyStates::ES_NEUTRAL);
 		~Enemy();
 
 		void Update(float dt);
