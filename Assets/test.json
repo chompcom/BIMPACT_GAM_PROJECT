@@ -555,14 +555,14 @@
 					"actions": [
 						"ClearTarget",
 						"TargetPlayer"
-							
+
 					]
 				}
 			],
 			"neutral": [
 				{
 					"context": "default",
-					"actions": [
+					 "actions": [
 						"TargetPlayer",
 						"Wander"
 					]
@@ -622,13 +622,13 @@
 						"FireProjectile"
 					]
 				},
-				{
-					"context": "default",
-					"actions": [
-						"ClearTarget",
-						"TargetEnemyInDetectionRadius"
-					]
-				}
+					{
+						"context": "default",
+						"actions": [
+							"ClearTarget",
+							"TargetEnemyInDetectionRadius"
+						]
+					}
 			],
 			"neutral": [
 				{
@@ -683,7 +683,7 @@
 				"sprite": "Assets/pattyfish.png"
 			},
 			"traits": [ "Wet" ],
-			"likes": [ "Cold" , "Wet" ],
+			"likes": [ "Cold", "Wet" ],
 			"dislikes": [ "Hot" ],
 			"happy": [
 				{
@@ -738,6 +738,117 @@
 					"context": "default",
 					"actions": [
 						"TargetPlayer",
+						"ChargeAtTarget"
+					]
+				}
+			]
+		},
+		// Goblin Knight
+		{
+			"name": "Goblin Knight",
+			"angrySound": "Goblin",
+			"sprite": "Assets/Enemies/goblinKnight.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 1,
+			"speed": 100,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 2.5,
+			"happyProjectile": {
+				"damage": 30,
+				"radius": 50,
+				"speed": 300,
+				"lifetime": 3,
+				"sprite": "Assets/Rooms/Items/Boulders.png"
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 50,
+				"speed": 300,
+				"lifetime": 2,
+				"sprite": "Assets/Rooms/Items/Boulders.png"
+			},
+			"traits": [ "Gross" ],
+			"likes": [ "Dirty", "Hot" ],
+			"dislikes": [ "Clean", "Wet" ],
+			"happy": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget",
+						"ClearTarget",
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget" /*
+						"FireProjectile",
+						"ClearTarget" */
+
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"FireSpirally",
+						"ChargeAtTarget"
+					]
+				},
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"ClearTarget",
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsAttackCooldownUp",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"ShootProjectile"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"FireSpirally",
 						"ChargeAtTarget"
 					]
 				}

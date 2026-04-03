@@ -119,6 +119,13 @@
       "spawnCategory": "enemy",
       "spawnName": "Crab Chef"
     },
+    "210": {
+      "name": "GoblinKnightMarker",
+      "blocked": false,
+      "asset": "Assets/Enemies/goblinKnight.png",
+      "spawnCategory": "enemy",
+      "spawnName": "Goblin Knight"
+    },
     "500": {
       "name": "Generic_GiftMarker",
       "blocked": false,
@@ -161,7 +168,7 @@
     ,"imageDir":"Assets/Rooms/Normal/NORMAL"
   },
   "Green": {
-    "allowedTiles": [0,1,2,3,4,100,200,201,202,203,500,501,502,503],
+    "allowedTiles": [0,1,2,3,4,100,200,201,202,203,210,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/GREEN/Room2.png"
     ,"imageDir":"Assets/Rooms/Normal/GREEN"
   },
