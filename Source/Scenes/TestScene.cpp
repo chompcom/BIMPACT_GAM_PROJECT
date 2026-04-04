@@ -781,11 +781,12 @@ void TestUpdate(float dt)
 		if (currentRoom != lastRoom && !almanac.isOpen)
 		{
 			lastRoom = currentRoom;
+			fightMusicPlaying = false;  
 			ResetBGM();
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
 			if (currentRoom->biome == "Ice") IceBiomeAudio();
 			if (currentRoom->biome == "Ocean") OceanBiomeAudio();
-			if (roomData.boss)  BossBGMAudio();
+			if (roomData.boss) BossBGMAudio();
 		}
 
 		bool isAngry = false;
@@ -795,7 +796,9 @@ void TestUpdate(float dt)
 				break;
 			}
 		}
-		if (!almanac.isOpen) {
+
+		if (!almanac.isOpen && !roomData.boss)
+		{
 			if (isAngry && !fightMusicPlaying) {
 				ResetBGM();
 				FightMusicAudio();
@@ -805,7 +808,7 @@ void TestUpdate(float dt)
 				ResetBGM();
 				fightMusicPlaying = false;
 			}
-			if (!roomData.boss && !fightMusicPlaying) RandomBGMAudio(dt);
+			if (!fightMusicPlaying) RandomBGMAudio(dt);
 		}
 		// FOR DOOR
 		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
