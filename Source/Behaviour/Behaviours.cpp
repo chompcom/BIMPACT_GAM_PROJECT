@@ -532,10 +532,10 @@ void DamageTarget(Enemy& me) {
 		
 		if (me.target.isPlayer) {
 			if (me.type.damage < 0.f) {
-				playerHealsDamage(*me.roomData->player);
+				PlayerHealsDamage(*me.roomData->player);
 			}
 			else if (me.state != ES_HAPPY) {
-				playerTakesDamage(*me.roomData->player);
+				PlayerTakesDamage(*me.roomData->player);
 			}
 		}
 		me.target.DealDamage(me.type.damage);

@@ -122,7 +122,7 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 
 		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
-			playerTakesDamage(player);
+			PlayerTakesDamage(player);
 		}
 
 		interval += dt;
@@ -198,7 +198,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 		else {
 			if (CollisionIntersection_RectRect(target, boss->hitbox.scale.Abs(), Vector2{},
 				player.position, player.sprite.scale * 0.8, player.GetVelocity(), collisionTime)) {
-				playerTakesDamage(player);
+				PlayerTakesDamage(player);
 			}
 		}
 		if (interval >= jumpInterval) {
@@ -260,7 +260,7 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 
 		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
-			playerTakesDamage(player);
+			PlayerTakesDamage(player);
 			interval = 0.0f;
 			boss->velocity = Vector2{};
 			boss->sprite.GetAnimation("Idle");

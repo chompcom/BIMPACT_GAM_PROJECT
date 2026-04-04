@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file     Almanac.cpp
+\author   Lee Hng Hwee Celest, hnghweecelest.l, 2502385
+\par      hnghweecelest.l@digipen.edu
+\brief    This file defines some functions that implement the almanac
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -8,6 +22,7 @@
 #include "Utils/Utils.h"
 #include "json/json.h"
 
+//Constructor for the almanac
 Almanac::Almanac() :
 	pageSprites{},
 	entries{},
@@ -22,6 +37,7 @@ Almanac::Almanac() :
 
 }
 
+//Constructor for the almanac entry
 AlmanacEntry::AlmanacEntry(EnemyType enemyType, std::string description, std::string area, 
 	TexturedSprite enemyEntrySprite) :
 	enemyType { enemyType }, 
@@ -33,16 +49,20 @@ AlmanacEntry::AlmanacEntry(EnemyType enemyType, std::string description, std::st
 
 }
 
+//anonymous namespace for variables that will be needed in this file
 namespace {
+	//all areas except boss and tutorial
 	std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
+	//the page number each bookmark brings the player to
 	std::vector<int> bookmarkPages{ 3,4,8,10,13,15 };
+	static bool almanacSound = false;
 }
-static bool almanacSound = false;
+
 
 //Loading the sprites for the almanac and setting their transforms
 void LoadAlmanacPages(Almanac & almanac)
 {
-	//page sprites for main UI for each area
+	//create page sprites for main UI for each main area (excluding boss and tutorial)
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacMain.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacNormal.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacPlant.png"));
@@ -50,7 +70,7 @@ void LoadAlmanacPages(Almanac & almanac)
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacCold.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHot.png"));
 
-	//page sprites for lit up bookmarks for each area
+	//create page sprites for lit up bookmarks for each area (excluding boss and tutorial)
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacMainLitUp.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacNormalLitUp.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacPlantLitUp.png"));
@@ -58,28 +78,28 @@ void LoadAlmanacPages(Almanac & almanac)
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacColdLitUp.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHotLitUp.png"));
 
-	//tutorial page sprites
+	//create tutorial page sprites
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHelp1.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHelp2.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHelp3.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacHelpLitUp.png"));
 
-	//boss page stuff
+	//create boss page sprites
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacBoss.png"));
 	almanac.pageSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacBossLitUp.png"));
 
-	//page arrow sprites
+	//create page arrow sprites
 	almanac.arrowSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacArrowsFirstPage.png"));
 	almanac.arrowSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacArrows.png"));
 	almanac.arrowSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacArrowsLastPage.png"));
 	almanac.arrowSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacBackLitUp.png"));
 	almanac.arrowSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacNextLitUp.png"));
 
-	//close button sprites
+	//create close button sprites
 	almanac.closeSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacClose.png"));
 	almanac.closeSprites.push_back(DataLoader::CreateTexture("Assets/AlmanacScreen/openAlmanacCloseLitUp.png"));
 
-	//updating transform matrices for the almanac's sprites
+	//updating transform matrices for all of the almanac's sprites
 	for (int i {0}; i < 18; ++i)
 	{
 		almanac.pageSprites[i].scale = Vector2(1600.f, 900.f);
@@ -103,43 +123,42 @@ void LoadAlmanacEntries(Almanac& almanac)
 {
 	almanac.entries.clear();
 	almanac.entries = DataLoader::GetAlmanacVector();
+	//make an extra entry for the chimera
 	almanac.entries[14].enemyEntrySprite = DataLoader::CreateTexture("Assets/Enemies/Boss/chimeraBoss.png");
 }
 
-//Only called in RenderAlmanacPages, renders the appropriate items ON the current page
+//Only called in RenderAlmanacPages, renders the appropriate items ON the current page (text, enemy images)
 void RenderCurrentPage(Almanac & almanac, s8 font)
 {
-	//std::cout << almanac.currentArea;
 	//text rgb values
 	float r {105.f / 255.f}, g {87.f / 255.f}, b{61.f / 255.f};
-	//std::cout << almanac.currentPageNumber << " " << almanac.entries.size() << std::endl;
-	//figure out which area of the almanac we are looking at
-	/*almanac.currentArea = (almanac.currentPageNumber && almanac.currentPageNumber <= almanac.maxPages - 1) 
-		? almanac.entries[almanac.currentPageNumber - 1].area : "main";*/
 
+	//buffer for printing text to the almanac
 	char buffer[50];
+	//text widt and height to centralise text
 	f32 textWidth, textHeight;
-	//Print entry number
+	//print page number
 	sprintf_s(buffer, 50, "%d", almanac.currentPageNumber);
 	AEGfxGetPrintSize(font, buffer, 0.8f, &textWidth, &textHeight);
 	AEGfxPrint(font, buffer, -textWidth / 2 - 0.72f, -textHeight / 2 - 0.55f, 0.8f, r, g, b, 1.f);
 	
 
-	//entries of each creature
+	//entries of each enemy
 	if (almanac.currentPageNumber < 19 && almanac.currentPageNumber > 3)
 	{
+		//get the current entry to show
 		AlmanacEntry thisEntry{ almanac.entries[almanac.currentPageNumber - 4] };
+		//display the enemy name
 		const char * text { (18 == almanac.currentPageNumber) ? "Chimera" : thisEntry.enemyType.name.c_str()};
-		
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 + 0.13f, 1.f, r, g, b, 1.f);
 
-		//NOTE: text currently does NOT wrap if too long, will do something about it if we need longer descriptions
+		//display the enemy description
 		text = thisEntry.description.c_str() ;
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 - 0.3f, 1.f, r, g, b, 1.f);
 
-
+		//header texts for traits, likes and dislikes
 		text = "Traits:";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, 0.055f, -textHeight / 2 + 0.7f, 1.f, r, g, b, 1.f);
@@ -152,7 +171,7 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, 0.055f, -textHeight / 2 - 0.25f, 1.f, r, g, b, 1.f);
 
-		//print traits, likes, and dislikes is not boss page
+		//get and print traits, likes, and dislikes if not boss page
 		if (almanac.currentPageNumber != 18)
 		{
 			//Print traits
@@ -191,36 +210,28 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 				++index;
 			}
 		}
+		//print special traits, likes, and dislikes for the boss
 		else
 		{
 			text = "- Evil";
-			//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 			AEGfxPrint(font, text, 0.055f, 0.555f, 0.8f, r, g, b, 1.f);
 
 			text = "- Nothing";
-			//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 			AEGfxPrint(font, text, 0.055f, 0.09f, 0.8f, r, g, b, 1.f);
 
 			text = "- Everything";
-			//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 			AEGfxPrint(font, text, 0.055f, -0.395f, 0.8f, r, g, b, 1.f);
 		}
 
-		//Print health and damage
-		//changed to speed and damage?
-		
-		/*sprintf_s(buffer, 50, "%.0f", thisEntry.enemyType.health);
-		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
-		AEGfxPrint(font, buffer, -textWidth / 2 - 0.27f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);*/
+		//print the enemy's damage
 		sprintf_s(buffer, 50, (18 == almanac.currentPageNumber) ? "?" : "%.0f", thisEntry.enemyType.damage);
 		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, buffer, -textWidth / 2 - 0.555f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);
 
+		//print the enemy's speed
 		sprintf_s(buffer, 50, (18 == almanac.currentPageNumber) ? "?" : "%.0f", thisEntry.enemyType.speed);
 		AEGfxGetPrintSize(font, buffer, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, buffer, -textWidth / 2 - 0.27f, -textHeight / 2 - 0.065f, 1.f, r, g, b, 1.f);
-
-		
 
 		//Render enemy sprite
 		thisEntry.enemyEntrySprite.position = Vector2(-320.f, 200.f);
@@ -230,16 +241,12 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	//main page
 	else if (3 == almanac.currentPageNumber)
 	{
+	//header text
 		const char* text{ "Enemies" };
-		//f32 textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 2.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2.f - 0.4f, -textHeight / 2.f + 0.6f, 2.f, r, g, b, 1.f);
 
-		//const char* text{ "Tutorial" };
-		//f32 textWidth, textHeight;
-		//AEGfxGetPrintSize(font, text, 2.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 - 0.4, -textHeight / 2 + 0.6, 2.f, r, g, b, 1.f);
-
+		//print the image of each enemy entry
 		int index {0};
 		for (AlmanacEntry entry: almanac.entries)
 		{
@@ -253,8 +260,8 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	//tutorial page 1
 	else if (0 == almanac.currentPageNumber)
 	{
+		//hardcoded tutorial texts
 		const char* text { "Tutorial" };
-		//f32 textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 2.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 + 0.6f, 2.f, r, g, b, 1.f);
 
@@ -273,23 +280,14 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	//tutorial page 2
 	else if (1 == almanac.currentPageNumber)
 	{
+		//hardcoded tutorial texts
 		const char* text{ "Press or hold" };
-		//f32 textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.56f, -textHeight / 2 - 0.22f, 1.f, r, g, b, 1.f);
 
 		text = "to throw a gift";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 - 0.35f, 1.f, r, g, b, 1.f);
-
-		//text = "Find out your enemies' liked";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.25f, 1.f, r, g, b, 1.f);
-
-		//text = "gifts to befriend them";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.15f, 1.f, r, g, b, 1.f);
-
 
 		text = "Give your enemies gifts they";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
@@ -310,6 +308,7 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 	//tutoirial page 3
 	else if (2 == almanac.currentPageNumber)
 	{
+		//hardcoded tutorial texts
 		const char* text{ "Some enemies might not like" };
 		textWidth, textHeight;
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
@@ -322,23 +321,6 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 		text = "so watch out!";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
 		AEGfxPrint(font, text, -textWidth / 2 - 0.4f, -textHeight / 2 - 0.42f, 1.f, r, g, b, 1.f);
-
-		//text = "Find out your enemies' liked";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.25f, 1.f, r, g, b, 1.f);
-
-		//text = "gifts to befriend them";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.15f, 1.f, r, g, b, 1.f);
-
-
-		//text = "Give your enemies gifts they";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.25f, 1.f, r, g, b, 1.f);
-
-		//text = "like to befriend them";
-		//AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
-		//AEGfxPrint(font, text, -textWidth / 2 + 0.41f, -textHeight / 2 + 0.15f, 1.f, r, g, b, 1.f);
 
 		text = "Defeat the evil Chimera";
 		AEGfxGetPrintSize(font, text, 1.f, &textWidth, &textHeight);
@@ -357,62 +339,61 @@ void RenderCurrentPage(Almanac & almanac, s8 font)
 //Renders the book and its bookmarks/buttons, and calls RenderCurrentPage
 void RenderAlmanacPages(Almanac & almanac, s8 font)
 {
-	//std::cout << "current: " << almanac.currentPageNumber << "\n";
+	//set the proper render mode to properly render textures
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	//if the almanac is open
 	if (almanac.isOpen)
 	{
-		//std::vector<std::string> allAreas {"main", "normal", "plant", "ocean", "cold", "hot"};
-		
-		//check which area we are looking at in the almanac, and render the appropriate sprite
+		//render the correct page sprite depending on what area the page is from
 		for (int i{ 0 }; i < 6; ++i)
 		{
 			if (allAreas[i] == almanac.currentArea)
 				almanac.pageSprites[i].RenderSprite();
 		}
 
+		//render tutorial page 1 if on page 0
 		if (0 == almanac.currentPageNumber)
 		{
 			almanac.pageSprites[12].RenderSprite();
 		}
+		//render tutorial page 2 if on page 1
 		else if (1 == almanac.currentPageNumber)
 		{
 			almanac.pageSprites[13].RenderSprite();
 		}
+		//render tutorial page 3 if on page 2
 		else if (2 == almanac.currentPageNumber)
 		{
 			almanac.pageSprites[14].RenderSprite();
 		}
+		//render boss page 3 if on page 18
 		else if (18 == almanac.currentPageNumber)
 		{
 			almanac.pageSprites[16].RenderSprite();
 		}
-		//else if (3 == almanac.currentPageNumber)
-		//{
-		//	almanac.pageSprites[0].RenderSprite();
-		//}
 
 		//display close button and light it up when hovering mouse over it
 		(IsCursorInRect(Vector2(577, 332), 72, 92)) ? almanac.closeSprites[1].RenderSprite() : almanac.closeSprites[0].RenderSprite();
 		
-		//render the current arrow sprite(s) depending on what page we are in
+		//render the arrow sprite(s) depending on what page we are in
 		switch (almanac.currentPageNumber)
 		{
 			//first page
 			case (0):
 				almanac.arrowSprites[0].RenderSprite();
-				//display lit up next when hovering mouse over it
+				//display lit up next button when hovering mouse over it
 				if (IsCursorInRect(Vector2(583, -352), 74, 85))
 					almanac.arrowSprites[4].RenderSprite();
 				break;
 			//last page
 			case (18):
 				almanac.arrowSprites[2].RenderSprite();
-				//display lit up back when hovering mouse over it
+				//display lit up back button when hovering mouse over it
 				if (IsCursorInRect(Vector2(486, -352), 74, 85)) almanac.arrowSprites[3].RenderSprite();
 				break;
 			default:
 				almanac.arrowSprites[1].RenderSprite();
-				//display lit up next/back when hovering mouse over it
+				//display lit up next/back buttons when hovering mouse over it
 				if (IsCursorInRect(Vector2(583, -352), 74, 85)) almanac.arrowSprites[4].RenderSprite();
 				if (IsCursorInRect(Vector2(486, -352), 74, 85)) almanac.arrowSprites[3].RenderSprite();
 
@@ -443,234 +424,94 @@ void RenderAlmanacPages(Almanac & almanac, s8 font)
 }
 
 //Handles the inputs in the almanac
-void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
+void AlmanacInputs(Almanac & almanac)
 {
 	if (almanac.isOpen)
 	{ 
-		
+		//Plays the almanac's audio if it is not active (coded by Brandon)
 		if (!almanacSound) {
 			pauseBGM();
 			AlmanacAudio();
 			almanacSound = true;
 		}
-		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-		//input for close
-		//test for close
-		//Sprite test1 {Sprite(removeLater, Vector2(577, 332), Vector2(72,92), Color{0.0,0.0,0.0,0.5})};
-		//test1.UpdateTransform();
-		//test1.RenderSprite(true);
+
+		//input for the close button
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(577, 332), 72, 92))
 		{
+			//close almanac
 			almanac.isOpen = false;
+			//stop playing the almanac sounds and resume to the ususal BGM (coded by Brandon)
 			almanacSound = false;
 			ResumeBGM();
-			//std::cout << "current: " << almanac.currentPageNumber;
 		}
 
-		//input for next
-		//test for next
-		//Sprite test2{ Sprite(removeLater, Vector2(583, -352), Vector2(74,85), Color{0.0,0.0,0.0,0.5}) };
-		//test2.UpdateTransform();
-		//test2.RenderSprite(true);
+		//input for next button
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(583, -352), 74, 85))
 		{
 			if (almanac.currentPageNumber < almanac.maxPages) {
+				//go to the next page if not at the last
 				++(almanac.currentPageNumber);
+				//play the almanac audio (coded by Brandon)
 				AlmanacAudio();
 			}
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
 		//input for back
-		//test for back
-		//Sprite test3{ Sprite(removeLater, Vector2(486, -352), Vector2(74,85), Color{0.0,0.0,0.0,0.5}) };
-		//test3.UpdateTransform();
-		//test3.RenderSprite(true);
 		if (AEInputCheckTriggered(AEVK_LBUTTON) && IsCursorInRect(Vector2(486, -352), 74, 85))
 		{
 			if (almanac.currentPageNumber > 0) {
+				//go to the previous page if not at the last
 				--(almanac.currentPageNumber);
+				//play the almanac audio (coded by Brandon)
 				AlmanacAudio();
 			}
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
-		//{
-		//	//inputs for area bookmarks
-		//	//std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
-		//	//std::vector<int> bookmarkPages{ 0,1,5,8,11,13,15 };
-		//	//note: goes from bottom to top
-		//	//for (int i{ 0 }; i < 6; ++i)
-		//	//{
-		//	//	//test for area bookmarks
-		//	//	//Sprite test {Sprite(removeLater, Vector2(683, (68 * i) - 47), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-		//	//	//test.UpdateTransform();
-		//	//	//test.RenderSprite(true);
-
-		//	//	if (almanac.currentArea != allAreas[5 - i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
-		//	//		IsCursorInRect(Vector2(683, (68 * i) - 47), 75, 57))
-		//	//	{
-		//	//		almanac.currentPageNumber = bookmarkPages[5 - i];
-		//	//	//	BigPageFlip();
-		//	//		//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//	//	}
-		//	//}
-		//	//input for the help bookmark
-		//	//Sprite test{ Sprite(removeLater, Vector2(683, 293), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//	//test.UpdateTransform();
-		//	//test.RenderSprite(true);
-		//	if (almanac.currentArea != "help" && AEInputCheckTriggered(AEVK_LBUTTON) &&
-		//		IsCursorInRect(Vector2(683, 293), 75, 57))
-		//	{
-		//		BigPageFlip();
-		//		//	almanac.currentPageNumber = 16;
-		//		almanac.currentPageNumber = 0;
-		//		//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//	}
-		//}
-		//{
-		//	//inputs for area bookmarks
-		//	/*std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
-		//	std::vector<int> bookmarkPages{ 3,4,8,10,13,15 };*/
-		//	for (int i{ 0 }; i < 6; ++i)
-		//	{
-		//		//test for area bookmarks
-		//		//Sprite test {Sprite(removeLater, Vector2(683, -(68 * i) + 201), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-		//		//test.UpdateTransform();
-		//		//test.RenderSprite(true);
-
-		//		if (almanac.currentArea != allAreas[i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
-		//			IsCursorInRect(Vector2(683, -(68 * i) + 201), 75, 57))
-		//		{
-		//			BigPageFlip();
-		//			almanac.currentPageNumber = bookmarkPages[i];
-		//			//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//		}
-		//	}
-
-		//	//input for the boss bookmark
-		//	//Sprite test{ Sprite(removeLater, Vector2(683, - 208), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//	//test.UpdateTransform();
-		//	//test.RenderSprite(true);
-		//	if (almanac.currentArea != "boss" && AEInputCheckTriggered(AEVK_LBUTTON) &&
-		//		IsCursorInRect(Vector2(683, -208), 75, 57))
-		//	{
-		//		BigPageFlip();
-		//		almanac.currentPageNumber = 18;
-		//		//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//	}
-
-
-
-		//	//inputs for main page enemy buttons 
-		//	if (3 == almanac.currentPageNumber)
-		//	{
-		//		//for (int i{ 0 }; i < almanac.maxPages; ++i)
-		//		for (int i{ 0 }; i < 15; ++i)
-		//		{
-		//			//test for main page enemy buttons
-		//			//Sprite test { (i < 6) ?
-		//			//Sprite(removeLater, Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) :
-		//			//Sprite(removeLater, Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) };
-		//			//test.UpdateTransform();
-		//			//test.RenderSprite(true);
-
-		//			if (AEInputCheckTriggered(AEVK_LBUTTON) && ((i < 6) ?
-		//				IsCursorInRect(Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), 160, 160) :
-		//				IsCursorInRect(Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), 160, 160)))
-		//			{
-		//				//std::cout << "TRIGGERED";
-		//				almanac.currentPageNumber = i + 4;
-		//				//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//			}
-		//		}
-		//	}
-		//}
-
-		//inputs for area bookmarks
-		//std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
-		//std::vector<int> bookmarkPages{ 0,1,5,8,11,13,15 };
-		//note: goes from bottom to top
-		//for (int i{ 0 }; i < 6; ++i)
-		//{
-		//	//test for area bookmarks
-		//	//Sprite test {Sprite(removeLater, Vector2(683, (68 * i) - 47), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-		//	//test.UpdateTransform();
-		//	//test.RenderSprite(true);
-
-		//	if (almanac.currentArea != allAreas[5 - i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
-		//		IsCursorInRect(Vector2(683, (68 * i) - 47), 75, 57))
-		//	{
-		//		almanac.currentPageNumber = bookmarkPages[5 - i];
-		//	//	BigPageFlip();
-		//		//std::cout << "current: " << almanac.currentPageNumber << "\n";
-		//	}
-		//}
-		//input for the help bookmark
-		//Sprite test{ Sprite(removeLater, Vector2(683, 293), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//test.UpdateTransform();
-		//test.RenderSprite(true);
+		//input for tutorial bookmark
 		if (almanac.currentArea != "help" && AEInputCheckTriggered(AEVK_LBUTTON) &&
 			IsCursorInRect(Vector2(683, 293), 75, 57))
 		{
+			//play the almanac audio (coded by Brandon)
 			BigPageFlip();
-			//	almanac.currentPageNumber = 16;
+			//set curent page to first page
 			almanac.currentPageNumber = 0;
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
 		//inputs for area bookmarks
-		/*std::vector<std::string> allAreas{ "main", "normal", "plant", "ocean", "cold", "hot" };
-		std::vector<int> bookmarkPages{ 3,4,8,10,13,15 };*/
 		for (int i{ 0 }; i < 6; ++i)
 		{
-			//test for area bookmarks
-			//Sprite test {Sprite(removeLater, Vector2(683, -(68 * i) + 201), Vector2(75,57), Color{0.0,0.0,0.0,0.5})};
-			//test.UpdateTransform();
-			//test.RenderSprite(true);
-
 			if (almanac.currentArea != allAreas[i] && AEInputCheckTriggered(AEVK_LBUTTON) &&
 				IsCursorInRect(Vector2(683, -(68 * i) + 201), 75, 57))
 			{
+				//play the almanac audio (coded by Brandon)
 				BigPageFlip();
+				//set curent page depending on which bookmark is clicked
 				almanac.currentPageNumber = bookmarkPages[i];
-				//std::cout << "current: " << almanac.currentPageNumber << "\n";
 			}
 		}
 
 		//input for the boss bookmark
-		//Sprite test{ Sprite(removeLater, Vector2(683, - 208), Vector2(75,57), Color{0.0,0.0,0.0,0.5}) };
-		//test.UpdateTransform();
-		//test.RenderSprite(true);
 		if (almanac.currentArea != "boss" && AEInputCheckTriggered(AEVK_LBUTTON) &&
 			IsCursorInRect(Vector2(683, -208), 75, 57))
 		{
+			//play the almanac audio (coded by Brandon)
 			BigPageFlip();
+			//set curent page to 18, the boss page
 			almanac.currentPageNumber = 18;
-			//std::cout << "current: " << almanac.currentPageNumber << "\n";
 		}
 
 
 
-		//inputs for main page enemy buttons 
+		//inputs for the enemy entry buttons on the main page
 		if (3 == almanac.currentPageNumber)
 		{
-			//for (int i{ 0 }; i < almanac.maxPages; ++i)
 			for (int i{ 0 }; i < 15; ++i)
 			{
-				//test for main page enemy buttons
-				//Sprite test { (i < 6) ?
-				//Sprite(removeLater, Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) :
-				//Sprite(removeLater, Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), Vector2(160,160), Color{0.0,0.0,0.0,0.5}) };
-				//test.UpdateTransform();
-				//test.RenderSprite(true);
-
+				//when an enemy on this page is clicked, go to their page
 				if (AEInputCheckTriggered(AEVK_LBUTTON) && ((i < 6) ?
 					IsCursorInRect(Vector2(-520 + (i % 3 * 187), 80 - (i / 3 * 185)), 160, 160) :
 					IsCursorInRect(Vector2(140 + ((i - 6) % 3 * 187), 190 - ((i - 6) / 3 * 185)), 160, 160)))
 				{
-					//std::cout << "TRIGGERED";
 					almanac.currentPageNumber = i + 4;
-					//std::cout << "current: " << almanac.currentPageNumber << "\n";
 				}
 			}
 		}
@@ -683,6 +524,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 	}
 }
 
+//initialise some of the almanac's values
 void AlmanacInit(Almanac& almanac)
 {
 	almanac.isOpen = false;
@@ -690,6 +532,7 @@ void AlmanacInit(Almanac& almanac)
 	almanac.currentPageNumber = 0;
 }
 
+//free the almanac by clearing its vectors
 void AlmanacFree(Almanac& almanac)
 {
 	almanac.pageSprites.clear();

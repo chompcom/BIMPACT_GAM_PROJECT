@@ -132,10 +132,10 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
                 tFirst);
             if  (hit) {
                 if ((*it)->GetDmg() < 0.f) {
-                    playerHealsDamage(player);
+                    PlayerHealsDamage(player);
                 }
                 else if ( (*it)->GetDmg() > 0.f)
-                    playerTakesDamage(player);
+                    PlayerTakesDamage(player);
 
 
             }
