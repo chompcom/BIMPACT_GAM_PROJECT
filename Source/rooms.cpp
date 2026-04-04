@@ -195,10 +195,6 @@ namespace mapRooms
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
-			//Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			//Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			//Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-
 			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
 			Gift* sauce = new Gift(allGiftTypes["HotSauce"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
 			Gift* spray = new Gift(allGiftTypes["Spray"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
