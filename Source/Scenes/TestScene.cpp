@@ -778,19 +778,14 @@ void TestUpdate(float dt)
 
 		//std::cout << currentRoom->biome << std::endl;
 		static mapRooms::Room* lastRoom = nullptr;
-		if (currentRoom != lastRoom)
+		if (currentRoom != lastRoom && !almanac.isOpen)
 		{
 			lastRoom = currentRoom;
 			ResetBGM();
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
 			if (currentRoom->biome == "Ice") IceBiomeAudio();
 			if (currentRoom->biome == "Ocean") OceanBiomeAudio();
-			//if (currentRoom->biome == "Normal");
-			if (roomData.boss) {
-				BossBGMAudio();
-				//return;
-
-			}
+			if (roomData.boss)  BossBGMAudio();
 		}
 
 		bool isAngry = false;
@@ -800,17 +795,18 @@ void TestUpdate(float dt)
 				break;
 			}
 		}
-		if (isAngry && !fightMusicPlaying) {
-			ResetBGM();
-			FightMusicAudio();
-			fightMusicPlaying = true;
+		if (!almanac.isOpen) {
+			if (isAngry && !fightMusicPlaying) {
+				ResetBGM();
+				FightMusicAudio();
+				fightMusicPlaying = true;
+			}
+			else if (!isAngry && fightMusicPlaying) {
+				ResetBGM();
+				fightMusicPlaying = false;
+			}
+			if (!roomData.boss && !fightMusicPlaying) RandomBGMAudio(dt);
 		}
-		else if (!isAngry && fightMusicPlaying) {
-			ResetBGM();
-			fightMusicPlaying = false;
-		}
-		if (!roomData.boss && !fightMusicPlaying) RandomBGMAudio(dt);
-
 		// FOR DOOR
 		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
 		if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;
@@ -1377,9 +1373,10 @@ void TestUpdate(float dt)
 			gameState = WIN;
 		if (AEInputCheckTriggered(AEVK_4))
 			gameState = LOSE;
-		if (AEInputCheckTriggered(AEVK_R) || AEInputCheckTriggered(AEVK_5))
+		if (AEInputCheckTriggered(AEVK_R) || AEInputCheckTriggered(AEVK_5)) {
+			StopAllAudio();
 			ChangeState(GS_RESTART);
-
+		}
 		player.speed *= 2;
 
 		// to test damage

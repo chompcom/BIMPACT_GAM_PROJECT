@@ -363,6 +363,14 @@ void ResetBGM() {
 //	AEAudioStopGroup(RoomAudio);
 	AEAudioStopGroup(BGMAudio);
 }
+void pauseBGM() {
+	AEAudioPauseGroup(RoomAudio);
+	AEAudioPauseGroup(BGMAudio);
+}
+void ResumeBGM() {
+	AEAudioResumeGroup(RoomAudio);
+	AEAudioResumeGroup(BGMAudio);
+}
 
 // Menu
 void InitMenuAudio() {	
