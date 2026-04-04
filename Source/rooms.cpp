@@ -777,16 +777,6 @@ namespace mapRooms
 		return (static_cast<unsigned int>(low + (std::rand() % (high - low + 1))));
 	}
 
-	//// UpdateMap()
-	//void Map::UpdateMap(  )
-	//{
-	//	// Input (Get x and y of player)
-	//	// Perhaps testing for collision
-	//	
-
-	//	MoveTo(Direction::Left);	// If collide with door area, use MoveTo(Direction direcci�n)
-	//}
-
 	// DeleteMap()?
 	void Map::DeleteMap() 
 	{
