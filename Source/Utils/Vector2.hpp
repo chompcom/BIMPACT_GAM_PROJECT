@@ -9,6 +9,10 @@
     and clearer code writing.
 */
 #pragma once
+
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
+
 #include <cmath>
 #include <stdexcept>
 
@@ -166,5 +170,15 @@ public:
         return Vector2(myx, myy);
     }
 
+    Vector2 Abs() const {
+        float newx = x < 0 ? -x : x;
+        float newy = y < 0 ? -y : y;
+
+        return Vector2{ newx, newy};
+    }
+
+
 };
 
+
+#endif //VECTOR_HPP

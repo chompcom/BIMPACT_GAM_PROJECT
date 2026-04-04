@@ -23,6 +23,7 @@ class Boss {
 		//TexturedSprite sprite;
 		AnimatedSprite sprite;
 		TexturedSprite shadow;
+		TexturedSprite hitbox;
 		float shadowOffset;
 		//Sprite hpBar;
 		f32 currentHealth;
@@ -41,7 +42,7 @@ class Boss {
 		//points to the room it should be inside, so that it knows whats going on inside!
 		RoomData& roomData;
 
-		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite,
+		Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, //Sprite hpBarSprite,
 			RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos = {0, 350}, Vector2 size = {1000, 30});
 		~Boss();
 

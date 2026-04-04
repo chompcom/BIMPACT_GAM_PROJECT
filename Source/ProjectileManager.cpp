@@ -122,16 +122,22 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         else {
 
             //deliberate assignment
-            if ( (hit = CollisionIntersection_RectRect(
+            hit = CollisionIntersection_RectRect(
                 (*it)->GetPosition(),
                 (*it)->GetScale(),
                 (*it)->GetVelocity(),
                 player.sprite.position,
                 player.sprite.scale,
                 Vector2{ 0, 0 },
-                tFirst
-            )) ) {
-                playerTakesDamage(player);
+                tFirst);
+            if  (hit) {
+                if ((*it)->GetDmg() < 0.f) {
+                    playerHealsDamage(player);
+                }
+                else if ( (*it)->GetDmg() > 0.f)
+                    playerTakesDamage(player);
+
+
             }
         }
 

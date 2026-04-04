@@ -228,12 +228,12 @@
 			"yPictureScale": 100
 		},
 		{
-			"name": "Teensy Tiny Dragon",
+			"name": "Tiny Dragon",
 			"description": "Awww! How cute!",
 			"area": "hot",
 			"spritePath": "Assets/Enemies/tinyDragon.png",
-			"xPictureScale": 50,
-			"yPictureScale": 50
+			"xPictureScale": 100,
+			"yPictureScale": 100
 		},
 		{
 			"name": "Chimera",

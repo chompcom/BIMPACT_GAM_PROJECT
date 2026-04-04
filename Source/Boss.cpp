@@ -6,9 +6,9 @@
 
 extern LV_STATES gameState;
 
-Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, //Sprite hpBarSprite, 
+Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSprite enemySprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, //Sprite hpBarSprite, 
 	 RoomData& currentRoom, std::vector<AttackData> attackData, std::string const& filePath, s8 font, Vector2 pos, Vector2 size)
-	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{ shadowSprite }, shadowOffset{}, //hpBar{hpBarSprite},
+	: name{ enemyName }, health{ enemyHealth }, damage{ enemyDamage }, currentHealth{ enemyHealth }, sprite{ enemySprite }, shadow{ shadowSprite }, hitbox{ hitboxSprite }, shadowOffset{}, //hpBar{hpBarSprite},
 	roomData{ currentRoom }, bossStateMachine{ std::make_unique<Boss_FSM>(this) }, isActive{true}
 {
 	healthbarInitialized = healthbar.LoadFromFilePopUp(filePath, pos, size);
@@ -53,7 +53,7 @@ void Boss::CollideProjectile() {
 	for (Projectile* proj : roomData.projectileList) {
 		if (!proj->IsAlive()) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= proj->GetDmg();
@@ -74,7 +74,7 @@ void Boss::CollideGift() {
 	for (Gift* gift : roomData.giftList) {
 		if (gift->velocity.LengthSq() <= EPSILON) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, Vector2(abs(sprite.scale.x), abs(sprite.scale.y)), velocity,
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= 1;

@@ -34,6 +34,7 @@
     <ClCompile Include="..\Source\Scenes\TestScene.cpp" />
     <ClCompile Include="..\Source\Screens\ContentEditorScene.cpp" />
     <ClCompile Include="..\Source\Screens\Credits.cpp" />
+    <ClCompile Include="..\Source\Screens\LogoScene.cpp" />
     <ClCompile Include="..\Source\Screens\MainMenuScene.cpp" />
     <ClCompile Include="..\Source\Screens\Tutorial.cpp" />
     <ClCompile Include="..\Source\Screens\Ui.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="..\Source\rooms.h" />
     <ClInclude Include="..\Source\Screens\ContentEditorScene.h" />
     <ClInclude Include="..\Source\Screens\Credits.h" />
+    <ClInclude Include="..\Source\Screens\LogoScene.h" />
     <ClInclude Include="..\Source\Screens\MainMenuScene.h" />
     <ClInclude Include="..\Source\Screens\Tutorial.h" />
     <ClInclude Include="..\Source\Screens\Ui.h" />
@@ -153,6 +155,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine\lib\fmodL.dll" "$(OutDir)" /s /r /y /q</
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -46,7 +46,8 @@ void Projectile::UpdateProjectile(f32 dt) {
 	projectileSprite.UpdateTransform();
 }
 void Projectile::RenderProjectile() {
-	projectileSprite.RenderSprite();
+	//add true so it can be transparent
+	projectileSprite.RenderSprite(true);
 }
 
 int Projectile::GetDmg() const {

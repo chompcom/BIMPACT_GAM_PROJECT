@@ -4,6 +4,7 @@
 #include "GameStateManager.h"
 
 #include "Scenes/TestScene.h"
+#include "Screens/LogoScene.h"
 #include "Screens/MainMenuScene.h"
 #include "Screens/ContentEditorScene.h"
 #include "Screens/Credits.h"
@@ -37,7 +38,13 @@ void GSM_Update()
 		fpDraw = TestDraw;
 		fpUpdate = TestUpdate;
 		break;
-	case GS_LEVEL2:
+	case GS_LOGO:
+		fpLoad =       LogoLoad;
+		fpUnload =     LogoUnload;
+		fpInitialize = LogoInit;
+		fpFree =       LogoFree;
+		fpDraw =       LogoDraw;
+		fpUpdate =     LogoUpdate;
 		break;
 	case GS_RESTART:
 		break;

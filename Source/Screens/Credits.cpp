@@ -20,8 +20,8 @@ void CreditsInit() {
 }
 
 
-constexpr float speed = 0.25f;
-
+constexpr float speed = 0.10f;
+float timer = 20.0f, counter = 0;
 void CreditsUpdate(float dt = AEFrameRateControllerGetFrameTime()) {
 
 	// SCROLL HEIAN ERA TECHNIQUE 

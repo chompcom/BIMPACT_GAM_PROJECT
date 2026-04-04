@@ -29,11 +29,12 @@ AEGfxVertexList *sqmesh = nullptr;
 
 TexturedSprite *bulletSprite = nullptr;
 
-AEGfxTexture *rockpng = nullptr;
+//AEGfxTexture *rockpng = nullptr;
 AEGfxTexture *playerpng = nullptr;
 AEGfxTexture *shadowpng = nullptr;
-AEGfxTexture *bulletpng = nullptr;
-AEGfxTexture *aoepng = nullptr;
+AEGfxTexture* hitboxpng = nullptr;
+//AEGfxTexture *bulletpng = nullptr;
+//AEGfxTexture *aoepng = nullptr;
 AEGfxTexture *heartpng = nullptr;
 AEGfxTexture *almanacpng = nullptr;
 AEGfxTexture *almanacLitUppng = nullptr;
@@ -57,10 +58,10 @@ Almanac almanac{};
 s8 font = 0;
 //Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
 //static ProjectileManager projManager;
-Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
+Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqmesh, hitboxpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
 
-EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
-Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
+//EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
+//Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
 
@@ -118,10 +119,11 @@ void TestLoad()
 {
 	DataLoader::Load();
 	sqmesh = CreateSquareMesh();
-	rockpng = AEGfxTextureLoad("Assets/poprocks.png");
+	//rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
-	bulletpng = AEGfxTextureLoad("Assets/fireball.png");
+	hitboxpng = AEGfxTextureLoad("Assets/hitbox.png");
+	//bulletpng = AEGfxTextureLoad("Assets/fireball.png");
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
@@ -150,6 +152,7 @@ void TestLoad()
 
 	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
 	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
+	player.hitbox = TexturedSprite(sqmesh, hitboxpng, Vector2(300, 300), Vector2(100, 100), Color{ 1, 1, 1, 0 });
 
 	
 	// Global Data Here
@@ -345,7 +348,7 @@ void TestDraw()
 		RoomData &roomData = room->currentRoomData;
 		RoomData &carryData = gameMap.GetTransferData();
 
-		gameMap.GetCurrentRoom()->roomGrid.RenderGrid(DataLoader::GetMesh(), carryData.player->position, carryData.player->sprite.scale, AE_GFX_RM_TEXTURE);
+		//gameMap.GetCurrentRoom()->roomGrid.RenderGrid(DataLoader::GetMesh(), carryData.player->position, carryData.player->sprite.scale, AE_GFX_RM_TEXTURE);
 
 		for (Gift *g : roomData.giftList)
 		{
@@ -478,6 +481,97 @@ void TestDraw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	player.sprite.RenderSprite(true);
 #endif
+	if (debugMode)
+	{
+		if (mapRooms::Room* room = gameMap.GetCurrentRoom())
+		{
+			RoomData& roomData = room->currentRoomData;
+			RoomData& carryData = gameMap.GetTransferData();
+
+			gameMap.GetCurrentRoom()->roomGrid.RenderGrid(DataLoader::GetMesh(), carryData.player->position, carryData.player->sprite.scale, AE_GFX_RM_TEXTURE);
+
+			for (Gift* g : roomData.giftList)
+			{
+				if (g)
+				{
+					/*if (!g->pickUpState)
+						g->shadow.RenderSprite();
+					g->giftType.sprite.RenderSprite();*/
+					g->hitbox.RenderSprite();
+				}
+			}
+			for (Enemy* e : roomData.enemyList)
+			{
+				if (e && e->isActive)
+				{
+
+					/*e->shadow.RenderSprite();
+					e->sprite.RenderSprite();*/
+					e->hitbox.RenderSprite();
+				}
+			}
+			if (roomData.boss)
+			{
+				if (roomData.boss->currentHealth > 0)
+				{
+					/*roomData.boss->shadow.RenderSprite();
+					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);*/\
+						roomData.boss->hitbox.RenderSprite();
+				}
+			}
+
+			for (Gift* g : carryData.giftList)
+			{
+				if (g)
+				{
+					/*if (!g->pickUpState)
+						g->shadow.RenderSprite();
+					g->giftType.sprite.RenderSprite();*/
+					g->hitbox.RenderSprite();
+				}
+			}
+			for (Enemy* e : carryData.enemyList)
+			{
+				if (e)
+				{
+					/*e->shadow.RenderSprite();
+					e->sprite.RenderSprite();*/
+					e->hitbox.RenderSprite();
+				}
+			}
+		}
+
+		player.hitbox.RenderSprite();
+
+		char buffer[50];
+
+		sprintf_s(buffer, 50, "DEBUG MODE ON");
+		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.9), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+		sprintf_s(buffer, 50, "GAME STATE: ");
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.8), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+		switch (gameState)
+		{
+		case RUNNING:
+			sprintf_s(buffer, 50, "RUNNING");
+			break;
+		case PAUSED:
+			sprintf_s(buffer, 50, "PAUSED");
+			break;
+		case WIN:
+			sprintf_s(buffer, 50, "YOU WIN");
+			break;
+		case LOSE:
+			sprintf_s(buffer, 50, "YOU LOSE");
+			break;
+		}
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
+		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
+		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
+
+		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
+	}
 
 	// Pause screen
 
@@ -551,39 +645,6 @@ void TestDraw()
 
 		loseUi.Draw();
 	}
-
-	if (debugMode)
-	{
-
-		char buffer[50];
-
-		sprintf_s(buffer, 50, "DEBUG MODE ON");
-		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
-		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.9), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
-		sprintf_s(buffer, 50, "GAME STATE: ");
-		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.8), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
-		switch (gameState)
-		{
-		case RUNNING:
-			sprintf_s(buffer, 50, "RUNNING");
-			break;
-		case PAUSED:
-			sprintf_s(buffer, 50, "PAUSED");
-			break;
-		case WIN:
-			sprintf_s(buffer, 50, "YOU WIN");
-			break;
-		case LOSE:
-			sprintf_s(buffer, 50, "YOU LOSE");
-			break;
-		}
-		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.7), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
-
-		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
-		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
-
-		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
-	}
 }
 
 void TestFree()
@@ -627,10 +688,11 @@ void TestUnload()
 	delete almanacLitUpIcon;
 
 	//#warning "GET RID OF THE TEST PNGS"
-	AEGfxTextureUnload(rockpng);
+	//AEGfxTextureUnload(rockpng);
 	AEGfxTextureUnload(playerpng);
 	AEGfxTextureUnload(shadowpng);
-	AEGfxTextureUnload(bulletpng);
+	AEGfxTextureUnload(hitboxpng);
+	//AEGfxTextureUnload(bulletpng);
 
 	AEGfxTextureUnload(heartpng);
 	AEGfxTextureUnload(almanacpng);
@@ -782,9 +844,11 @@ void TestUpdate(float dt)
 		// sync sprite + shadow AFTER collision correction
 		player.sprite.position = player.position;
 		player.shadow.position = player.position - Vector2{ 0, 40 };
+		player.hitbox.position = player.position;
 
 		player.sprite.UpdateTransform();
 		player.shadow.UpdateTransform();
+		player.hitbox.UpdateTransform();
 
 		// Game Map Update was here
 
@@ -798,6 +862,9 @@ void TestUpdate(float dt)
 			if (e)
 			{
 				e->Update(dt);
+
+				e->hitbox.position = e->sprite.position;
+				e->hitbox.UpdateTransform();
 			}
 		}
 
@@ -822,6 +889,9 @@ void TestUpdate(float dt)
 						b->sprite.position += dir.Normalized() * b->sprite.scale.x * 0.5f * dt;
 					}
 				}
+
+				e->hitbox.position = e->sprite.position;
+				e->hitbox.UpdateTransform();
 
 			
 				//if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 800))
@@ -906,9 +976,11 @@ void TestUpdate(float dt)
 
 				g->giftType.sprite.position = g->position;
 				g->shadow.position = g->position - Vector2{ 0, 40 };
+				g->hitbox.position = g->position;
 
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
+				g->hitbox.UpdateTransform();
 			}
 		}
 
@@ -938,6 +1010,10 @@ void TestUpdate(float dt)
 
 			roomData.boss->collideWall = false;
 
+			// Test Player Collision with Map			
+			//int prevCellBoss = roomData.grid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
+
+
 			// Test Player Collision with Map
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
@@ -953,41 +1029,38 @@ void TestUpdate(float dt)
 				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
+			
+			
+			//gonna try to make it dynamic..
+			/*
+			float gridWidth = roomData.grid.GetTileWidth();
+			float gridHeight = roomData.grid.GetTileHeight();
+			if (CollisionBoundary_Static(roomData.boss->sprite.position, roomData.boss->sprite.scale, roomData.grid.GetBoundary().x * 0.99f, roomData.grid.GetBoundary().y * 0.99f)) {
 
-			/*// FOR DOOR
-			int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
-			if (prevCell < 0 && currentRoom->lastValidCell >= 0) prevCell = currentRoom->lastValidCell;
+				if (collisionResBoss & COLLISION_RIGHT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f - 0.10f;
 
-			// TEST PLAYER COLLISION WITH MAP
-			Vector2 moveDelta = roomData.boss->sprite.position - bossPrevPos;
-			Vector2 moveDir = moveDelta.Normalized();
-			int curCell = currentRoom->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
-			if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
+					roomData.boss->collideWall = true;
+				}
+				if (collisionResBoss & COLLISION_LEFT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x - gridWidth * 0.5f + roomData.boss->sprite.scale.x * 0.5f + 0.10f;
+					roomData.boss->collideWall = true;
 
-			// Scale size 0.8f
-			float collisionScaleX = roomData.boss->sprite.scale.x * 0.8f;
-			float collisionScaleY = roomData.boss->sprite.scale.y * 0.8f;
+				}
+				if (collisionResBoss & COLLISION_BOTTOM && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f + 0.10f;
+					roomData.boss->collideWall = true;
 
-			int colRes = currentRoom->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, collisionScaleX, collisionScaleY, prevCell);
+				}
+				if (collisionResBoss & COLLISION_TOP && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
+					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y + gridHeight * 0.5f - roomData.boss->sprite.scale.y * 0.5f - 0.10f;
+					roomData.boss->collideWall = true;
 
-			float gridWidth = currentRoom->roomGrid.GetTileWidth();
-			float gridHeight = currentRoom->roomGrid.GetTileHeight();
-			constexpr float skin = 0.10f;
-
-			if (prevCell >= 0)
-			{
-				Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-				if ((colRes & COLLISION_LEFT) && moveDir.x < -EPSILON)	roomData.boss->sprite.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-				if ((colRes & COLLISION_RIGHT) && moveDir.x > EPSILON)	roomData.boss->sprite.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-				if ((colRes & COLLISION_TOP) && moveDir.y > EPSILON)	roomData.boss->sprite.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
-				if ((colRes & COLLISION_BOTTOM) && moveDir.y < -EPSILON)	roomData.boss->sprite.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
-
-				if (colRes) roomData.boss->collideWall = true;
+				}
 			}*/
+			std::cout << roomData.boss->collideWall << std::endl;
 
-			//if (player.position.x - roomData.boss->sprite.position.x < -50) roomData.boss->sprite.scale = { -100, 100 };
-			//else if (player.position.x - roomData.boss->sprite.position.x > 50) roomData.boss->sprite.scale = { 100, 100 };
-
+			//Code that sets the boss sprite to the direction its facing
 			if (roomData.boss->direction.x < 0.f) 
 				roomData.boss->sprite.scale = { -abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
 			else {
@@ -996,6 +1069,9 @@ void TestUpdate(float dt)
 
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
+
+			roomData.boss->hitbox.position = roomData.boss->sprite.position;
+			roomData.boss->hitbox.UpdateTransform();
 			//roomData.boss->hpBar.UpdateTransform();
 
 			roomData.boss->sprite.UpdateAnimation(dt);
@@ -1301,6 +1377,7 @@ void TestUpdate(float dt)
 		if (AEInputCheckTriggered(AEVK_R) || AEInputCheckTriggered(AEVK_5))
 			ChangeState(GS_RESTART);
 
+		player.speed *= 2;
 
 		// to test damage
 		if (AEInputCheckTriggered(AEVK_P))

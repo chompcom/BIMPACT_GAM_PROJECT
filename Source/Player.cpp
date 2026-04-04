@@ -11,10 +11,11 @@
 extern LV_STATES gameState;
 
 //contructor for player class
-Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, f32 throwStrength, f32 _speed, Vector2 position, Vector2 direction) :
+Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, f32 throwStrength, f32 _speed, Vector2 position, Vector2 direction) :
 	//initialiser list
 	sprite{ playerSprite },
 	shadow{ shadowSprite },
+	hitbox{hitboxSprite},
 	throwStrength{ throwStrength },
 	speed{ 1.f },
 	baseSpeed{ _speed },

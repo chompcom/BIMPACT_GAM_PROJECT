@@ -1,58 +1,60 @@
 {
-    "enemies":
-    [
+	"enemies": [
 		// This default is just for everyone to know what are the stuff
-		{	"name": "Default",
+		{
+			"name": "Default",
 			"sprite": "Assets/poprocks.png",
 			"health": 0,
 			"damage": 0,
 			"speed": 0,
 			"detectionRadius": 0,
 			"safeRadius": 0,
-			"attackRate":0,
+			"attackRate": 0,
 			"wanderTime": 3, //defaults to 3 if not included
-			"waitTime": 3,//defaults to 3 if not included
+			"waitTime": 3, //defaults to 3 if not included
 			"traits": [],
 			"likes": [],
 			"dislikes": [],
 			//ok to omit. projectile info is same for happy neutral and angry
-			"happyProjectile":{
-				"damage":0,
-				"radius":0,
-				"speed":0,
-				"lifetime":0,
-				"sprite":"Assets/Enemies/poprocks.png",
-				"color":[255,255,255,255]
+			"happyProjectile": {
+				"damage": 0,
+				"radius": 0,
+				"speed": 0,
+				"lifetime": 0,
+				"sprite": "Assets/Enemies/poprocks.png",
+				"color": [ 255, 255, 255, 255 ]
 			},
-			"angryProjectile":{},
-			"neutralProjectile":{},
+			"angryProjectile": {},
+			"neutralProjectile": {},
 			"happy": [
 				//anatomy of a behaviour:
 				//Contexts are checked in the order they are placed in the list
-				{ "context":"IsWaiting",
-				  "actions":[
-				  ]
+				{
+					"context": "IsWaiting",
+					"actions": [
+					]
 				},
-				{ 
-					"context":"default", //boolean check
-					"actions":[
+				{
+					"context": "default", //boolean check
+					"actions": [
 					] //list of actions in order
 				}
 			],
 			"neutral": [],
 			"angry": []
 		},
-		
+
 
 
 		//Start enemies
 
 		//Booger
-		{	"name": "Booger",
+		{
+			"name": "Booger",
 			"angrySound": "BoogerStick",
 			"sprite": "Assets/Enemies/booger.png",
 			"health": 100,
-			"traits": ["Gross"],
+			"traits": [ "Gross" ],
 			"damage": 0,
 			"speed": 60,
 			"detectionRadius": 5,
@@ -123,73 +125,76 @@
 			]
 		},
 		//Pop rocks
-		{	"name": "Pop Rocks",
+		{
+			"name": "Pop Rocks",
 			"angrySound": "Poprocks",
 			"sprite": "Assets/Enemies/poprocks.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
-			"traits": ["Hot"],
+			"traits": [ "Hot" ],
 			"damage": 100,
 			"speed": 200,
 			"detectionRadius": 200,
 			"safeRadius": 200,
 			"attackRate": 5,
-			"likes": ["Hot"],
-			"dislikes": ["Wet"],
-			"happyProjectile":{
+			"likes": [ "Hot" ],
+			"dislikes": [ "Wet" ],
+			"happyProjectile": {
 				"damage": 100,
-				"radius":300,
-				"speed":0,
-				"lifetime":1,
-				"sprite":"Assets/fireball.png"
-				,"color": [ 255, 0, 167, 255 ]
+				"radius": 300,
+				"speed": 0,
+				"lifetime": 1,
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 90, 0, 255 ]
 			},
 			"neutralProjectile": {
-				"damage":50,
-				"radius":300,
-				"speed":0,
+				"damage": 50,
+				"radius": 300,
+				"speed": 0,
 				"lifetime": 1,
-				"sprite": "Assets/fireball.png"
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 90, 0, 255 ]
 			},
 			"angryProjectile": {
-				"damage":50,
-				"radius":500,
-				"speed":0,
+				"damage": 50,
+				"radius": 500,
+				"speed": 0,
 				"lifetime": 1,
 				"sprite": "Assets/fireball.png"
+				,"color": [ 255, 90, 0, 255 ]
 			},
 			"happy": [
-				{	
-					"context":"IsWaiting",
-					"actions":[
+				{
+					"context": "IsWaiting",
+					"actions": [
 						"ClearTarget",
 						"MoveToTarget"
 					]
 				},
 				{
-					"context":"IsAttackCooldownUp",
-					"actions" : [
+					"context": "IsAttackCooldownUp",
+					"actions": [
 						"ClearTarget",
 						"MoveToTarget"
 					]
 				},
 				{
-					"context":"OnceWaitTimerIsUp",
-					"actions":[
+					"context": "OnceWaitTimerIsUp",
+					"actions": [
 						"TargetPlayer",
 						"FireProjectile"
 					]
 				},
 
 				{
-					"context":"IsTouchingTarget",
-					"actions":[
+					"context": "IsTouchingTarget",
+					"actions": [
 						"ClearTarget",
 						"Wait"
 					]
 				},
-				{ 
-					"context":"IsTargetInDetectionRadius",
+				{
+					"context": "IsTargetInDetectionRadius",
 					"actions": [
 						"TargetEnemyInDetectionRadius",
 						"MoveToTarget"
@@ -204,24 +209,25 @@
 						"TargetEnemyInDetectionRadius"
 					]
 				},
-				{ "context":"default",
-				"actions":[
-					"TargetEnemyInDetectionRadius",
-					"Wander"
-				]
+				{
+					"context": "default",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"Wander"
+					]
 				}
 			],
 			"neutral": [
-				{	
-					"context":"IsWaiting",
-					"actions":[
+				{
+					"context": "IsWaiting",
+					"actions": [
 						"ClearTarget",
 						"MoveToTarget"
 					]
 				},
 				{
-					"context":"IsAttackCooldownUp",
-					"actions" : [
+					"context": "IsAttackCooldownUp",
+					"actions": [
 						"TargetSelf",
 						"ApplySlowToTarget",
 						"Wander",
@@ -229,59 +235,60 @@
 					]
 				},
 				{
-					"context":"OnceWaitTimerIsUp",
-					"actions":[
+					"context": "OnceWaitTimerIsUp",
+					"actions": [
 						"TargetPlayer",
 						"FireProjectile"
 					]
 				},
-				{ 
-					"context":"IsTouchingTarget",
-					"actions":[
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
 						"ClearTarget",
 						"Wait"
 					]
 				},
-				{ "context":"default",
-				"actions":[
-					"TargetPlayer",
-					"Wander"
-				]
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
 				}
 			],
 			"angry": [
-				{	
-					"context":"IsWaiting",
-					"actions":[
+				{
+					"context": "IsWaiting",
+					"actions": [
 						"ClearTarget",
 						"MoveToTarget"
 					]
 				},
 				{
-					"context":"IsAttackCooldownUp",
-					"actions" : [
+					"context": "IsAttackCooldownUp",
+					"actions": [
 						"ClearTarget",
 						"MoveToTarget"
 					]
 				},
 				{
-					"context":"OnceWaitTimerIsUp",
-					"actions":[
+					"context": "OnceWaitTimerIsUp",
+					"actions": [
 						"TargetPlayer",
 						"FireProjectile"
 					]
 				},
 
 				{
-					"context":"IsTouchingTarget",
-					"actions":[
+					"context": "IsTouchingTarget",
+					"actions": [
 						"ClearTarget",
 						"Wait"
 					]
 				},
 				{
-					"context":"default",
-					"actions":[
+					"context": "default",
+					"actions": [
 						"TargetPlayer",
 						"MoveToTarget"
 					]
@@ -289,7 +296,8 @@
 			]
 		},
 		//The Oven
-		{	"name": "THE OVEN",
+		{
+			"name": "THE OVEN",
 			"angrySound": "Oven",
 			"sprite": "Assets/Enemies/oven.png",
 			"color": [ 255, 255, 255, 255 ],
@@ -301,10 +309,11 @@
 			"attackRate": 4,
 			"happyProjectile": {
 				"damage": 50,
-				"radius" : 75,
+				"radius": 75,
 				"speed": 100,
-				"lifetime" : 2,
-				"sprite" : "Assets/pattyfish.png"
+				"lifetime": 2,
+				"sprite": "Assets/pattyfish.png"
+				,"color": [ 67, 67, 67, 255 ]
 			},
 			"angryProjectile": {
 				"damage": 20,
@@ -312,56 +321,67 @@
 				"speed": 100,
 				"lifetime": 2.5,
 				"sprite": "Assets/fireball.png"
+				,"color": [ 67, 67, 67, 255 ]
 			},
-			"traits": ["Hot"],
-			"likes": ["Hot"],
-			"dislikes": ["Wet", "Gross"],
+			"traits": [ "Hot" ],
+			"likes": [ "Hot" ],
+			"dislikes": [ "Wet", "Gross" ],
 			"happy": [
-				{ "context": "IsTargetInDetectionRadius",
-				  "actions" : [
-					"MoveToTarget",
-					"CircleMove",
-					"FireProjectile"
-				  ]
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"MoveToTarget",
+						"CircleMove",
+						"FireProjectile"
+					]
 				},
 
-				{ "context": "default",
-				   "actions": [
-					"TargetPlayer",
-					"MoveToTarget",
-					"ClearTarget",
-					"TargetEnemyInDetectionRadius"
-				]}
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
 			],
 			"neutral": [
-				{ "context" : "IsTouchingTarget",
-					"actions":[
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
 						"SafeDistancePlayer"
 					]
 				},
-				{ "context": "default",
-					"actions":[
+				{
+					"context": "default",
+					"actions": [
 						"Wander"
 					]
 				}
 			],
 			"angry": [
-				{"context":"IsNotFollowingPlayer",
-				"actions": [
-					"TargetPlayer",
-					"MoveToTarget",
-					"FireProjectile"
-				]},
-				{"context":"default",
-				"actions":[
-					"TargetPlayer",
-					"CircleMove",
-					"FireProjectile"
-				]}
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"FireProjectile"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"FireProjectile"
+					]
+				}
 			]
 		},
 		//snowman
-		{ "name": "Snowman",
+		{
+			"name": "Snowman",
 			"angrySound": "SnowmanAngrySound",
 			"sprite": "Assets/Enemies/snowman.png",
 			"color": [ 255, 255, 255, 255 ],
@@ -373,10 +393,10 @@
 			"attackRate": 1.5,
 			"happyProjectile": {
 				"damage": 10,
-				"radius" : 50,
+				"radius": 50,
 				"speed": 500,
-				"lifetime" : 2,
-				"sprite" : "Assets/snowball.png"
+				"lifetime": 2,
+				"sprite": "Assets/snowball.png"
 			},
 			"angryProjectile": {
 				"damage": 20,
@@ -385,48 +405,58 @@
 				"lifetime": 2.5,
 				"sprite": "Assets/snowball.png"
 			},
-			"traits": ["Cold","Wet"],
-			"likes": ["Cold", "Wet"],
-			"dislikes": ["Hot"],
+			"traits": [ "Cold", "Wet" ],
+			"likes": [ "Cold", "Wet" ],
+			"dislikes": [ "Hot" ],
 			"happy": [
-				{ "context": "IsTargetInDetectionRadius",
-					"actions":[
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
 						"FireProjectile"
 					]
 				},
-				{ "context": "default",
-				   "actions": [
-					"ClearTarget",
-					"TargetEnemyInDetectionRadius"
-				]}
+				{
+					"context": "default",
+					"actions": [
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
 			],
 			"neutral": [
-				{ "context": "IsTouchingTarget",
-					"actions":[
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
 						"BecomeAngry"
 					]
 				},
-				{ "context": "default",
-				   "actions": [
-					"TargetPlayer"
-				]}
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer"
+					]
+				}
 			],
 			"angry": [
-				{ "context": "IsTargetInDetectionRadius",
-					"actions":[
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
 						"FireProjectile"
 					]
 				},
-				{ "context": "default",
-				   "actions": [
-					"TargetPlayer"
-				]}
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer"
+					]
+				}
 
 			]
-		}
-		,
+		},
 		//Soap
-		{ "name": "Soap",
+		{
+			"name": "Soap",
+			"angrySound": "Soap",
 			"sprite": "Assets/Enemies/soap.png",
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
@@ -435,12 +465,14 @@
 			"detectionRadius": 300,
 			"safeRadius": 300,
 			"attackRate": 1,
+			"waitTime": 2,
 			"happyProjectile": {
 				"damage": 10,
-				"radius" : 50,
+				"radius": 50,
 				"speed": 1,
-				"lifetime" : 3,
-				"sprite" : "Assets/snowball.png"
+				"lifetime": 3,
+				"sprite": "Assets/snowball.png"
+				,"color": [ 0, 255, 205, 255 ]
 			},
 			"angryProjectile": {
 				"damage": 20,
@@ -448,36 +480,656 @@
 				"speed": 1,
 				"lifetime": 3,
 				"sprite": "Assets/snowball.png"
+				,"color": [ 0, 255, 205, 255 ]
 			},
-			"traits": ["Clean","Wet"],
-			"likes": ["Clean", "Wet"],
-			"dislikes": ["Gross"],
+			"traits": [ "Clean", "Wet" ],
+			"likes": [ "Clean", "Wet" ],
+			"dislikes": [ "Gross" ],
 			"happy": [
-				{ "context":"IsNotFollowingPlayer",
-				  "actions" : [
-					"TargetPlayer",
-					 "MoveToTarget",
-					 "FireProjectile"
-				  ]
-				}
-				,{ "context":"default", 
-				   "actions":[
-					"ClearTarget",
-					"MoveToTarget"
-				   ]
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"FireProjectile"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"ClearTarget",
+						"MoveToTarget"
+					]
 				}
 			],
 			"neutral": [
-				{ "context": "IsWaiting",
-				  "actions":[
-					"ClearTarget",
-					"MoveToTarget"
-				  ]
+				{
+					"context": "OnceWanderTimerIsUp",
+					"actions": [
+						"Wait"
+					]
+				},
+				{
+					"context": "IsWaiting",
+					"actions": [
+						"ClearTarget",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions":[
+						"Wander",
+						"FireProjectile"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsWandering",
+					"actions" :[
+						"FireProjectile"	
+					]
+				},
+				{
+					"context": "OnceWanderTimerIsUp",
+					"actions": [
+						"Wait"
+					]
+				},
+				{ 
+					"context": "IsWaiting",
+					"actions": [
+						"StopMoving"
+					]
+				},
+				{
+					"context" : "default",
+					"actions":[
+						"TargetPlayer",
+						"Wander",
+						"ChargeAtTarget"
+					]
+				}
+			]
+		},
+		//Tom
+		{
+			"name": "Tom",
+			"angrySound": "Tom",
+			"sprite": "Assets/Enemies/tom.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": -50,
+			"speed": 100,
+			"detectionRadius": 300,
+			"safeRadius": 300,
+			"attackRate": 8,
+			"happyProjectile": {
+				"damage": -50,
+				"radius": 100,
+				"speed": 100,
+				"lifetime": 3,
+				"sprite": "Assets/pattyfish.png"
+				,"color": [ 0, 255, 0, 255 ]
+			},
+			"traits": ["Bum"],
+			"likes": [ "Cold", "Hot", "Clean", "Wet", "Gross" ],
+			"dislikes": [],
+			"happy": [
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"FireProjectile"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"ClearTarget",
+						"TargetPlayer"
+
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					 "actions": [
+						"TargetPlayer",
+						"Wander"
+					]
 				}
 			],
 			"angry": [
 			]
+		},
+		// Tiny Dragon
+		{
+			"name": "Tiny Dragon",
+			"angrySound": "Roar",
+			"sprite": "Assets/Enemies/tinyDragon.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 50,
+			"speed": 1000,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 1.5,
+			"happyProjectile": {
+				"damage": 5,
+				"radius": 250,
+				"speed": 200,
+				"lifetime": 5,
+				"sprite": "Assets/fireball.png"
+				,"color": [ 255, 90, 0, 255 ]
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 300,
+				"speed": 10,
+				"lifetime": 5,
+				"sprite": "Assets/fireball.png"
+				,"color": [ 255, 90, 0, 255 ]
+			},
+			"traits": [ "Hot" ],
+			"likes": [ "Hot" ],
+			"dislikes": [ "Cold", "Clean" ],
+			"happy": [
+
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+						,"FireProjectile"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"MoveToTarget",
+						"CircleMove",
+						"FireProjectile"
+					]
+				},
+					{
+						"context": "default",
+						"actions": [
+							"ClearTarget",
+							"TargetEnemyInDetectionRadius"
+						]
+					}
+			],
+			"neutral": [
+				{ 
+					"context": "IsTouchingTarget",
+					"actions": [
+						"ApplySlowToTarget",
+						"DVDMove"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"DVDMove"
+					]
+				}
+			],
+			"angry": [
+				{ 
+					"context": "OnceWaitTimerIsUp",
+					"actions": [
+						"FireProjectile"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"StopMoving",
+						"Wait"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+
+			]
+		},
+		// Crab Chef
+		{
+			"name": "Crab Chef",
+			"angrySound": "CrabAttack",
+			"sprite": "Assets/Enemies/crabChef.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 30,
+			"speed": 100,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 2.5,
+			"happyProjectile": {
+				"damage": 30,
+				"radius": 50,
+				"speed": 100,
+				"lifetime": 3,
+				"sprite": "Assets/pattyfish.png"
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 120,
+				"speed": 100,
+				"lifetime": 2,
+				"sprite": "Assets/pattyfish.png"
+			},
+			"traits": [ "Wet" ],
+			"likes": [ "Cold", "Wet" ],
+			"dislikes": [ "Hot" ],
+			"happy": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"ChargeAtTarget"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"ChargeAtTarget"
+					]
+				}
+			]
+		},
+		// Goblin Knight
+		{
+			"name": "Goblin Knight",
+			"angrySound": "Goblin",
+			"sprite": "Assets/Enemies/goblinKnight.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 1,
+			"speed": 100,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 2.5,
+			"happyProjectile": {
+				"damage": 30,
+				"radius": 50,
+				"speed": 300,
+				"lifetime": 3,
+				"sprite": "Assets/Rooms/Items/Boulders.png"
+				,"color": [ 114, 114, 114, 255]
+			},
+			"angryProjectile": {
+				"damage": 10,
+				"radius": 50,
+				"speed": 300,
+				"lifetime": 2,
+				"sprite": "Assets/Rooms/Items/Boulders.png"
+				,"color": [ 114, 114, 114, 255]
+			},
+			"traits": [ "Gross" ],
+			"likes": [ "Dirty", "Hot" ],
+			"dislikes": [ "Clean", "Wet" ],
+			"happy": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget",
+						"ClearTarget",
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget" 
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"FireSpirally",
+						"ChargeAtTarget"
+					]
+				},
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"ClearTarget",
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsAttackCooldownUp",
+					"actions": [
+						"TargetEnemyInDetectionRadius",
+						"ShootProjectile"
+					]
+				},
+				{
+					"context": "IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"CircleMove",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetPlayer",
+						"FireSpirally",
+						"ChargeAtTarget"
+					]
+				}
+			]
+		},
+		//Campfire
+		{
+			"name": "Campfire",
+			"sprite": "Assets/Enemies/campfire.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 2,
+			"speed": 60,
+			"detectionRadius": 10,
+			"safeRadius": 200,
+			"attackRate": 1.5,
+
+			"happyProjectile": {
+				"damage": 2,
+				"radius": 300,
+				"speed": 0,
+				"lifetime": 2,
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 255, 0, 20 ]
+			},
+			"neutralProjectile": {
+				"damage": 0,
+				"radius": 300,
+				"speed": 0,
+				"lifetime": 2,
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 255, 0, 20 ]
+			},
+			"angryProjectile": {
+				"damage": 2,
+				"radius": 300,
+				"speed": 0,
+				"lifetime": 2,
+				"sprite": "Assets/fireball.png",
+				"color": [ 255, 255, 0, 20 ]
+			},
+
+			"traits": [ "Hot" ],
+			"likes": [ "Hot" ],
+			"dislikes": [ "Gross", "Wet" ],
+			"happy": [
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"StopMoving",
+						"FireAOE"
+					]
+				},
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"TargetMiddle",
+						"MoveToTarget"
+					]
+				}, 
+				{
+					"context": "default",
+					"actions": [
+						"MoveToTarget"
+					]
+				}
+			],
+			"neutral": [
+
+				{
+					"context": "IsFollowingPlayer",
+					"actions": [
+						"StopMoving",
+						"TargetPlayer",
+						"ApplySlowToTarget",
+						"FireAOE",
+						"TargetMiddle"
+					]
+				},
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"StopMoving"
+						,"FireAOE"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetMiddle",
+						"MoveToTarget"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTargetInDetectionRadius",
+					"actions": [
+						"StopMoving",
+						"TargetPlayer",
+						"FireAOE",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"TargetMiddle"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"MoveToTarget",
+						"ClearTarget"
+					]
+				}
+			]
+		},
+		{
+			"name": "Flytrap",
+			"sprite": "Assets/Enemies/flytrap.png",
+			"color": [ 255, 255, 255, 255 ],
+			"health": 100,
+			"damage": 20,
+			"speed": 500,
+			"detectionRadius": 800,
+			"safeRadius": 300,
+			"attackRate": 4,
+
+			"happyProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 0.5,
+				"sprite": "Assets/bite.png"
+			},
+			"angryProjectile": {
+				"damage": 20,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 0.5,
+				"sprite": "Assets/bite.png"
+			},
+
+			"traits": [ "Gross" ],
+			"likes": [ "Wet", "Gross" ],
+			"dislikes": [ "Hot", "Cold" ],
+			//Lunge at nearby target
+			//Use projectile instead of DamageTarget so the attack is more visible
+			"happy": [
+
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"FireProjectile"
+					]
+				},
+
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"StopMoving",
+						"ClearTarget"
+					]
+				},
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"StopMoving",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"MoveToTarget",
+						"ClearTarget"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"BecomeAngry"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"StopMoving",
+						"TargetPlayer"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"FireProjectile",
+						"ClearTarget"
+					]
+				},
+
+				{
+					"context": "IsAttackOnCooldown",
+					"actions": [
+						"StopMoving"
+					]
+				},
+
+				{
+					"context": "IsNotTargeting",
+					"actions": [
+						"TargetPlayer"
+					]
+				},
+
+				{
+					"context": "default",
+					"actions": [
+						"MoveToTarget"
+					]
+				}
+			]
 		}
-    ]
+	]
 }
+
     

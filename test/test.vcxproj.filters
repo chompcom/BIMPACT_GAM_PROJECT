@@ -98,10 +98,13 @@
     <ClCompile Include="..\Source\Audio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\GameOver.cpp">
+    <ClCompile Include="..\Source\Screens\Credits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Screens\Credits.cpp">
+    <ClCompile Include="..\Source\Screens\Tutorial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\LogoScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -193,10 +196,13 @@
     <ClInclude Include="..\Source\Audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\GameOver.h">
+    <ClInclude Include="..\Source\Screens\Credits.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Screens\Credits.h">
+    <ClInclude Include="..\Source\Screens\Tutorial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Screens\LogoScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
