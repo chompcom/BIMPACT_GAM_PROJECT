@@ -53,7 +53,7 @@
 			"name": "Booger",
 			"angrySound": "BoogerStick",
 			"sprite": "Assets/Enemies/booger.png",
-			"health": 100,
+			"health": 50,
 			"traits": [ "Gross" ],
 			"damage": 0,
 			"speed": 60,
@@ -70,7 +70,7 @@
 					"context": "IsTouchingTarget",
 					"actions": [
 						"ApplySlowToTarget",
-						"TargetEnemyInDetectionRadius",
+						"TargetEnemyInDetectionRadiusDumb",
 						"MoveToTarget"
 					]
 				},
@@ -87,7 +87,7 @@
 					"actions": [
 						"TargetPlayer",
 						"CircleMove",
-						"TargetEnemyInDetectionRadius"
+						"TargetEnemyInDetectionRadiusDumb"
 					]
 				}
 			],
@@ -132,7 +132,7 @@
 			"color": [ 255, 255, 255, 255 ],
 			"health": 100,
 			"traits": [ "Hot" ],
-			"damage": 100,
+			"damage": 30,
 			"speed": 200,
 			"detectionRadius": 200,
 			"safeRadius": 200,
@@ -140,7 +140,7 @@
 			"likes": [ "Hot" ],
 			"dislikes": [ "Wet" ],
 			"happyProjectile": {
-				"damage": 100,
+				"damage": 50,
 				"radius": 300,
 				"speed": 0,
 				"lifetime": 1,
@@ -156,7 +156,7 @@
 				"color": [ 255, 90, 0, 255 ]
 			},
 			"angryProjectile": {
-				"damage": 50,
+				"damage": 30,
 				"radius": 500,
 				"speed": 0,
 				"lifetime": 1,
@@ -463,7 +463,7 @@
 			"damage": 10,
 			"speed": 100,
 			"detectionRadius": 300,
-			"safeRadius": 300,
+			"safeRadius": 200,
 			"attackRate": 1,
 			"waitTime": 2,
 			"happyProjectile": {
@@ -472,7 +472,15 @@
 				"speed": 1,
 				"lifetime": 3,
 				"sprite": "Assets/snowball.png"
-				,"color": [ 0, 255, 205, 255 ]
+				,"color": [ 0, 255, 205, 125 ]
+			},
+			"neutralProjectile": {
+				"damage": 10,
+				"radius": 50,
+				"speed": 1,
+				"lifetime": 3,
+				"sprite": "Assets/snowball.png"
+				,"color": [ 0, 255, 205, 125 ]
 			},
 			"angryProjectile": {
 				"damage": 20,
@@ -480,7 +488,7 @@
 				"speed": 1,
 				"lifetime": 3,
 				"sprite": "Assets/snowball.png"
-				,"color": [ 0, 255, 205, 255 ]
+				,"color": [ 0, 255, 205, 125 ]
 			},
 			"traits": [ "Clean", "Wet" ],
 			"likes": [ "Clean", "Wet" ],
@@ -519,6 +527,7 @@
 				{
 					"context": "default",
 					"actions":[
+						"TargetPlayer",
 						"Wander",
 						"FireProjectile"
 					]
@@ -1129,6 +1138,382 @@
 				}
 			]
 		}
+		,
+		// Bouncy Spikes
+		{
+				"name": "Bouncy Spikes",
+			"sprite": "Assets/Enemies/bouncySpikes.png",
+			"health": 50,
+			"damage": 10,
+			"speed": 100,
+			"detectionRadius": 100,
+			"safeRadius": 100,
+			"attackRate": 0.5,
+			"traits": ["Dirty"],
+			"likes": ["Spicy", "Dirty"],
+			"dislikes": ["Wet"],
+			"happy": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DVDBounce",
+						"DVDMove",
+						"TargetEnemyInDetectionRadiusDumb",
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default", 
+					"actions": [
+						"TargetPlayer",
+						"TargetEnemyInDetectionRadiusDumb",
+						"DVDMove"
+					] 
+				}
+			],
+			"neutral": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DVDBounce",
+						"DVDMove",
+						"TargetPlayer",
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default", 
+					"actions": [
+						"TargetPlayer",
+						"TargetEnemyInDetectionRadiusDumb",
+						"DVDMove"
+					] 
+				}
+			],
+			"angry": [
+				{
+					"context": "IsTouchingTarget",
+					"actions": [
+						"DVDBounce",
+						"DVDMove",
+						"TargetPlayer",
+						"DamageTarget"
+					]
+				},
+				{
+					"context": "default", 
+					"actions": [
+						"TargetPlayer",
+						"TargetEnemyInDetectionRadiusDumb",
+						"DVDMove"
+					] 
+				}
+			]
+		}
+		,
+		// Ice
+		{
+			"name": "Ice",
+			"sprite": "Assets/Enemies/ice.png",
+			"health": 50,
+			"damage": 0,
+			"speed": 50,
+			"detectionRadius": 100,
+			"safeRadius": 50,
+			"attackRate": 2,
+			"wanderTime": 5, 
+			"waitTime": 2.5, 
+			"traits": [ "Wet"],
+			"likes": [ "Clean", "Wet"],
+			"dislikes": [ "Hot"],
+			"happyProjectile": {
+				"damage": 5,
+				"radius": 100,
+				"speed": 20,
+				"lifetime": 2,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"angryProjectile": {
+				"damage": 5,
+				"radius": 100,
+				"speed": 20,
+				"lifetime": 2,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"neutralProjectile": {
+				"damage": 0,
+				"radius": 100,
+				"speed": 0,
+				"lifetime": 2,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"happy": [
+				{
+					"context": "IsWaiting",
+					"actions": [
+						"ApplySlowToTarget"	
+					]
+				},
+				{
+					"context": "OnceWaitTimerIsUp",
+					"actions": [
+						"FireAOE"
+					]
+				},
+				{
+					"context":"IsTargetInDetectionRadius",
+					"actions":[
+						"StopMoving",
+						"Wait"
+					]
+				},
+				{
+					"context": "default", 
+					"actions": [
+						"TargetPlayer",
+						"TargetEnemyInDetectionRadiusDumb",
+						"Wander"
+					] 
+				}
+			],
+			"neutral": [
+				{
+					"context":"IsWaiting",
+					"actions":[
+						"ApplySlowToTarget",
+						"StopMoving"
+					]
+				},
+				{
+					"context":"IsFollowingPlayer",
+					"actions": [
+						"Wait",
+						"StopMoving"
+					]
+				},
+				{
+					"context":"default",
+					"actions": [
+						"TargetPlayer",
+						"Wander"
+					]
+				}
+			],
+			"angry": [
+				{
+					"context":"IsWaiting",
+					"actions":[
+						"ApplySlowToTarget",
+						"StopMoving"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						"FireAOE"
+					]
+				},
+				{
+					"context":"IsFollowingPlayer",
+					"actions":[
+						"StopMoving",
+						"TargetPlayer",
+						"ApplySlowToTarget",
+						"Wait"
+					]
+				},
+				{
+					"context":"default",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget"
+					]
+				}
+			]
+		}
+		,
+		// Sponge
+		{
+			"name": "Sponge",
+			"sprite": "Assets/Enemies/sponge.png",
+			"health": 100,
+			"damage": 10,
+			"speed": 300,
+			"detectionRadius": 300,
+			"safeRadius": 100,
+			"attackRate": 0.2,
+			"waitTime": 2.5,
+			"wanderTime": 5,
+			"traits": [ "Clean", "Wet" ],
+			"likes": [ "Clean" ],
+			"dislikes": [ "Spicy", "Gross" ],
+			"happyProjectile": {
+				"damage": 1,
+				"radius": 20,
+				"speed": 400,
+				"lifetime": 0.15,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"angryProjectile": {
+				"damage": 1,
+				"radius": 20,
+				"speed": 300,
+				"lifetime": 0.15,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"neutralProjectile": {
+				"damage": 1,
+				"radius": 20,
+				"speed": 300,
+				"lifetime": 0.15,
+				"sprite": "Assets/snowball.png",
+				"color": [ 0, 255, 255, 255 ]
+			},
+			"happy": [
+				{
+					"context":"IsWaiting",
+					"actions":[
+						"StopMoving"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						"Wander",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"IsTouchingTarget",
+					"actions":[
+						"DVDBounce",
+						"FireAOE",
+						"ClearTarget"
+					]
+				},
+				{
+					"context":"IsHittingWall",
+					"actions":[
+						"DVDMove",
+						"FireAOE",
+						"ClearTarget"
+					]
+				},
+				{
+					"context":"IsWandering",
+					"actions":[
+						"DVDMove"
+					]
+				},
+				{ 
+					"context":"IsTargetInDetectionRadius",
+					"actions":[
+						"StopMoving",
+						"Wait"
+					]
+				},
+				{
+					"context":"IsNotFollowingPlayer",
+					"actions": [
+						"TargetPlayer",
+						"MoveToTarget",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				},
+				{
+					"context": "default",
+					"actions": [
+						"TargetSelf",
+						"ApplySlowToTarget",
+						"TargetPlayer",
+						"CircleMove",
+						"ClearTarget",
+						"TargetEnemyInDetectionRadius"
+					]
+				}
+			],
+			"neutral": [
+				{
+					"context":"IsHittingWall",
+					"actions":[
+						"DVDMove",
+						"TargetPlayer",
+						"FireAOE"
+					]
+				},
+				{
+					"context":"IsTouchingTarget",
+					"actions":[
+						"BecomeAngry"
+					]
+				},
+				{
+					"context":"default",
+					"actions":[
+						"TargetSelf",
+						"ApplySlowToTarget",
+						"ClearTarget",
+						"DVDMove",
+						"TargetPlayer"
+					]
+				}
+			],
+			"angry": [
+
+				{
+					"context":"IsWaiting",
+					"actions":[
+						"StopMoving",
+						"TargetPlayer"
+					]
+				},
+
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions":[
+						"Wander",
+						"TargetPlayer",
+						"MoveToTarget"
+					]
+				},
+				{
+					"context":"IsHittingWall",
+					"actions":[
+						"FireAOE",
+						"DVDMove"
+					]
+				},
+				{
+					"context":"IsTouchingTarget",
+					"actions":[
+						"DVDBounce",
+						"FireAOE"
+					]
+				},
+				{
+					"context":"IsWandering",
+					"actions":[
+						"DVDMove"
+					]
+				},
+				{
+					"context":"default",
+					"actions":[
+						"StopMoving",
+						"TargetPlayer",
+						"Wait"
+					]
+				}
+
+			]
+		}
+
 	]
 }
 

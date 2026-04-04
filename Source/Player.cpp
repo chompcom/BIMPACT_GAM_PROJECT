@@ -213,6 +213,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 	player.position = Vector2{ 0.f,0.f };
 	player.direction = Vector2{ 0.f, 0.f };
 	player.baseSpeed = source["speed"].asFloat();
+	player.speed = 1.0f; 
 	player.throwStrength = source["throwStrength"].asFloat();
 	player.throwShakeModifier = source["throwShakeModifier"].asFloat();
 	player.throwMin = source["throwMin"].asFloat();
