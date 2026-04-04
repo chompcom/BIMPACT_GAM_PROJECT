@@ -41,7 +41,7 @@ struct ContentEditorState
 	int hoveredCellIndex{ -1 };
 
 	std::string exportFileName{ "Custom" };
-	std::string statusMessage{ "Ready" };
+	std::string statusMessage{ "Ready to export" };
 
 	// Existing CSV edit mode
 	bool isLoadPopupOpen{ false };				// For Popups
