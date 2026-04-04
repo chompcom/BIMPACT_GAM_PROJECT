@@ -124,8 +124,8 @@ namespace Config {
 		if (fullPath.empty()) return "Default";
 
 		std::string fileName = ExtractFileName(fullPath);	// Extract File name only
-		
-		
+
+
 		size_t underScore = fileName.find_last_of('_');		// Get position of underscore
 		if (underScore != std::string::npos) fileName = fileName.substr(0, underScore);
 
@@ -136,21 +136,22 @@ namespace Config {
 }
 
 // Is this still needed lmao
-EnemyType somethingelse{"rock",100,10,{"sad"},{"happy"},{"sad"}};
+EnemyType somethingelse{ "rock",100,10,{"sad"},{"happy"},{"sad"} };
 
 namespace mapRooms
 {
-    Room::Room(RoomType roomType) :
-        left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
-        rmType{ roomType },
+	Room::Room(RoomType roomType) :
+		left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
+		rmType{ roomType },
 		visited{ false },
 		themeTag{ "Default" },
-		toBeTransferred{nullptr},
+		toBeTransferred{ nullptr },
 		currentRoomData{}
-    {}
+	{
+	}
 	Room::~Room() {
 
-		for (Enemy* i : currentRoomData.enemyList){
+		for (Enemy* i : currentRoomData.enemyList) {
 			delete i;
 			i = nullptr;
 		}
@@ -172,13 +173,13 @@ namespace mapRooms
 			currentRoomData.boss = nullptr;
 		}
 	}
-	
+
 
 	void Room::Init(RoomType roomType) {
 
 		//rmType = RoomType::Normal;
 
-		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount()  <<  " ****************\n";
+		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount() << " ****************\n";
 
 		//std::cout << static_cast<int>(this->rmType) << '\n';
 
@@ -193,10 +194,6 @@ namespace mapRooms
 			//this->layoutFile = "Assets\"
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
-
-			//Gift* gift = new Gift("trash", { "Gross" }, DataLoader::CreateTexture("Assets/Gifts/trash.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			//Gift* sauce = new Gift("sauce", { "Hot", "Spicy"}, DataLoader::CreateTexture("Assets/Gifts/hotsauce.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			//Gift* spray = new Gift("spray", { "Wet", "Clean"}, DataLoader::CreateTexture("Assets/Gifts/spray.png"), DataLoader::CreateTexture("Assets/shadow.png"));
 
 			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
 			Gift* sauce = new Gift(allGiftTypes["HotSauce"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
@@ -397,93 +394,94 @@ namespace mapRooms
 		}
 
 
-			//std::cout << "Display Room Init of " << biome << "\n";
-			//roomGrid.
-			//for (int j = 0; j < roomGrid.GetHeight(); j++) {
-			//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
-			//		const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
-			//		std::cout << (tile ? tile->id : 0) << " ";
-			//		if (!tile) continue;
-			//		if (tile->id > 101) {
-			//			//std::cout << "Spawned " << tile->name << "! \n";
-			//			const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
-			//			currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
-			//			currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
+		//std::cout << "Display Room Init of " << biome << "\n";
+		//roomGrid.
+		//for (int j = 0; j < roomGrid.GetHeight(); j++) {
+		//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
+		//		const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
+		//		std::cout << (tile ? tile->id : 0) << " ";
+		//		if (!tile) continue;
+		//		if (tile->id > 101) {
+		//			//std::cout << "Spawned " << tile->name << "! \n";
+		//			const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
+		//			currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
+		//			currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
 
-			//		}
-			//	}
-			//	std::cout << "\n";
-			//}
-
-			// Spawn enemies
-			//if (0 && currentRoomData.enemyList.empty()) {
-			//	currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
-			//	for (Enemy* i : currentRoomData.enemyList) {
-			//		i->shadow.position = Vector2{ 0.f, -35.f };
-			//		i->shadow.UpdateTransform();
-			//		i->ChangeState(EnemyStates::ES_NEUTRAL);
-			//		i->roomData = &this->currentRoomData;
-			//	}
-			//}
-
-			// Spawn gifts
-			//if (0 && currentRoomData.giftList.empty()) {
-			//	Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-			//	gift->shadow.position = Vector2{ 0.f, -40.f };
-			//	currentRoomData.giftList.push_back(gift);
-			//}
+		//		}
+		//	}
+		//	std::cout << "\n";
 		//}
-			// Gifts here (1 Gift per room for now)
-			//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-			//Vector2 giftPos{ 200.0f, 450.0f };
-			//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-			//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
-			
-		
 
-		// Boss Init
-			if (rmType == RoomType::Boss) {
-				//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-				//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+		// Spawn enemies
+		//if (0 && currentRoomData.enemyList.empty()) {
+		//	currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+		//	for (Enemy* i : currentRoomData.enemyList) {
+		//		i->shadow.position = Vector2{ 0.f, -35.f };
+		//		i->shadow.UpdateTransform();
+		//		i->ChangeState(EnemyStates::ES_NEUTRAL);
+		//		i->roomData = &this->currentRoomData;
+		//	}
+		//}
 
-				Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
+		// Spawn gifts
+		//if (0 && currentRoomData.giftList.empty()) {
+		//	Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
+		//	gift->shadow.position = Vector2{ 0.f, -40.f };
+		//	currentRoomData.giftList.push_back(gift);
+		//}
+	//}
+		// Gifts here (1 Gift per room for now)
+		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
+		//Vector2 giftPos{ 200.0f, 450.0f };
+		//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
+		//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 
-				Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
 
-				std::vector<AttackData>attackData = {
-				{
-					fsm["charge"]["speed"].asFloat(),
-					fsm["charge"]["startup"].asFloat(),
-					fsm["charge"]["interval"].asFloat(),
-					fsm["charge"]["endLag"].asFloat()
-				}, 
-			{		
-				fsm["jump"]["speed"].asFloat(),
-				fsm["jump"]["startup"].asFloat(),
-				fsm["jump"]["interval"].asFloat(),
-				fsm["jump"]["endLag"].asFloat()
-			},
+
+	// Boss Init
+		if (rmType == RoomType::Boss) {
+			//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
+
+			Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
+
+			Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
+
+			std::vector<AttackData>attackData = {
 			{
-				fsm["follow"]["speed"].asFloat(),
-				fsm["follow"]["startup"].asFloat(),
-				fsm["follow"]["interval"].asFloat(),
-				fsm["follow"]["endLag"].asFloat()
-			} };
+				fsm["charge"]["speed"].asFloat(),
+				fsm["charge"]["startup"].asFloat(),
+				fsm["charge"]["interval"].asFloat(),
+				fsm["charge"]["endLag"].asFloat()
+			},
+		{
+			fsm["jump"]["speed"].asFloat(),
+			fsm["jump"]["startup"].asFloat(),
+			fsm["jump"]["interval"].asFloat(),
+			fsm["jump"]["endLag"].asFloat()
+		},
+		{
+			fsm["follow"]["speed"].asFloat(),
+			fsm["follow"]["startup"].asFloat(),
+			fsm["follow"]["interval"].asFloat(),
+			fsm["follow"]["endLag"].asFloat()
+		} };
 			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
 				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
 
-			
-			currentRoomData.boss->sprite.scale = Vector2{1,1} * bossSource["scale"].asFloat();
+
+			currentRoomData.boss->sprite.scale = Vector2{ 1,1 } *bossSource["scale"].asFloat();
 			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
 
 			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
 			currentRoomData.boss->shadow.scale = Vector2{ currentRoomData.boss->sprite.scale.x, currentRoomData.boss->sprite.scale.y / 2 };
 			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
 
-			currentRoomData.boss->hitbox.scale = currentRoomData.boss->sprite.scale;
+			currentRoomData.boss->hitbox.scale = currentRoomData.boss->sprite.scale * 0.7;
+			currentRoomData.boss->hitbox.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset + currentRoomData.boss->hitbox.scale.y / 2};
 
 			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 
@@ -516,11 +514,11 @@ namespace mapRooms
 			this->roomGrid.LoadRoomCSV(layoutFile);
 			PatchDoorCells();
 		}
-		
+
 		//Setting grid to roomGrid
 		currentRoomData.grid = roomGrid;
 
-	} 
+	}
 	void Room::Update(float dt) {
 		UNREFERENCED_PARAMETER(dt);
 		//for (Enemy* i : currentRoomData.enemyList) {
@@ -530,7 +528,7 @@ namespace mapRooms
 		//}
 
 		// Check collision with room ig
-		
+
 
 
 
@@ -602,7 +600,7 @@ namespace mapRooms
 		rooms{},
 		currentRoom{ nullptr },
 		rngState{ 0xA341316Cu },
-		transferData{nullptr}	// Some random seed
+		transferData{ nullptr }	// Some random seed
 	{
 		//Room x[2]{};
 		//for (Room y : x) {
@@ -610,7 +608,7 @@ namespace mapRooms
 		//}
 	}
 
-	Map::~Map(){
+	Map::~Map() {
 		DeleteMap();
 	}
 
@@ -624,10 +622,10 @@ namespace mapRooms
 
 		//Config::ScanPngFolderWin32(normalDir, normalRoomFiles);
 		std::string const normalDir = "Assets/Rooms/Normal/NORMAL";
-		std::string const greenDir	= "Assets/Rooms/Normal/GREEN";
-		std::string const iceDir	= "Assets/Rooms/Normal/ICE";
-		std::string const bossDir	= "Assets/Rooms/Boss";
-		std::string const oceanDir	= "Assets/Rooms/Normal/OCEAN";
+		std::string const greenDir = "Assets/Rooms/Normal/GREEN";
+		std::string const iceDir = "Assets/Rooms/Normal/ICE";
+		std::string const bossDir = "Assets/Rooms/Boss";
+		std::string const oceanDir = "Assets/Rooms/Normal/OCEAN";
 
 		std::string filePath = "Assets/Levels/Room_Data/TilesInfo.json";
 		Json::Value tilesInfo = DataLoader::LoadJsonFile(filePath);
@@ -640,7 +638,7 @@ namespace mapRooms
 		Json::Value::Members biomeNames = tilesInfo["biomes"].getMemberNames();
 		for (Json::String name : biomeNames) {
 			std::string imagePath = tilesInfo["biomes"][name]["imageDir"].asString();
-			Config::ScanPngFolderWin32( imagePath, biomeRoomFiles[name]);
+			Config::ScanPngFolderWin32(imagePath, biomeRoomFiles[name]);
 		}
 		/*
 		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
@@ -650,7 +648,7 @@ namespace mapRooms
 		Config::ScanPngFolderWin32(oceanDir,    biomeRoomFiles["Ocean"]);
 		*/
 
-		Config::ScanPngFolderWin32(bossDir,		bossRoomFiles);
+		Config::ScanPngFolderWin32(bossDir, bossRoomFiles);
 
 		// Not up yet... There should be a neater way via json lol
 		//Config::ScanPngFolderWin32("Assets/Rooms/Boss", bossRoomFiles);
@@ -709,17 +707,17 @@ namespace mapRooms
 
 				}
 
-				rm->roomTexturePath		= chosenPath;
-				rm->roomTexture			= (chosenPath.empty() ? nullptr : GetOrLoadTexture(chosenPath));
-				rm->themeTag			= Config::ExtractThemeTag(chosenPath, rm->rmType); // hopefully this works
+				rm->roomTexturePath = chosenPath;
+				rm->roomTexture = (chosenPath.empty() ? nullptr : GetOrLoadTexture(chosenPath));
+				rm->themeTag = Config::ExtractThemeTag(chosenPath, rm->rmType); // hopefully this works
 
 			}
 		}
 	}
-		
-	
+
+
 	//InitMap(): Allocate / Reset Maps (Rooms)
-	void Map::InitMap(RoomData &globalSceneData, unsigned int seed) {
+	void Map::InitMap(RoomData& globalSceneData, unsigned int seed) {
 		rngState = seed;
 		srand(rngState);
 		gridSize = RandInt(Config::minGrid, Config::maxGrid);
@@ -751,7 +749,7 @@ namespace mapRooms
 		// Somehow assign startX and startY into starting room coordinates value
 		currentRoom = GetRoom(startX, startY);
 
-		if (currentRoom!=nullptr) {
+		if (currentRoom != nullptr) {
 			currentRoom->toBeTransferred = transferData;
 			currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;
 		}
@@ -792,7 +790,7 @@ namespace mapRooms
 	//}
 
 	// DeleteMap()?
-	void Map::DeleteMap() 
+	void Map::DeleteMap()
 	{
 		rooms.clear();			// Clear room information
 		gridSize = 0;			// Set gridsize to zero
@@ -828,9 +826,9 @@ namespace mapRooms
 		int MaxRooms = max(4, gridSize * gridSize - 1);
 
 		int roomsVisit = RandInt(MinRooms, MaxRooms);	// Set How many rooms to make available
-		
-		startX =		RandInt(0, gridSize - 1), startY = RandInt(0, gridSize - 1);
-		int startIdx =	GetRoomIdx(startX, startY);
+
+		startX = RandInt(0, gridSize - 1), startY = RandInt(0, gridSize - 1);
+		int startIdx = GetRoomIdx(startX, startY);
 
 		// DFS Tracking for paths
 		std::vector<bool> visited(gridSize * gridSize, false); // Init array of n x n size to false
@@ -847,14 +845,14 @@ namespace mapRooms
 		while (!stack.empty() && visitedCount < roomsVisit) {
 			int currentIdx = stack.back();	// Get current Room
 			int curX = currentIdx % gridSize, curY = currentIdx / gridSize;	// Get x, y value of 2d room array
-			
+
 
 			int neighbourIdx[4]{}, neighbourX[4]{}, neighbourY[4]{}, neighCount{};
 
 			// Go Left
 			if (InBounds(curX - 1, curY))
 			{
-				int idxRoom = GetRoomIdx(curX - 1, curY);	
+				int idxRoom = GetRoomIdx(curX - 1, curY);
 				if (!visited[idxRoom]) {
 					neighbourIdx[neighCount] = idxRoom;
 					neighbourX[neighCount] = -1;
@@ -910,8 +908,8 @@ namespace mapRooms
 			int pick = RandInt(0, neighCount - 1);
 			int nextIdx = neighbourIdx[pick];
 			int nextX = nextIdx % gridSize, nextY = nextIdx / gridSize;
-			
-			Room* curRoom  = GetRoom(curX, curY);
+
+			Room* curRoom = GetRoom(curX, curY);
 			Room* nextRoom = GetRoom(nextX, nextY);
 
 			// Link current room to next Room
@@ -932,7 +930,7 @@ namespace mapRooms
 
 			// Link Rooms
 			LinkRooms(curRoom, nextRoom, linkDirection);
-			
+
 
 			// Mark Visited
 			visited[nextIdx] = true;
@@ -950,7 +948,7 @@ namespace mapRooms
 
 		}
 
-		
+
 		// End Boss for Level
 		startIdx = GetRoomIdx(startX, startY);
 		std::vector<int> deadEnds;
@@ -961,15 +959,15 @@ namespace mapRooms
 
 			Room const& r = rooms[idx];
 			int links = 0;
-			if (r.left!=nullptr) ++links;
+			if (r.left != nullptr) ++links;
 			if (r.right != nullptr) ++links;
 			if (r.up != nullptr) ++links;
-			if (r.down!= nullptr) ++links;
+			if (r.down != nullptr) ++links;
 
 			if (links == 1) deadEnds.push_back(idx);
 		}
 
-		int bossIdx{startIdx};
+		int bossIdx{ startIdx };
 
 		if (!deadEnds.empty()) {
 			bossIdx = deadEnds.at(RandInt(0, static_cast<int>(deadEnds.size() - 1)));
@@ -980,7 +978,7 @@ namespace mapRooms
 		}
 
 		// Mark Boss
-		GetRoom(bossIdx% gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
+		GetRoom(bossIdx % gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
 
 		// Init all rooms now;
 		//for (Room &curRoom : this->rooms) {
@@ -999,7 +997,7 @@ namespace mapRooms
 			// Check Left
 			if (InBounds(curX - 1, curY))
 			{
-				int idxRoom		= GetRoomIdx(curX - 1, curY);
+				int idxRoom = GetRoomIdx(curX - 1, curY);
 				Room* neighbour = GetRoom(curX - 1, curY);
 				if (visited[idxRoom] && (curRoom->left == nullptr || neighbour->right == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Left);
 			}
@@ -1007,7 +1005,7 @@ namespace mapRooms
 			// Check Right
 			if (InBounds(curX + 1, curY))
 			{
-				int idxRoom		= GetRoomIdx(curX + 1, curY);
+				int idxRoom = GetRoomIdx(curX + 1, curY);
 				Room* neighbour = GetRoom(curX + 1, curY);
 				if (visited[idxRoom] && (curRoom->right == nullptr || neighbour->left == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Right);
 			}
@@ -1015,7 +1013,7 @@ namespace mapRooms
 			// Check Up
 			if (InBounds(curX, curY - 1))
 			{
-				int idxRoom		= GetRoomIdx(curX, curY - 1);
+				int idxRoom = GetRoomIdx(curX, curY - 1);
 				Room* neighbour = GetRoom(curX, curY - 1);
 				if (visited[idxRoom] && (curRoom->up == nullptr || neighbour->down == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Up);
 			}
@@ -1023,7 +1021,7 @@ namespace mapRooms
 			// Check Down
 			if (InBounds(curX, curY + 1))
 			{
-				int idxRoom		= GetRoomIdx(curX, curY + 1);
+				int idxRoom = GetRoomIdx(curX, curY + 1);
 				Room* neighbour = GetRoom(curX, curY + 1);
 				if (visited[idxRoom] && (curRoom->down == nullptr || neighbour->up == nullptr) && neighbour->rmType != RoomType::Empty) LinkRooms(curRoom, neighbour, Direction::Down);
 			}
@@ -1040,7 +1038,7 @@ namespace mapRooms
 		return gridSize;
 	}
 
-	
+
 
 	void Map::RenderCurrentRoom(AEGfxVertexList* squaremesh) const {
 		if (!currentRoom || !squaremesh || !currentRoom->roomTexture) return;	// possibly skip empty textures?
@@ -1072,10 +1070,10 @@ namespace mapRooms
 		//RenderDoorsSimple(squaremesh);
 
 		//TexturedSprite dr = DataLoader::CreateTexture("Assets/Rooms/Door/door.png");	// Does this require freeing
-		
+
 		// Render Room Obstacles
-		
-		
+
+
 		// Render Room Doors
 		RenderRoomDoors(squaremesh, doorTex);
 
@@ -1104,7 +1102,7 @@ namespace mapRooms
 					TexturedSprite tex = DataLoader::CreateTexture(tile->asset);
 
 					tex.position = pos;
-					tex.scale = Vector2{ grid.GetTileWidth(), grid.GetTileHeight()};
+					tex.scale = Vector2{ grid.GetTileWidth(), grid.GetTileHeight() };
 					tex.UpdateTransform();
 					tex.RenderSprite();
 
@@ -1112,7 +1110,7 @@ namespace mapRooms
 			}
 		}
 
-		
+
 		// Render Enemy?
 		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
 			Color oldColor = i->sprite.color;
@@ -1120,7 +1118,7 @@ namespace mapRooms
 			i->sprite.RenderSprite();
 			i->sprite.color = oldColor;
 		}
-		
+
 	}
 
 
@@ -1136,7 +1134,7 @@ namespace mapRooms
 		float minY = AEGfxGetWinMinY();	UNREFERENCED_PARAMETER(minY);
 		float maxY = AEGfxGetWinMaxY();
 
-		float cell	= 18.0F;
+		float cell = 18.0F;
 		float gap = 4.0f;
 
 		float startXPixel = minX + 30.0f;
@@ -1150,7 +1148,7 @@ namespace mapRooms
 			int curX = idx % gridSize, curY = idx / gridSize;	// Get x, y value of 2d room array
 			Room const* curRoom = Map::GetRoom(curX, curY);
 			Room const& rm = *(curRoom);
-			
+
 			if (rm.rmType == RoomType::Empty) continue;			// Skip void rooms obviously, given that this is a 2D Array
 
 			Color c;
@@ -1190,7 +1188,7 @@ namespace mapRooms
 
 		// Size of doors
 
-		
+
 
 		//const float doorW = this->currentRoom->roomGrid.GetTileWidth() * 2 + 35.0f;
 		const float doorW = 145.0f;
@@ -1292,11 +1290,11 @@ namespace mapRooms
 		Room* previousRoom = currentRoom;
 		Room* target = nullptr;
 		switch (direction) {
-			case Direction::Left:  target = currentRoom->left;  break;
-			case Direction::Right: target = currentRoom->right; break;
-			case Direction::Up:    target = currentRoom->up;    break;
-			case Direction::Down:  target = currentRoom->down;  break;
-			default: break;
+		case Direction::Left:  target = currentRoom->left;  break;
+		case Direction::Right: target = currentRoom->right; break;
+		case Direction::Up:    target = currentRoom->up;    break;
+		case Direction::Down:  target = currentRoom->down;  break;
+		default: break;
 		}
 
 		if (!target) return false;	// again should not happen just a function safeguard
@@ -1306,7 +1304,7 @@ namespace mapRooms
 		currentRoom = target; // Room changed
 		StopAllAudio();
 		RoomEnterAudio();
-		
+
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 

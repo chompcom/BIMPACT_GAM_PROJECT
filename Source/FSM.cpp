@@ -32,6 +32,9 @@ void Boss1_FSM::Update(Player& player, f32 dt) {
 				if (AERandFloat() >= 0.75f) {
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
+					target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
+					target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
+
 					boss->direction = (target - boss->sprite.position).Normalized();
 					boss->velocity = boss->direction * walkSpeed * boss->speedModifier;
 					boss->sprite.GetAnimation("Run");
@@ -94,6 +97,8 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 	case ATTACK_CHARGE:
 		//std::cout << "Boss Charge Starting\n";
 		target = player.position;
+		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
+		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
@@ -113,8 +118,9 @@ void Boss1_FSM::ChargeAttack(Player& player, f32 dt) {
 
 		boss->sprite.position += boss->velocity * dt;
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
+		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
-		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale.Abs() * 0.8, boss->velocity * dt,
+		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			playerTakesDamage(player);
 		}
@@ -161,6 +167,8 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 	case ATTACK_CHARGE:
 		//std::cout << "Boss Jump Starting\n";
 		target = player.position;
+		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
+		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 
 		interval += dt;
 		if (interval >= 0.25f * jumpStartup) {
@@ -188,7 +196,7 @@ void Boss1_FSM::JumpAttack(Player& player, f32 dt) {
 
 		if (boss->sprite.position.y - target.y > 10) boss->invulnerableTimer = dt;
 		else {
-			if (CollisionIntersection_RectRect(target, boss->sprite.scale.Abs() * 0.8, Vector2{},
+			if (CollisionIntersection_RectRect(target, boss->hitbox.scale.Abs(), Vector2{},
 				player.position, player.sprite.scale * 0.8, player.GetVelocity(), collisionTime)) {
 				playerTakesDamage(player);
 			}
@@ -222,6 +230,8 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 	case ATTACK_CHARGE:
 		//std::cout << "Boss Follow Starting\n";
 		target = player.position;
+		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
+		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 		boss->direction = (target - boss->sprite.position).Normalized();
 
 		interval += dt;
@@ -239,13 +249,16 @@ void Boss1_FSM::FollowAttack(Player& player, f32 dt) {
 		//std::cout << "Boss Follow Attack\n";
 		//direction = target - boss->sprite.position;
 		target = player.position;
+		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
+		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 		boss->direction = (target - boss->sprite.position).Normalized();
 		boss->velocity = boss->direction * followSpeed * boss->speedModifier;
 
 		boss->sprite.position += boss->velocity * dt;
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
+		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
-		if (CollisionIntersection_RectRect(boss->sprite.position, boss->sprite.scale.Abs() * 0.8, boss->velocity * dt,
+		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			playerTakesDamage(player);
 			interval = 0.0f;

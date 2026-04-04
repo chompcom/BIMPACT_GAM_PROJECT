@@ -1158,7 +1158,6 @@
 					"actions": [
 						"DVDBounce",
 						"DVDMove",
-						"TargetEnemyInDetectionRadiusDumb",
 						"DamageTarget"
 					]
 				},
@@ -1177,7 +1176,6 @@
 					"actions": [
 						"DVDBounce",
 						"DVDMove",
-						"TargetPlayer",
 						"DamageTarget"
 					]
 				},
@@ -1196,7 +1194,6 @@
 					"actions": [
 						"DVDBounce",
 						"DVDMove",
-						"TargetPlayer",
 						"DamageTarget"
 					]
 				},

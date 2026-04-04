@@ -220,6 +220,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 	player.throwMax = source["throwMax"].asFloat();
 	player.throwForce = 0.f;
 
+
 	player.pickUpCooldown = 0.f;
 	player.invulnerableTimer = 0.f;
 	player.baseInvulnerable = source["invulnTimer"].asFloat();
