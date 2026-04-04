@@ -480,7 +480,8 @@ namespace mapRooms
 			currentRoomData.boss->shadow.scale = Vector2{ currentRoomData.boss->sprite.scale.x, currentRoomData.boss->sprite.scale.y / 2 };
 			currentRoomData.boss->shadow.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset };
 
-			currentRoomData.boss->hitbox.scale = currentRoomData.boss->sprite.scale;
+			currentRoomData.boss->hitbox.scale = currentRoomData.boss->sprite.scale * 0.7;
+			currentRoomData.boss->hitbox.position = Vector2{ currentRoomData.boss->sprite.position.x, currentRoomData.boss->sprite.position.y - currentRoomData.boss->shadowOffset + currentRoomData.boss->hitbox.scale.y / 2};
 
 			Json::Value animationSource = bossSource["spriteInfo"]["animationInfo"];
 

@@ -132,6 +132,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 	if (!gift.shakeState) {
 		gift.giftType.sprite.position = gift.position;
 		gift.shadow.position = gift.position - Vector2{ 0, 40 };
+		gift.hitbox.position = gift.position;
 	}
 
 	return;
