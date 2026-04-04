@@ -752,6 +752,9 @@ namespace mapRooms
 			currentRoom->toBeTransferred = transferData;
 			currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;
 		}
+		else if (currentRoom == nullptr) {
+			currentRoom = GetRoom(startX, startY);
+		}
 
 		doorCooldown = 0.0f;
 
