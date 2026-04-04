@@ -169,11 +169,24 @@ void TestLoad()
 
 void TestInit()
 {
+	// RESTART STATE
+	gameMap.DeleteMap();
+	globalTransferData.enemyList.clear();
+	globalTransferData.giftList.clear();
+	globalTransferData.projectileList.clear();
+	globalTransferData.player = nullptr;
+	globalTransferData.particleSystem = nullptr;
+
+	
+
+	// INIT
 	InitAudio();
 	loseAudioPlaying = false;
 	WinAudioPlaying = false;
 	fightMusicPlaying = false;
 	PlayerInit(player);
+	player.speed = 1.0f; // hope this works (I THINK THIS WORKS?)
+	globalTransferData.player = &player;
 	AlmanacInit(almanac);
 
 	// WIN STATISTICS INIT
@@ -184,12 +197,11 @@ void TestInit()
 	levelElapsedSeconds = 0.0f;
 	pendingWinStatusRefresh = true;
 
-	globalTransferData.enemyList.clear();
-	globalTransferData.giftList.clear();
-	globalTransferData.projectileList.clear();
+
+	
+
 	// carryData.enemyList.clear();
 
-	globalTransferData.player = &player;
 
 	// square seed: 0xA341311Cu
 	//gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
@@ -198,7 +210,9 @@ void TestInit()
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
+
 	//std::cout << "Current Seed: " << curSeed << "\n";
+	player.position.x = player.position.y = 0;
 
 	testParticles = ParticleSystem(sqmesh);
 
@@ -911,7 +925,7 @@ void TestUpdate(float dt)
 				//gridHeight = currentRoom->roomGrid.GetTileHeight();
 				constexpr float skin = 0.10f;
 
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.99f, currentRoom);
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f, currentRoom);
 
 				Vector2 moveDeltaGift = g->position - prevGiftPos;
 				Vector2 moveDirGift	  = moveDeltaGift.Normalized();
