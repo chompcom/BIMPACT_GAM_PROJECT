@@ -447,40 +447,6 @@ void TestDraw()
 	renderPlayerLives(player, healthIcons, font);
 	//(*almanacIcon).RenderSprite();
 
-	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite, player);
-
-	RenderAlmanacPages(almanac, font);
-
-	RenderTutorial();
-
-#if 0
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	TexturedSprite thing = DataLoader::CreateTexture("Assets/poprocks.png");
-	std::pair<int, int> yup{ 5,11 };
-	float width = 110;
-	thing.scale = Vector2{ width,width };
-	//Vector2 offsetpos{ -(yup.second * width) / 2 , (yup.first * width) / 2 };
-	Vector2 offsetpos{ -(yup.second * width) / 2, -(yup.first * width) / 2 + 50};
-	for (int row = 0; row < yup.first; row++) {
-
-	//gift.sprite.RenderSprite();
-	//gift2.sprite.RenderSprite();
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	//grid.PrintRetrievedInformation();
-	//grid.RenderGrid(sqmesh);
-
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	player.sprite.RenderSprite(true);
-		for (int col = 0; col < yup.second; col++) {
-			thing.position = Vector2{ offsetpos.x + (1.1f*col * width), offsetpos.y + (1.1f*row * width) };
-			thing.UpdateTransform();
-			thing.RenderSprite();
-		}
-
-	}
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	player.sprite.RenderSprite(true);
-#endif
 	if (debugMode)
 	{
 		if (mapRooms::Room* room = gameMap.GetCurrentRoom())
@@ -572,6 +538,41 @@ void TestDraw()
 
 		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
+
+	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite, player);
+
+	RenderAlmanacPages(almanac, font);
+
+	RenderTutorial();
+
+#if 0
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	TexturedSprite thing = DataLoader::CreateTexture("Assets/poprocks.png");
+	std::pair<int, int> yup{ 5,11 };
+	float width = 110;
+	thing.scale = Vector2{ width,width };
+	//Vector2 offsetpos{ -(yup.second * width) / 2 , (yup.first * width) / 2 };
+	Vector2 offsetpos{ -(yup.second * width) / 2, -(yup.first * width) / 2 + 50};
+	for (int row = 0; row < yup.first; row++) {
+
+	//gift.sprite.RenderSprite();
+	//gift2.sprite.RenderSprite();
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+	//grid.PrintRetrievedInformation();
+	//grid.RenderGrid(sqmesh);
+
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	player.sprite.RenderSprite(true);
+		for (int col = 0; col < yup.second; col++) {
+			thing.position = Vector2{ offsetpos.x + (1.1f*col * width), offsetpos.y + (1.1f*row * width) };
+			thing.UpdateTransform();
+			thing.RenderSprite();
+		}
+
+	}
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+	player.sprite.RenderSprite(true);
+#endif
 
 	// Pause screen
 
@@ -988,6 +989,7 @@ void TestUpdate(float dt)
 				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
+				g->hitbox.UpdateTransform();
 			}
 		}
 
@@ -1014,7 +1016,7 @@ void TestUpdate(float dt)
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
-			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x, roomData.boss->sprite.scale.y, bossCurCell);
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9, roomData.boss->sprite.scale.y * 0.9, bossCurCell);
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
 				roomData.boss->shadow.position.x = bossPrevPos.x;
@@ -1066,7 +1068,8 @@ void TestUpdate(float dt)
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 
-			roomData.boss->hitbox.position = roomData.boss->sprite.position;
+			//roomData.boss->hitbox.position = roomData.boss->sprite.position;
+			roomData.boss->hitbox.position = Vector2{ roomData.boss->sprite.position.x, roomData.boss->sprite.position.y - roomData.boss->shadowOffset + roomData.boss->hitbox.scale.y / 2};
 			roomData.boss->hitbox.UpdateTransform();
 			//roomData.boss->hpBar.UpdateTransform();
 

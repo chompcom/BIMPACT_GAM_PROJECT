@@ -84,49 +84,120 @@
       "spawnName": "Pop Rocks"
     },
 
-    "203": {
-      "name": "OvenMarker",
-      "blocked": false,
-      "asset": "Assets/Enemies/oven.png",
-      "spawnCategory": "enemy",
-      "spawnName": "THE OVEN"
+        "203": {
+            "name": "OvenMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/oven.png",
+            "spawnCategory": "enemy",
+            "spawnName": "THE OVEN"
+        },
+        "204": {
+            "name": "SnowmanMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/snowman.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Snowman"
+        },
+        "205": {
+            "name": "TomMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/tom.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Tom"
+        },
+        "206": {
+            "name": "TinyDragonMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/tinyDragon.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Tiny Dragon"
+        },
+        "207": {
+            "name": "CrabChefMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/crabChef.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Crab Chef"
+        },
+        "208": {
+            "name": "CampfireMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/campfire.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Campfire"
+        },
+        "209": {
+            "name": "FlytrapMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/flytrap.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Flytrap"
+        },
+        "210": {
+            "name": "GoblinKnightMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/goblinKnight.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Goblin Knight"
+        },
+        "211": {
+            "name": "SoapMarker",
+            "blocked": false,
+            "asset": "Assets/Enemies/soap.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Soap"
+        },
+        "212": {
+            "name": "Ice",
+            "blocked": false,
+            "asset": "Assets/Enemies/ice.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Ice"
+        },
+        "213": {
+            "name": "Bouncy Spike",
+            "blocked": false,
+            "asset": "Assets/Enemies/bouncySpikes.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Bouncy Spikes"
+        },
+        "214": {
+            "name": "Sponge",
+            "blocked": false,
+            "asset": "Assets/Enemies/sponge.png",
+            "spawnCategory": "enemy",
+            "spawnName": "Sponge"
+        },
+        
+        "500": {
+            "name": "Generic_GiftMarker",
+            "blocked": false,
+            "asset": "Assets/Rooms/Items/Gifts.png",
+            "spawnCategory": "gift",
+            "spawnName": ""
+        },
+        "501": {
+            "name": "Hot sauce",
+            "blocked": false,
+            "asset": "Assets/Gifts/hotsauce.png",
+            "spawnCategory": "gift",
+            "spawnName": "HotSauce"
+        },
+        "502": {
+            "name": "Spray",
+            "blocked": false,
+            "asset": "Assets/Gifts/spray.png",
+            "spawnCategory": "gift",
+            "spawnName": "Spray"
+        },
+        "503": {
+            "name": "Trash",
+            "blocked": false,
+            "asset": "Assets/Gifts/trash.png",
+            "spawnCategory": "gift",
+            "spawnName": "Trash"
+        }
     },
-    "204": {
-      "name": "SnowmanMarker",
-      "blocked": false,
-      "asset": "Assets/Enemies/snowman.png",
-      "spawnCategory": "enemy",
-      "spawnName": "Snowman"
-    },
-    "500": {
-      "name": "Generic_GiftMarker",
-      "blocked": false,
-      "asset": "Assets/Rooms/Items/Gifts.png",
-      "spawnCategory":"gift",
-      "spawnName":""
-    },
-    "501": {
-      "name": "Hot sauce",
-      "blocked": false,
-      "asset": "Assets/Gifts/hotsauce.png",
-      "spawnCategory": "gift",
-      "spawnName": "HotSauce"
-    },
-    "502": {
-      "name": "Spray",
-      "blocked": false,
-      "asset": "Assets/Gifts/spray.png",
-      "spawnCategory": "gift",
-      "spawnName": "Spray"
-    },
-    "503": {
-      "name": "Trash",
-      "blocked": false,
-      "asset": "Assets/Gifts/trash.png",
-      "spawnCategory": "gift",
-      "spawnName": "Trash"
-    }
-  },
 
   "biomes": {
   "Start": {
@@ -135,7 +206,7 @@
     ,"imageDir":"Assets/Rooms/Normal/NORMAL"
   },
   "Normal": {
-    "allowedTiles": [0,1,2,100,200,201,202,203,204,500,501,502,503],
+    "allowedTiles": [0,1,2,100,200,201,202,203,204,205,206,208,213,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/NORMAL/Room1.png"
     ,"imageDir":"Assets/Rooms/Normal/NORMAL"
   },
@@ -145,12 +216,12 @@
     ,"imageDir":"Assets/Rooms/Normal/GREEN"
   },
   "Ice": {
-    "allowedTiles": [0,1,2,3,5,6,7,8,100,200,201,202,203,204,500,501,502,503],
+    "allowedTiles": [0,1,2,3,5,6,7,8,100,200,201,202,203,204,212,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/ICE/Room1.png"
     ,"imageDir":"Assets/Rooms/Normal/ICE"
   },
   "Ocean": {
-    "allowedTiles": [0,1,3,100,200,500,501,502,503],
+    "allowedTiles": [0,1,3,100,200,207,211,214,500,501,502,503],
     "imagePath":"Assets/Rooms/Normal/OCEAN/Room1.png"
     ,"imageDir":"Assets/Rooms/Normal/OCEAN"
   }
