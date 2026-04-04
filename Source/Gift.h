@@ -10,7 +10,7 @@
 //forward declaration, needed as Player.h needs the Gift class, 
 //and Gift.h needs the player class
 class Player;
-namespace mapRooms { struct Room; };
+namespace mapRooms { class Room; };
 
 class GiftType {
 public:

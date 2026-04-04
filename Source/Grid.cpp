@@ -248,8 +248,9 @@ bool Grid::IsDoor(int x, int y) const {
 
 TileDataBase Grid::tileDB{};
 
-Grid::Grid() : width(0), height(0), tileSizeX(0), tileSizeY(0) {
-	Grid::tileDB.Load(".\\Assets\\Levels\\Room_Data\\TilesInfo.json");
+Grid::Grid() : width(0), height(0), tileSizeX(0), tileSizeY(0), tileHeight(0), tileWidth(0), offsetX(0), offsetY(0) {
+	const char* informationFile = ".\\Assets\\Levels\\Room_Data\\TilesInfo.json";
+	Grid::tileDB.Load(informationFile);
 	
 };
 

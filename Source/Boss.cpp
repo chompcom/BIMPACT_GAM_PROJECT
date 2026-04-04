@@ -53,7 +53,7 @@ void Boss::CollideProjectile() {
 	for (Projectile* proj : roomData.projectileList) {
 		if (!proj->IsAlive()) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, sprite.scale, velocity,
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= proj->GetDmg();
@@ -74,7 +74,7 @@ void Boss::CollideGift() {
 	for (Gift* gift : roomData.giftList) {
 		if (gift->velocity.LengthSq() <= EPSILON) continue;
 
-		if (CollisionIntersection_RectRect(sprite.position, Vector2(abs(sprite.scale.x), abs(sprite.scale.y)), velocity,
+		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
 				//currentHealth -= 1;

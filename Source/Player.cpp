@@ -205,7 +205,7 @@ void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/)
 		player.heldGift = nullptr;
 	}
 
-	player.health = source["maxHearts"].asInt();
+	player.health = static_cast<s16>(source["maxHearts"].asInt());
 	player.pickUpState = false;
 	player.throwState = false;
 	player.sprite = DataLoader::CreateTexture(source["sprite"].asString());

@@ -842,7 +842,8 @@
 				{
 					"context": "IsTargetInDetectionRadius",
 					"actions": [
-						"FireSpirally"
+						"FireSpirally",
+						"ChargeAtTarget"
 					]
 				},
 				{

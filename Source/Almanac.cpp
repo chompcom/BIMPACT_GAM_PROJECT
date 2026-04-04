@@ -361,7 +361,7 @@ void RenderAlmanacPages(Almanac & almanac, s8 font)
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 	if (almanac.isOpen)
 	{
-		std::vector<std::string> allAreas {"main", "normal", "plant", "ocean", "cold", "hot"};
+		//std::vector<std::string> allAreas {"main", "normal", "plant", "ocean", "cold", "hot"};
 		
 		//check which area we are looking at in the almanac, and render the appropriate sprite
 		for (int i{ 0 }; i < 6; ++i)
