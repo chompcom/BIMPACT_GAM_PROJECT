@@ -38,6 +38,7 @@ void LogoFree()
 
 void LogoUnload()
 {
+    DataLoader::Unload();
 }
 
 void LogoUpdate(float dt)

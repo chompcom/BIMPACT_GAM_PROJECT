@@ -198,7 +198,8 @@ namespace DataLoader {
 			//std::cout << theGuy["enemies"][0]["name"];
 
 			//Getting enemy types
-			enemyTypes.reserve(theGuy["enemies"].size());
+			//enemyTypes.reserve(theGuy["enemies"].size());
+
 
 			for (Json::Value& name : theGuy["enemies"]) {
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };

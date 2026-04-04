@@ -694,6 +694,7 @@ void InitCommands() {
 		{"StopMoving", StopMoving},
 		{"FireAOE", FireAOE},
 
+
 		{"default", DefaultAction} //This should Never be called!
     };
 }
