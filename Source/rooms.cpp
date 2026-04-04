@@ -106,16 +106,16 @@ namespace Config {
 		return files[idx];
 	}
 
-	// Absolute
-	static float AbsF(float v) { return (v < 0.0f) ? -v : v; }
+	// Absolute (legacy dead code)
+	//static float AbsF(float v) { return (v < 0.0f) ? -v : v; }
 
-	// Overlap Algo rectangle
-	static bool OverlapAabb(Vector2 aCenter, Vector2 aHalf, Vector2 bCenter, Vector2 bHalf)
-	{
-		float dx = AbsF(aCenter.x - bCenter.x);
-		float dy = AbsF(aCenter.y - bCenter.y);
-		return (dx <= (aHalf.x + bHalf.x)) && (dy <= (aHalf.y + bHalf.y));
-	}
+	// Overlap Algo rectangle (Legacy dead code)
+	//static bool OverlapAabb(Vector2 aCenter, Vector2 aHalf, Vector2 bCenter, Vector2 bHalf)
+	//{
+	//	float dx = AbsF(aCenter.x - bCenter.x);
+	//	float dy = AbsF(aCenter.y - bCenter.y);
+	//	return (dx <= (aHalf.x + bHalf.x)) && (dy <= (aHalf.y + bHalf.y));
+	//}
 
 	// Extracting filename from fullpath
 	std::string ExtractThemeTag(std::string const& fullPath, mapRooms::RoomType type)
@@ -414,15 +414,15 @@ namespace mapRooms
 			//}
 
 			// Spawn enemies
-			if (0 && currentRoomData.enemyList.empty()) {
-				currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
-				for (Enemy* i : currentRoomData.enemyList) {
-					i->shadow.position = Vector2{ 0.f, -35.f };
-					i->shadow.UpdateTransform();
-					i->ChangeState(EnemyStates::ES_NEUTRAL);
-					i->roomData = &this->currentRoomData;
-				}
-			}
+			//if (0 && currentRoomData.enemyList.empty()) {
+			//	currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
+			//	for (Enemy* i : currentRoomData.enemyList) {
+			//		i->shadow.position = Vector2{ 0.f, -35.f };
+			//		i->shadow.UpdateTransform();
+			//		i->ChangeState(EnemyStates::ES_NEUTRAL);
+			//		i->roomData = &this->currentRoomData;
+			//	}
+			//}
 
 			// Spawn gifts
 			//if (0 && currentRoomData.giftList.empty()) {
@@ -518,6 +518,7 @@ namespace mapRooms
 
 	} 
 	void Room::Update(float dt) {
+		UNREFERENCED_PARAMETER(dt);
 		//for (Enemy* i : currentRoomData.enemyList) {
 			//i->Update(dt);
 

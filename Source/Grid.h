@@ -41,7 +41,7 @@ struct GridTile {
 // FOR INTERWORKINGNESS?
 struct TileType
 {
-	int id;
+	int id{};
 	std::string name;
 
 	// Attributes

@@ -270,7 +270,7 @@ void TestInit()
 
 	//winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
 
-	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(1200.0f, 570.0f));
+	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(980.0f, 610.0f));
 
 	winUi.BindOnClick("btn_restart", [](UIElement &self)
 					  {
@@ -722,7 +722,7 @@ void TestUpdate(float dt)
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
 			if (currentRoom->biome == "Ice") IceBiomeAudio();
 			if (currentRoom->biome == "Ocean") OceanBiomeAudio();
-			if (currentRoom->biome == "Normal");
+			//if (currentRoom->biome == "Normal");
 			if (roomData.boss) {
 				BossBGMAudio();
 				//return;
@@ -766,15 +766,17 @@ void TestUpdate(float dt)
 
 		float gridWidth = currentRoom->roomGrid.GetTileWidth();
 		float gridHeight = currentRoom->roomGrid.GetTileHeight();
-		constexpr float skin = 0.10f;
+
+		//constexpr float skin = 0.10f;
+		constexpr float skinBoss{ 0.10f };
 
 		if (prevCell >= 0)
 		{
 			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-			if ((colRes & COLLISION_LEFT) &&	moveDir.x < - EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-			if ((colRes & COLLISION_RIGHT) &&	moveDir.x >   EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-			if ((colRes & COLLISION_TOP) &&		moveDir.y >   EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
-			if ((colRes & COLLISION_BOTTOM) &&	moveDir.y < - EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
+			if ((colRes & COLLISION_LEFT) &&	moveDir.x < - EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f +  skinBoss;
+			if ((colRes & COLLISION_RIGHT) &&	moveDir.x >   EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f -  skinBoss;
+			if ((colRes & COLLISION_TOP) &&		moveDir.y >   EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skinBoss;
+			if ((colRes & COLLISION_BOTTOM) &&	moveDir.y < - EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skinBoss;
 		}
 
 		// sync sprite + shadow AFTER collision correction
@@ -835,21 +837,21 @@ void TestUpdate(float dt)
 				Vector2 prevGiftPos = g->position;
 				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
 
-				float gridWidth = currentRoom->roomGrid.GetTileWidth();
-				float gridHeight = currentRoom->roomGrid.GetTileHeight();
+				//gridWidth = currentRoom->roomGrid.GetTileWidth();
+				//gridHeight = currentRoom->roomGrid.GetTileHeight();
 				constexpr float skin = 0.10f;
 
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.99f, currentRoom);
 
-				Vector2 moveDelta = g->position - prevGiftPos;
-				Vector2 moveDir = moveDelta.Normalized();
+				Vector2 moveDeltaGift = g->position - prevGiftPos;
+				//Vector2 moveDirGift = moveDelta.Normalized();
 
 				float speed = sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y);
 
 				// Increase scale as speed goes up hacky method
-				float collisionScaleX = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 2.0f);
-				float collisionScaleY = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 2.0f);
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x,g->position.y, collisionScaleX, collisionScaleY,prevCell);
+				float collisionScaleXGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 2.0f);
+				float collisionScaleYGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 2.0f);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x,g->position.y, collisionScaleXGift, collisionScaleYGift,prevCell);
 
 				bool hitX = (res & COLLISION_LEFT) || (res & COLLISION_RIGHT);
 				bool hitY = (res & COLLISION_TOP) || (res & COLLISION_BOTTOM);
@@ -861,13 +863,13 @@ void TestUpdate(float dt)
 					float rubberBand = 0.1f;
 			
 					// JOSIAH'S inspiration from enemies method (0.1 instead of 0.01 to prevent rubberband?)
-					if ((res & COLLISION_LEFT) && moveDir.x <  -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skin;
-					if ((res & COLLISION_RIGHT) && moveDir.x >  rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skin;
-					if ((res & COLLISION_BOTTOM) && moveDir.y < -rubberBand) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skin;
-					if ((res & COLLISION_TOP) && moveDir.y >    rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skin;
+					if ((res & COLLISION_LEFT) && moveDir.x <  -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f +  collisionScaleXGift * 0.5f + skin;
+					if ((res & COLLISION_RIGHT) && moveDir.x >  rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f -  collisionScaleXGift * 0.5f - skin;
+					if ((res & COLLISION_BOTTOM) && moveDir.y < -rubberBand) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleYGift * 0.5f + skin;
+					if ((res & COLLISION_TOP) && moveDir.y >    rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleYGift * 0.5f - skin;
 
 					// If basically stopped, try prevent rubberbanding for long?
-					if (moveDelta.LengthSq() < (rubberBand*rubberBand))
+					if (moveDeltaGift.LengthSq() < (rubberBand*rubberBand))
 					{
 						if (hitX) g->velocity.x = 0.0f;
 						if (hitY) g->velocity.y = 0.0f;

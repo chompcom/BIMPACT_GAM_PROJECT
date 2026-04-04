@@ -39,9 +39,9 @@ class TexturedSprite : public Sprite {
 
 struct AnimationInfo {
 	std::string name;
-	s32 start_row;
-	s32 start_col;
-	s32 no_frames;
+	s32 start_row{};
+	s32 start_col{};
+	s32 no_frames{};
 	f32 frame_duration{ 0.25f };
 };
 

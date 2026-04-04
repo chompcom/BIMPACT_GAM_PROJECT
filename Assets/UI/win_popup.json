@@ -84,12 +84,12 @@
 
         {
           "id": "label_k_missed",
-          "x": 0.18,
+          "x": 0.24,
           "y": -0.13,
           "w": 0.32,
           "h": 0.08,
           "visible": true,
-          "text": "k missed: 0",
+          "text": "Friends missed missed: 0",
           "textScale": 0.95,
           "textColor": [0.0, 0.0, 0.0, 1.0]
         },
