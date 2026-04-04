@@ -844,14 +844,14 @@ void TestUpdate(float dt)
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.99f, currentRoom);
 
 				Vector2 moveDeltaGift = g->position - prevGiftPos;
-				//Vector2 moveDirGift = moveDelta.Normalized();
+				Vector2 moveDirGift	  = moveDeltaGift.Normalized();
 
 				float speed = sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y);
 
 				// Increase scale as speed goes up hacky method
 				float collisionScaleXGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 2.0f);
 				float collisionScaleYGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 2.0f);
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x,g->position.y, collisionScaleXGift, collisionScaleYGift,prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x,g->position.y, collisionScaleXGift, collisionScaleYGift, prevCell);
 
 				bool hitX = (res & COLLISION_LEFT) || (res & COLLISION_RIGHT);
 				bool hitY = (res & COLLISION_TOP) || (res & COLLISION_BOTTOM);
@@ -863,10 +863,10 @@ void TestUpdate(float dt)
 					float rubberBand = 0.1f;
 			
 					// JOSIAH'S inspiration from enemies method (0.1 instead of 0.01 to prevent rubberband?)
-					if ((res & COLLISION_LEFT) && moveDir.x <  -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f +  collisionScaleXGift * 0.5f + skin;
-					if ((res & COLLISION_RIGHT) && moveDir.x >  rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f -  collisionScaleXGift * 0.5f - skin;
-					if ((res & COLLISION_BOTTOM) && moveDir.y < -rubberBand) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleYGift * 0.5f + skin;
-					if ((res & COLLISION_TOP) && moveDir.y >    rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleYGift * 0.5f - skin;
+					if ((res & COLLISION_LEFT)   &&	moveDirGift.x <  -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f +  collisionScaleXGift * 0.5f + skin;
+					if ((res & COLLISION_RIGHT)  &&	moveDirGift.x >  rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f -  collisionScaleXGift * 0.5f - skin;
+					if ((res & COLLISION_BOTTOM) && moveDirGift.y < -rubberBand) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleYGift * 0.5f + skin;
+					if ((res & COLLISION_TOP)	 &&	moveDirGift.y >    rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleYGift * 0.5f - skin;
 
 					// If basically stopped, try prevent rubberbanding for long?
 					if (moveDeltaGift.LengthSq() < (rubberBand*rubberBand))
