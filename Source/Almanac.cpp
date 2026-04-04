@@ -447,8 +447,9 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 {
 	if (almanac.isOpen)
 	{ 
-		ResetBGM();
+		
 		if (!almanacSound) {
+			pauseBGM();
 			AlmanacAudio();
 			almanacSound = true;
 		}
@@ -462,6 +463,7 @@ void AlmanacInputs(Almanac & almanac/*, AEGfxVertexList* removeLater*/)
 		{
 			almanac.isOpen = false;
 			almanacSound = false;
+			ResumeBGM();
 			//std::cout << "current: " << almanac.currentPageNumber;
 		}
 
