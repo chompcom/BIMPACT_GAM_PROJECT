@@ -28,20 +28,15 @@
 AEGfxVertexList *sqmesh = nullptr;
 
 TexturedSprite *bulletSprite = nullptr;
-
-//AEGfxTexture *rockpng = nullptr;
 AEGfxTexture *playerpng = nullptr;
 AEGfxTexture *shadowpng = nullptr;
 AEGfxTexture* hitboxpng = nullptr;
-//AEGfxTexture *bulletpng = nullptr;
-//AEGfxTexture *aoepng = nullptr;
 AEGfxTexture *heartpng = nullptr;
 AEGfxTexture *almanacpng = nullptr;
 AEGfxTexture *almanacLitUppng = nullptr;
 AEGfxTexture *pDoorTex = nullptr; // Door image
 AEGfxTexture *arrowpng = nullptr;
 
-// AEGfxTexture* almanacpagepng = nullptr;
 
 std::vector<TexturedSprite> healthIcons;
 TexturedSprite *almanacIcon = nullptr;
@@ -51,17 +46,12 @@ std::vector<TexturedSprite> gameOverButtons;
 
 Sprite gameOverDarkScreen{};
 
-// TexturedSprite* almanacPage = nullptr;
 Almanac almanac{};
-// std::vector<TexturedSprite> almanacPageSprites;
 
 s8 font = 0;
-//Player player{ TexturedSprite(sqmesh,playerpng,Vector2(),Vector2(),Color{1,1,1,1}), TexturedSprite(sqmesh,shadowpng,Vector2(),Vector2(),Color{1,1,1,1}), 25000.f, 600.f, Vector2(0,0) };
-//static ProjectileManager projManager;
+
 Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqmesh, hitboxpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
 
-//EnemyType rocktype{"rock", 100, 10, {"sad"}, {"happy"}, {"sad"}};
-//Enemy rock{rocktype, TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, rockpng, Vector2(), Vector2(), Color{1, 1, 1, 1})};
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
 
@@ -101,8 +91,6 @@ enum class ConfirmAction
 static ConfirmAction pendingConfirmAction = ConfirmAction::None;
 
 
-
-
 bool debugMode;
 
 // WIN CONDITION STATISTICS
@@ -119,11 +107,9 @@ void TestLoad()
 {
 	DataLoader::Load();
 	sqmesh = CreateSquareMesh();
-	//rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
 	hitboxpng = AEGfxTextureLoad("Assets/hitbox.png");
-	//bulletpng = AEGfxTextureLoad("Assets/fireball.png");
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
@@ -198,20 +184,11 @@ void TestInit()
 	pendingWinStatusRefresh = true;
 
 
-	
-
-	// carryData.enemyList.clear();
-
-
-	// square seed: 0xA341311Cu
-	//gameMap.InitMap(globalTransferData, 0xA341311Cu); // Seeded Run
-
 	// Enable to allow for random values each run
 	std::srand(static_cast<unsigned int>(std::time(nullptr))); // So based on number of seconds passed since Jan 1, 1970, this becomes our srand seed
 	unsigned int curSeed = gameMap.RandInt(0, RAND_MAX - 1);
 	gameMap.InitMap(globalTransferData, curSeed);
 
-	//std::cout << "Current Seed: " << curSeed << "\n";
 	player.position.x = player.position.y = 0;
 
 	testParticles = ParticleSystem(sqmesh);
@@ -220,17 +197,6 @@ void TestInit()
 	confirmUi.LoadFromFilePopUp("Assets/UI/confirmation_popup.json", Vector2(0.0f, 0.0f), Vector2(560.0f, 240.0f));
 	confirmUi.SetFont(font);
 
-	//auto openConfirmPopup = [](ConfirmAction action, char const* messageText)
-	//	{
-	//		pendingConfirmAction = action;
-	//		isConfirmPopupOpen = true;
-
-	//		UIElement* titleLabel = confirmUi.FindById("title");
-	//		if (titleLabel) titleLabel->text = "ARE YOU SURE?";
-
-	//		UIElement* messageLabel = confirmUi.FindById("message");
-	//		if (messageLabel) messageLabel->text = messageText;
-	//	};
 
 	confirmUi.BindOnClick("btn_yes", [](UIElement&)
 		{
@@ -261,9 +227,7 @@ void TestInit()
 
 	// For pause screen;
 	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
-	//UIElement *tipText = pauseUi.FindById("tip_text");
-	//if (tipText)
-		//tipText->text = pauseTipText;
+	
 	pauseUi.BindOnClick("btn_restart", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
@@ -284,8 +248,6 @@ void TestInit()
 		});
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
-
-	//winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
 
 	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(980.0f, 610.0f));
 
@@ -361,8 +323,6 @@ void TestDraw()
 	{
 		RoomData &roomData = room->currentRoomData;
 		RoomData &carryData = gameMap.GetTransferData();
-
-		//gameMap.GetCurrentRoom()->roomGrid.RenderGrid(DataLoader::GetMesh(), carryData.player->position, carryData.player->sprite.scale, AE_GFX_RM_TEXTURE);
 
 		for (Gift *g : roomData.giftList)
 		{
@@ -447,19 +407,15 @@ void TestDraw()
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
-	if (gameMap.GetCurrentRoom()->currentRoomData.boss) {//gameMap.GetCurrentRoom()->currentRoomData.boss->hpBar.RenderSprite();
+	if (gameMap.GetCurrentRoom()->currentRoomData.boss) {
 		if (gameMap.GetCurrentRoom()->currentRoomData.boss->healthbarInitialized) {
-			//std::cout << "true\n";
 			gameMap.GetCurrentRoom()->currentRoomData.boss->healthbar.Draw();
 		}
 	}
-	// rock.sprite.RenderSprite();
-	// gift.sprite.RenderSprite();
-	// gift2.sprite.RenderSprite();
+
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
 	renderPlayerLives(player, healthIcons, font);
-	//(*almanacIcon).RenderSprite();
 
 	if (debugMode)
 	{
@@ -474,9 +430,6 @@ void TestDraw()
 			{
 				if (g)
 				{
-					/*if (!g->pickUpState)
-						g->shadow.RenderSprite();
-					g->giftType.sprite.RenderSprite();*/
 					g->hitbox.RenderSprite();
 				}
 			}
@@ -484,9 +437,6 @@ void TestDraw()
 			{
 				if (e && e->isActive)
 				{
-
-					/*e->shadow.RenderSprite();
-					e->sprite.RenderSprite();*/
 					e->hitbox.RenderSprite();
 				}
 			}
@@ -494,9 +444,8 @@ void TestDraw()
 			{
 				if (roomData.boss->currentHealth > 0)
 				{
-					/*roomData.boss->shadow.RenderSprite();
-					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);*/\
-						roomData.boss->hitbox.RenderSprite();
+					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
+					roomData.boss->hitbox.RenderSprite();
 				}
 			}
 
@@ -504,9 +453,6 @@ void TestDraw()
 			{
 				if (g)
 				{
-					/*if (!g->pickUpState)
-						g->shadow.RenderSprite();
-					g->giftType.sprite.RenderSprite();*/
 					g->hitbox.RenderSprite();
 				}
 			}
@@ -514,8 +460,6 @@ void TestDraw()
 			{
 				if (e)
 				{
-					/*e->shadow.RenderSprite();
-					e->sprite.RenderSprite();*/
 					e->hitbox.RenderSprite();
 				}
 			}
@@ -526,7 +470,6 @@ void TestDraw()
 		char buffer[50];
 
 		sprintf_s(buffer, 50, "DEBUG MODE ON");
-		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.9), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
 		sprintf_s(buffer, 50, "GAME STATE: ");
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.8), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
@@ -550,7 +493,6 @@ void TestDraw()
 		sprintf_s(buffer, 50, "%.2f", AEFrameRateControllerGetFrameRate());
 		AEGfxPrint(font, buffer, static_cast<f32>(0.6), static_cast<f32>(0.6), static_cast<f32>(1), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f), static_cast<f32>(1.f));
 
-		// AEGfxGetPrintSize(font, buffer, 4.f, &textWidth, &textHeight);
 	}
 
 	RenderAlmanacIcon(almanac, *almanacIcon, *almanacLitUpIcon, *arrowSprite, player);
@@ -558,35 +500,6 @@ void TestDraw()
 	RenderAlmanacPages(almanac, font);
 
 	RenderTutorial();
-
-#if 0
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	TexturedSprite thing = DataLoader::CreateTexture("Assets/poprocks.png");
-	std::pair<int, int> yup{ 5,11 };
-	float width = 110;
-	thing.scale = Vector2{ width,width };
-	//Vector2 offsetpos{ -(yup.second * width) / 2 , (yup.first * width) / 2 };
-	Vector2 offsetpos{ -(yup.second * width) / 2, -(yup.first * width) / 2 + 50};
-	for (int row = 0; row < yup.first; row++) {
-
-	//gift.sprite.RenderSprite();
-	//gift2.sprite.RenderSprite();
-	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	//grid.PrintRetrievedInformation();
-	//grid.RenderGrid(sqmesh);
-
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	player.sprite.RenderSprite(true);
-		for (int col = 0; col < yup.second; col++) {
-			thing.position = Vector2{ offsetpos.x + (1.1f*col * width), offsetpos.y + (1.1f*row * width) };
-			thing.UpdateTransform();
-			thing.RenderSprite();
-		}
-
-	}
-	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
-	player.sprite.RenderSprite(true);
-#endif
 
 	// Pause screen
 
@@ -613,7 +526,6 @@ void TestDraw()
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		// AEGfxSetTransparency(0.1f);
 
 		Sprite overlay(
 			DataLoader::GetOrCreateSquareMesh(),
@@ -630,7 +542,6 @@ void TestDraw()
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		// AEGfxSetTransparency(0.1f);
 
 		Sprite overlay(
 			DataLoader::GetOrCreateSquareMesh(),
@@ -647,7 +558,6 @@ void TestDraw()
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-		// AEGfxSetTransparency(0.1f);
 
 		Sprite overlay(
 			DataLoader::GetOrCreateSquareMesh(),
@@ -664,17 +574,7 @@ void TestDraw()
 
 void TestFree()
 {
-	// RoomData& roomData = gameMap.GetCurrentRoom()->currentRoomData;
-	// RoomData& carryData = gameMap.GetTransferData();
-	//
-	// roomData.enemyList.clear();
-	// roomData.giftList.clear();
-	// roomData.projectileList.clear();
-	// carryData.enemyList.clear();
-	// carryData.giftList.clear();
 
-	// globalTransferData.player = &player;
-	//  Dellocate enemy and gift assets
 	for (Enemy *e : globalTransferData.enemyList)
 	{
 		delete e;
@@ -702,12 +602,12 @@ void TestUnload()
 	delete arrowSprite;
 	delete almanacLitUpIcon;
 
-	//#warning "GET RID OF THE TEST PNGS"
-	//AEGfxTextureUnload(rockpng);
+
+
 	AEGfxTextureUnload(playerpng);
 	AEGfxTextureUnload(shadowpng);
 	AEGfxTextureUnload(hitboxpng);
-	//AEGfxTextureUnload(bulletpng);
+
 
 	AEGfxTextureUnload(heartpng);
 	AEGfxTextureUnload(almanacpng);
@@ -730,7 +630,6 @@ void TestUnload()
 
 	loseUi.Clear();
 	loseUiInitialized = false;
-	// isPaused = false;
 
 	allGiftTypes.clear();
 
@@ -753,19 +652,6 @@ void TestUpdate(float dt)
 		// Get previous pos
 		Vector2 prevPos{ player.position.x, player.position.y };
 
-		//// to test damage
-		//if (player.health > 0)
-		//{
-		//	//this has to be above checkIfAlmanacClicked or the arrows will bug
-		//	AlmanacInputs(almanac);
-		//	checkIfAlmanacClicked(*almanacIcon, almanac);
-
-		//	// for now,
-		//	//  Player update
-		//	UpdatePlayer(player, dt);
-		//	player.sprite.UpdateTransform();
-		//	player.shadow.UpdateTransform();
-		//}
 
 		//this has to be above checkIfAlmanacClicked or the arrows will bug
 		AlmanacInputs(almanac);
@@ -774,11 +660,10 @@ void TestUpdate(float dt)
 		// for now,
 		//  Player update
 		UpdatePlayer(player, dt);
-		//player.sprite.UpdateTransform();
-		//player.shadow.UpdateTransform();
+
 
 		UpdateMobAudioCD(dt);
-		//winUI.Update();
+
 
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
@@ -834,7 +719,6 @@ void TestUpdate(float dt)
 		int curCell = currentRoom->roomGrid.WorldToCell(player.position.x, player.position.y);
 		if (curCell >= 0 && curCell != 0xffffff) currentRoom->lastValidCell = curCell;
 
-		// Scale size 0.8f
 		float collisionScaleX = player.sprite.scale.x * 0.8f;
 		float collisionScaleY = player.sprite.scale.y * 0.8f;
 
@@ -843,7 +727,6 @@ void TestUpdate(float dt)
 		float gridWidth = currentRoom->roomGrid.GetTileWidth();
 		float gridHeight = currentRoom->roomGrid.GetTileHeight();
 
-		//constexpr float skin = 0.10f;
 		constexpr float skinBoss{ 0.10f };
 
 		if (prevCell >= 0)
@@ -864,9 +747,6 @@ void TestUpdate(float dt)
 		player.shadow.UpdateTransform();
 		player.hitbox.UpdateTransform();
 
-		// Game Map Update was here
-
-		//checkIfAlmanacClicked(*almanacIcon, almanac);
 
 		MoveArrow(*arrowSprite, almanac, dt);
 
@@ -907,9 +787,7 @@ void TestUpdate(float dt)
 				e->hitbox.position = e->sprite.position;
 				e->hitbox.UpdateTransform();
 
-			
-				//if (CollisionBoundary_Static(e->sprite.position, e->sprite.scale, 1600, 800))
-					//e->velocity = -e->velocity;
+
 			}
 		}
 
@@ -920,9 +798,6 @@ void TestUpdate(float dt)
 			{
 				Vector2 prevGiftPos = g->position;
 				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
-
-				//gridWidth = currentRoom->roomGrid.GetTileWidth();
-				//gridHeight = currentRoom->roomGrid.GetTileHeight();
 				constexpr float skin = 0.10f;
 
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f, currentRoom);
@@ -1002,7 +877,6 @@ void TestUpdate(float dt)
 		{
 			if (g)
 			{
-				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
 				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
@@ -1020,20 +894,15 @@ void TestUpdate(float dt)
 			Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
-			//std::cout << roomData.boss->sprite.current_animation_index << roomData.boss->sprite.current_sprite_index << '\n';
-			//std::cout << roomData.boss->sprite.current_sprite_uv_offset_x << roomData.boss->sprite.current_sprite_uv_offset_y << '\n';
 
 			roomData.boss->collideWall = false;
-
-			// Test Player Collision with Map			
-			//int prevCellBoss = roomData.grid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 
 
 			// Test Player Collision with Map
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
-			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9, roomData.boss->sprite.scale.y * 0.9, bossCurCell);
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9f, roomData.boss->sprite.scale.y * 0.9f, bossCurCell);
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
 				roomData.boss->shadow.position.x = bossPrevPos.x;
@@ -1046,33 +915,6 @@ void TestUpdate(float dt)
 			}
 			
 			
-			//gonna try to make it dynamic..
-			/*
-			float gridWidth = roomData.grid.GetTileWidth();
-			float gridHeight = roomData.grid.GetTileHeight();
-			if (CollisionBoundary_Static(roomData.boss->sprite.position, roomData.boss->sprite.scale, roomData.grid.GetBoundary().x * 0.99f, roomData.grid.GetBoundary().y * 0.99f)) {
-
-				if (collisionResBoss & COLLISION_RIGHT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x + gridWidth * 0.5f - roomData.boss->sprite.scale.x * 0.5f - 0.10f;
-
-					roomData.boss->collideWall = true;
-				}
-				if (collisionResBoss & COLLISION_LEFT && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-					roomData.boss->sprite.position.x = roomData.grid.CellToWorldCenter(prevCellBoss).x - gridWidth * 0.5f + roomData.boss->sprite.scale.x * 0.5f + 0.10f;
-					roomData.boss->collideWall = true;
-
-				}
-				if (collisionResBoss & COLLISION_BOTTOM && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y - gridHeight * 0.5f + roomData.boss->sprite.scale.y * 0.5f + 0.10f;
-					roomData.boss->collideWall = true;
-
-				}
-				if (collisionResBoss & COLLISION_TOP && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-					roomData.boss->sprite.position.y = roomData.grid.CellToWorldCenter(prevCellBoss).y + gridHeight * 0.5f - roomData.boss->sprite.scale.y * 0.5f - 0.10f;
-					roomData.boss->collideWall = true;
-
-				}
-			}*/
 			std::cout << roomData.boss->collideWall << std::endl;
 
 			//Code that sets the boss sprite to the direction its facing
@@ -1085,10 +927,8 @@ void TestUpdate(float dt)
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 
-			//roomData.boss->hitbox.position = roomData.boss->sprite.position;
 			roomData.boss->hitbox.position = Vector2{ roomData.boss->sprite.position.x, roomData.boss->sprite.position.y - roomData.boss->shadowOffset + roomData.boss->hitbox.scale.y / 2};
 			roomData.boss->hitbox.UpdateTransform();
-			//roomData.boss->hpBar.UpdateTransform();
 
 			roomData.boss->sprite.UpdateAnimation(dt);
 		}
@@ -1234,9 +1074,7 @@ void TestUpdate(float dt)
 
 			pauseUi.Update();
 		}
-		
 
-		//pauseUi.Update();
 	}
 	else if (gameState == WIN)
 	{
@@ -1278,7 +1116,7 @@ void TestUpdate(float dt)
 			UIElement* friendsMadeLabel = winUi.FindById("label_friends_made");
 			if (friendsMadeLabel)
 			{
-				//sprintf_s(buffer, sizeof(buffer), "Friends made: %d", winStatus["friends_made"]);
+
 				std::stringstream buf;
 				buf << "Friends made: " << winStatus["friends_made"];
 				friendsMadeLabel->text = buf.str();
@@ -1298,7 +1136,7 @@ void TestUpdate(float dt)
 			{
 				std::stringstream buf;
 				buf << "Enemies Killed: " << winStatus["enemies_killed"];
-				//sprintf_s(buffer, sizeof(buffer), "Enemies Killed: %d", winStatus["enemies_killed"]);
+
 				enemiesKilledLabel->text = buf.str();
 			}
 
@@ -1343,12 +1181,6 @@ void TestUpdate(float dt)
 	}
 	else if (gameState == LOSE)
 	{
-		//if (!loseAudioPlaying) {		
-		//	StopAllAudio();
-		//	GameLoseAudio();
-		//	loseAudioPlaying = true;
-		//}
-		//loseUi.Update();
 
 
 		// Check if popup open else do win ui
@@ -1364,11 +1196,7 @@ void TestUpdate(float dt)
 		}
 		else
 		{
-			//if (AEInputCheckTriggered(AEVK_ESCAPE))
-			//{
-			//	ResumeAllAudio();
-			//	gameState = RUNNING;
-			//}
+
 
 			if (!loseAudioPlaying) {
 				StopAllAudio();

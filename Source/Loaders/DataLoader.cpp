@@ -204,6 +204,7 @@ namespace DataLoader {
 			for (Json::Value& name : theGuy["enemies"]) {
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };
 
+					std::cout << "********** LOADING " << tmp.name << "*****************" << std::endl;
 				AddBehaviours(tmp, name, "happy");
 				AddBehaviours(tmp, name, "angry");
 				AddBehaviours(tmp, name, "neutral");
@@ -219,9 +220,11 @@ namespace DataLoader {
 				if (!name["wanderTime"].isNull()) {
 					tmp.wanderTime = name["wanderTime"].asFloat();
 				}
+					std::cout << "********** WANDER TIEM ****:" << tmp.wanderTime << std::endl;
 				if (!name["waitTime"].isNull()) {
 					tmp.waitTime = name["waitTime"].asFloat();
 				}
+					std::cout << "********** WAIT TIEM ****:" << tmp.waitTime << std::endl;
 
 				if (name["traits"]) {
 					for (Json::Value& traitStr : name["traits"]) {
