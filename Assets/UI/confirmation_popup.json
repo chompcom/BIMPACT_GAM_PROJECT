@@ -1,0 +1,84 @@
+{
+  "elements": [
+    {
+      "id": "root",
+      "x": 0.0,
+      "y": 0.0,
+      "w": 1.0,
+      "h": 1.0,
+      "visible": true,
+      "children": [
+        {
+          "id": "panel",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 1.0,
+          "h": 1.0,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.18,
+          "roundSegments": 32,
+          "backgroundColor": [0.90, 0.92, 0.78, 1.0]
+        },
+
+        {
+          "id": "title",
+          "x": 0.0,
+          "y": 0.22,
+          "w": 0.70,
+          "h": 0.14,
+          "visible": true,
+          "text": "ARE YOU SURE?",
+          "textScale": 0.95,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "message",
+          "x": 0.0,
+          "y": 0.02,
+          "w": 0.80,
+          "h": 0.12,
+          "visible": true,
+          "text": "Confirm action?",
+          "textScale": 0.56,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "btn_yes",
+          "x": -0.20,
+          "y": -0.25,
+          "w": 0.24,
+          "h": 0.18,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.10,
+          "roundSegments": 8,
+          "text": "YES",
+          "textScale": 0.60,
+          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "btn_no",
+          "x": 0.20,
+          "y": -0.25,
+          "w": 0.24,
+          "h": 0.18,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.10,
+          "roundSegments": 8,
+          "text": "CANCEL",
+          "textScale": 0.52,
+          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        }
+      ]
+    }
+  ]
+}

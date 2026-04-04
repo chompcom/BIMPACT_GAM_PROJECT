@@ -11,7 +11,9 @@
 namespace
 {
 	UIManager ui;
+	UIManager confirmUi;
 	s8 uiFont = 0;
+	bool isQuitConfirmOpen = false;
 }
 
 void MainMenuLoad()
@@ -26,10 +28,27 @@ void MainMenuLoad()
 	//system("cd");
 	ui.LoadFromFile("Assets/UI/mainmenu.json"); // Load menu
 
-	// Bind button actions
-	ui.BindOnClick("btn_start", [](UIElement& self)
+
+	// Load confirmation windwo for quit button
+	confirmUi.SetFont(uiFont);
+	confirmUi.LoadFromFilePopUp("Assets/UI/confirmation_popup.json", Vector2(0.0f, 0.0f), Vector2(560.0f, 240.0f));
+
+	UIElement* confirmMessage = confirmUi.FindById("message");
+	if (confirmMessage) confirmMessage->text = "Exit the game?";
+
+	confirmUi.BindOnClick("btn_yes", [](UIElement&)
 		{
-			UNREFERENCED_PARAMETER(self);
+			ChangeState(GS_QUIT);
+		});
+
+	confirmUi.BindOnClick("btn_no", [](UIElement&)
+		{
+			isQuitConfirmOpen = false;
+		});
+
+	// Bind button actions
+	ui.BindOnClick("btn_start", [](UIElement&)
+		{
 			ChangeState(GS_LEVEL1);
 		});
 
@@ -43,7 +62,7 @@ void MainMenuLoad()
 	ui.BindOnClick("btn_quit", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
-			ChangeState(GS_QUIT);	// Apparently game running must be changed too. I thought gsm would handle this lmao.
+			isQuitConfirmOpen = true;
 		});
 
 	ui.BindOnClick("btn_credits", [](UIElement& self) {
@@ -102,19 +121,44 @@ void MainMenuInit(){
 void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 {
 	UNREFERENCED_PARAMETER(dt);
+
+	if (isQuitConfirmOpen)
+	{
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		{
+			isQuitConfirmOpen = false;
+		}
+
+		confirmUi.Update();
+		return;
+	}
+
 	ui.Update();
-	//if (AEInputCheckTriggered(AEVK_ESCAPE))
-	//{
-	//	ChangeState(GS_QUIT);
-	//}
 }
 
 void MainMenuDraw()
 {
-	// Soft background
-	//AEGfxSetBackgroundColor(0.12f, 0.12f, 0.12f);
-
 	ui.Draw();
+
+	if (isQuitConfirmOpen)
+	{
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.55f }
+		);
+		overlay.RenderSprite(true);
+
+		confirmUi.Draw();
+	}
 }
 
 void MainMenuFree(){}
@@ -124,6 +168,9 @@ void MainMenuUnload()
 	FreeMenuAudio();
 
 	ui.Clear();
+
+	confirmUi.Clear();
+	isQuitConfirmOpen = false;
 
 	if (uiFont)
 	{

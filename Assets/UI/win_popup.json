@@ -16,50 +16,151 @@
           "h": 1.0,
           "visible": true,
           "drawBackground": true,
-          "borderRadiusRatio": 0.25,
-          "roundSegments": 64,
+          "borderRadiusRatio": 0.02,
+          "roundSegments": 16,
           "backgroundColor": [0.90, 0.92, 0.78, 1.0]
         },
+
+        {
+          "id": "top_bar",
+          "x": 0.0,
+          "y": 0.49,
+          "w": 1.0,
+          "h": 0.03,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 8,
+          "backgroundColor": [0.40, 0.10, 0.08, 1.0]
+        },
+
         {
           "id": "title",
           "x": 0.0,
-          "y": 0.22,
-          "w": 0.5,
-          "h": 0.12,
+          "y": 0.34,
+          "w": 0.50,
+          "h": 0.10,
           "visible": true,
           "text": "YOU WIN",
-          "textScale": 1.2,
+          "textScale": 1.9,
           "textColor": [0.0, 0.0, 0.0, 1.0]
         },
+
+        {
+          "id": "divider_top",
+          "x": 0.0,
+          "y": 0.20,
+          "w": 0.92,
+          "h": 0.004,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 4,
+          "backgroundColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "character_image",
+          "x": -0.26,
+          "y": -0.02,
+          "w": 0.20,
+          "h": 0.20,
+          "visible": true,
+          "drawBackground": false,
+          "texture": "Assets/player.png"
+        },
+
+        {
+          "id": "label_friends_made",
+          "x": 0.23,
+          "y": 0.02,
+          "w": 0.42,
+          "h": 0.08,
+          "visible": true,
+          "text": "Friends made: 0",
+          "textScale": 0.95,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "label_k_missed",
+          "x": 0.18,
+          "y": -0.13,
+          "w": 0.32,
+          "h": 0.08,
+          "visible": true,
+          "text": "k missed: 0",
+          "textScale": 0.95,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "label_enemies_killed",
+          "x": 0.24,
+          "y": -0.29,
+          "w": 0.46,
+          "h": 0.08,
+          "visible": true,
+          "text": "Enemies Killed: 0",
+          "textScale": 0.95,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "label_time_taken",
+          "x": -0.23,
+          "y": -0.29,
+          "w": 0.45,
+          "h": 0.08,
+          "visible": true,
+          "text": "YOU TOOK 00:00!!!",
+          "textScale": 0.95,
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
+          "id": "divider_bottom",
+          "x": 0.0,
+          "y": -0.41,
+          "w": 0.92,
+          "h": 0.004,
+          "visible": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.0,
+          "roundSegments": 4,
+          "backgroundColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
         {
           "id": "btn_restart",
-          "x": -0.24,
-          "y": -0.22,
-          "w": 0.30,
-          "h": 0.20,
+          "x": -0.26,
+          "y": -0.60,
+          "w": 0.18,
+          "h": 0.10,
           "visible": true,
           "clickable": true,
           "drawBackground": true,
-          "borderRadiusRatio": 0.14,
+          "borderRadiusRatio": 0.04,
           "roundSegments": 8,
           "text": "RESTART LEVEL",
-          "textScale": 0.52,
+          "textScale": 0.48,
           "backgroundColor": [0.86, 0.86, 0.86, 1.0],
           "textColor": [0.0, 0.0, 0.0, 1.0]
         },
+
         {
           "id": "btn_mainmenu",
-          "x": 0.24,
-          "y": -0.22,
-          "w": 0.30,
-          "h": 0.20,
+          "x": 0.30,
+          "y": -0.60,
+          "w": 0.22,
+          "h": 0.10,
           "visible": true,
           "clickable": true,
           "drawBackground": true,
-          "borderRadiusRatio": 0.14,
+          "borderRadiusRatio": 0.04,
           "roundSegments": 8,
           "text": "BACK TO MAIN MENU",
-          "textScale": 0.45,
+          "textScale": 0.44,
           "backgroundColor": [0.86, 0.86, 0.86, 1.0],
           "textColor": [0.0, 0.0, 0.0, 1.0]
         }

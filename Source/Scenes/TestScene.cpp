@@ -1,6 +1,7 @@
 #include "TestScene.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 #include "AEEngine.h"
 #include "../Sprite.h"
@@ -84,7 +85,34 @@ static bool fightMusicPlaying = false;
 static bool loseAudioPlaying = false;
 static bool WinAudioPlaying = false;
 
+
+// Confirmation window
+static UIManager confirmUi;
+static bool isConfirmPopupOpen = false;
+
+enum class ConfirmAction
+{
+	None,
+	RestartLevel,
+	BackToMainMenu
+};
+
+static ConfirmAction pendingConfirmAction = ConfirmAction::None;
+
+
+
+
 bool debugMode;
+
+// WIN CONDITION STATISTICS
+static std::unordered_map<std::string, int> winStatus{
+	{"friends_made", 0},
+	{"k_missed", 0},
+	{"enemies_killed", 0}
+};
+
+static float levelElapsedSeconds = 0.0f;
+static bool pendingWinStatusRefresh = false;
 
 void TestLoad()
 {
@@ -145,6 +173,14 @@ void TestInit()
 	PlayerInit(player);
 	AlmanacInit(almanac);
 
+	// WIN STATISTICS INIT
+	winStatus["friends_made"] = 0;
+	winStatus["k_missed"] = 0;
+	winStatus["enemies_killed"] = 0;
+
+	levelElapsedSeconds = 0.0f;
+	pendingWinStatusRefresh = true;
+
 	globalTransferData.enemyList.clear();
 	globalTransferData.giftList.clear();
 	globalTransferData.projectileList.clear();
@@ -163,6 +199,49 @@ void TestInit()
 
 	testParticles = ParticleSystem(sqmesh);
 
+	// Confirmation screen dialog
+	confirmUi.LoadFromFilePopUp("Assets/UI/confirmation_popup.json", Vector2(0.0f, 0.0f), Vector2(560.0f, 240.0f));
+	confirmUi.SetFont(font);
+
+	//auto openConfirmPopup = [](ConfirmAction action, char const* messageText)
+	//	{
+	//		pendingConfirmAction = action;
+	//		isConfirmPopupOpen = true;
+
+	//		UIElement* titleLabel = confirmUi.FindById("title");
+	//		if (titleLabel) titleLabel->text = "ARE YOU SURE?";
+
+	//		UIElement* messageLabel = confirmUi.FindById("message");
+	//		if (messageLabel) messageLabel->text = messageText;
+	//	};
+
+	confirmUi.BindOnClick("btn_yes", [](UIElement&)
+		{
+			// FAST CONFIRMATION ENUMS SETUP hah.
+			switch (pendingConfirmAction)
+			{
+			case ConfirmAction::RestartLevel:
+				ChangeState(GS_RESTART);
+				break;
+
+			case ConfirmAction::BackToMainMenu:
+				ChangeState(GS_MAINMENU);
+				break;
+
+			default:
+				break;
+			}
+
+			pendingConfirmAction = ConfirmAction::None;
+			isConfirmPopupOpen = false;
+		});
+
+	confirmUi.BindOnClick("btn_no", [](UIElement&)
+		{
+			pendingConfirmAction = ConfirmAction::None;
+			isConfirmPopupOpen = false;
+		});
+
 	// For pause screen;
 	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
 	//UIElement *tipText = pauseUi.FindById("tip_text");
@@ -171,41 +250,68 @@ void TestInit()
 	pauseUi.BindOnClick("btn_restart", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
-			ChangeState(GS_RESTART); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+			pendingConfirmAction = ConfirmAction::RestartLevel;
+			isConfirmPopupOpen = true;
+
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Restart?";
 		});
 	pauseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
-			ChangeState(GS_MAINMENU); // Apparently game running must be changed too. I thought gsm would handle this lmao.
+			pendingConfirmAction = ConfirmAction::BackToMainMenu;
+			isConfirmPopupOpen = true;
+
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Return to menu?";
 		});
 	pauseUiInitialized = true;
 	pauseUi.SetFont(font);
 
-	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+	//winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
+
+	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(1200.0f, 570.0f));
+
 	winUi.BindOnClick("btn_restart", [](UIElement &self)
 					  {
-						  UNREFERENCED_PARAMETER(self);
-						  ChangeState(GS_RESTART); // Apparently game running must be changed too. I thought gsm would handle this lmao.
-					  });
+				UNREFERENCED_PARAMETER(self);
+				pendingConfirmAction = ConfirmAction::RestartLevel;
+				isConfirmPopupOpen = true;
+
+				UIElement* messageLabel = confirmUi.FindById("message");
+				if (messageLabel) messageLabel->text = "Restart?";
+		});
 	winUi.BindOnClick("btn_mainmenu", [](UIElement &self)
 					  {
-						  UNREFERENCED_PARAMETER(self);
-						  ChangeState(GS_MAINMENU); // Apparently game running must be changed too. I thought gsm would handle this lmao.
-					  });
+			UNREFERENCED_PARAMETER(self);
+			pendingConfirmAction = ConfirmAction::BackToMainMenu;
+			isConfirmPopupOpen = true;
+
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Return to menu?";
+		});
 	winUiInitialized = true;
 	winUi.SetFont(font);
 
 	loseUi.LoadFromFilePopUp("Assets/UI/lose_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
 	loseUi.BindOnClick("btn_restart", [](UIElement &self)
-					   {
-						   UNREFERENCED_PARAMETER(self);
-						   ChangeState(GS_RESTART); // Apparently game running must be changed too. I thought gsm would handle this lmao.
-					   });
+		{
+		UNREFERENCED_PARAMETER(self);
+		pendingConfirmAction = ConfirmAction::RestartLevel;
+		isConfirmPopupOpen = true;
+
+		UIElement* messageLabel = confirmUi.FindById("message");
+		if (messageLabel) messageLabel->text = "Restart?";
+		});
 	loseUi.BindOnClick("btn_mainmenu", [](UIElement &self)
-					   {
-						   UNREFERENCED_PARAMETER(self);
-						   ChangeState(GS_MAINMENU); // Apparently game running must be changed too. I thought gsm would handle this lmao.
-					   });
+		{
+		UNREFERENCED_PARAMETER(self);
+		pendingConfirmAction = ConfirmAction::BackToMainMenu;
+		isConfirmPopupOpen = true;
+
+		UIElement* messageLabel = confirmUi.FindById("message");
+		if (messageLabel) messageLabel->text = "Return to menu?";
+		});
 	loseUiInitialized = true;
 	loseUi.SetFont(font);
 
@@ -374,7 +480,27 @@ void TestDraw()
 #endif
 
 	// Pause screen
-	if (gameState == PAUSED)
+
+	if (isConfirmPopupOpen) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.55f }
+		);
+		overlay.RenderSprite(true);
+
+		confirmUi.Draw();
+	}
+
+	else if (gameState == PAUSED)
 	{
 		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
@@ -536,6 +662,8 @@ void TestUnload()
 
 void TestUpdate(float dt)
 {
+
+	levelElapsedSeconds += dt;
 
 	if (gameState == RUNNING)
 	{
@@ -992,25 +1120,170 @@ void TestUpdate(float dt)
 			gameState = RUNNING;
 		}
 
-		pauseUi.Update();
+		if (isConfirmPopupOpen)
+		{
+			if (AEInputCheckTriggered(AEVK_ESCAPE))
+			{
+				pendingConfirmAction = ConfirmAction::None;
+				isConfirmPopupOpen = false;
+			}
+
+			confirmUi.Update();
+		}
+		else
+		{
+			if (AEInputCheckTriggered(AEVK_ESCAPE))
+			{
+				ResumeAllAudio();
+				gameState = RUNNING;
+			}
+
+			pauseUi.Update();
+		}
+		
+
+		//pauseUi.Update();
 	}
 	else if (gameState == WIN)
 	{
-		if (!WinAudioPlaying) {
+		if (!WinAudioPlaying)
+		{
 			StopAllAudio();
 			GameWinAudio();
 			WinAudioPlaying = true;
 		}
-		winUi.Update();
+
+		if (pendingWinStatusRefresh)
+		{
+			RoomData& carryData = gameMap.GetTransferData();
+
+			winStatus["friends_made"] = static_cast<int>(carryData.enemyList.size());
+			winStatus["k_missed"] = 0;
+			winStatus["enemies_killed"] = 0;
+
+			int mapGridSize = gameMap.GetGridSize();
+
+			for (int row = 0; row < mapGridSize; ++row)
+			{
+				for (int column = 0; column < mapGridSize; ++column)
+				{
+					mapRooms::Room* room = gameMap.GetRoom(column, row);
+					if (!room) continue;
+
+					for (Enemy* enemy : room->currentRoomData.enemyList)
+					{
+						if (!enemy) continue;
+
+						if (enemy->isActive) ++winStatus["k_missed"];
+						else ++winStatus["enemies_killed"];
+					}
+				}
+			}
+			
+
+			UIElement* friendsMadeLabel = winUi.FindById("label_friends_made");
+			if (friendsMadeLabel)
+			{
+				//sprintf_s(buffer, sizeof(buffer), "Friends made: %d", winStatus["friends_made"]);
+				std::stringstream buf;
+				buf << "Friends made: " << winStatus["friends_made"];
+				friendsMadeLabel->text = buf.str();
+			}
+
+			UIElement* missedLabel = winUi.FindById("label_k_missed");
+			if (missedLabel)
+			{
+				std::stringstream buf;
+				buf << "Friends missed: " << winStatus["k_missed"];
+				//sprintf_s(buffer, sizeof(buffer), "k missed: %d", );
+				missedLabel->text = buf.str();
+			}
+
+			UIElement* enemiesKilledLabel = winUi.FindById("label_enemies_killed");
+			if (enemiesKilledLabel)
+			{
+				std::stringstream buf;
+				buf << "Enemies Killed: " << winStatus["enemies_killed"];
+				//sprintf_s(buffer, sizeof(buffer), "Enemies Killed: %d", winStatus["enemies_killed"]);
+				enemiesKilledLabel->text = buf.str();
+			}
+
+			int totalSeconds = static_cast<int>(levelElapsedSeconds + 0.5f);
+			int minutes = totalSeconds / 60;
+			int seconds = totalSeconds % 60;
+
+			UIElement* timeTakenLabel = winUi.FindById("label_time_taken");
+			if (timeTakenLabel)
+			{
+				char buffer[128]{};
+				sprintf_s(buffer, sizeof(buffer), "YOU TOOK %02d:%02d!!!", minutes, seconds);
+				timeTakenLabel->text = buffer;
+			}
+
+			pendingWinStatusRefresh = false;
+		}
+
+		
+		// Check if popup open else do win ui
+		if (isConfirmPopupOpen)
+		{
+			if (AEInputCheckTriggered(AEVK_ESCAPE))
+			{
+				pendingConfirmAction = ConfirmAction::None;
+				isConfirmPopupOpen = false;
+			}
+
+			confirmUi.Update();
+		}
+		else
+		{
+			if (AEInputCheckTriggered(AEVK_ESCAPE))
+			{
+				ResumeAllAudio();
+				gameState = RUNNING;
+			}
+
+			winUi.Update();
+		}
+
 	}
 	else if (gameState == LOSE)
 	{
-		if (!loseAudioPlaying) {		
-			StopAllAudio();
-			GameLoseAudio();
-			loseAudioPlaying = true;
+		//if (!loseAudioPlaying) {		
+		//	StopAllAudio();
+		//	GameLoseAudio();
+		//	loseAudioPlaying = true;
+		//}
+		//loseUi.Update();
+
+
+		// Check if popup open else do win ui
+		if (isConfirmPopupOpen)
+		{
+			if (AEInputCheckTriggered(AEVK_ESCAPE))
+			{
+				pendingConfirmAction = ConfirmAction::None;
+				isConfirmPopupOpen = false;
+			}
+
+			confirmUi.Update();
 		}
-		loseUi.Update();
+		else
+		{
+			//if (AEInputCheckTriggered(AEVK_ESCAPE))
+			//{
+			//	ResumeAllAudio();
+			//	gameState = RUNNING;
+			//}
+
+			if (!loseAudioPlaying) {
+				StopAllAudio();
+				GameLoseAudio();
+				loseAudioPlaying = true;
+			}
+			loseUi.Update();
+		}
+
 	}
 
 	if (debugMode)
