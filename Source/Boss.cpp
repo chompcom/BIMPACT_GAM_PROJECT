@@ -46,6 +46,14 @@ void Boss::Update(Player& player, f32 dt) {
 		gameState = WIN;
 	}
 	healthbar.Update();
+
+	if (healthbarInitialized) {
+		UIElement* healthUI = healthbar.FindById("foreground");
+		if (healthUI) {
+			healthUI->sizeRatio.x = (currentHealth / health); //* 1000.f;
+			healthUI->localPos.x = -0.5f + (currentHealth / health) * 0.5f;
+		}
+	}
 }
 
 void Boss::CollideProjectile() {
@@ -95,13 +103,7 @@ void Boss::DamageBoss(s32 dmg) {
 	currentHealth -= dmg;
 	if (currentHealth < 0) currentHealth = 0;
 	
-	if (healthbarInitialized) {
-		UIElement* healthUI = healthbar.FindById("foreground");
-		if (healthUI) {
-			healthUI->sizeRatio.x = (currentHealth / health); //* 1000.f;
-			healthUI->localPos.x = -0.5f + (currentHealth / health) * 0.5f;
-		}
-	}
+	
 	//hpBar.scale.x = (currentHealth / health) * 1000.f;
 	//hpBar.position.x = -500.f + (currentHealth / health) * 500.f;
 }

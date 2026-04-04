@@ -278,7 +278,7 @@ void TargetEnemyInDetectionRadius(Enemy& me){
 //Dumb version that includes neutral mobs
 void TargetEnemyInDetectionRadiusDumb(Enemy& me) {
 	for (Enemy* guy : me.roomData->enemyList) {
-		if (!guy->isActive) continue;
+		if (!guy->isActive || (guy == &me)) continue;
 		if (AreCirclesIntersecting(me.prevPos, me.type.detectionRadius,
 			guy->prevPos, guy->sprite.scale.x)) {
 

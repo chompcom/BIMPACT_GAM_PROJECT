@@ -22,8 +22,25 @@
         },
 
         {
+          "id": "btn_mainmenu",
+          "x": -0.38,
+          "y": 0.44,
+          "w": 0.14,
+          "h": 0.06,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.18,
+          "roundSegments": 8,
+          "text": "Back to Main Menu",
+          "textScale": 0.50,
+          "backgroundColor": [0.86, 0.86, 0.86, 1.0],
+          "textColor": [0.0, 0.0, 0.0, 1.0]
+        },
+
+        {
           "id": "btn_biomes",
-          "x": -0.33,
+          "x": -0.18,
           "y": 0.44,
           "w": 0.14,
           "h": 0.06,
@@ -39,7 +56,7 @@
 
         {
           "id": "btn_obstacles",
-          "x": -0.10,
+          "x": 0.00,
           "y": 0.44,
           "w": 0.18,
           "h": 0.06,
@@ -106,7 +123,7 @@
               "w": 0.42,
               "h": 0.06,
               "visible": true,
-              "text": "Select Biomes:",
+              "text": "Biome Selected:",
               "textScale": 0.62,
               "textColor": [1.0, 1.0, 1.0, 1.0]
             },
@@ -259,7 +276,7 @@
               "w": 0.55,
               "h": 0.05,
               "visible": true,
-              "text": "Ready",
+              "text": "Ready to export",
               "textScale": 0.40,
               "textColor": [1.0, 1.0, 1.0, 1.0]
             }

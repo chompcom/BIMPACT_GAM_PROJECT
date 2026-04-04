@@ -58,6 +58,8 @@ void BGM3Audio();
 void BossBGMAudio();
 void FightMusicAudio();
 void ResetBGM();
+void pauseBGM();
+void ResumeBGM();
 
 // Menu
 void InitMenuAudio();

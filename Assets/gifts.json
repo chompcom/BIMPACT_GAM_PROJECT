@@ -2,7 +2,7 @@
 	"giftTypes": [
 		{
 			"name": "Trash",
-			"traits": [ "Gross" ],
+			"traits": [ "Gross", "Dirty" ],
 			"spritePath": "Assets/Gifts/trash.png"
 		},
 		{

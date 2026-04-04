@@ -6,6 +6,17 @@ namespace
 {
 	UIManager contentEditorUi;
 	UIManager loadPopupUi;
+	UIManager confirmUi;
+	static bool isConfirmPopupOpen = false;
+
+	enum class ConfirmAction
+	{
+		None,
+		RestartLevel,
+		BackToMainMenu
+	};
+
+	static ConfirmAction pendingConfirmAction = ConfirmAction::None;
 
 	s8 contentEditorFont = 0;
 	ContentEditorState contentEditorState{};
@@ -277,7 +288,7 @@ namespace
 		{
 			if (contentEditorState.currentTab == ContentEditorTab::Biomes)
 			{
-				modeLabel->text = "Select Biomes:";
+				modeLabel->text = "Biome Selected:";
 			}
 			else
 			{
@@ -574,13 +585,20 @@ void ContentEditorLoad()
 	contentEditorState.currentObstaclePalettePage = 0;
 	contentEditorState.selectedTileId = 0;
 	contentEditorState.hoveredCellIndex = -1;
-	contentEditorState.statusMessage = "Ready";
+	contentEditorState.statusMessage = "Ready to export";
 
 	RebuildObstaclePaletteForSelectedBiome();
 	UpdateContentEditorUi();
 
 	// Resolve UI once now so the preview panel has valid world bounds before first draw/update
 	contentEditorUi.Update();
+
+	contentEditorUi.BindOnClick("btn_mainmenu", [](UIElement&)
+		{
+			contentEditorState.currentTab = ContentEditorTab::Biomes;
+			UpdateContentEditorUi();
+		});
+
 
 	contentEditorUi.BindOnClick("btn_biomes", [](UIElement&)
 		{
@@ -777,6 +795,49 @@ void ContentEditorLoad()
 
 			UpdateContentEditorUi();
 		});
+
+	contentEditorUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			pendingConfirmAction = ConfirmAction::BackToMainMenu;
+			isConfirmPopupOpen = true;
+
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Return to menu?";
+		});
+
+	// Confirmation screen dialog
+	confirmUi.LoadFromFilePopUp("Assets/UI/confirmation_popup.json", Vector2(0.0f, 0.0f), Vector2(560.0f, 240.0f));
+	confirmUi.SetFont(contentEditorFont);
+
+
+	confirmUi.BindOnClick("btn_yes", [](UIElement&)
+		{
+			// FAST CONFIRMATION ENUMS SETUP hah.
+			switch (pendingConfirmAction)
+			{
+			case ConfirmAction::RestartLevel:
+				ChangeState(GS_RESTART);
+				break;
+
+			case ConfirmAction::BackToMainMenu:
+				ChangeState(GS_MAINMENU);
+				break;
+
+			default:
+				break;
+			}
+
+			pendingConfirmAction = ConfirmAction::None;
+			isConfirmPopupOpen = false;
+		});
+
+	confirmUi.BindOnClick("btn_no", [](UIElement&)
+		{
+			pendingConfirmAction = ConfirmAction::None;
+			isConfirmPopupOpen = false;
+		});
+
 }
 
 void ContentEditorInit()
@@ -826,6 +887,26 @@ void ContentEditorUpdate(float dt)
 		}
 
 		return;
+	}
+
+	if (isConfirmPopupOpen)
+	{
+		if (AEInputCheckTriggered(AEVK_ESCAPE))
+		{
+			pendingConfirmAction = ConfirmAction::None;
+			isConfirmPopupOpen = false;
+		}
+
+		confirmUi.Update();
+	}
+
+	if (AEInputCheckTriggered(AEVK_ESCAPE))
+	{
+		pendingConfirmAction = ConfirmAction::BackToMainMenu;
+		isConfirmPopupOpen = true;
+
+		UIElement* messageLabel = confirmUi.FindById("message");
+		if (messageLabel) messageLabel->text = "Return to menu?";
 	}
 
 	contentEditorUi.Update();
@@ -897,7 +978,7 @@ void ContentEditorUpdate(float dt)
 	}
 
 	// Idek who did this but thanks, escape back instead of explicit 'back' button
-	if (AEInputCheckTriggered(AEVK_ESCAPE)) ChangeState(GS_MAINMENU);
+	//if (AEInputCheckTriggered(AEVK_ESCAPE)) ChangeState(GS_MAINMENU);
 	
 }
 
@@ -1043,6 +1124,26 @@ void ContentEditorDraw()
 
 		loadPopupUi.Draw();
 	}
+
+	if (isConfirmPopupOpen) {
+		AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+		AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+		AEGfxSetTransparency(1.0f);
+
+		Sprite overlay(
+			DataLoader::GetOrCreateSquareMesh(),
+			Vector2(0.0f, 0.0f),
+			Vector2(
+				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
+				AEGfxGetWinMaxY() - AEGfxGetWinMinY()
+			),
+			Color{ 0.0f, 0.0f, 0.0f, 0.55f }
+		);
+		overlay.RenderSprite(true);
+
+		confirmUi.Draw();
+	}
+
 }
 
 void ContentEditorFree()
