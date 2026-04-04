@@ -106,7 +106,7 @@
       },
       {
         "name": "RoundingProjectileSound",
-        "path": "Assets/Audio/Mobs/RoundingProjectile.ogg"
+        "path": "dontwantthissound"
       },
       {
         "name": "CrabAttack",
