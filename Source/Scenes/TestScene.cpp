@@ -916,7 +916,7 @@ void TestUpdate(float dt)
 				//gridHeight = currentRoom->roomGrid.GetTileHeight();
 				constexpr float skin = 0.10f;
 
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f, currentRoom);
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f);
 
 				Vector2 moveDeltaGift = g->position - prevGiftPos;
 				Vector2 moveDirGift	  = moveDeltaGift.Normalized();
@@ -994,7 +994,7 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
+				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()});
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 				g->hitbox.UpdateTransform();
@@ -1024,7 +1024,7 @@ void TestUpdate(float dt)
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
-			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9, roomData.boss->sprite.scale.y * 0.9, bossCurCell);
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9f, roomData.boss->sprite.scale.y * 0.9f, bossCurCell);
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
 				roomData.boss->shadow.position.x = bossPrevPos.x;
