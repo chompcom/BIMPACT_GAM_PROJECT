@@ -41,12 +41,19 @@ namespace
 	UIManager confirmUi;
 	s8 uiFont = 0;
 	bool isQuitConfirmOpen = false;
-
-
-
-
 }
 
+/*!
+\brief
+	Load all assets and UI layouts for the Main Menu scene.
+
+\par
+	Methodology:
+		1. Initialize menu audio and create the font used by UI elements.
+		2. Load the main menu UI from JSON and bind button callbacks.
+		3. Load the quit-confirmation popup UI and configure its buttons.
+		4. Set up hover effects for interactive buttons.
+*/
 void MainMenuLoad()
 {
 	InitMenuAudio();
@@ -159,10 +166,31 @@ void MainMenuLoad()
 
 }
 
+/*!
+\brief
+	Initialize the Main Menu scene after loading.
+
+\par
+	Methodology:
+		1. Start background music for the menu.
+		2. Perform any additional runtime initialization if needed.
+*/
 void MainMenuInit(){
 	MenuBGMAudio();
 }
 
+/*!
+\brief
+	Update the Main Menu scene each frame.
+
+\par
+	Methodology:
+		1. If the quit-confirmation popup is open:
+			* Allow ESC to close it.
+			* Update only the popup UI.
+			* Skip updating the main UI.
+		2. Otherwise, update the main menu UI normally.
+*/
 void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 {
 	UNREFERENCED_PARAMETER(dt);
@@ -190,6 +218,17 @@ void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 	ui.Update();
 }
 
+/*!
+\brief
+	Render the Main Menu scene.
+
+\par
+	Methodology:
+		1. Draw the main menu UI.
+		2. If the quit-confirmation popup is open:
+			* Render a semi-transparent dark overlay.
+			* Draw the popup UI on top.
+*/
 void MainMenuDraw()
 {
 	ui.Draw();
@@ -215,8 +254,20 @@ void MainMenuDraw()
 	}
 }
 
+// Nothing to see here
 void MainMenuFree(){}
 
+/*!
+\brief
+	Unload all assets used by the Main Menu scene.
+
+\par
+	Methodology:
+		1. Stop and free menu audio.
+		2. Clear both UI managers.
+		3. Destroy the font used by the menu.
+		4. Unload textures and meshes through DataLoader.
+*/
 void MainMenuUnload()
 {
 	FreeMenuAudio();

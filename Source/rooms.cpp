@@ -1,3 +1,21 @@
+/* Start Header ************************************************************************/
+/*!
+\file        rooms.cpp
+\author		 Quah Ming Jun, m.quah
+\par         m.quah@digipen.edu
+\brief       This source file implements the Room and Map systems used for the
+			 procedural dungeon layout. It includes room initialization, biome
+			 selection, CSV layout loading, enemy and gift spawning, boss setup,
+			 door patching, and various helper utilities for Windows file scanning.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+
 #include "rooms.h"
 #include <random>
 #include <cstdlib>
@@ -21,7 +39,20 @@ namespace Config {
 	// We are making an n x n grid with 1 and 0s
 	static const int minGrid = 3, maxGrid = 4;
 
-	// Legacy File System Scanning (Perhaps rework in a utils class?)
+
+	/*!
+	\brief
+		Scan a Windows directory for PNG files and return a sorted list. (Legacy File System Scanning)
+
+	\param[in] folder
+		Directory path.
+
+	\param[out] outList
+		Vector receiving full file paths.
+
+	\details
+		Uses Win32 FindFirstFileA and FindNextFileA to enumerate files.
+	*/
 	void ScanPngFolderWin32(std::string const& folder, std::vector<std::string>& outList)
 	{
 		outList.clear();	// Clear Lists
@@ -58,6 +89,19 @@ namespace Config {
 	}
 
 
+	/*!
+	\brief
+		Scan a Windows directory for CSV files matching a pattern.
+
+	\param[in] folder
+		Directory path.
+
+	\param[in] patternAppend
+		Pattern suffix such as "*.csv".
+
+	\param[out] outList
+		Vector receiving full file paths.
+	*/
 	void ScanCsvFolderWin32(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
 	{
 		outList.clear();	// Clear Lists
@@ -94,6 +138,16 @@ namespace Config {
 	}
 
 
+	/*!
+	\brief
+		Choose a random CSV layout file for a given biome.
+
+	\param[in] biome
+		Biome name prefix.
+
+	\return
+		Full path to a randomly selected CSV file.
+	*/
 	std::string ChooseRandomRoomCsv(std::string const& biome) {
 		// Load csv files
 		std::vector<std::string> files;
@@ -106,7 +160,19 @@ namespace Config {
 	}
 
 
-	// Extracting filename from fullpath
+	/*!
+	\brief
+		Extracting filename from fullpath.
+
+	\param[in] fullPath
+		Full file path.
+
+	\param[in] type
+		Room type.
+
+	\return
+		Theme tag string.
+	*/
 	std::string ExtractThemeTag(std::string const& fullPath, mapRooms::RoomType type)
 	{
 		if (type == mapRooms::RoomType::Boss) return "Boss";
@@ -125,10 +191,18 @@ namespace Config {
 }
 
 // Is this still needed lmao
-EnemyType somethingelse{ "rock",100,10,{"sad"},{"happy"},{"sad"} };
+//EnemyType somethingelse{ "rock",100,10,{"sad"},{"happy"},{"sad"} };
 
 namespace mapRooms
 {
+
+	/*!
+	\brief
+		Construct a room with default values and no neighbors.
+
+	\param[in] roomType
+		Initial room type.
+	*/
 	Room::Room(RoomType roomType) :
 		left{ nullptr }, right{ nullptr }, up{ nullptr }, down{ nullptr },
 		rmType{ roomType },
@@ -138,6 +212,12 @@ namespace mapRooms
 		currentRoomData{}
 	{
 	}
+
+	/*!
+	\brief
+		Destructor cleans up all dynamically allocated gameplay objects
+		stored in RoomData.
+	*/
 	Room::~Room() {
 
 		for (Enemy* i : currentRoomData.enemyList) {
@@ -163,7 +243,14 @@ namespace mapRooms
 		}
 	}
 
+	/*!
+	\brief
+		Initialize room based on its type. Loads CSV layout, assigns biome,
+		spawns enemies and gifts, and configures boss rooms.
 
+	\param[in] roomType
+		Optional override for room type.
+	*/
 	void Room::Init(RoomType roomType) {
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
@@ -173,7 +260,6 @@ namespace mapRooms
 		if (this->rmType == RoomType::Start) {
 			biome = "Start";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
-			//this->layoutFile = "Assets\"
 			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
@@ -205,7 +291,7 @@ namespace mapRooms
 
 			if (!biomeNames.empty()) {
 				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
-				//biome = biomeNames[randomBiomeIndex];
+
 				biome = biomeNames[randomBiomeIndex] == "Start" ? "Normal" : biomeNames[randomBiomeIndex];
 			}
 			else {
@@ -252,7 +338,6 @@ namespace mapRooms
 
 					Enemy* enemy = new Enemy(
 						enemyType,
-						//DataLoader::CreateTexture(enemyType.spritePath),
 						DataLoader::CreateAnimatedTexture(enemyType.spritePath),
 						DataLoader::CreateTexture("Assets/shadow.png"),
 						DataLoader::CreateTexture("Assets/hitbox.png")
@@ -356,14 +441,9 @@ namespace mapRooms
 		}
 
 
-
-
-
-
-
-	// Boss Init
+		// Boss Init
 		if (rmType == RoomType::Boss) {
-
+									
 			Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
 
 			Json::Value fsm = DataLoader::LoadJsonFile("Assets/bossFSM.json")[bossSource["FSM"].asString()];
@@ -387,8 +467,8 @@ namespace mapRooms
 			fsm["follow"]["interval"].asFloat(),
 			fsm["follow"]["endLag"].asFloat()
 		} };
-			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
-				currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
+						currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
+				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
 			currentRoomData.boss->sprite.scale = Vector2{ 1,1 } *bossSource["scale"].asFloat();
 
@@ -410,7 +490,6 @@ namespace mapRooms
 					});
 			}
 
-
 			currentRoomData.boss->sprite.GetAnimation("Idle");
 
 
@@ -425,11 +504,21 @@ namespace mapRooms
 		currentRoomData.grid = roomGrid;
 
 	}
+
+	// Update room logic.
 	void Room::Update(float dt) {
 		UNREFERENCED_PARAMETER(dt);
 	}
 
 
+	/*!
+	\brief
+		Patch door tiles in the grid based on which neighbors exist.
+
+	\details
+		Places a 2x2 door tile region centered on each wall that has a
+		connected neighbor.
+	*/
 	void Room::PatchDoorCells()
 	{
 		const int DOOR_TILE = 100;
@@ -489,7 +578,11 @@ namespace mapRooms
 	}
 
 
-
+	/*!***************************************************************************
+	\brief
+		Construct an empty Map object. Initializes grid size, RNG state, and
+		internal pointers. Rooms will be allocated later in InitMap().
+	***************************************************************************/
 	Map::Map() :
 		gridSize{ 0 },
 		rooms{},
@@ -499,11 +592,26 @@ namespace mapRooms
 	{
 	}
 
+	/*!***************************************************************************
+	\brief
+		Destructor for Map. Calls DeleteMap() to release textures and reset
+		all room data.
+	***************************************************************************/
 	Map::~Map() {
 		DeleteMap();
 	}
 
-	// Maybe make it dynamic
+	/*!***************************************************************************
+	\brief
+		Load lists of available room background art for each biome. Uses
+		TilesInfo.json to determine biome directories, then scans each folder
+		for PNG files.
+
+	\details
+		Populates:
+		* biomeRoomFiles (map of biome -> list of PNG paths)
+		* bossRoomFiles (list of boss room backgrounds)
+	***************************************************************************/
 	void Map::LoadRoomArtLists()
 	{
 		// Normal Room Files
@@ -511,7 +619,6 @@ namespace mapRooms
 		normalRoomFiles.clear();
 		bossRoomFiles.clear();
 
-		//Config::ScanPngFolderWin32(normalDir, normalRoomFiles);
 		std::string const normalDir = "Assets/Rooms/Normal/NORMAL";
 		std::string const greenDir = "Assets/Rooms/Normal/GREEN";
 		std::string const iceDir = "Assets/Rooms/Normal/ICE";
@@ -521,6 +628,9 @@ namespace mapRooms
 		std::string filePath = "Assets/Levels/Room_Data/TilesInfo.json";
 		Json::Value tilesInfo = DataLoader::LoadJsonFile(filePath);
 
+
+
+
 		Json::Value::Members biomeNames = tilesInfo["biomes"].getMemberNames();
 		for (Json::String name : biomeNames) {
 			std::string imagePath = tilesInfo["biomes"][name]["imageDir"].asString();
@@ -528,8 +638,19 @@ namespace mapRooms
 		}
 
 		Config::ScanPngFolderWin32(bossDir, bossRoomFiles);
-	}
 
+		}
+
+	/*!***************************************************************************
+	\brief
+		Retrieve a texture from cache or load it if not already present.
+
+	\param[in] path
+		File path to texture.
+
+	\return
+		Pointer to loaded AEGfxTexture, or nullptr if loading failed.
+	***************************************************************************/
 	AEGfxTexture* Map::GetOrLoadTexture(std::string const& path)
 	{
 		// If already loaded, reuse it
@@ -542,10 +663,17 @@ namespace mapRooms
 		return tex;
 	}
 
-	// Asset Code was here
+	/*!***************************************************************************
+	\brief
+		Assign background textures to all rooms based on their biome and type.
+
+	\details
+		* Boss rooms use bossRoomFiles.
+		* Normal and Start rooms use biomeRoomFiles[biome].
+		* Stores chosen path in roomTexturePath and loads texture.
+	***************************************************************************/
 	void Map::AssignRoomArt() {
-		//bool haveNormal = !normalRoomFiles.empty();
-		bool haveNormal = !biomeRoomFiles.empty();
+				bool haveNormal = !biomeRoomFiles.empty();
 		bool haveBoss = !bossRoomFiles.empty();
 
 		for (int y = 0; y < gridSize; ++y)
@@ -589,13 +717,21 @@ namespace mapRooms
 		}
 	}
 
+	/*!***************************************************************************
+	\brief
+		Initialize the entire map. Generates rooms, loads textures, assigns
+		art, and sets the starting room.
 
-	//InitMap(): Allocate / Reset Maps (Rooms)
+	\param[in,out] globalSceneData
+		Reference to global RoomData used for player transfer.
+
+	\param[in] seed
+		Seed for procedural generation.
+	***************************************************************************/
 	void Map::InitMap(RoomData& globalSceneData, unsigned int seed) {
 		rngState = seed;
 		srand(rngState);
 		gridSize = RandInt(Config::minGrid, Config::maxGrid);
-
 
 		rooms.clear();
 		rooms.resize(gridSize * gridSize);	// Grid generated, calls upon default constructor (no init rooms yet)
@@ -604,7 +740,6 @@ namespace mapRooms
 
 		ResetRooms();							// Ensure rooms are nothing;
 		GenerateRooms();						// Generate, links and init rooms.
-		// Probably generate other room types???
 
 		// Load available Pngs
 		LoadRoomArtLists();
@@ -629,28 +764,55 @@ namespace mapRooms
 
 	}
 
+	/*!***************************************************************************
+	\brief
+		Check if coordinates (x, y) are within the map grid.
+
+	\return
+		True if inside bounds.
+	***************************************************************************/
 	bool Map::InBounds(int x, int y) const
 	{
 		return (x >= 0 && x < gridSize && y >= 0 && y < gridSize);
 	}
 
+	/*!***************************************************************************
+	\brief
+		Reset all rooms to Empty type.
+	***************************************************************************/
 	void Map::ResetRooms() {
 		for (int i = 0; i < gridSize * gridSize; ++i) {
 			rooms[i] = Room(RoomType::Empty);
 		}
 	}
 
+	/*!***************************************************************************
+	\brief
+		Convert (x, y) coordinates to a linear index.
+
+	\return
+		Index into rooms vector.
+	***************************************************************************/
 	int Map::GetRoomIdx(int x, int y) const
 	{
 		return ((y * gridSize) + x);
 	}
 
+	/*!***************************************************************************
+	\brief
+		Generate a random integer in [low, high].
+
+	\return
+		Random integer.
+	***************************************************************************/
 	unsigned int Map::RandInt(int low, int high) {
 		return (static_cast<unsigned int>(low + (std::rand() % (high - low + 1))));
 	}
 
-
-	// DeleteMap()?
+	/*!***************************************************************************
+	\brief
+		Delete all rooms, unload textures, and reset map state.
+	***************************************************************************/
 	void Map::DeleteMap()
 	{
 		rooms.clear();			// Clear room information
@@ -671,6 +833,19 @@ namespace mapRooms
 		// Perhaps before unload, we serialize this and save it in some save file before loading in a new level. It will be only erased if user fails the level.
 	}
 
+	/*!***************************************************************************
+	\brief
+		Link two rooms bidirectionally based on direction.
+
+	\param[in] a
+		First room.
+
+	\param[in] b
+		Second room.
+
+	\param[in] dirFromAToB
+		Direction from room a to room b.
+	***************************************************************************/
 	void Map::LinkRooms(Room* a, Room* b, Direction dirFromAToB)
 	{
 		if (dirFromAToB == Direction::Right) { a->right = b; b->left = a; }
@@ -679,8 +854,20 @@ namespace mapRooms
 		if (dirFromAToB == Direction::Down) { a->down = b; b->up = a; }
 	}
 
-	// Simple generation using random pathing. Alternative would be randomized DFS. Computationally intensive however.
-	// https://en.wikipedia.org/wiki/File:Depth-First_Search_Animation.ogv explains how DFS works
+	/*!***************************************************************************
+	\brief
+		Simple generation using random pathing. Alternative would be randomized DFS. Computationally intensive however. https://en.wikipedia.org/wiki/File:Depth-First_Search_Animation.ogv explains how DFS works.
+		Assigns Start and Boss rooms, links neighbors, and initializes all visited rooms.
+
+	\par
+		Methodology:
+		* Choose random grid size.
+		* Pick random start room.
+		* Perform DFS to create a connected path.
+		* Identify dead ends to place boss room.
+		* Link all adjacent rooms.
+		* Initialize each visited room.
+	***************************************************************************/
 	void Map::GenerateRooms() {
 
 		int MinRooms = min(4, gridSize * gridSize - 1);
@@ -801,12 +988,8 @@ namespace mapRooms
 
 			// Mark next room for exist
 			if (nextRoom != nullptr) {
-				//nextRoom->Init(); // move this after everything? if room != empty
 				nextRoom->rmType = RoomType::Normal;
 			}
-
-
-
 		}
 
 
@@ -888,12 +1071,25 @@ namespace mapRooms
 
 	}
 
+	/*!***************************************************************************
+	\brief
+		Get the grid size of the map.
+
+	\return
+		Integer grid size.
+	***************************************************************************/
 	int Map::GetGridSize() const {
 		return gridSize;
 	}
 
 
+	/*!***************************************************************************
+	\brief
+		Render the background, doors, obstacles, and enemies of the current room.
 
+	\param[in] squaremesh
+		Mesh used for rendering quads.
+	***************************************************************************/
 	void Map::RenderCurrentRoom(AEGfxVertexList* squaremesh) const {
 		if (!currentRoom || !squaremesh || !currentRoom->roomTexture) return;	// possibly skip empty textures?
 
@@ -960,7 +1156,13 @@ namespace mapRooms
 
 	}
 
-	// Render map
+	/*!***************************************************************************
+	\brief
+		Render a simple minimap showing visited rooms, current room, and room types.
+
+	\param[in] squareMesh
+		Mesh used for rendering tiles.
+	***************************************************************************/
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
 	{
 		if (!squareMesh) return;
@@ -1005,6 +1207,16 @@ namespace mapRooms
 		}
 	}
 
+	/*!***************************************************************************
+	\brief
+		Render door textures for the current room based on which neighbors exist.
+
+	\param[in] squareMesh
+		Mesh used for rendering.
+
+	\param[in] doorTexture
+		Texture for door graphics.
+	***************************************************************************/
 	void Map::RenderRoomDoors(AEGfxVertexList* squareMesh, AEGfxTexture* doorTexture) const
 	{
 		if (!squareMesh || !doorTexture || !currentRoom) return;
@@ -1024,9 +1236,6 @@ namespace mapRooms
 		const float winMaxY = AEGfxGetWinMaxY();
 
 		// Size of doors
-
-
-
 		const float doorW = 145.0f;
 		const float doorH = 169.0f;
 		const float edgeOffset = 63.0f;	// Offset from screen 
@@ -1105,20 +1314,49 @@ namespace mapRooms
 		}
 	}
 
+	/*!***************************************************************************
+	\brief
+		Retrieve a room at coordinates (x, y).
+
+	\return
+		Pointer to Room.
+	***************************************************************************/
 	Room* Map::GetRoom(int x, int y) {
 		size_t idx = static_cast<size_t>(GetRoomIdx(x, y));
 		return &(Map::rooms[idx]);
 	}
 
+	/*!***************************************************************************
+	\brief
+		Retrieve a const room pointer at coordinates (x, y).
+	***************************************************************************/
 	const Room* Map::GetRoom(int x, int y) const {
 		size_t idx = static_cast<size_t>(GetRoomIdx(x, y));
 		return &(Map::rooms[idx]);
 	}
 
+	/*!***************************************************************************
+	\brief
+		Get the currently active room.
+
+	\return
+		Pointer to current room.
+	***************************************************************************/
 	Room* Map::GetCurrentRoom() {
 		return currentRoom;
 	}
 
+	/*!***************************************************************************
+	\brief
+		Attempt to move to an adjacent room. Handles boss reset, audio,
+		and transfer of RoomData.
+
+	\param[in] direction
+		Direction to move.
+
+	\return
+		True if movement succeeded.
+	***************************************************************************/
 	bool Map::MoveTo(Direction direction) {
 
 		if (!currentRoom) return false;	// should not happen just a function safeguard...
@@ -1144,11 +1382,27 @@ namespace mapRooms
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 
-
+				
 		return true;
 	}
 
-	// Update Loop
+	/*!***************************************************************************
+	\brief
+		Update the map each frame. Handles door collision triggers and
+		transitions between rooms.
+
+	\param[in,out] playerPos
+		Player world position.
+
+	\param[in] playerHalfSize
+		Half-size of player bounding box.
+
+	\param[in,out] particleSystem
+		Particle system to clear on room transition.
+
+	\param[in] dt
+		Delta time.
+	***************************************************************************/
 	void Map::UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt)
 	{
 		if (!currentRoom) return;
@@ -1233,6 +1487,13 @@ namespace mapRooms
 		}
 	}
 
+	/*!***************************************************************************
+	\brief
+		Retrieve transfer data used for room transitions.
+
+	\return
+		Reference to RoomData.
+	***************************************************************************/
 	RoomData& Map::GetTransferData()
 	{
 		return *transferData;

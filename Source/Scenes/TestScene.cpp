@@ -439,8 +439,10 @@ void TestDraw()
 
 	RenderPlayerLives(player, healthIcons, font);
 
+	// Debug mode active
 	if (debugMode)
 	{
+		// Render object hitboxes
 		if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 		{
 			RoomData& roomData = room->currentRoomData;
@@ -489,6 +491,7 @@ void TestDraw()
 
 		player.hitbox.RenderSprite();
 
+		// Display debug info
 		char buffer[50];
 
 		sprintf_s(buffer, 50, "DEBUG MODE ON");
@@ -823,7 +826,7 @@ void TestUpdate(float dt)
 				prevCell = currentRoom->roomGrid.WorldToCell(prevGiftPos.x, prevGiftPos.y);
 				constexpr float skin = 0.10f;
 
-				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f, currentRoom);
+				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f);
 
 				Vector2 moveDeltaGift = g->position - prevGiftPos;
 				Vector2 moveDirGift	  = moveDeltaGift.Normalized();
@@ -900,7 +903,8 @@ void TestUpdate(float dt)
 		{
 			if (g)
 			{
-				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()}, currentRoom);
+				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
+				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()});
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 				g->hitbox.UpdateTransform();

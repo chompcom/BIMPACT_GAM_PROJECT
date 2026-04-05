@@ -18,15 +18,18 @@ Technology is prohibited.
 
 #include <iostream>
 
+// Constructor for sprite
 Sprite::Sprite(AEGfxVertexList* spriteMesh, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor) 
 	: mesh{ spriteMesh }, transform{ 0 }, position {spritePosition}, scale{ spriteScale }, color{ spriteColor } {
 		UpdateTransform();
 }
 
+// Default constructor for sprite
 Sprite::Sprite() : Sprite{nullptr,Vector2(),Vector2(1,1),Color{1.0,1.0,1.0,0.0}}
 {
 }
 
+// Update transformation matrix of sprite
 void Sprite::UpdateTransform() {
 		// Create a scale matrix that scales by 500 x and y
 		AEMtx33 transformScale = { 0 };
@@ -51,48 +54,44 @@ void Sprite::UpdateTransform() {
 		AEMtx33Concat(&transform, &transformTranslate, &transform);
 }
 
-//void Sprite::RenderSprite() {
-//		AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
-//		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
-//		AEGfxSetTransform(transform.m);
-//		AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
-//}
-
-//changed this slightly so that the sprite alpha can be changed if needed
+// Handles rendering of sprite
 void Sprite::RenderSprite(bool changeAlpha) {
+	// Set sprite color
 	AEGfxSetColorToMultiply(color.r, color.g, color.b, color.a);
-	
-	if (!changeAlpha)
-	{
-		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
-	}
-	else 
-	{
-		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
-	}
+
+	if (!changeAlpha) AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
+	else AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
+
+	// Render sprite
 	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
 
+// Constructor for textured sprite
 TexturedSprite::TexturedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor)
 	: Sprite(spriteMesh, spritePosition, spriteScale, spriteColor), texture{ spriteTexture } {
 }
 
-void TexturedSprite::RenderSprite(bool changeAlpha, f32 uv_offsetX, f32 uv_offsetY) {
-		AEGfxTextureSet(texture, uv_offsetX, uv_offsetY);
+// Handles rendering of textured sprite
+void TexturedSprite::RenderSprite(bool changeAlpha, f32 UVOffsetX, f32 UVOffsetY) {
+		// Set sprite texture
+		AEGfxTextureSet(texture, UVOffsetX, UVOffsetY);
 		Sprite::RenderSprite(changeAlpha);
 }
 
-AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows, u32 spritesheetCols, f32 initial_offsetX, f32 initial_offsetY)
-	: TexturedSprite{texturedSprite}, spritesheet_rows{spritesheetRows}, spritesheet_cols{spritesheetCols}, sprite_uv_width{1.f/spritesheetCols}, sprite_uv_height{1.f/spritesheetRows},
-	current_sprite_uv_offset_x{initial_offsetX}, initial_offsetX{initial_offsetX}, current_sprite_uv_offset_y{initial_offsetY}, initial_offsetY{initial_offsetY} {
+// Constructor for animated sprite
+AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows, u32 spritesheetCols, f32 initialOffsetX, f32 initialOffsetY)
+	: TexturedSprite{texturedSprite}, spritesheetRows{spritesheetRows}, spritesheetCols{spritesheetCols}, spriteUVWidth{1.f/spritesheetCols}, spriteUVHeight{1.f/spritesheetRows},
+	currentSpriteUVOffsetX{initialOffsetX}, initialOffsetX{initialOffsetX}, currentSpriteUVOffsetY{initialOffsetY}, initialOffsetY{initialOffsetY} {
 
 }
 
+// Add animation to animated sprite
 void AnimatedSprite::SetAnimation(AnimationInfo animationInfo) {
 	animations.push_back(animationInfo);
 }
 
+// Set current animation of animated sprite
 void AnimatedSprite::GetAnimation(std::string animationName) {
 	for (s32 i{}; i < animations.size(); ++i) {
 		if (animations[i].name == animationName) {
@@ -102,22 +101,28 @@ void AnimatedSprite::GetAnimation(std::string animationName) {
 	}
 }
 
+// Update which frame animation is on
 void AnimatedSprite::UpdateAnimation(f32 dt) {
-	animation_timer += dt;
-	if (animation_timer >= currentAnimation.frame_duration) {
-		animation_timer = 0;
+	animationTimer += dt;
+	// Duration for current frame has passed, move to next frame in animation
+	if (animationTimer >= currentAnimation.frameDuration) {
+		animationTimer = 0;
 
-		current_sprite_index = ++current_sprite_index % currentAnimation.no_frames;
+		// Get index of next frame
+		currentSpriteIndex = ++currentSpriteIndex % currentAnimation.noFrames;
 
-		u32 current_sprite_row = currentAnimation.start_row;
-		u32 current_sprite_col = currentAnimation.start_col + current_sprite_index;
+		// Get position of next frame
+		u32 currentSpriteRow = currentAnimation.startRow;
+		u32 currentSpriteCol = currentAnimation.startCol + currentSpriteIndex;
 
-		current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
-		current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
+		// Move offsets to next frame
+		currentSpriteUVOffsetX = spriteUVWidth * currentSpriteCol + initialOffsetX;
+		currentSpriteUVOffsetY = spriteUVHeight * currentSpriteRow + initialOffsetY;
 	}
 }
 
-AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {
+// Create square mesh
+AEGfxVertexList* CreateSquareMesh(f32 spriteUVWidth, f32 spriteUVHeight) {
 		// Informing the library that we're about to start adding triangles
 		AEGfxMeshStart();
 
@@ -125,13 +130,13 @@ AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {
 		// Color parameters represent colours as ARGB
 		// UV coordinates to read from loaded textures
 		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, sprite_uv_height,  // bottom-left: red
-			0.5f, -0.5f, 0xFFFFFFFF, sprite_uv_width, sprite_uv_height,   // bottom-right: green
+			-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, spriteUVHeight,  // bottom-left: red
+			0.5f, -0.5f, 0xFFFFFFFF, spriteUVWidth, spriteUVHeight,   // bottom-right: green
 			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: blue
 
 		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, sprite_uv_width, sprite_uv_height,   // bottom-right: green
-			0.5f, 0.5f, 0xFFFFFFFF, sprite_uv_width, 0.0f,    // top-right: white
+			0.5f, -0.5f, 0xFFFFFFFF, spriteUVWidth, spriteUVHeight,   // bottom-right: green
+			0.5f, 0.5f, 0xFFFFFFFF, spriteUVWidth, 0.0f,    // top-right: white
 			-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);  // top-left: blue
 
 		// Saving the mesh (list of triangles) in pMesh
@@ -140,28 +145,28 @@ AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {
 		return mesh;
 }
 
-
+// Create circle mesh
 AEGfxVertexList* CreateCircleMesh() {
 		AEGfxMeshStart();
 
 		for (f32 x{}; x <= 0.5f; x += 0.0025f) {
-			f32 next_x{ x + 0.0025f };
+			f32 nextX{ x + 0.0025f };
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
 				x, sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f + sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
-				next_x, sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f + sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				nextX, sqrtf(0.5f * 0.5f - nextX * nextX), 0xFFFFFFFF, 0.5f + nextX, 0.5f + sqrtf(0.5f * 0.5f - nextX * nextX));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
 				x, -sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f + x, 0.5f - sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
-				next_x, -sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f + next_x, 0.5f - sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				nextX, -sqrtf(0.5f * 0.5f - nextX * nextX), 0xFFFFFFFF, 0.5f + nextX, 0.5f - sqrtf(0.5f * 0.5f - nextX * nextX));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
 				-x, sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f + sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
-				-next_x, sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f + sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				-nextX, sqrtf(0.5f * 0.5f - nextX * nextX), 0xFFFFFFFF, 0.5f - nextX, 0.5f + sqrtf(0.5f * 0.5f - nextX * nextX));   // right end of triangle slice
 			AEGfxTriAdd(
 				0.0f, 0.0f, 0xFFFFFFFF, 0.5f, 0.5f,  // center of circle
 				-x, -sqrtf(0.5f * 0.5f - x * x), 0xFFFFFFFF, 0.5f - x, 0.5f - sqrtf(0.5f * 0.5f - x * x),   // left end of triangle slice
-				-next_x, -sqrtf(0.5f * 0.5f - next_x * next_x), 0xFFFFFFFF, 0.5f - next_x, 0.5f - sqrtf(0.5f * 0.5f - next_x * next_x));   // right end of triangle slice
+				-nextX, -sqrtf(0.5f * 0.5f - nextX * nextX), 0xFFFFFFFF, 0.5f - nextX, 0.5f - sqrtf(0.5f * 0.5f - nextX * nextX));   // right end of triangle slice
 		}
 
 		AEGfxVertexList* mesh = AEGfxMeshEnd();

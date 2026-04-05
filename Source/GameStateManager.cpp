@@ -28,13 +28,13 @@ int current = 0, previous = 0, next = 0;
 FP fpLoad = nullptr, fpInitialize = nullptr, fpDraw = nullptr, fpFree = nullptr, fpUnload = nullptr;
 Update fpUpdate = nullptr;
 
+// Initializes GSM
 void GSM_Initialize(int startingState)
 {
 	current = previous = next = startingState;
-	//DataLoader::Load();
-	//InitAudio();
 }
 
+// Updates function pointers of GSM to point to respective cycle functions of current scene
 void GSM_Update()
 {
 	switch (current)

@@ -22,6 +22,7 @@ struct RoomData;
 
 class Boss;
 
+// Possible states boss may be in
 enum BossStates {
 	BOSS_IDLE,
 	BOSS_WALK,
@@ -30,6 +31,7 @@ enum BossStates {
 	BOSS_JUMP
 };
 
+// Which phase of attack boss is in
 enum AttackState {
 	ATTACK_NIL,
 	ATTACK_CHARGE,
@@ -37,6 +39,7 @@ enum AttackState {
 	ATTACK_COOLDOWN
 };
 
+// Base Boss FSM
 class Boss_FSM {
 	public:
 		Boss* boss;
@@ -52,6 +55,7 @@ class Boss_FSM {
 		virtual void Update(Player&, f32) {}
 };
 
+// Chimera Boss FSM
 class ChimeraBoss_FSM : public Boss_FSM {
 	public:
 		f32 walkSpeed{ 120 };

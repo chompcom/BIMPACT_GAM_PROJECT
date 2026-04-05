@@ -28,9 +28,10 @@ Technology is prohibited.
 
 #pragma once
 
-void MainMenuLoad();
-void MainMenuInit();
-void MainMenuUpdate(float dt);
-void MainMenuDraw();
-void MainMenuFree();
-void MainMenuUnload();
+void MainMenuLoad();			// Load
+void MainMenuInit();			// Init
+void MainMenuUpdate(float dt);	// Update
+void MainMenuDraw();			// Render
+void MainMenuFree();			// Free
+void MainMenuUnload();			// Unload
+

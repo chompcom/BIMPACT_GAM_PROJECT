@@ -1,3 +1,17 @@
+/* Start Header ************************************************************************/
+/*!
+\file     Gift.cpp
+\author   Lee Hng Hwee Celest, hnghweecelest.l, 2502385
+\par      hnghweecelest.l@digipen.edu
+\brief    This file defines some functions that implement the gift
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "Gift.h"
 #include "Sprite.h"
 #include "Player.h"
@@ -8,23 +22,26 @@
 #include "rooms.h" //from main
 #include <iostream>
 
+//unordered map to store all the gift types taken from the json, using unordered map so that gifts can be found via their name
 std::unordered_map<std::string, GiftType> allGiftTypes;
 
+//default constructor for gift type (coded by Josiah)
 GiftType::GiftType() :
 	name{ "default" },
 	traits{ },
 	sprite{ DataLoader::CreateTexture("Assets/default.png") }
 {
-
 }
 
-GiftType::GiftType(std::string _name, Labels _traits, TexturedSprite _sprite) :
-	name {_name},
-	traits{_traits},
-	sprite{_sprite}
+//constructor for gift type
+GiftType::GiftType(std::string name, Labels traits, TexturedSprite sprite) :
+	name {name},
+	traits{traits},
+	sprite{sprite}
 {
 }
 
+//constructor for a gift
 Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, Vector2 position) :
 	giftType{ giftType },
 	shadow{ shadowSprite },
@@ -37,10 +54,10 @@ Gift::Gift(GiftType giftType, TexturedSprite shadowSprite, TexturedSprite hitbox
 }
 
 
-//this is just to test throwing
-void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries, mapRooms::Room* curRoom)
+//Updates the gift's position and handles collision (collision coded by Yee Kiat and MJ)
+void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries)
 {
-	UNREFERENCED_PARAMETER(curRoom);
+
 	//if player and gift are intersecting, pick up the gift
 	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
 		AABB{ gift.position - gift.giftType.sprite.scale / 2, gift.position + gift.giftType.sprite.scale / 2 }) && !player.pickUpState)
@@ -49,19 +66,21 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 		player.heldGift = &gift;
 		gift.pickUpState = true;
 		gift.velocity = Vector2{ 0.f, 0.f };
+		//play the gift pick up audio when the player picks it up (coded by Brandon)
 		PlayerPickUpAudio();
 	}
-	//if the gift is picked up, put it on the player's head
+	//if the gift is picked up, have it in front of the player
 	if (gift.pickUpState)
 	{
 		gift.position = player.position + Vector2{ 80.f * player.direction.x, 80.f * player.direction.y };
 	}
-	//if not, calculate its position based on its velocity
+	//if the gift if not picked up, calculate its position based on its velocity, and handle collision
 	else
 	{
-		//gift.sprite.position = gift.position;
+		
 		gift.position += gift.velocity * deltaTime;
 
+		//Gift collision handling (coded by Yee Kiat and MJ)
 		int collideFlags = 0x00;
 
 		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, (int)boundaries.x, (int)boundaries.y, collideFlags)) {
@@ -76,30 +95,26 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 			// Dampen bounce
 			gift.velocity /= 1.3f;
 		}
-
 		else {
 			gift.velocity /= 1.1;
 		}
-
-		//set the gift's sprite position to match its actual position if not 
-		//getting shaken
 		
 	}
+	//if the gifts velocity is very low, set it to 0 (coded by Yee Kiat and MJ)
 	if (gift.velocity.LengthSq() < 0.001f) gift.velocity = Vector2(0, 0);
-	//set the gift's sprite position to match its actual position
-	//gift.sprite.position = gift.position;
 
-	//set the gift's sprite position to match its actual position if not 
-	//getting shaken
+	
 	if (!gift.shakeState) {
+		//set the gift's sprite position to match its actual position if not 
+		//getting shaken
 		gift.giftType.sprite.position = gift.position;
 		gift.shadow.position = gift.position - Vector2{ 0, 40 };
 		gift.hitbox.position = gift.position;
 	}
 
-	return;
 }
 
+//load all of the gift types from a json file
 void LoadGiftTypes()
 {
 	//put the json file contents into json value
@@ -109,9 +124,10 @@ void LoadGiftTypes()
 	//for each gift in the giftTypes block in the json value
 	for (Json::Value& gift : giftJson["giftTypes"])
 	{
-		GiftType temp {gift["name"].asString(), {}, DataLoader::CreateTexture(gift["spritePath"].asString())};
 		//insert each gift trait from the json into temp's traits
-
+		GiftType temp {gift["name"].asString(), {}, DataLoader::CreateTexture(gift["spritePath"].asString())};
+		
+		//insert each of the gifts traits into the gift's traits container
 		for (Json::Value& trait : gift["traits"])
 		{
 			temp.traits.insert(trait.asString());

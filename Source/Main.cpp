@@ -64,7 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     while (current != GS_QUIT)
     {
         if (current != GS_RESTART) {
-            GSM_Update();
+            GSMUpdate();
             fpLoad();
         }
         else {
@@ -94,7 +94,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         
         
     }
-
 
     // free the system
     AESysExit();

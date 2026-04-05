@@ -1,3 +1,22 @@
+/* Start Header ***********************************************************************/
+/*!
+\file        Grid.cpp
+\author		 Quah Ming Jun, m.quah
+\par         m.quah@digipen.edu
+\brief
+			 This source file implements the Grid and TileDataBase systems used for
+			 tile-based room layouts. The Grid class loads CSV room data, stores tile
+			 IDs, performs collision checks, converts between world and grid coordinates,
+			 and supports biome-based tile filtering. The TileDataBase class loads tile
+			 metadata and biome definitions from JSON and provides lookup utilities.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header *************************************************************************/
+
 #include "AEEngine.h"
 #include "Grid.h"
 #include <fstream>
@@ -9,7 +28,19 @@
 
 
 namespace {
-	// Man wts excel csv is in utf-8 BOM encoding...
+
+	/*!
+	\brief
+		Man wts excel csv is in utf-8 BOM encoding...
+		Hence this function is to remove UTF-8 BOM prefix from a string if present.
+
+	\param[in,out] s
+		String to sanitize.
+
+	\par
+		Excel-exported CSV files often include a UTF-8 BOM. This helper ensures
+		the first three bytes (0xEF, 0xBB, 0xBF) are removed before parsing.
+	*/
 	static void RemoveUtf8Bom(std::string& s)
 	{
 		if (s.size() >= 3 &&
@@ -22,35 +53,75 @@ namespace {
 	}
 }
 
+
 TileDataBase Grid::tileDB{};
 
+/*!
+\brief
+	Construct an empty Grid and load the global tile database.
+
+\details
+	Loads TilesInfo.json immediately so tile metadata is available for
+	all subsequent grid operations.
+*/
 Grid::Grid() : width(0), height(0), tileSizeX(0), tileSizeY(0), tileHeight(0), tileWidth(0), offsetX(0), offsetY(0) {
 	const char* informationFile = ".\\Assets\\Levels\\Room_Data\\TilesInfo.json";
 	Grid::tileDB.Load(informationFile);
 	
 };
 
+/*!
+\brief
+	Check if (x, y) is within grid bounds.
+*/
 bool Grid::IsValid(int x, int y) const {
 	return x >= 0 && x < width && y >= 0 && y < height;
 }
 
+/*!
+\brief
+	Get grid height in tiles.
+*/
 int Grid::GetHeight() const {
 	return height;
 }
+
+/*!
+\brief
+	Get grid width in tiles.
+*/
 int Grid::GetWidth() const {
 	return width;
 }
 
-//Grid::LoadRoomCSV()
+/*!
+\brief
+	Load tile database from JSON file.
 
+\return
+	True if load succeeded.
+*/
 bool Grid::LoadTileDataBase(std::string const& fileName) {
 	return tileDB.Load(fileName);
 }
 
 // Query Type of Tile and TileType
-TileType const* Grid::QueryTileType(int id) { return Grid::tileDB.GetTileType(id); };
-bool Grid::QueryTileAllowedInBiome(int tileId, const std::string& biome) {return tileDB.TileAllowedInBiome(tileId, biome);}
+TileType const* Grid::QueryTileType(int id) { return Grid::tileDB.GetTileType(id); };	// Query tile metadata by ID.
+bool Grid::QueryTileAllowedInBiome(int tileId, const std::string& biome) {return tileDB.TileAllowedInBiome(tileId, biome);} // Check if tile is allowed in biome.
 
+/*!
+\brief
+	Load a room layout from a CSV file.
+
+\par	
+	Methodology:
+	* Reads metadata lines until numeric rows begin.
+	* Validates tiles against biome rules.
+	* Computes tile sizes based on window dimensions and padding.
+
+\return
+	True if CSV loaded successfully.
+*/
 bool Grid::LoadRoomCSV(std::string const& fileName)
 {
 	tiles_.clear();
@@ -79,8 +150,6 @@ bool Grid::LoadRoomCSV(std::string const& fileName)
 
 	// Get biome information
 	std::string biome = metaData.at("Biome");
-
-
 
 	// Get remaining room data
 	std::string line;
@@ -119,10 +188,10 @@ bool Grid::LoadRoomCSV(std::string const& fileName)
 		this->tileSizeY = totalGridHeight / static_cast<float>(this->height);
 	}
 
-
 	return (width > 0 && height > 0);
 }
 
+// Retrieve tile ID at (x, y). Returns -1 if out of bounds.
 int Grid::GetCell(int x, int y) const
 {
 	if (y < 0 || y >= height) return -1;
@@ -130,6 +199,7 @@ int Grid::GetCell(int x, int y) const
 	return tiles_[y][x];
 }
 
+// Retrieve tile ID by linear index.
 int Grid::GetCell(int idx) const {
 
 	int const outOfBound = 0xffffffff;
@@ -143,7 +213,7 @@ int Grid::GetCell(int idx) const {
 	return tiles_[y][x];
 }
 
-
+// Set tile ID at (row, col).
 int  Grid::SetCell(int row, int col, int val) {
 	if (row < 0 || row >= height) return -1;
 	if (col < 0 || col >= width) return -1;
@@ -152,6 +222,13 @@ int  Grid::SetCell(int row, int col, int val) {
 	return 0;
 }
 
+/*!
+\brief
+	Convert world coordinates to tile index system.
+
+\par
+	Accounts for padding and window coordinate system.
+*/
 int Grid::WorldToCell(float x, float y) const
 {
 
@@ -174,10 +251,18 @@ int Grid::WorldToCell(float x, float y) const
 	return row * width + col;
 }
 
+/*!
+\brief
+	Test collision at world coordinate (x, y).
+
+\par
+	* Returns true if tile is blocked.
+	* Handles door transitions using prevCell.
+*/
 bool Grid::TestCollision(float x, float y, int prevCell) const {
 	int idx = this->WorldToCell(x, y);
 
-	// Out of bounds
+	// Out of bounds (THIS SEQUENCE IS FOR A DOOR HACK)
 	if (idx < 0) {
 
 		// Check for doors
@@ -206,8 +291,6 @@ bool Grid::TestCollision(float x, float y, int prevCell) const {
 
 	}; 
 
-	// Gonna account for doors somehow
-
 	int tileId = this->GetCell(idx);
 	if (tileId < 0) return false;	// tile id shouldn't be less than 0 unless there's a problem in our json
 
@@ -218,6 +301,13 @@ bool Grid::TestCollision(float x, float y, int prevCell) const {
 	return tile->blocked;
 }
 
+/*!
+\brief
+	Perform collision detection using multiple hotspots around the object.
+
+\return
+	Bitmask of collision flags.
+*/
 int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY, int prevCell) const
 {
 	//At the end of this function, "Flag" will be used and returned, to determine which sides
@@ -225,7 +315,6 @@ int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scal
 
 	int Flag = 0x0000;
 	float x1, y1, x2, y2, x3, y3;
-	
 
 	/*----------------------LEFT-------------------------------*/
 	// 1.1 Hotspot 1
@@ -296,6 +385,15 @@ int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scal
 	return Flag;
 }
 
+/*!
+\brief
+	Load tile and biome metadata from JSON file.
+
+\details
+	Populates:
+	* tileTypes: map of tile ID -> TileType
+	* biomes: map of biome name -> BiomeInfo
+*/
 bool TileDataBase::Load(std::string const& fileName)
 {
 	Json::Value file = DataLoader::LoadJsonFile(fileName);
@@ -348,7 +446,13 @@ bool TileDataBase::Load(std::string const& fileName)
 	return true;
 }
 
-// Get tile by ID from unordered_map of tileTypes
+/*!
+\brief
+	Retrieve tile metadata by ID.
+
+\par
+	Get tile by ID from unordered_map of tileTypes
+*/
 const TileType* TileDataBase::GetTileType(int id) const
 {
 	auto it = tileTypes.find(id);
@@ -356,7 +460,10 @@ const TileType* TileDataBase::GetTileType(int id) const
 	return &it->second;
 }
 
-// Get tukes from biome
+/*!
+\brief
+	Retrieve all TileType pointers allowed in a biome.
+*/
 std::vector< TileType const*> TileDataBase::GetTilesFromBiome(std::string const& biome) const
 {
 	std::vector<TileType const*> result;
@@ -375,7 +482,13 @@ std::vector< TileType const*> TileDataBase::GetTilesFromBiome(std::string const&
 	return result;
 }
 
-// Get tile by ID from unordered_map of biomes, check if tile id matches any in allowedTiles
+
+/*!
+\brief
+	Check if a tile ID is allowed in a biome.
+\par
+	Get tile by ID from unordered_map of biomes, check if tile id matches any in allowedTiles
+*/
 bool TileDataBase::TileAllowedInBiome(int tileId, const std::string& biome) const
 {
 	auto biomeIt = biomes.find(biome);
@@ -391,7 +504,10 @@ bool TileDataBase::TileAllowedInBiome(int tileId, const std::string& biome) cons
 	return false;
 }
 
-
+/*!
+\brief
+	Retrieve all biome names.
+*/
 std::vector<std::string> TileDataBase::GetAllBiomes() const
 {
 	std::vector<std::string> result;
@@ -404,17 +520,27 @@ std::vector<std::string> TileDataBase::GetAllBiomes() const
 	return result;
 }
 
-
+/*!
+\brief
+	Retrieve texture path for a biome.
+*/
 std::string TileDataBase::GetTexturePath(std::string const& biome) {
 	return this->biomes[biome].imagePath;
 }
 
+/*!
+\brief
+	Retrieve all biome names through Grid interface.
+*/
 std::vector<std::string> Grid::GetAllBiomes()
 {
 	return tileDB.GetAllBiomes();
 }
 
-
+/*!
+\brief
+	Convert tile coordinates to world center position.
+*/
 Vector2 Grid::CellToWorldCenter(int row, int col) const 
 {
 	float left = AEGfxGetWinMinX() + this->pad.left;	// MIN LEFT
@@ -426,6 +552,10 @@ Vector2 Grid::CellToWorldCenter(int row, int col) const
 	return Vector2{ x, y };
 }
 
+/*!
+\brief
+	Convert tile index to world center position.
+*/
 Vector2 Grid::CellToWorldCenter(int curCell) const
 {
 	int x = curCell % this->width;
@@ -434,16 +564,19 @@ Vector2 Grid::CellToWorldCenter(int curCell) const
 	return res;
 }
 
+// Get tile width in world units.
 float Grid::GetTileWidth() const
 {
 	return tileSizeX;
 }
 
+// Get tile height in world units.
 float Grid::GetTileHeight() const
 {
 	return tileSizeY;
 }
 
+// Get world boundary of grid.
 Vector2 Grid::GetBoundary() const {
 	Vector2 res{ this->GetWidth() * this->GetTileWidth(), this->GetHeight() * this->GetTileHeight() };
 	return res;
@@ -452,17 +585,49 @@ Vector2 Grid::GetBoundary() const {
 
 bool TOGGLE_STATE = false;
 
+/*!
+\brief
+	Debug-render the grid, including player tile highlighting and grid lines.
+
+\param[in] mesh
+	Mesh used for drawing tile rectangles and grid lines.
+
+\param[in] playerPos
+	Player world position.
+
+\param[in] playerScale
+	Player sprite scale, used to compute bounding corners.
+
+\param[in] prevRender
+	Previous render mode to restore after drawing.
+
+\par
+	Methodology (when active):
+		1. Check prerequisites (mesh and grid dimensions). If invalid,
+		   exit early.
+		2. Toggle debug state when K is pressed. If debug is disabled,
+		   return immediately.
+		3. Compute the player's tile index and determine the bounding
+		   rectangle of tiles that overlap the player's scaled sprite.
+		4. Highlight all tiles intersecting the player's bounding box.
+		5. Draw vertical and horizontal grid lines to visualize tile
+		   boundaries.
+		6. Restore the previous render mode.
+*/
 void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerScale, AEGfxRenderMode prevRender)
 {
-	if (!mesh || width <= 0 || height <= 0) return;
+	if (!mesh || width <= 0 || height <= 0) return;	    // Abort if grid or mesh is invalid
 
+	// Toggle debug mode when K is pressed
 	if (AEInputCheckTriggered(AEVK_K)) TOGGLE_STATE = !TOGGLE_STATE;
 	if (TOGGLE_STATE == false) return;
 
+	// Set up color rendering
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
+	// Determine which tile the player center is in
 	int playerIdx = WorldToCell(playerPos.x, playerPos.y);
 	int playerRow = -1;
 	int playerCol = -1;
@@ -473,7 +638,7 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 		playerRow = playerIdx / width;
 	}
 
-	// Grid starts from top left 0, 0
+	// Compute top-left world coordinate of the grid (accounting for padding)
 	float left = AEGfxGetWinMinX() + static_cast<float>(pad.left);
 	float top = AEGfxGetWinMaxY() - static_cast<float>(pad.top);
 
@@ -481,14 +646,17 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 	float halfW = playerScale.x *0.8f*0.5f / 2.0f;
 	float halfH = playerScale.y* 0.8f * 0.5f / 2.0f;
 
+	// Compute tile indices for the four corners of the player's bounding box
 	int idxTL = WorldToCell(playerPos.x - halfW, playerPos.y + halfH);	// Top Left Corner
 	int idxTR = WorldToCell(playerPos.x + halfW, playerPos.y + halfH);	// Top Right Corner
 	int idxBL = WorldToCell(playerPos.x - halfW, playerPos.y - halfH);	// Bottom Left corner
 	int idxBR = WorldToCell(playerPos.x + halfW, playerPos.y - halfH);	// Bottom Right corner
 
+	// Track min/max rows and columns touched by the player
 	int minRow = height, maxRow = -1;
 	int minCol = width, maxCol = -1;
 
+	// Update bounds
 	if (idxTL >= 0)
 	{
 		int row = idxTL / width;
@@ -529,6 +697,7 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 		if (col > maxCol) maxCol = col;
 	}
 
+	// Highlight all tiles intersecting the player's bounding box
 	if (maxRow >= 0 && maxCol >= 0)
 	{
 		for (int row = minRow; row <= maxRow; ++row)
@@ -561,16 +730,17 @@ void Grid::RenderGrid(AEGfxVertexList* mesh, Vector2 playerPos, Vector2 playerSc
 		line.RenderSprite();
 	}
 
-
+	// Restore previous render mode (Tbh this should be done for most functions but wtv)
 	AEGfxSetRenderMode(prevRender);
 }
 
+// Retrieve all TileType pointers allowed in a biome.
 std::vector<TileType const*> Grid::GetTilesFromBiome(std::string const& biome)
 {
 	return tileDB.GetTilesFromBiome(biome);
 }
 
-
+// Retrieve texture path for biome.
 std::string Grid::GetPathNameBiome(std::string const& biome)
 {
 	return tileDB.GetTexturePath(biome);
