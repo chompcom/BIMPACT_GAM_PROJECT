@@ -79,7 +79,7 @@
         {
           "id": "btn_editor",
           "x": 0.28,
-          "y": -0.03,
+          "y": 0.015,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -92,11 +92,26 @@
           "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
           "textColor": [0.8, 0.8, 0.8, 1.0]
         },
-
+        {
+          "id": "btn_controls",
+          "x": 0.28,
+          "y": -0.095,
+          "w": 0.30,
+          "h": 0.09,
+          "visible": true,
+          "clickable": true,
+          "drawBackground": true,
+          "borderRadiusRatio": 0.14,
+          "roundSegments": 8,
+          "text": "CONTROLS",
+          "textScale": 1,
+          "backgroundColor": [ 0.44, 0.44, 0.44, 1.0 ],
+          "textColor": [0.8, 0.8, 0.8, 1.0]
+        },
         {
           "id": "btn_credits",
           "x": 0.28,
-          "y": -0.18,
+          "y": -0.21,
           "w": 0.30,
           "h": 0.09,
           "visible": true,
@@ -139,6 +154,21 @@
           "roundSegments": 12,
           "backgroundColor": [1, 1, 1, 1.0],
           "texture":  "Assets/MainMenuImage.png"
+        },
+
+        {
+          "id": "img_controls",
+          "x":  0,
+          "y":  0,
+          "w": 1,
+          "h": 1,
+          "visible": false,
+          "drawBackground":false,
+          "borderRadiusRatio": 0.16,
+          "roundSegments": 8,
+          "backgroundColor" : [1,1,1,1.0],
+          "texture": "Assets/AlmanacScreen/openAlmanacMainMenuHelp.png"
+
         },
 
         {

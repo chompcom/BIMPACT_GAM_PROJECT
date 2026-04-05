@@ -1058,12 +1058,6 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Doors
-		//GetOrLoadTexture()
-		//RenderDoorsSimple(squaremesh);
-
-		//TexturedSprite dr = DataLoader::CreateTexture("Assets/Rooms/Door/door.png");	// Does this require freeing
-
 		// Render Room Obstacles
 
 
@@ -1084,8 +1078,6 @@ namespace mapRooms
 					if (tileId == 100) continue;   // door tile, no obstacle sprite
 
 					TileType const* tile = Grid::QueryTileType(tileId);
-
-					//std::cout << "Tile: " << tile->asset.c_str() << '\n';
 
 					if (!tile) continue;
 					if (tile->asset.empty()) continue;
