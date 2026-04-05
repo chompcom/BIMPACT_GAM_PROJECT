@@ -162,12 +162,13 @@ namespace DataLoader {
 		return false;
 	}
 
-	AEAudio GetSound(std::string const& name)
+	  //  Lookup the name given in the sounds map and returns the Aeaudio handle (brandon)
+	AEAudio GetSound(std::string const& name)  
 	{
 		SoundList::const_iterator finder = sounds.find(name);
 		if (finder == sounds.end()) {
-			std::cout << "Sound not found: " << name << std::endl;
-			return AEAudio{};
+			std::cout << "Sound not found: " << name << std::endl; // if no name is found then returns this line
+			return AEAudio{};										// fyi even if the sound is missing no sound will just play and it wont crash
 		}
 		return finder->second;
 	}
@@ -304,7 +305,9 @@ namespace DataLoader {
 
 		}
 
-		if (audioFile.is_open()) {
+
+// Parses the audio json and loads all audio assets into the sounds map. (Brandon)
+		if (audioFile.is_open()) {  
 			Json::Value audioJson;
 			audioFile >> audioJson;
 
@@ -548,8 +551,8 @@ namespace DataLoader {
 		}
 		roundRectMeshes.clear();
 
-		FreeAudio(); 
-		for (SoundPair AllSounds : sounds) {
+		FreeAudio();   // this unloads the audio grp only
+		for (SoundPair AllSounds : sounds) { // unload individual sounds
 			AEAudioUnloadAudio(AllSounds.second);
 		}
 		sounds.clear();

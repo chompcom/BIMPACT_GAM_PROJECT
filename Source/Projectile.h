@@ -1,13 +1,28 @@
+/* Start Header ************************************************************************/
+/*!
+\file        Projectile.h
+\author     Brandon Choo, 2501888
+\par        b.choo@digipen.edu
+\brief		This code declares the projectile type using enums for each type of projectile and the projectile class
+			and the members and functions inside the class
+			
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #pragma once
 #include "Sprite.h"
 #include "Collision.h"
 #include "Audio.h"
 enum ProjectileType {
-	BULLET,
-	FIREBALL,
-	AOE,
-	ROUNDING,
-	SCATTER,
+	BULLET, // normal shooting projectile
+	FIREBALL,  
+	AOE,  // shoots projectiles in a 360degree aoe 
+	ROUNDING, // A swirl like projectile
+	SCATTER,  // Projectile that shoots a scatter of projectile once its inital one died
 	BOOMERANG
 };
 class Projectile {
@@ -22,7 +37,7 @@ public:
 	Vector2 GetVelocity() const;
 	bool IsAlive() const;
 	ProjectileType GetType() const;
-	void RemoveProjectile();
+	void RemoveProjectile();  // destroy projectile
 	TexturedSprite GetSprite() const;
 
 public: // flag for my projectiles

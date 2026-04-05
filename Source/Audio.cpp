@@ -1,16 +1,29 @@
+/* Start Header ************************************************************************/
+/*!
+\file        Audio.cpp
+\author     Brandon Choo, 2501888
+\par        b.choo@digipen.edu
+\brief		This is the audio code where for the Player, Mobs, UIs, Room, Background Music and Menu + Charging of gifts
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "Audio.h"
 #include "Loaders/DataLoader.h"
 
-// Player grp
+// Player grp 
 AEAudioGroup PlayerAudio;
 AEAudio DmgTaken;
 AEAudio Footstep_1;
 AEAudio Footstep_2;
 AEAudio Footstep_3;
 AEAudio PickUp;
-AEAudio Throw;
+AEAudio Throw; // throwing of gifts
 
-// Charging grp
+// Charging grp for the charge up of throwing the gifts
 AEAudioGroup ChargingAudio;
 AEAudio ChargingThrow;
 AEAudio ChargingThrowMax;
@@ -65,16 +78,17 @@ AEAudio FightMusic;
 AEAudioGroup MenuAudio;
 AEAudio MenuBGM;
 
-static float chargingTimer = 0.0f;
-static bool maxPlaying = false;
-static bool chargingStarted = false;
-static float mobSoundCooldown = 0.0f;
+static float chargingTimer = 0.0f; 
+static bool maxPlaying = false;  // when charging is at its max
+static bool chargingStarted = false; 
+static float mobSoundCooldown = 0.0f; // so mobs sound dont get spammed when they interact with the gifts
 static bool buttonAudioState = false;
 
 void InitAudio() {
 	buttonAudioState = true;
 	// Player grp
 	PlayerAudio = AEAudioCreateGroup();
+	// GetSound is used in Josiah's dataloader is being used to get the path for the sound
 	DmgTaken = DataLoader::GetSound("DmgTaken");
 	Footstep_1 = DataLoader::GetSound("Footstep_1");
 	Footstep_2 = DataLoader::GetSound("Footstep_2");
@@ -133,9 +147,6 @@ void InitAudio() {
 	BossBGM = DataLoader::GetSound("BossBGM");	
 	FightMusic = DataLoader::GetSound("FightMusic");
 
-	// Menu Group
-//	MenuAudio = AEAudioCreateGroup();
-//	MenuBGM = DataLoader::GetSound("MenuBGM");
 }
 
 void FreeAudio() { // Use before dataloader::unload pls
@@ -149,12 +160,18 @@ void FreeAudio() { // Use before dataloader::unload pls
 	buttonAudioState = false;
 }
 
+
+//--------------------------------------------------------------------
+//         Individual functions to call the specific audio
+//--------------------------------------------------------------------
+
+
 // Player
 void PlayerDmgAudio() {
 	AEAudioPlay(DmgTaken, PlayerAudio, 1.0f, 1.0f, 0);
 }
 
-void PlayerFootstepAudio() {
+void PlayerFootstepAudio() { //  random between 3 different footsteps audio
 	int step = rand() % 3;
 	if (step == 0)      AEAudioPlay(Footstep_1, PlayerAudio, 0.4f, 1.0f, 0);
 	else if (step == 1) AEAudioPlay(Footstep_2, PlayerAudio, 0.4f, 1.0f, 0);
@@ -168,8 +185,8 @@ void PlayerPickUpAudio() {
 void PlayerThrowAudio() {
 	AEAudioPlay(Throw, PlayerAudio, 1.0f, 1.0f, 0);
 }
-
-void ChargingThrowAudio(float dt) {
+  
+void ChargingThrowAudio(float dt) { // charging throw sound
 	if (!chargingStarted) {
 		AEAudioPlay(ChargingThrow, ChargingAudio, 1.0f, 1.0f, 0);
 		chargingStarted = true;
@@ -185,7 +202,7 @@ void ChargingThrowAudio(float dt) {
 	}
 }
 
-void StopChargingAudio() {
+void StopChargingAudio() { 
 	chargingTimer = 0.0f;
 	maxPlaying = false;
 	chargingStarted = false;
@@ -350,7 +367,7 @@ void RandomBGMAudio(float dt) {
 	if (bgmTimer >= bgmInterval) {
 		AEAudioStopGroup(BGMAudio);
 
-		int pick = rand() % 3;
+		int pick = rand() % 3;   // every interval random between 3 short bgm sounds will be played 
 		if (pick == 0)      AEAudioPlay(BGM1, BGMAudio, 0.2f, 1.0f, 0);
 		else if (pick == 1) AEAudioPlay(BGM2, BGMAudio, 0.2f, 1.0f, 0);
 		else                AEAudioPlay(BGM3, BGMAudio, 0.2f, 1.0f, 0);

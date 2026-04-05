@@ -1,8 +1,22 @@
+/* Start Header ************************************************************************/
+/*!
+\file        ProjectileManager.cpp
+\author     Brandon Choo, 2501888
+\par        b.choo@digipen.edu
+\brief		This code implements the spawning functions for all projectile types, and handles updates the projectile every frame.
+            Collision detection of projectile against enemies/players with projectile, and Josiah's particle effects too.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "ProjectileManager.h"
 
 #include "ParticleSystem.h"
 
-
+// Spawns a standard fireball projectile in the given direction
 void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
 	sprite.position = pos;
 	sprite.scale = scale;
@@ -13,6 +27,7 @@ void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vec
     ProjectileAudio();
 }
 
+// Spawns a 360 spread of projectiles
 void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     int numProjectiles = 10;
     float angleAround = 360.0f / numProjectiles;  
@@ -33,6 +48,7 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
     }
 }
 
+// Spawns a projectile that curves like a spiral with the given rotation rate
 void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend, float rot) {
     sprite.position = pos;
     sprite.scale = scale;
@@ -47,6 +63,7 @@ void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vecto
     RoundingProjectileAudio();
 }
 
+// Spawns a scatter projectile that explodes into AOE projectile once the inital projectile dies
 void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
@@ -59,6 +76,7 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     
 }
 
+// Spawns a boomerang projectile
 void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
@@ -68,12 +86,14 @@ void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vect
 
 }
 
+// Updates all projectiles each frame and handles scatter expansion and removes dead projectiles
 void UpdateProjectiles(RoomData& roomData, float dt) {
     std::vector<Projectile*> rmdata;
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         (*it)->UpdateProjectile(dt);
         if (!(*it)->IsAlive()) {
+            // Scatter projectile spawns AOE on death
             if ((*it)->isScatter && !(*it)->didScatter) {
                 int numProjectiles = 10;
                 float angleAround = 360.0f / numProjectiles;
@@ -98,6 +118,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
     }
 
 
+// Check for collision for each projectile
 void CheckProjectileCollision(RoomData& roomData, Player& player) {
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         float tFirst = 0.0f;
@@ -132,6 +153,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
                 tFirst);
             if  (hit) {
                 if ((*it)->GetDmg() < 0.f) {
+                    // If dmg is neg then it heals 
                     playerHealsDamage(player);
                 }
                 else if ( (*it)->GetDmg() > 0.f)
