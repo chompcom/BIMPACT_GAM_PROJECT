@@ -266,7 +266,8 @@ bool Grid::TestCollision(float x, float y, int prevCell) const {
 	if (idx < 0) {
 
 		// Check for doors
-		const int doorFlag = 0x64;
+		int doorFlag = 0x64;
+		if (prevCell == -2) doorFlag = -2;
 		const int outOfBounds = 0xffffffff;
 
 		if (this->WorldToCell(x, y + tileSizeY) == outOfBounds && this->GetCell(this->WorldToCell(x, y - tileSizeY))==doorFlag) {			// TOP DOOR?
