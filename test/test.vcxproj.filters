@@ -149,9 +149,6 @@
     <ClCompile Include="..\Source\rooms.cpp">
       <Filter>Rooms\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Levels.cpp">
-      <Filter>Rooms\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Grid.cpp">
       <Filter>Rooms\Source</Filter>
     </ClCompile>
@@ -248,9 +245,6 @@
       <Filter>Rooms\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\rooms.h">
-      <Filter>Rooms\Header</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Levels.h">
       <Filter>Rooms\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\BoundaryCollision.h">
