@@ -20,28 +20,33 @@ Technology is prohibited.
 #include "Sprite.h"
 #include <iostream>
 
-Boss_FSM::Boss_FSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE }, 
+BossFSM::BossFSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE }, 
 	attackPhase{ ATTACK_NIL }, target{}, counter{ 0 } {}
 
-ChimeraBoss_FSM::ChimeraBoss_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
+ChimeraBossFSM::ChimeraBossFSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
 	f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
 	f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag)
-	: Boss_FSM(Boss),  canWalk{true},
+	: BossFSM(Boss),  canWalk{true},
 	chargeDamage{ 1.f }, chargeStartup{ ChargeStartup }, chargeInterval{ ChargeInterval }, chargeEndlag{ ChargeEndlag },
 	jumpDamage{ 1.f }, jumpStartup{ JumpStartup }, jumpInterval{ JumpInterval }, jumpEndlag{ JumpEndlag },
 	followDamage{ 1.f }, followStartup{ FollowStartup }, followInterval{ FollowInterval }, followEndlag{ FollowEndlag }
 	,chargeSpeed{ ChargeDamage}, followSpeed{FollowDamage}, jumpSpeed{JumpDamage}
 {}
 
-void ChimeraBoss_FSM::Update(Player& player, f32 dt) {
+// Update loop for chimera boss FSM
+void ChimeraBossFSM::Update(Player& player, f32 dt) {
 	switch (currentState) {
 		case BOSS_IDLE:
 			interval += dt;
 			if (interval >= 1.0f && canWalk) {
 				canWalk = false;
+				// Random chance boss can walk
 				if (AERandFloat() >= 0.75f) {
+					// Set random position to walk to
+					// If else determines which side position will be on relative to boss position
 					if (AERandFloat() >= 0.5f) target = boss->sprite.position + Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
 					else target = boss->sprite.position - Vector2{ AERandFloat() * 100 + 75, AERandFloat() * 100 + 75};
+					// Clamp target position to within traversable area
 					target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
 					target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 
@@ -73,6 +78,7 @@ void ChimeraBoss_FSM::Update(Player& player, f32 dt) {
 			boss->sprite.position += boss->velocity * dt;
 			boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 
+			// Boss is roughly around target position or has collided with wall,
 			if ((abs(boss->sprite.position.x - target.x) <= 1.0f && abs(boss->sprite.position.y - target.y) <= 1.0f) || 
 				boss->collideWall ) {
 				boss->velocity = {};
@@ -94,11 +100,13 @@ void ChimeraBoss_FSM::Update(Player& player, f32 dt) {
 	}
 }
 
-void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
+// Charge attack for chimera boss
+void ChimeraBossFSM::ChargeAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		target = player.position;
+		// Clamp target position to within traversable area
 		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
 		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 		boss->direction = (target - boss->sprite.position).Normalized();
@@ -119,7 +127,7 @@ void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
-		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
+		if (CollisionIntersectionRectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			PlayerTakesDamage(player);
 		}
@@ -138,6 +146,8 @@ void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
 	case ATTACK_COOLDOWN:
 		interval += dt;
 		if (interval >= chargeEndlag) {
+			// Random chance boss can charge immediately after
+			// Limited to 2 additional charges
 			if (AERandFloat() >= 0.5f && additionalCharges < 2) {
 				interval = chargeStartup - 0.5f;
 				attackPhase = ATTACK_CHARGE;
@@ -154,15 +164,18 @@ void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
 	}
 }
 
-void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
+// Jump attack for chimera boss
+void ChimeraBossFSM::JumpAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		target = player.position;
+		// Clamp target position to within traversable area
 		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
 		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 
 		interval += dt;
+		// Boss is jumping upwards
 		if (interval >= 0.25f * jumpStartup) {
 			boss->invulnerableTimer = dt;
 
@@ -184,12 +197,15 @@ void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
 
 	case ATTACK_ATTACK:
 		interval += dt;
+		// Clamp target position to within traversable area
 		boss->sprite.position = Vector2{ target.x, target.y + jumpSpeed * jumpInterval } + Vector2{ 0, -1 } * jumpSpeed * interval;
 		boss->shadow.position = Vector2{ target.x, target.y - boss->shadowOffset};
-
+		
+		// Boss is falling downwards, no need to check for collision
 		if (boss->sprite.position.y - target.y > 10) boss->invulnerableTimer = dt;
+		// Boss has landed, now can check for collisions
 		else {
-			if (CollisionIntersection_RectRect(target, boss->hitbox.scale.Abs(), Vector2{},
+			if (CollisionIntersectionRectRect(target, boss->hitbox.scale.Abs(), Vector2{},
 				player.position, player.sprite.scale * 0.8, player.GetVelocity(), collisionTime)) {
 				PlayerTakesDamage(player);
 			}
@@ -216,11 +232,13 @@ void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
 	}
 }
 
-void ChimeraBoss_FSM::FollowAttack(Player& player, f32 dt) {
+// Follow attack for chimera boss
+void ChimeraBossFSM::FollowAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
 		target = player.position;
+		// Clamp target position to within traversable area
 		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
 		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 		boss->direction = (target - boss->sprite.position).Normalized();
@@ -237,6 +255,7 @@ void ChimeraBoss_FSM::FollowAttack(Player& player, f32 dt) {
 
 	case ATTACK_ATTACK:
 		target = player.position;
+		// Clamp target position to within traversable area
 		target.x = AEClamp(target.x, -650 + boss->sprite.scale.y / 2, 650 - boss->sprite.scale.y / 2);
 		target.y = AEClamp(target.y, -350 + boss->sprite.scale.y / 2, 350 - boss->sprite.scale.y / 2);
 
@@ -247,7 +266,8 @@ void ChimeraBoss_FSM::FollowAttack(Player& player, f32 dt) {
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
-		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
+		// Chimera boss stops upon colliding with player
+		if (CollisionIntersectionRectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			PlayerTakesDamage(player);
 

@@ -34,7 +34,6 @@ Technology is prohibited.
 #include "RoomData.h"
 #include "Gift.h"		// ????
 #include "Boss.h"
-//#include "Grid.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -364,7 +363,6 @@ namespace mapRooms
 
 					Labels giftTraits{};
 
-
 					Gift* gift = new Gift(
 						allGiftTypes[giftDisplayName],
 						DataLoader::CreateTexture("Assets/shadow.png"),
@@ -592,8 +590,6 @@ namespace mapRooms
 		rngState{ 0xA341316Cu },
 		transferData{ nullptr }	// Some random seed
 	{
-		//Room x[2]{};
-							//}
 	}
 
 	/*!***************************************************************************
@@ -1119,13 +1115,8 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Obstacles
-
-
 		// Render Room Doors
 		RenderRoomDoors(squaremesh, doorTex);
-
-
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		// Render Room Obstacles
 		if (currentRoom != nullptr) {
@@ -1155,8 +1146,6 @@ namespace mapRooms
 				}
 			}
 		}
-
-
 		// Render Enemy?
 		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
 			Color oldColor = i->sprite.color;
@@ -1449,7 +1438,7 @@ namespace mapRooms
 		Vector2 botDoorC{ 0.0f, minY + doorDepth * 0.5f };
 
 		// LEFT
-		if (currentRoom->left && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->left && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ leftDoorC - halfLR, leftDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Left)) {
@@ -1462,7 +1451,7 @@ namespace mapRooms
 		}
 
 		// RIGHT
-		if (currentRoom->right && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->right && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ rightDoorC - halfLR, rightDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Right)) {
@@ -1474,7 +1463,7 @@ namespace mapRooms
 		}
 
 		// UP
-		if (currentRoom->up && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->up && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ topDoorC - halfUD, topDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Up)) {
@@ -1486,7 +1475,7 @@ namespace mapRooms
 		}
 
 		// DOWN
-		if (currentRoom->down && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->down && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ botDoorC - halfUD, botDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Down)) {

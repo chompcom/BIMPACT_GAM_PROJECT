@@ -125,7 +125,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
             for (Enemy* guy : roomData.enemyList) {
                 if (!guy->isActive) continue;
                 if (static_cast<void*>(guy) == (*it)->GetSource()) continue;
-                if (CollisionIntersection_RectRect(
+                if (CollisionIntersectionRectRect(
                     (*it)->GetPosition(), (*it)->GetScale(), (*it)->GetVelocity(),
                     guy->sprite.position, guy->sprite.scale, guy->velocity, tFirst)
                     ) {
@@ -138,7 +138,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
         else {
 
             //deliberate assignment
-            hit = CollisionIntersection_RectRect(
+            hit = CollisionIntersectionRectRect(
                 (*it)->GetPosition(),
                 (*it)->GetScale(),
                 (*it)->GetVelocity(),

@@ -17,5 +17,5 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "Utils/Vector2.hpp"
 
-bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight);
-bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& COLLISION_FLAGS);
+bool CollisionBoundaryStatic(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight);
+bool CollisionBoundaryStatic(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& collisionFlags);

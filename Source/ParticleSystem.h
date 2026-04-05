@@ -19,6 +19,7 @@ Technology is prohibited.
 #include <vector>
 
 
+// Particle
 struct Particle {
 	Sprite sprite;
 	Vector2 velocity {};
@@ -28,6 +29,7 @@ struct Particle {
 	Particle(AEGfxVertexList* particleMesh);
 };
 
+// Particle System
 class ParticleSystem {
 	public:
 		std::vector<Particle> particles;

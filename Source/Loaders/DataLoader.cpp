@@ -149,7 +149,7 @@ namespace DataLoader {
 	static AEGfxVertexList *circleMesh{ nullptr };			// For square and circle mesh
 	static RoundRectMeshList roundRectMeshes{};										// For rrect unit mesh
 
-	static std::vector< std::unique_ptr<Boss_FSM>> bossStateMachines;
+	static std::vector< std::unique_ptr<BossFSM>> bossStateMachines;
 
 	// Loan Json From File into Json::Value object
 	Json::Value LoadJsonFile(std::string const& file) {
@@ -210,10 +210,6 @@ namespace DataLoader {
 		if (enemyFile.is_open()) {
 			enemyFile >> theGuy; //Take the value!
 
-			//Getting enemy types
-			//enemyTypes.reserve(theGuy["enemies"].size());
-
-
 			for (Json::Value& name : theGuy["enemies"]) {
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };
 
@@ -243,20 +239,10 @@ namespace DataLoader {
 					}
 				}
 
-				if (MapProjectile(tmp.happyProjectile, name, "happyProjectile"))
-				{
-					std::cout << tmp.name << "'s Happy Projectile: " << tmp.happyProjectile.damage << "\n";
-				}
+				MapProjectile(tmp.happyProjectile, name, "happyProjectile");
+				MapProjectile(tmp.angryProjectile, name, "angryProjectile");
+				MapProjectile(tmp.neutralProjectile, name, "neutralProjectile");
 
-				if (MapProjectile(tmp.angryProjectile, name, "angryProjectile"))
-				{
-					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
-				}
-
-				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
-				{
-					std::cout << tmp.name << "'s Neutral Projectile: " << tmp.neutralProjectile.damage << "\n";
-				}
 
 
 				for (Json::Value& thing : name["likes"]){
@@ -292,7 +278,6 @@ namespace DataLoader {
 				AlmanacEntry tmp{entryEnemyType, name["description"].asString(), 
 					name["area"].asString(), 
 					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
-					//DataLoader::CreateTexture(name["spritePath"].asString())};
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 

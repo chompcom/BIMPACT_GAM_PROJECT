@@ -26,6 +26,6 @@ extern FP fpLoad, fpInitialize, fpDraw, fpFree, fpUnload;
 
 extern Update fpUpdate;
 
-void GSM_Initialize(int startingState);
-void GSM_Update();
-void ChangeState(GS_STATES thing);
+void GSMInitialize(int startingState);
+void GSMUpdate();
+void ChangeState(GameStates thing);

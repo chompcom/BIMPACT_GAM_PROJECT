@@ -397,7 +397,6 @@ int Grid::CheckMapGridCollision(float PosX, float PosY, float scaleX, float scal
 */
 bool TileDataBase::Load(std::string const& fileName)
 {
-	//using JsonOut = Json::Value;
 	Json::Value file = DataLoader::LoadJsonFile(fileName);
 
 	tileTypes.clear();

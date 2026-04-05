@@ -15,7 +15,8 @@ Technology is prohibited.
 #pragma once
 #include "AEEngine.h"
 
-enum GS_STATES
+// Game scenes
+enum GameStates
 {
 	GS_LEVEL1 = 0,
 	
@@ -29,7 +30,8 @@ enum GS_STATES
 	GS_CREDITS
 };
 
-enum LV_STATES
+// State of level
+enum LevelStates
 {
 	RUNNING = 0,
 	PAUSED,

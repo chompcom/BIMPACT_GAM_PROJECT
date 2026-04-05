@@ -29,7 +29,6 @@ Technology is prohibited.
 #include "Utils/Utils.h"
 #include "ParticleSystem.h"
 #include "Grid.h"
-//#include "AEEngine.h"
 
 struct AEGfxTexture;
 struct AEGfxVertexList;
@@ -226,6 +225,9 @@ const	Room*	GetRoom(int x, int y) const; // Retrieve a room (const)
 
 		// Render door textures for the current room.
 		void RenderRoomDoors(AEGfxVertexList* squareMesh, AEGfxTexture* doorTexture) const;
-	};
-}
 
+
+	};
+
+
+}

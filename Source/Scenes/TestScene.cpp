@@ -1,3 +1,32 @@
+/* Start Header ************************************************************************/
+/*!
+\file		TestScene.cpp
+
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+
+\author 	Hong Josiah Qin, hong.j, 2501239
+\par  		hong.j@digipen.edu
+
+\author		Lee Hng Hwee Celest, hnghweecelest.l, 2502385
+\par		hnghweecelest.l@digipen.edu
+
+\author     Brandon Choo, b.choo, 2501888
+\par        b.choo@digipen.edu
+
+\author		Ming Jun, m.quah, 2501182
+\par		m.quah@digipen.edu
+
+\brief		This scene is where the main game is played and the player is tested on their abilities.
+The bulk of game's logic is located here.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "TestScene.h"
 
 #include <algorithm>
@@ -25,16 +54,16 @@
 #include "GameStateManager.h"
 #include "../Screens/Tutorial.h"
 
-AEGfxVertexList *sqmesh = nullptr;
+AEGfxVertexList *sqMesh = nullptr;
 
-AEGfxTexture *playerpng = nullptr;
-AEGfxTexture *shadowpng = nullptr;
-AEGfxTexture* hitboxpng = nullptr;
-AEGfxTexture *heartpng = nullptr;
-AEGfxTexture *almanacpng = nullptr;
-AEGfxTexture *almanacLitUppng = nullptr;
+AEGfxTexture *playerPng = nullptr;
+AEGfxTexture *shadowPng = nullptr;
+AEGfxTexture *hitboxPng = nullptr;
+AEGfxTexture *heartPng = nullptr;
+AEGfxTexture *almanacPng = nullptr;
+AEGfxTexture *almanacLitUpPng = nullptr;
 AEGfxTexture *pDoorTex = nullptr; // Door image
-AEGfxTexture *arrowpng = nullptr;
+AEGfxTexture *arrowPng = nullptr;
 
 
 std::vector<TexturedSprite> healthIcons;
@@ -49,12 +78,12 @@ Almanac almanac{};
 
 s8 font = 0;
 
-Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqmesh, shadowpng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqmesh, hitboxpng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
+Player player{TexturedSprite(sqMesh, playerPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqMesh, shadowPng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqMesh, hitboxPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
 
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
 
-LV_STATES gameState;
+LevelStates gameState;
 
 static UIManager pauseUi;
 static bool pauseUiInitialized = false;
@@ -103,15 +132,15 @@ static bool pendingWinStatusRefresh = false;
 void TestLoad()
 {
 	DataLoader::Load();
-	sqmesh = CreateSquareMesh();
-	playerpng = AEGfxTextureLoad("Assets/player.png");
-	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
-	hitboxpng = AEGfxTextureLoad("Assets/hitbox.png");
-	heartpng = AEGfxTextureLoad("Assets/heart.png");
-	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
-	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
-	arrowpng = AEGfxTextureLoad("Assets/arrow.png");
-	gameOverDarkScreen = {sqmesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{0, 0, 0, 0.8f}};
+	sqMesh = CreateSquareMesh();
+	playerPng = AEGfxTextureLoad("Assets/player.png");
+	shadowPng = AEGfxTextureLoad("Assets/shadow.png");
+	hitboxPng = AEGfxTextureLoad("Assets/hitbox.png");
+	heartPng = AEGfxTextureLoad("Assets/heart.png");
+	almanacPng = AEGfxTextureLoad("Assets/almanac.png");
+	almanacLitUpPng = AEGfxTextureLoad("Assets/almanacLitUp.png");
+	arrowPng = AEGfxTextureLoad("Assets/arrow.png");
+	gameOverDarkScreen = {sqMesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{0, 0, 0, 0.8f}};
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.clear();
@@ -129,13 +158,13 @@ void TestLoad()
 	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
 	LoadAlmanacEntries(almanac /*, enemyTypeNames*/);
 
-	almanacIcon = new TexturedSprite(sqmesh, almanacpng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	almanacLitUpIcon = new TexturedSprite(sqmesh, almanacLitUppng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	arrowSprite = new TexturedSprite(sqmesh, arrowpng, Vector2(645.f, -180.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
+	almanacIcon = new TexturedSprite(sqMesh, almanacPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
+	almanacLitUpIcon = new TexturedSprite(sqMesh, almanacLitUpPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
+	arrowSprite = new TexturedSprite(sqMesh, arrowPng, Vector2(645.f, -180.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
 
-	player.sprite = TexturedSprite(sqmesh, playerpng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
-	player.shadow = TexturedSprite(sqmesh, shadowpng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
-	player.hitbox = TexturedSprite(sqmesh, hitboxpng, Vector2(300, 300), Vector2(100, 100), Color{ 1, 1, 1, 0 });
+	player.sprite = TexturedSprite(sqMesh, playerPng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
+	player.shadow = TexturedSprite(sqMesh, shadowPng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
+	player.hitbox = TexturedSprite(sqMesh, hitboxPng, Vector2(300, 300), Vector2(100, 100), Color{ 1, 1, 1, 0 });
 
 	
 	// Global Data Here
@@ -305,8 +334,6 @@ void TestDraw()
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 	
-	
-	//gameMap.RenderCurrentRoom(sqmesh);
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 
@@ -342,7 +369,7 @@ void TestDraw()
 			if (roomData.boss->currentHealth > 0)
 			{
 				roomData.boss->shadow.RenderSprite();
-				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
+				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.currentSpriteUVOffsetX, roomData.boss->sprite.currentSpriteUVOffsetY);
 			}
 		}
 
@@ -408,12 +435,14 @@ void TestDraw()
 		}
 	}
 
-	gameMap.RenderDebugMap(sqmesh); // Debug Map
+	gameMap.RenderDebugMap(sqMesh); // Debug Map
 
 	RenderPlayerLives(player, healthIcons, font);
 
+	// Debug mode active
 	if (debugMode)
 	{
+		// Render object hitboxes
 		if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 		{
 			RoomData& roomData = room->currentRoomData;
@@ -439,7 +468,7 @@ void TestDraw()
 			{
 				if (roomData.boss->currentHealth > 0)
 				{
-					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
+					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.currentSpriteUVOffsetX, roomData.boss->sprite.currentSpriteUVOffsetY);
 					roomData.boss->hitbox.RenderSprite();
 				}
 			}
@@ -462,6 +491,7 @@ void TestDraw()
 
 		player.hitbox.RenderSprite();
 
+		// Display debug info
 		char buffer[50];
 
 		sprintf_s(buffer, 50, "DEBUG MODE ON");
@@ -590,7 +620,7 @@ void TestFree()
 
 void TestUnload()
 {
-	AEGfxMeshFree(sqmesh);
+	AEGfxMeshFree(sqMesh);
 
 	//#warning "there are icons being deleted, are we not using dataloader?"	
 	delete almanacIcon;
@@ -599,15 +629,15 @@ void TestUnload()
 
 
 
-	AEGfxTextureUnload(playerpng);
-	AEGfxTextureUnload(shadowpng);
-	AEGfxTextureUnload(hitboxpng);
+	AEGfxTextureUnload(playerPng);
+	AEGfxTextureUnload(shadowPng);
+	AEGfxTextureUnload(hitboxPng);
 
 
-	AEGfxTextureUnload(heartpng);
-	AEGfxTextureUnload(almanacpng);
-	AEGfxTextureUnload(almanacLitUppng);
-	AEGfxTextureUnload(arrowpng);
+	AEGfxTextureUnload(heartPng);
+	AEGfxTextureUnload(almanacPng);
+	AEGfxTextureUnload(almanacLitUpPng);
+	AEGfxTextureUnload(arrowPng);
 
 	AEGfxDestroyFont(font);
 
@@ -771,7 +801,7 @@ void TestUpdate(float dt)
 					if (e == b) continue;
 					float ti{};
 					if (
-						CollisionIntersection_RectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
+						CollisionIntersectionRectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
 						)
 					{
 						Vector2 dir = b->sprite.position - (e->sprite.position + Vector2(AERandFloat(), AERandFloat()));
@@ -903,11 +933,15 @@ void TestUpdate(float dt)
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
 				roomData.boss->shadow.position.x = bossPrevPos.x;
+				//roomData.boss->sprite.position.x = AEClamp(bossPrevPos.x, -650 + roomData.boss->sprite.scale.y / 2, 650 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.x; // Test for x collision
+				//roomData.boss->shadow.position.x = AEClamp(bossPrevPos.x, -650 + roomData.boss->sprite.scale.y / 2, 650 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.x;
 				roomData.boss->collideWall = true;
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
 				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
+				//roomData.boss->sprite.position.y = AEClamp(bossPrevPos.y, -350 + roomData.boss->sprite.scale.y / 2, 350 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.y; // Test for y collision
+				//roomData.boss->shadow.position.y = AEClamp(bossPrevPos.y, -350 + roomData.boss->sprite.scale.y / 2, 350 - roomData.boss->sprite.scale.y / 2) - roomData.boss->shadowOffset;//bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
 			

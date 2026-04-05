@@ -17,17 +17,18 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "Utils/Vector2.hpp"
 
+// Container to simplify AABB collision
 struct AABB
 {
 	Vector2	min;
 	Vector2	max;
 };
 
-bool CollisionIntersection_RectRect_Static(const AABB& aabb1,					//Input
+bool CollisionIntersectionRectRectStatic(const AABB& aabb1,					//Input
 	const AABB& aabb2);					//Input
 
 
-bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,					//Input
+bool CollisionIntersectionRectRectDynamic(const AABB& aabb1,					//Input
 	const Vector2& vel1,					//Input 
 	const AABB& aabb2,					//Input 
 	const Vector2& vel2,					//Input
@@ -44,7 +45,7 @@ bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1,					//Input
 // returns true if there is intersection.
 //
 // ----------------------------------------------------------------------------
-inline bool CollisionIntersection_RectRect(const Vector2& pos1,					//Input
+inline bool CollisionIntersectionRectRect(const Vector2& pos1,					//Input
 	const Vector2& scale1,					//Input 
 	const Vector2& vel1,					//Input 
 	const Vector2& pos2,					//Input 
@@ -57,12 +58,12 @@ inline bool CollisionIntersection_RectRect(const Vector2& pos1,					//Input
 
 	//Step 1
 	bool staticCollision = false;
-	staticCollision = CollisionIntersection_RectRect_Static(aabb1, aabb2);
+	staticCollision = CollisionIntersectionRectRectStatic(aabb1, aabb2);
 	if (staticCollision)
 	{
 		return true;
 	}
 
 	//Step 2 until 5
-	return CollisionIntersection_RectRect_Dynamic(aabb1, vel1, aabb2, vel2, firstTimeOfCollision);
+	return CollisionIntersectionRectRectDynamic(aabb1, vel1, aabb2, vel2, firstTimeOfCollision);
 }
