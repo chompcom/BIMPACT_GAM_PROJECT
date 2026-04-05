@@ -92,6 +92,17 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         (*it)->UpdateProjectile(dt);
+        // Wall collision for projectile check using room boundary
+        Vector2 pos = (*it)->GetPosition();
+        Vector2 scale = (*it)->GetScale();
+        Vector2 vel = (*it)->GetVelocity();
+      // Getting the grid collision
+        int colRes = roomData.grid.CheckMapGridCollision(pos.x, pos.y, scale.x, scale.y,
+            roomData.grid.WorldToCell(pos.x, pos.y));
+        if (colRes != 0)
+        {
+            (*it)->RemoveProjectile(); // remove projectile if collide 
+        }
         if (!(*it)->IsAlive()) {
             // Scatter projectile spawns AOE on death
             if ((*it)->isScatter && !(*it)->didScatter) {
