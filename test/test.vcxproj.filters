@@ -9,201 +9,282 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;inl;inc</Extensions>
     </Filter>
+    <Filter Include="Common Engine Files">
+      <UniqueIdentifier>{3fdc2a3f-cf90-4f09-85df-4e73ca82a1ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemies">
+      <Extensions>cpp;c;cxx;cc</Extensions>
+    </Filter>
+    <Filter Include="Boss">
+      <Extensions>h;hh;hpp;hxx;inl;inc</Extensions>
+    </Filter>
+    <Filter Include="UI">
+      <Extensions>cpp;c;cxx;cc</Extensions>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{a0150d72-d68d-43bc-8015-965dd477f5f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\Header">
+      <UniqueIdentifier>{e6049ff7-5e28-404c-911f-a1be0f9aa27f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\Source">
+      <UniqueIdentifier>{02180c45-e2a1-4ff9-a056-5666dfff5783}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Boss\Header">
+      <UniqueIdentifier>{c30e748a-103c-43d0-97f4-0d08753aa512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Boss\Source">
+      <UniqueIdentifier>{314d7813-4dcf-4b22-be0b-8153a1300ac8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemies\Header">
+      <UniqueIdentifier>{cf52570e-35f4-4a08-85bd-4ba109f794fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Enemies\Source">
+      <UniqueIdentifier>{b2a0cdbe-3fcb-4463-a9d4-94e86afa8f7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EntitySystems">
+      <UniqueIdentifier>{b7109088-a617-4cdc-83ab-57823bcb6826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EntitySystems\Header">
+      <UniqueIdentifier>{07bf6380-2807-4666-bad9-a2a91fd8d4e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EntitySystems\Source">
+      <UniqueIdentifier>{b299fc5e-b90d-4c0c-bfc3-ff2638e85158}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Header">
+      <UniqueIdentifier>{f6d8d226-dc6d-48f0-ba0e-8b4161822295}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\Source">
+      <UniqueIdentifier>{b7c1d38b-9119-4631-a9aa-693d5301d9b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rooms">
+      <UniqueIdentifier>{777543d8-09af-4df0-b2a1-09e75e99367b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rooms\Header">
+      <UniqueIdentifier>{e8ffa7e5-b2c1-453e-85b8-e0f95e19bd4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rooms\Source">
+      <UniqueIdentifier>{4b9481f3-df53-40c1-99d0-b8e73b226c08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{ab8c1164-f2dd-4f7c-afeb-0b052438707e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Colliders">
+      <UniqueIdentifier>{b0dfb4ee-942f-4ac2-8fe4-1f2b6ea378d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Colliders\Header">
+      <UniqueIdentifier>{9ecffe55-eb45-49ce-9787-03fa8c949f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Colliders\Source">
+      <UniqueIdentifier>{cdbf1eee-3e7f-47b8-ae7a-b5e5797539a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common Engine Files\Header">
+      <UniqueIdentifier>{883e50e7-97bd-44c2-8982-4a2b319f758b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common Engine Files\Source">
+      <UniqueIdentifier>{fbf8ae44-d819-44a5-98ba-4c18af4eb5ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player\Header">
+      <UniqueIdentifier>{54621361-85a0-44d7-8df1-7aefa802ae19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player\Source">
+      <UniqueIdentifier>{076e218d-9265-4ab6-b698-e99827f0a9ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Almanac.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Boss.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\BoundaryCollision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Collision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Enemy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\FSM.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\GameStateManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Gift.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\HUD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Loaders\DataLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Player.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Source\Scenes\TestScene.cpp">
+      <Filter>Scenes\Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\Projectile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\ProjectileManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\Source\FSM.cpp">
+      <Filter>Boss\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Boss.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\RoomData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Scenes\TestScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Traits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Utils\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\rooms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\ParticleSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Levels.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Screens\Ui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Screens\MainMenuScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Boss\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Screens\ContentEditorScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Audio.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Screens\Credits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\Screens\Tutorial.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Scenes\Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\Screens\LogoScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Scenes\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\MainMenuScene.cpp">
+      <Filter>Scenes\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\Credits.cpp">
+      <Filter>Scenes\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Behaviour\Behaviours.cpp">
+      <Filter>Enemies\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Enemy.cpp">
+      <Filter>Enemies\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ProjectileManager.cpp">
+      <Filter>EntitySystems\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ParticleSystem.cpp">
+      <Filter>EntitySystems\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Projectile.cpp">
+      <Filter>EntitySystems\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\Ui.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Screens\Tutorial.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\HUD.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Almanac.cpp">
+      <Filter>UI\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\RoomData.cpp">
+      <Filter>Rooms\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\rooms.cpp">
+      <Filter>Rooms\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Levels.cpp">
+      <Filter>Rooms\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Grid.cpp">
+      <Filter>Rooms\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\BoundaryCollision.cpp">
+      <Filter>Colliders\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Collision.cpp">
+      <Filter>Colliders\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Audio.cpp">
+      <Filter>Common Engine Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Loaders\DataLoader.cpp">
+      <Filter>Common Engine Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\GameStateManager.cpp">
+      <Filter>Common Engine Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Sprite.cpp">
+      <Filter>Common Engine Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Traits.cpp">
+      <Filter>Enemies\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Utils\Utils.cpp">
+      <Filter>Common Engine Files\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Gift.cpp">
+      <Filter>Player\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Player.cpp">
+      <Filter>Player\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Boss.cpp">
+      <Filter>Boss\Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Source\Almanac.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Source\Scenes\TestScene.h">
+      <Filter>Scenes\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Boss.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\BoundaryCollision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Collision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Behaviour\Behaviours.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Enemy.h">
-      <Filter>Header Files</Filter>
+      <Filter>Boss\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\FSM.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GameStateList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\GameStateManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Gift.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\HUD.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Loaders\DataLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Projectile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\ProjectileManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\RoomData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Grid.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Scenes\TestScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\rooms.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Traits.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Utils\Utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Utils\Vector2.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\ParticleSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Levels.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Screens\Ui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Screens\MainMenuScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Screens\ContentEditorScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\Audio.h">
-      <Filter>Header Files</Filter>
+      <Filter>Boss\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Screens\Credits.h">
-      <Filter>Header Files</Filter>
+      <Filter>Scenes\Header</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\Screens\Tutorial.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\Source\Screens\MainMenuScene.h">
+      <Filter>Scenes\Header</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\Screens\LogoScene.h">
-      <Filter>Header Files</Filter>
+      <Filter>Scenes\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Screens\ContentEditorScene.h">
+      <Filter>Scenes\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Enemy.h">
+      <Filter>Enemies\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Behaviour\Behaviours.h">
+      <Filter>Enemies\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Traits.h">
+      <Filter>Enemies\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ParticleSystem.h">
+      <Filter>EntitySystems\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Projectile.h">
+      <Filter>EntitySystems\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\ProjectileManager.h">
+      <Filter>EntitySystems\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Almanac.h">
+      <Filter>UI\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\HUD.h">
+      <Filter>UI\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Screens\Tutorial.h">
+      <Filter>UI\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Screens\Ui.h">
+      <Filter>UI\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Grid.h">
+      <Filter>Rooms\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\RoomData.h">
+      <Filter>Rooms\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\rooms.h">
+      <Filter>Rooms\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Levels.h">
+      <Filter>Rooms\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\BoundaryCollision.h">
+      <Filter>Colliders\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Collision.h">
+      <Filter>Colliders\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Loaders\DataLoader.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Audio.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Sprite.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Utils\Utils.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Utils\Vector2.hpp">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GameStateList.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\GameStateManager.h">
+      <Filter>Common Engine Files\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Gift.h">
+      <Filter>Player\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Player.h">
+      <Filter>Player\Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
