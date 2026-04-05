@@ -1,3 +1,18 @@
+/*!***************************************************************************
+\file       ContentEditorScene.cpp
+\author     Quah Ming Jun, m.quah
+\par        m.quah@digipen.edu
+\brief
+	This source file implements the Content Editor scene, an in-game tool
+	for creating, modifying, and exporting room layout CSV files used by
+	the procedural generation system.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+***************************************************************************/
+
 #include "ContentEditorScene.h"
 
 
@@ -9,6 +24,7 @@ namespace
 	UIManager confirmUi;
 	static bool isConfirmPopupOpen = false;
 
+	// Confirmatimation Action
 	enum class ConfirmAction
 	{
 		None,
@@ -32,17 +48,58 @@ namespace
 	constexpr float obstacleThumbnailGapY = 70.0f;
 	constexpr float obstacleThumbnailSize = 48.0f;
 
+	// Save Directory
 	std::string saveDirectory{ ".\\Assets\\Levels\\Room_Data\\" };
 
+	/*!
+	\struct RectBounds
+	\brief
+		Represents an axis-aligned rectangle in world coordinates.
+
+	\par
+		Used for:
+			* Preview panel bounds
+			* Room floor bounds
+			* Grid cell mapping
+	*/
 	struct RectBounds {float left{}, right{}, top{}, bottom{};};
 
 
+	/*!
+	\brief
+		Extract the filename (without extension) from a CSV path.
+
+	\param path
+		Full file path.
+
+	\return
+		Filename without ".csv".
+	*/
 	std::string GetFileNameCSV(std::string const& path) {
 		return ExtractFileName(path, ".csv");
 	}
 
+	/*!
+	\brief
+		Scan a folder for CSV files matching a pattern and populate a list.
 
+	\par
+		Methodology:
+			1. Build a Windows wildcard search pattern.
+			2. Use FindFirstFileA / FindNextFileA to enumerate files.
+			3. Skip directories.
+			4. Append full paths to outList.
+			5. Sort results alphabetically.
 
+	\param folder
+		Directory to scan.
+
+	\param patternAppend
+		Wildcard pattern (e.g., "*.csv").
+
+	\param outList
+		Output vector of file paths.
+	*/
 	void ScanCSVBiomes(std::string const& folder, std::string patternAppend, std::vector<std::string>& outList)
 	{
 		outList.clear();	// Clear Lists
@@ -77,6 +134,15 @@ namespace
 		std::sort(outList.begin(), outList.end());
 	}
 
+	/*!
+	\brief
+		Refresh the list of existing CSV files available for editing.
+
+	\details
+		Scans the Room_Data folder and updates:
+			* existingCsvPaths
+			* existingCsvIndex
+	*/
 	void RefreshExistingCsvList()
 	{
 		contentEditorState.existingCsvPaths.clear();
@@ -86,7 +152,14 @@ namespace
 		std::sort(contentEditorState.existingCsvPaths.begin(), contentEditorState.existingCsvPaths.end());
 	}
 
-	// popup de text
+
+	/*!
+	\brief
+		Update the popup label to show the currently selected CSV file.
+
+	\details
+		If no CSV files exist, displays "No CSV files found".
+	*/
 	void RefreshLoadPopupLabel()
 	{
 		UIElement* label = loadPopupUi.FindById("label_existing_file");
@@ -104,6 +177,13 @@ namespace
 	}
 
 
+	/*!
+	\brief
+		Retrieve the mouse cursor position in world coordinates.
+
+	\return
+		Vector2 containing world-space X/Y.
+	*/
 	Vector2 GetMouseWorldPosition()
 	{
 		s32 mouseX = 0, mouseY = 0;
@@ -137,6 +217,19 @@ namespace
 	}
 
 	
+	/*!
+	\brief
+		Rebuild the obstacle palette based on the selected biome.
+
+	\details
+		Methodology:
+			1. Retrieve all tiles belonging to the biome.
+			2. Filter out:
+				* Empty tiles
+				* Special marker tiles (ID 0, 100)
+				* Tiles with no asset path
+			3. Reset palette page and selected tile.
+	*/
 	void RebuildObstaclePaletteForSelectedBiome()
 	{
 		contentEditorState.obstaclePalette.clear();
@@ -158,7 +251,7 @@ namespace
 		contentEditorState.selectedTileId = (!contentEditorState.obstaclePalette.empty()) ? (contentEditorState.selectedTileId = contentEditorState.obstaclePalette[0]->id) : (0);
 	}
 
-
+	// Remove tiles from the grid that are not allowed in the selected biome.
 	void RemoveTilesNotAllowedForSelectedBiome()
 	{
 		for (int row = 0; row < contentEditorState.roomGrid.GetHeight(); ++row)
@@ -175,7 +268,7 @@ namespace
 	}
 
 
-	// Room Code
+	// Retrieve world-space bounds of the room preview panel from UI.
 	RectBounds GetPreviewPanelBoundsFromUi()
 	{
 		RectBounds previewPanelBounds{};
@@ -196,6 +289,8 @@ namespace
 
 		return previewPanelBounds;
 	}
+
+	// Compute the world-space bounds of the playable floor inside the preview panel.
 	RectBounds GetRoomFloorBoundsFromPreviewPanel()
 	{
 		RectBounds previewPanelBounds = GetPreviewPanelBoundsFromUi();
@@ -218,6 +313,8 @@ namespace
 
 		return floorBounds;
 	}
+
+	// Compute the world-space center of a grid cell in the preview panel.
 	Vector2 GetEditorRoomCellWorldCenter(int row, int column)
 	{
 		RectBounds floorBounds = GetRoomFloorBoundsFromPreviewPanel();
@@ -228,19 +325,14 @@ namespace
 		float cellWidth = floorWidth / static_cast<float>(contentEditorState.roomGrid.GetWidth());
 		float cellHeight = floorHeight / static_cast<float>(contentEditorState.roomGrid.GetHeight());
 
-		float centerX =
-			floorBounds.left +
-			static_cast<float>(column) * cellWidth +
-			cellWidth * 0.5f;
+		float centerX = floorBounds.left + static_cast<float>(column) * cellWidth + cellWidth * 0.5f;
 
-		float centerY =
-			floorBounds.top -
-			static_cast<float>(row) * cellHeight -
-			cellHeight * 0.5f;
+		float centerY = floorBounds.top - static_cast<float>(row) * cellHeight - cellHeight * 0.5f;
 
 		return Vector2{ centerX, centerY };
 	}
 
+	// Convert a world-space position to a grid cell index in the editor.
 	int GetEditorRoomCellIndexAtWorldPosition(float worldX, float worldY)
 	{
 		// Do not use Grid::WorldToCell() here.
@@ -281,6 +373,7 @@ namespace
 		return row * contentEditorState.roomGrid.GetWidth() + column;
 	}
 
+	// Update UI labels, visibility, and dynamic text based on editor state.
 	void UpdateContentEditorUi()
 	{
 		UIElement* modeLabel = contentEditorUi.FindById("label_mode");
@@ -355,7 +448,7 @@ namespace
 		}
 	}
 
-
+	// Load a room layout from a CSV file and update editor state accordingly.
 	bool ReadFromBiomeCsv(std::string const& filePath) {
 		if (!contentEditorState.roomGrid.LoadRoomCSV(filePath))
 		{
@@ -386,6 +479,7 @@ namespace
 		return true;
 	}
 
+	// Export the current editor grid to a CSV file.
 	bool ExportCurrentEditorRoomToCsv(std::string const& outputFilePath)
 	{
 		std::ofstream outputFile(outputFilePath);
@@ -416,7 +510,16 @@ namespace
 	}
 
 
-	// To amend in time to come?
+	/*!
+	\brief
+		Randomly populate the grid with obstacles for quick testing.
+
+	\par
+		Places:
+			* Random obstacles
+			* One enemy marker
+			* One gift marker
+	*/
 	void RandomizeCurrentEditorRoomLayout()
 	{
 		ClearEditorRoomGrid();
@@ -433,37 +536,25 @@ namespace
 
 		for (int i = 0; i < numberOfPlacements; ++i)
 		{
-			int randomRow =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
-
-			int randomColumn =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
-
-			int randomPaletteIndex =
-				std::rand() % static_cast<int>(contentEditorState.obstaclePalette.size());
+			int randomRow = 1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+			int randomColumn = 1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
+			int randomPaletteIndex = std::rand() % static_cast<int>(contentEditorState.obstaclePalette.size());
 
 			contentEditorState.roomGrid.SetCell(randomRow,randomColumn, contentEditorState.obstaclePalette[randomPaletteIndex]->id);
 		}
 
 		// Place one generic enemy marker
 		{
-			int randomRow =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
-
-			int randomColumn =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
+			int randomRow = 1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+			int randomColumn = 1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
 
 			contentEditorState.roomGrid.SetCell(randomRow, randomColumn, 200);
 		}
 
 		// Place one generic gift marker
 		{
-			int randomRow =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
-
-			int randomColumn =
-				1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
-
+			int randomRow = 1 + (std::rand() % (contentEditorState.roomGrid.GetHeight() - 2));
+			int randomColumn = 1 + (std::rand() % (contentEditorState.roomGrid.GetWidth() - 2));
 			contentEditorState.roomGrid.SetCell(randomRow, randomColumn, 500);
 		}
 
@@ -471,21 +562,25 @@ namespace
 		UpdateContentEditorUi();
 	}
 
+	/*!
+	\brief
+		Draw obstacle palette thumbnails in the left panel.
+
+	\details
+		Methodology:
+			1. Determine visible palette range based on current page.
+			2. Draw background slot for each thumbnail.
+			3. Draw tile texture if available.
+			4. Draw selection outline if tile is selected.
+	*/
 	void DrawObstaclePaletteThumbnails()
 	{
-		if (contentEditorState.currentTab != ContentEditorTab::Obstacles)
-		{
-			return;
-		}
+		if (contentEditorState.currentTab != ContentEditorTab::Obstacles) return;
 
 		AEGfxVertexList* squareMesh = DataLoader::GetOrCreateSquareMesh();
-		if (!squareMesh)
-		{
-			return;
-		}
+		if (!squareMesh) return;
 
-		int firstPaletteIndex =
-			contentEditorState.currentObstaclePalettePage * obstaclePaletteItemsPerPage;
+		int firstPaletteIndex = contentEditorState.currentObstaclePalettePage * obstaclePaletteItemsPerPage;
 
 		int lastPaletteIndex = firstPaletteIndex + obstaclePaletteItemsPerPage;
 		if (lastPaletteIndex > static_cast<int>(contentEditorState.obstaclePalette.size()))
@@ -500,11 +595,9 @@ namespace
 			int row = visibleSlotIndex / obstaclePaletteColumns;
 			int column = visibleSlotIndex % obstaclePaletteColumns;
 
-			float thumbnailCenterX =
-				obstacleThumbnailStartX + static_cast<float>(column) * obstacleThumbnailGapX;
+			float thumbnailCenterX = obstacleThumbnailStartX + static_cast<float>(column) * obstacleThumbnailGapX;
 
-			float thumbnailCenterY =
-				obstacleThumbnailStartY - static_cast<float>(row) * obstacleThumbnailGapY;
+			float thumbnailCenterY = obstacleThumbnailStartY - static_cast<float>(row) * obstacleThumbnailGapY;
 
 			TileType const* currentTileType = contentEditorState.obstaclePalette[paletteIndex];
 			if (!currentTileType)
@@ -561,6 +654,7 @@ namespace
 	}
 }
 
+// Load all assets, UI layouts, and initial editor data.
 void ContentEditorLoad()
 {
 	contentEditorFont = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 56);
@@ -575,10 +669,7 @@ void ContentEditorLoad()
 
 	contentEditorState.biomeNames = Grid::GetAllBiomes();
 
-	if (contentEditorState.biomeNames.empty())
-	{
-		contentEditorState.biomeNames.push_back("Normal");
-	}
+	if (contentEditorState.biomeNames.empty()) contentEditorState.biomeNames.push_back("Normal");
 
 	contentEditorState.selectedBiomeIndex = 0;
 	contentEditorState.currentTab = ContentEditorTab::Biomes;
@@ -661,16 +752,8 @@ void ContentEditorLoad()
 			}
 			else
 			{
-				int totalPalettePages =
-					static_cast<int>(
-						(contentEditorState.obstaclePalette.size() + obstaclePaletteItemsPerPage - 1) /
-						obstaclePaletteItemsPerPage
-						);
-
-				if (contentEditorState.currentObstaclePalettePage + 1 < totalPalettePages)
-				{
-					contentEditorState.currentObstaclePalettePage++;
-				}
+				int totalPalettePages = static_cast<int>((contentEditorState.obstaclePalette.size() + obstaclePaletteItemsPerPage - 1) /obstaclePaletteItemsPerPage);
+				if (contentEditorState.currentObstaclePalettePage + 1 < totalPalettePages) contentEditorState.currentObstaclePalettePage++;
 			}
 
 			UpdateContentEditorUi();
@@ -682,11 +765,7 @@ void ContentEditorLoad()
 
 			loadPopupUi.Clear();
 			loadPopupUi.SetFont(contentEditorFont);
-			loadPopupUi.LoadFromFilePopUp(
-				"Assets/UI/contenteditor_load_popup.json",
-				Vector2(0.0f, 0.0f),
-				Vector2(720.0f, 260.0f)
-			);
+			loadPopupUi.LoadFromFilePopUp("Assets/UI/contenteditor_load_popup.json", Vector2(0.0f, 0.0f), Vector2(720.0f, 260.0f));
 
 			RefreshLoadPopupLabel();
 			contentEditorState.isLoadPopupOpen = true;
@@ -700,8 +779,7 @@ void ContentEditorLoad()
 					contentEditorState.existingCsvIndex--;
 					if (contentEditorState.existingCsvIndex < 0)
 					{
-						contentEditorState.existingCsvIndex =
-							static_cast<int>(contentEditorState.existingCsvPaths.size()) - 1;
+						contentEditorState.existingCsvIndex = static_cast<int>(contentEditorState.existingCsvPaths.size()) - 1;
 					}
 
 					RefreshLoadPopupLabel();
@@ -712,8 +790,7 @@ void ContentEditorLoad()
 					if (contentEditorState.existingCsvPaths.empty()) return;
 
 					contentEditorState.existingCsvIndex++;
-					if (contentEditorState.existingCsvIndex >=
-						static_cast<int>(contentEditorState.existingCsvPaths.size()))
+					if (contentEditorState.existingCsvIndex >= static_cast<int>(contentEditorState.existingCsvPaths.size()))
 					{
 						contentEditorState.existingCsvIndex = 0;
 					}
@@ -723,8 +800,6 @@ void ContentEditorLoad()
 
 			loadPopupUi.BindOnClick("btn_cancel_existing", [](UIElement&)
 				{
-					//contentEditorState.isLoadPopupOpen = false;
-					//loadPopupUi.Clear();
 					contentEditorState.pendingClosePopUp = true; // prevent crashes...
 				});
 
@@ -751,8 +826,7 @@ void ContentEditorLoad()
 		{
 			std::string outputFilePath{};
 
-			if (contentEditorState.isEditingExistingFile &&
-				!contentEditorState.currentEditingFilePath.empty())
+			if (contentEditorState.isEditingExistingFile && !contentEditorState.currentEditingFilePath.empty())
 			{
 				outputFilePath = contentEditorState.currentEditingFilePath;
 			}
@@ -760,25 +834,11 @@ void ContentEditorLoad()
 			{
 				std::size_t fileNumber = 1;
 
-				outputFilePath =
-					saveDirectory +
-					GetSelectedBiomeName() +
-					"_" +
-					contentEditorState.exportFileName +
-					"_" +
-					std::to_string(fileNumber) +
-					".csv";
+				outputFilePath = saveDirectory + GetSelectedBiomeName() + "_" + contentEditorState.exportFileName + "_" + std::to_string(fileNumber) + ".csv";
 
 				while (FileExists(outputFilePath))
 				{
-					outputFilePath =
-						saveDirectory +
-						GetSelectedBiomeName() +
-						"_" +
-						contentEditorState.exportFileName +
-						"_" +
-						std::to_string(++fileNumber) +
-						".csv";
+					outputFilePath = saveDirectory + GetSelectedBiomeName() + "_" + contentEditorState.exportFileName + "_" + std::to_string(++fileNumber) + ".csv";
 				}
 			}
 
@@ -840,10 +900,12 @@ void ContentEditorLoad()
 
 }
 
+// Nth to see here
 void ContentEditorInit()
 {
 }
 
+// Update the Content Editor each frame
 void ContentEditorUpdate(float dt)
 {
 	UNREFERENCED_PARAMETER(dt);
@@ -913,8 +975,7 @@ void ContentEditorUpdate(float dt)
 
 	Vector2 mouseWorldPosition = GetMouseWorldPosition();
 
-	contentEditorState.hoveredCellIndex =
-		GetEditorRoomCellIndexAtWorldPosition(mouseWorldPosition.x, mouseWorldPosition.y);
+	contentEditorState.hoveredCellIndex = GetEditorRoomCellIndexAtWorldPosition(mouseWorldPosition.x, mouseWorldPosition.y);
 
 	if (contentEditorState.currentTab == ContentEditorTab::Obstacles && AEInputCheckTriggered(AEVK_LBUTTON))
 	{
@@ -933,12 +994,8 @@ void ContentEditorUpdate(float dt)
 			int row = visibleSlotIndex / obstaclePaletteColumns;
 			int column = visibleSlotIndex % obstaclePaletteColumns;
 
-			float thumbnailCenterX =
-				obstacleThumbnailStartX + static_cast<float>(column) * obstacleThumbnailGapX;
-
-			float thumbnailCenterY =
-				obstacleThumbnailStartY - static_cast<float>(row) * obstacleThumbnailGapY;
-
+			float thumbnailCenterX = obstacleThumbnailStartX + static_cast<float>(column) * obstacleThumbnailGapX;
+			float thumbnailCenterY = obstacleThumbnailStartY - static_cast<float>(row) * obstacleThumbnailGapY;
 			float halfThumbnailSize = 30.0f;
 
 			if (mouseWorldPosition.x >= thumbnailCenterX - halfThumbnailSize &&
@@ -946,11 +1003,8 @@ void ContentEditorUpdate(float dt)
 				mouseWorldPosition.y >= thumbnailCenterY - halfThumbnailSize &&
 				mouseWorldPosition.y <= thumbnailCenterY + halfThumbnailSize)
 			{
-				contentEditorState.selectedTileId =
-					contentEditorState.obstaclePalette[paletteIndex]->id;
-
-				contentEditorState.statusMessage =
-					"Selected tile name: " + contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name; // std::to_string(contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name);
+				contentEditorState.selectedTileId = contentEditorState.obstaclePalette[paletteIndex]->id;
+				contentEditorState.statusMessage = "Selected tile name: " + contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name; // std::to_string(contentEditorState.roomGrid.QueryTileType(contentEditorState.selectedTileId)->name);
 
 				UpdateContentEditorUi();
 				return;
@@ -963,11 +1017,8 @@ void ContentEditorUpdate(float dt)
 	if (contentEditorState.currentTab == ContentEditorTab::Obstacles &&
 		contentEditorState.hoveredCellIndex >= 0)
 	{
-		int clickedRow =
-			contentEditorState.hoveredCellIndex / contentEditorState.roomGrid.GetWidth();
-
-		int clickedColumn =
-			contentEditorState.hoveredCellIndex % contentEditorState.roomGrid.GetWidth();
+		int clickedRow = contentEditorState.hoveredCellIndex / contentEditorState.roomGrid.GetWidth();
+		int clickedColumn = contentEditorState.hoveredCellIndex % contentEditorState.roomGrid.GetWidth();
 
 		// Add stuff
 		if (AEInputCheckCurr(AEVK_LBUTTON)) contentEditorState.roomGrid.SetCell(clickedRow, clickedColumn, contentEditorState.selectedTileId);
@@ -982,6 +1033,7 @@ void ContentEditorUpdate(float dt)
 	
 }
 
+// Render the Content Editor scene.
 void ContentEditorDraw()
 {
 	AEGfxSetBackgroundColor(0.08f, 0.08f, 0.08f);
@@ -1014,12 +1066,8 @@ void ContentEditorDraw()
 		float roomFloorWidth = roomFloorBounds.right - roomFloorBounds.left;
 		float roomFloorHeight = roomFloorBounds.top - roomFloorBounds.bottom;
 
-		float roomCellWidth =
-			roomFloorWidth / static_cast<float>(contentEditorState.roomGrid.GetWidth());
-
-		float roomCellHeight =
-			roomFloorHeight / static_cast<float>(contentEditorState.roomGrid.GetHeight());
-
+		float roomCellWidth = roomFloorWidth / static_cast<float>(contentEditorState.roomGrid.GetWidth());
+		float roomCellHeight = roomFloorHeight / static_cast<float>(contentEditorState.roomGrid.GetHeight());
 		float placedObstacleDrawSize = AEMin(roomCellWidth, roomCellHeight) * 0.72f;
 
 		for (int row = 0; row < contentEditorState.roomGrid.GetHeight(); ++row)
@@ -1057,11 +1105,9 @@ void ContentEditorDraw()
 
 			if (contentEditorState.hoveredCellIndex >= 0)
 			{
-				int hoveredRow =
-					contentEditorState.hoveredCellIndex / contentEditorState.roomGrid.GetWidth();
+				int hoveredRow = contentEditorState.hoveredCellIndex / contentEditorState.roomGrid.GetWidth();
 
-				int hoveredColumn =
-					contentEditorState.hoveredCellIndex % contentEditorState.roomGrid.GetWidth();
+				int hoveredColumn = contentEditorState.hoveredCellIndex % contentEditorState.roomGrid.GetWidth();
 
 				Sprite hoveredCellHighlight(
 					squareMesh,
@@ -1146,10 +1192,13 @@ void ContentEditorDraw()
 
 }
 
+
+// Nth to see here
 void ContentEditorFree()
 {
 }
 
+// Unload all assets used by the Content Editor.
 void ContentEditorUnload()
 {
 	contentEditorUi.Clear();
