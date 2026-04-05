@@ -154,7 +154,7 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
             if  (hit) {
                 if ((*it)->GetDmg() < 0.f) {
                     // If dmg is neg then it heals 
-                    playerHealsDamage(player);
+                    PlayerHealsDamage(player);
                 }
                 else if ( (*it)->GetDmg() > 0.f)
                     PlayerTakesDamage(player);
