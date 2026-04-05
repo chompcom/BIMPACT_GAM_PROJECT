@@ -59,7 +59,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // Changing the window title
     AESysSetWindowTitle("Friend Dungeon!");
-    GSM_Initialize(GS_LOGO);
+    GSMInitialize(GS_LOGO);
     // Game Loop
     while (current != GS_QUIT)
     {
