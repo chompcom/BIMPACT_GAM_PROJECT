@@ -870,8 +870,8 @@ namespace mapRooms
 	***************************************************************************/
 	void Map::GenerateRooms() {
 
-		int MinRooms = min(4, gridSize * gridSize - 1);
-		int MaxRooms = max(4, gridSize * gridSize - 1);
+		int MinRooms = min(7, gridSize * gridSize - 1);
+		int MaxRooms = max(7, gridSize * gridSize - 1);
 
 		int roomsVisit = RandInt(MinRooms, MaxRooms);	// Set How many rooms to make available
 
