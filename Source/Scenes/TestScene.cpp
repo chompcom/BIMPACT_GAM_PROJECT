@@ -54,22 +54,22 @@ Technology is prohibited.
 #include "GameStateManager.h"
 #include "../Screens/Tutorial.h"
 
-AEGfxVertexList *sqMesh = nullptr;
+AEGfxVertexList* sqMesh = nullptr;
 
-AEGfxTexture *playerPng = nullptr;
-AEGfxTexture *shadowPng = nullptr;
-AEGfxTexture *hitboxPng = nullptr;
-AEGfxTexture *heartPng = nullptr;
-AEGfxTexture *almanacPng = nullptr;
-AEGfxTexture *almanacLitUpPng = nullptr;
-AEGfxTexture *pDoorTex = nullptr; // Door image
-AEGfxTexture *arrowPng = nullptr;
+AEGfxTexture* playerPng = nullptr;
+AEGfxTexture* shadowPng = nullptr;
+AEGfxTexture* hitboxPng = nullptr;
+AEGfxTexture* heartPng = nullptr;
+AEGfxTexture* almanacPng = nullptr;
+AEGfxTexture* almanacLitUpPng = nullptr;
+AEGfxTexture* pDoorTex = nullptr; // Door image
+AEGfxTexture* arrowPng = nullptr;
 
 
 std::vector<TexturedSprite> healthIcons;
-TexturedSprite *almanacIcon = nullptr;
-TexturedSprite *almanacLitUpIcon = nullptr;
-TexturedSprite *arrowSprite = nullptr;
+TexturedSprite* almanacIcon = nullptr;
+TexturedSprite* almanacLitUpIcon = nullptr;
+TexturedSprite* arrowSprite = nullptr;
 std::vector<TexturedSprite> gameOverButtons;
 
 Sprite gameOverDarkScreen{};
@@ -78,7 +78,7 @@ Almanac almanac{};
 
 s8 font = 0;
 
-Player player{TexturedSprite(sqMesh, playerPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqMesh, shadowPng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqMesh, hitboxPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0)};
+Player player{ TexturedSprite(sqMesh, playerPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), TexturedSprite(sqMesh, shadowPng, Vector2(), Vector2(), Color{1, 1, 1, 1}),  TexturedSprite(sqMesh, hitboxPng, Vector2(), Vector2(), Color{1, 1, 1, 1}), 2500.f, 100.f, Vector2(0, 0) };
 
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
@@ -87,7 +87,7 @@ LevelStates gameState;
 
 static UIManager pauseUi;
 static bool pauseUiInitialized = false;
-static char const *pauseTipText = "[TIP]: Press `TAB` to resume";
+static char const* pauseTipText = "[TIP]: Press `TAB` to resume";
 
 static UIManager winUi;
 static bool winUiInitialized = false;
@@ -140,17 +140,17 @@ void TestLoad()
 	almanacPng = AEGfxTextureLoad("Assets/almanac.png");
 	almanacLitUpPng = AEGfxTextureLoad("Assets/almanacLitUp.png");
 	arrowPng = AEGfxTextureLoad("Assets/arrow.png");
-	gameOverDarkScreen = {sqMesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{0, 0, 0, 0.8f}};
+	gameOverDarkScreen = { sqMesh, Vector2(0.f, 0.f), Vector2(1600.f, 900.f), Color{0, 0, 0, 0.8f} };
 	font = AEGfxCreateFont("Assets/Kenney Pixel.ttf", 64);
 
 	healthIcons.clear();
 	AlmanacFree(almanac);
-	
+
 	healthIcons.resize(3, DataLoader::CreateTexture("Assets/heart.png"));
-	for (int i{0}; i < 3; ++i)
+	for (int i{ 0 }; i < 3; ++i)
 	{
-		healthIcons[i].position = Vector2{-600.5f + (i * 100.f), -350.f};
-		healthIcons[i].scale = Vector2{64.f, 64.f};
+		healthIcons[i].position = Vector2{ -600.5f + (i * 100.f), -350.f };
+		healthIcons[i].scale = Vector2{ 64.f, 64.f };
 		healthIcons[i].UpdateTransform();
 	}
 
@@ -158,15 +158,15 @@ void TestLoad()
 	almanac.pageSprites[0].scale = Vector2(1600.f, 900.f);
 	LoadAlmanacEntries(almanac /*, enemyTypeNames*/);
 
-	almanacIcon = new TexturedSprite(sqMesh, almanacPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	almanacLitUpIcon = new TexturedSprite(sqMesh, almanacLitUpPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
-	arrowSprite = new TexturedSprite(sqMesh, arrowPng, Vector2(645.f, -180.f), Vector2(128, 128), Color{1.0, 1.0, 1.0, 0.0});
+	almanacIcon = new TexturedSprite(sqMesh, almanacPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0, 1.0, 1.0, 0.0 });
+	almanacLitUpIcon = new TexturedSprite(sqMesh, almanacLitUpPng, Vector2(640.f, -325.f), Vector2(128, 128), Color{ 1.0, 1.0, 1.0, 0.0 });
+	arrowSprite = new TexturedSprite(sqMesh, arrowPng, Vector2(645.f, -180.f), Vector2(128, 128), Color{ 1.0, 1.0, 1.0, 0.0 });
 
-	player.sprite = TexturedSprite(sqMesh, playerPng, Vector2(300, 300), Vector2(100, 100), Color{1, 1, 1, 0});
-	player.shadow = TexturedSprite(sqMesh, shadowPng, Vector2(300, 255), Vector2(100, 100), Color{1, 1, 1, 0});
+	player.sprite = TexturedSprite(sqMesh, playerPng, Vector2(300, 300), Vector2(100, 100), Color{ 1, 1, 1, 0 });
+	player.shadow = TexturedSprite(sqMesh, shadowPng, Vector2(300, 255), Vector2(100, 100), Color{ 1, 1, 1, 0 });
 	player.hitbox = TexturedSprite(sqMesh, hitboxPng, Vector2(300, 300), Vector2(100, 100), Color{ 1, 1, 1, 0 });
 
-	
+
 	// Global Data Here
 	// I moved these and the init map down to init so it'll reset when the game state is restarted
 
@@ -189,7 +189,7 @@ void TestInit()
 	globalTransferData.player = nullptr;
 	globalTransferData.particleSystem = nullptr;
 
-	
+
 
 	// INIT
 	InitAudio();
@@ -251,7 +251,7 @@ void TestInit()
 
 	// For pause screen;
 	pauseUi.LoadFromFilePopUp("Assets/UI/pause_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
-	
+
 	pauseUi.BindOnClick("btn_restart", [](UIElement& self)
 		{
 			UNREFERENCED_PARAMETER(self);
@@ -275,17 +275,17 @@ void TestInit()
 
 	winUi.LoadFromFilePopUp("Assets/UI/win_popup.json", Vector2(0.0f, 0.0f), Vector2(980.0f, 610.0f));
 
-	winUi.BindOnClick("btn_restart", [](UIElement &self)
-					  {
-				UNREFERENCED_PARAMETER(self);
-				pendingConfirmAction = ConfirmAction::RestartLevel;
-				isConfirmPopupOpen = true;
+	winUi.BindOnClick("btn_restart", [](UIElement& self)
+		{
+			UNREFERENCED_PARAMETER(self);
+			pendingConfirmAction = ConfirmAction::RestartLevel;
+			isConfirmPopupOpen = true;
 
-				UIElement* messageLabel = confirmUi.FindById("message");
-				if (messageLabel) messageLabel->text = "Restart?";
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Restart?";
 		});
-	winUi.BindOnClick("btn_mainmenu", [](UIElement &self)
-					  {
+	winUi.BindOnClick("btn_mainmenu", [](UIElement& self)
+		{
 			UNREFERENCED_PARAMETER(self);
 			pendingConfirmAction = ConfirmAction::BackToMainMenu;
 			isConfirmPopupOpen = true;
@@ -297,23 +297,23 @@ void TestInit()
 	winUi.SetFont(font);
 
 	loseUi.LoadFromFilePopUp("Assets/UI/lose_popup.json", Vector2(0.0f, 0.0f), Vector2(580.0f, 250.0f));
-	loseUi.BindOnClick("btn_restart", [](UIElement &self)
+	loseUi.BindOnClick("btn_restart", [](UIElement& self)
 		{
-		UNREFERENCED_PARAMETER(self);
-		pendingConfirmAction = ConfirmAction::RestartLevel;
-		isConfirmPopupOpen = true;
+			UNREFERENCED_PARAMETER(self);
+			pendingConfirmAction = ConfirmAction::RestartLevel;
+			isConfirmPopupOpen = true;
 
-		UIElement* messageLabel = confirmUi.FindById("message");
-		if (messageLabel) messageLabel->text = "Restart?";
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Restart?";
 		});
-	loseUi.BindOnClick("btn_mainmenu", [](UIElement &self)
+	loseUi.BindOnClick("btn_mainmenu", [](UIElement& self)
 		{
-		UNREFERENCED_PARAMETER(self);
-		pendingConfirmAction = ConfirmAction::BackToMainMenu;
-		isConfirmPopupOpen = true;
+			UNREFERENCED_PARAMETER(self);
+			pendingConfirmAction = ConfirmAction::BackToMainMenu;
+			isConfirmPopupOpen = true;
 
-		UIElement* messageLabel = confirmUi.FindById("message");
-		if (messageLabel) messageLabel->text = "Return to menu?";
+			UIElement* messageLabel = confirmUi.FindById("message");
+			if (messageLabel) messageLabel->text = "Return to menu?";
 		});
 	loseUiInitialized = true;
 	loseUi.SetFont(font);
@@ -333,7 +333,7 @@ void TestDraw()
 	AEGfxSetTransparency(1.0f);
 
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	
+
 
 	gameMap.RenderCurrentRoom(DataLoader::GetMesh());
 
@@ -341,12 +341,12 @@ void TestDraw()
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
 	// Draw objects: current-room objects + carried objects
-	if (mapRooms::Room *room = gameMap.GetCurrentRoom())
+	if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 	{
-		RoomData &roomData = room->currentRoomData;
-		RoomData &carryData = gameMap.GetTransferData();
+		RoomData& roomData = room->currentRoomData;
+		RoomData& carryData = gameMap.GetTransferData();
 
-		for (Gift *g : roomData.giftList)
+		for (Gift* g : roomData.giftList)
 		{
 			if (g)
 			{
@@ -355,7 +355,7 @@ void TestDraw()
 				g->giftType.sprite.RenderSprite();
 			}
 		}
-		for (Enemy *e : roomData.enemyList)
+		for (Enemy* e : roomData.enemyList)
 		{
 			if (e && e->isActive)
 			{
@@ -373,7 +373,7 @@ void TestDraw()
 			}
 		}
 
-		for (Gift *g : carryData.giftList)
+		for (Gift* g : carryData.giftList)
 		{
 			if (g)
 			{
@@ -382,7 +382,7 @@ void TestDraw()
 				g->giftType.sprite.RenderSprite();
 			}
 		}
-		for (Enemy *e : carryData.enemyList)
+		for (Enemy* e : carryData.enemyList)
 		{
 			if (e)
 			{
@@ -391,21 +391,21 @@ void TestDraw()
 			}
 		}
 
-		for (Projectile *p : roomData.projectileList)
+		for (Projectile* p : roomData.projectileList)
 			if (p)
 				p->RenderProjectile();
-		for (Projectile *p : carryData.projectileList)
+		for (Projectile* p : carryData.projectileList)
 			if (p)
 				p->RenderProjectile();
 	}
-	
+
 	player.shadow.RenderSprite();
 	player.sprite.RenderSprite(true);
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
-	for (Particle& particle : 
-	gameMap.GetCurrentRoom()->currentRoomData.particleSystem.particles) 
+	for (Particle& particle :
+		gameMap.GetCurrentRoom()->currentRoomData.particleSystem.particles)
 	{
-		
+
 		if (particle.isActive) {
 			Sprite darker = particle.sprite;
 
@@ -422,10 +422,10 @@ void TestDraw()
 			darker.scale *= 1.5f;
 			darker.UpdateTransform();
 			darker.RenderSprite();
-			particle.sprite.RenderSprite();	
+			particle.sprite.RenderSprite();
 		}
 	}
-	
+
 
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
@@ -558,7 +558,7 @@ void TestDraw()
 			Vector2(
 				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
 				AEGfxGetWinMaxY() - AEGfxGetWinMinY()),
-			Color{0.0f, 0.0f, 0.0f, 0.35f});
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f });
 		overlay.RenderSprite(true);
 
 		pauseUi.Draw();
@@ -574,7 +574,7 @@ void TestDraw()
 			Vector2(
 				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
 				AEGfxGetWinMaxY() - AEGfxGetWinMinY()),
-			Color{0.0f, 0.0f, 0.0f, 0.35f});
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f });
 		overlay.RenderSprite(true);
 
 		winUi.Draw();
@@ -590,7 +590,7 @@ void TestDraw()
 			Vector2(
 				AEGfxGetWinMaxX() - AEGfxGetWinMinX(),
 				AEGfxGetWinMaxY() - AEGfxGetWinMinY()),
-			Color{0.0f, 0.0f, 0.0f, 0.35f});
+			Color{ 0.0f, 0.0f, 0.0f, 0.35f });
 		overlay.RenderSprite(true);
 
 		loseUi.Draw();
@@ -600,17 +600,17 @@ void TestDraw()
 void TestFree()
 {
 
-	for (Enemy *e : globalTransferData.enemyList)
+	for (Enemy* e : globalTransferData.enemyList)
 	{
 		delete e;
 	}
 
-	for (Gift *g : globalTransferData.giftList)
+	for (Gift* g : globalTransferData.giftList)
 	{
 		delete g;
 	}
 
-	for (Projectile *p : globalTransferData.projectileList)
+	for (Projectile* p : globalTransferData.projectileList)
 		delete p;
 
 	globalTransferData.player = nullptr;
@@ -641,11 +641,11 @@ void TestUnload()
 
 	AEGfxDestroyFont(font);
 
-	
+
 	DataLoader::Unload();
 	if (gameMap.GetCurrentRoom())
 		ProjectileClear(gameMap.GetCurrentRoom()->currentRoomData);
-	
+
 
 	pauseUi.Clear();
 	pauseUiInitialized = false;
@@ -726,7 +726,7 @@ void TestUpdate(float dt)
 		{
 			if (isAngry && !fightMusicPlaying) {  // whem there is an angry mob fight music will play
 				ResetBGM();
-				FightMusicAudio(); 
+				FightMusicAudio();
 				fightMusicPlaying = true;
 			}
 			else if (!isAngry && fightMusicPlaying) {
@@ -758,10 +758,10 @@ void TestUpdate(float dt)
 		if (prevCell >= 0)
 		{
 			Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
-			if ((colRes & COLLISION_LEFT) &&	moveDir.x < - EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f +  skinBoss;
-			if ((colRes & COLLISION_RIGHT) &&	moveDir.x >   EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f -  skinBoss;
-			if ((colRes & COLLISION_TOP) &&		moveDir.y >   EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skinBoss;
-			if ((colRes & COLLISION_BOTTOM) &&	moveDir.y < - EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skinBoss;
+			if ((colRes & COLLISION_LEFT) && moveDir.x < -EPSILON)	player.position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleX * 0.5f + skinBoss;
+			if ((colRes & COLLISION_RIGHT) && moveDir.x > EPSILON)	player.position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleX * 0.5f - skinBoss;
+			if ((colRes & COLLISION_TOP) && moveDir.y > EPSILON)	player.position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleY * 0.5f - skinBoss;
+			if ((colRes & COLLISION_BOTTOM) && moveDir.y < -EPSILON)	player.position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleY * 0.5f + skinBoss;
 		}
 
 		// sync sprite + shadow AFTER collision correction
@@ -829,14 +829,14 @@ void TestUpdate(float dt)
 				UpdateGift(*g, player, dt, currentRoom->roomGrid.GetBoundary() * 0.95f);
 
 				Vector2 moveDeltaGift = g->position - prevGiftPos;
-				Vector2 moveDirGift	  = moveDeltaGift.Normalized();
+				Vector2 moveDirGift = moveDeltaGift.Normalized();
 
 				float speed = sqrtf(g->velocity.x * g->velocity.x + g->velocity.y * g->velocity.y);
 
 				// Increase scale as speed goes up hacky method
 				float collisionScaleXGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.x, g->giftType.sprite.scale.x, g->giftType.sprite.scale.x * 2.0f);
 				float collisionScaleYGift = AEClamp(speed / 2000.0f * g->giftType.sprite.scale.y, g->giftType.sprite.scale.y, g->giftType.sprite.scale.y * 2.0f);
-				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x,g->position.y, collisionScaleXGift, collisionScaleYGift, prevCell);
+				int res = currentRoom->roomGrid.CheckMapGridCollision(g->position.x, g->position.y, collisionScaleXGift, collisionScaleYGift, prevCell);
 
 				bool hitX = (res & COLLISION_LEFT) || (res & COLLISION_RIGHT);
 				bool hitY = (res & COLLISION_TOP) || (res & COLLISION_BOTTOM);
@@ -846,15 +846,15 @@ void TestUpdate(float dt)
 					Vector2 prevCellCenter = currentRoom->roomGrid.CellToWorldCenter(prevCell);
 
 					float rubberBand = 0.1f;
-			
+
 					// JOSIAH'S inspiration from enemies method (0.1 instead of 0.01 to prevent rubberband?)
-					if ((res & COLLISION_LEFT)   &&	moveDirGift.x <  -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f +  collisionScaleXGift * 0.5f + skin;
-					if ((res & COLLISION_RIGHT)  &&	moveDirGift.x >  rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f -  collisionScaleXGift * 0.5f - skin;
+					if ((res & COLLISION_LEFT) && moveDirGift.x < -rubberBand)  g->position.x = prevCellCenter.x - gridWidth * 0.5f + collisionScaleXGift * 0.5f + skin;
+					if ((res & COLLISION_RIGHT) && moveDirGift.x > rubberBand)  g->position.x = prevCellCenter.x + gridWidth * 0.5f - collisionScaleXGift * 0.5f - skin;
 					if ((res & COLLISION_BOTTOM) && moveDirGift.y < -rubberBand) g->position.y = prevCellCenter.y - gridHeight * 0.5f + collisionScaleYGift * 0.5f + skin;
-					if ((res & COLLISION_TOP)	 &&	moveDirGift.y >    rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleYGift * 0.5f - skin;
+					if ((res & COLLISION_TOP) && moveDirGift.y > rubberBand)  g->position.y = prevCellCenter.y + gridHeight * 0.5f - collisionScaleYGift * 0.5f - skin;
 
 					// If basically stopped, try prevent rubberbanding for long?
-					if (moveDeltaGift.LengthSq() < (rubberBand*rubberBand))
+					if (moveDeltaGift.LengthSq() < (rubberBand * rubberBand))
 					{
 						if (hitX) g->velocity.x = 0.0f;
 						if (hitY) g->velocity.y = 0.0f;
@@ -904,7 +904,7 @@ void TestUpdate(float dt)
 			if (g)
 			{
 				//int prevCell = currentRoom->roomGrid.WorldToCell(g->position.x, g->position.y);
-				UpdateGift(*g, player, dt, Vector2{AEGfxGetWindowWidth(), AEGfxGetWindowHeight()});
+				UpdateGift(*g, player, dt, Vector2{ AEGfxGetWindowWidth(), AEGfxGetWindowHeight() });
 				g->giftType.sprite.UpdateTransform();
 				g->shadow.UpdateTransform();
 				g->hitbox.UpdateTransform();
@@ -917,7 +917,7 @@ void TestUpdate(float dt)
 
 		if (roomData.boss)
 		{
-		
+
 			Vector2 bossPrevPos = roomData.boss->sprite.position;
 
 			roomData.boss->Update(player, dt);
@@ -944,11 +944,11 @@ void TestUpdate(float dt)
 				//roomData.boss->shadow.position.y = AEClamp(bossPrevPos.y, -350 + roomData.boss->sprite.scale.y / 2, 350 - roomData.boss->sprite.scale.y / 2) - roomData.boss->shadowOffset;//bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
-			
-			
+
+
 
 			//Code that sets the boss sprite to the direction its facing
-			if (roomData.boss->direction.x < 0.f) 
+			if (roomData.boss->direction.x < 0.f)
 				roomData.boss->sprite.scale = { -abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
 			else {
 				roomData.boss->sprite.scale = { abs(roomData.boss->sprite.scale.x), roomData.boss->sprite.scale.y };
@@ -957,7 +957,7 @@ void TestUpdate(float dt)
 			roomData.boss->sprite.UpdateTransform();
 			roomData.boss->shadow.UpdateTransform();
 
-			roomData.boss->hitbox.position = Vector2{ roomData.boss->sprite.position.x, roomData.boss->sprite.position.y - roomData.boss->shadowOffset + roomData.boss->hitbox.scale.y / 2};
+			roomData.boss->hitbox.position = Vector2{ roomData.boss->sprite.position.x, roomData.boss->sprite.position.y - roomData.boss->shadowOffset + roomData.boss->hitbox.scale.y / 2 };
 			roomData.boss->hitbox.UpdateTransform();
 
 			roomData.boss->sprite.UpdateAnimation(dt);
@@ -977,12 +977,12 @@ void TestUpdate(float dt)
 						gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
 						Labels traitsCheck = gift->giftType.traits;
 						//Include your friends in the traits check, because you can't friend those who judge yours
-						for (Enemy* friendly : carryData.enemyList){
-							traitsCheck.insert( friendly->type.traits.begin(), friendly->type.traits.end() );
+						for (Enemy* friendly : carryData.enemyList) {
+							traitsCheck.insert(friendly->type.traits.begin(), friendly->type.traits.end());
 						}
 
 						e->AssessTraits(traitsCheck);
-						
+
 						//If the enemy becomes happy now, we shall delete the gift.
 						if (e->state == ES_HAPPY) {
 							delete gift;
@@ -996,13 +996,13 @@ void TestUpdate(float dt)
 				}
 			}
 		}
-		
+
 		//erase any nullptrs
-		std::vector<Gift*>& roomGiftListReference = currentRoom->currentRoomData.giftList;	
+		std::vector<Gift*>& roomGiftListReference = currentRoom->currentRoomData.giftList;
 		roomGiftListReference.erase(
 			std::remove(roomGiftListReference.begin(), roomGiftListReference.end(), nullptr),
 			roomGiftListReference.end());
-		
+
 
 		// 4) Transfer enemies to our carrylist if they are essentially happy
 		for (size_t i = 0; i < roomData.enemyList.size();)
@@ -1062,7 +1062,7 @@ void TestUpdate(float dt)
 				// assess friend traits when entering a new room!
 
 				for (Enemy* enemy : gameMap.GetCurrentRoom()->currentRoomData.enemyList) {
-					
+
 					enemy->AssessTraits(e->type.traits, false);
 				}
 			}
@@ -1141,7 +1141,7 @@ void TestUpdate(float dt)
 					}
 				}
 			}
-			
+
 
 			UIElement* friendsMadeLabel = winUi.FindById("label_friends_made");
 			if (friendsMadeLabel)
@@ -1185,7 +1185,7 @@ void TestUpdate(float dt)
 			pendingWinStatusRefresh = false;
 		}
 
-		
+
 		// Check if popup open else do win ui
 		if (isConfirmPopupOpen)
 		{
