@@ -100,7 +100,7 @@ static UIManager tutorialUi;
 // Flags for my audio (brandon)
 static bool fightMusicPlaying = false;
 static bool loseAudioPlaying = false;
-static bool WinAudioPlaying = false;
+static bool winAudioPlaying = false;
 
 
 // Confirmation window
@@ -194,7 +194,7 @@ void TestInit()
 	// INIT
 	InitAudio();
 	loseAudioPlaying = false;
-	WinAudioPlaying = false;
+	winAudioPlaying = false;
 	fightMusicPlaying = false;
 	PlayerInit(player);
 	player.speed = 1.0f; // hope this works (I THINK THIS WORKS?)
@@ -1102,11 +1102,11 @@ void TestUpdate(float dt)
 	}
 	else if (gameState == WIN)
 	{
-		if (!WinAudioPlaying)
+		if (!winAudioPlaying)
 		{
 			StopAllAudio();
 			GameWinAudio();
-			WinAudioPlaying = true;
+			winAudioPlaying = true;
 		}
 
 		if (pendingWinStatusRefresh)
