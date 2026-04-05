@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        Audio.cpp
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This is the audio code where for the Player, Mobs, UIs, Room, Background Music and Menu + Charging of gifts
 

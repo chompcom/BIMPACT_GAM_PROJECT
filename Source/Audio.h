@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        Audio.h
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This is the audio header file where the Player, Mobs, UIs, Room, Background Music and Menu + Charging of gifts audio code is declared
 

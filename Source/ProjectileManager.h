@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        ProjectileManager.h
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This code declares the functions of each different types of projectile to use
 

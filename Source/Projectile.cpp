@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        Projectile.cpp
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This code implements the Projectile class, handling movement updates for standard,
 			 rounding, and boomerang projectile types, and also rendering, projectile lifetime management, 

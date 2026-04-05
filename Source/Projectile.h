@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        Projectile.h
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This code declares the projectile type using enums for each type of projectile and the projectile class
 			and the members and functions inside the class

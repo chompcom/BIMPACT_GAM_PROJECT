@@ -1,7 +1,7 @@
 /* Start Header ************************************************************************/
 /*!
 \file        ProjectileManager.cpp
-\author     Brandon Choo, 2501888
+\author     Brandon Choo, b.choo, 2501888
 \par        b.choo@digipen.edu
 \brief		This code implements the spawning functions for all projectile types, and handles updates the projectile every frame.
             Collision detection of projectile against enemies/players with projectile, and Josiah's particle effects too.
