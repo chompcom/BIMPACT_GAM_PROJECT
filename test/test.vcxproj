@@ -22,7 +22,6 @@
     <ClCompile Include="..\Source\GameStateManager.cpp" />
     <ClCompile Include="..\Source\Gift.cpp" />
     <ClCompile Include="..\Source\HUD.cpp" />
-    <ClCompile Include="..\Source\Levels.cpp" />
     <ClCompile Include="..\Source\Loaders\DataLoader.cpp" />
     <ClCompile Include="..\Source\Grid.cpp" />
     <ClCompile Include="..\Source\Main.cpp" />
@@ -56,7 +55,6 @@
     <ClInclude Include="..\Source\GameStateManager.h" />
     <ClInclude Include="..\Source\Gift.h" />
     <ClInclude Include="..\Source\HUD.h" />
-    <ClInclude Include="..\Source\Levels.h" />
     <ClInclude Include="..\Source\ParticleSystem.h" />
     <ClInclude Include="..\Source\Player.h" />
     <ClInclude Include="..\Source\Loaders\DataLoader.h" />
