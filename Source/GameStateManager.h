@@ -3,8 +3,7 @@
 \file       GameStateManager.h
 \author     Yee Kiat Lim, yeekiat.lim, 2503993
 \par        yeekiat.lim@digipen.edu
-\brief		This file implements the necessary functionality for bosses to exist (Boss
-			behaviour is handled by FSM).
+\brief		This file implements interfaces for functions of the Game State Manager.
 
 Copyright (C) 2026 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents
