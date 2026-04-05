@@ -458,7 +458,7 @@ void TestDraw()
 	// gift2.sprite.RenderSprite();
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
-	renderPlayerLives(player, healthIcons, font);
+	RenderPlayerLives(player, healthIcons, font);
 	//(*almanacIcon).RenderSprite();
 
 	if (debugMode)
@@ -769,7 +769,7 @@ void TestUpdate(float dt)
 
 		//this has to be above checkIfAlmanacClicked or the arrows will bug
 		AlmanacInputs(almanac);
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+		CheckIfAlmanacClicked(*almanacIcon, almanac);
 		TutorialInput();
 		// for now,
 		//  Player update
@@ -1398,9 +1398,9 @@ void TestUpdate(float dt)
 
 		// to test damage
 		if (AEInputCheckTriggered(AEVK_P))
-			playerTakesDamage(player);
+			PlayerTakesDamage(player);
 		if (AEInputCheckTriggered(AEVK_O))
-			playerHealsDamage(player);
+			PlayerHealsDamage(player);
 
 		if (AEInputCheckTriggered(AEVK_M))
 			PlayerInit(player);
