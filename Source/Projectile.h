@@ -18,7 +18,6 @@ Technology is prohibited.
 #include "Collision.h"
 #include "Audio.h"
 enum ProjectileType {
-	BULLET, // normal shooting projectile
 	FIREBALL,  
 	AOE,  // shoots projectiles in a 360degree aoe 
 	ROUNDING, // A swirl like projectile
@@ -40,11 +39,11 @@ public:
 	void RemoveProjectile();  // destroy projectile
 	TexturedSprite GetSprite() const;
 
+	const void* GetSource() const;
+
 public: // flag for my projectiles
 	bool isScatter = false;
 	bool didScatter = false;
-
-	const void* GetSource() const;
 
 	Vector2 startPos;
 	const bool friendProjectile; 

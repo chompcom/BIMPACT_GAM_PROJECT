@@ -13,9 +13,9 @@ without the prior written consent of DigiPen Institute of
 Technology is prohibited.
 */
 /* End Header **************************************************************************/
-#include "projectile.h"
+#include "Projectile.h"
 #include "AEEngine.h"
-#include <iostream>
+
 Projectile::Projectile(TexturedSprite projectileSprite, ProjectileType type, Vector2 velCurr, float lifeTime, int dmg,float rot, void* source, bool fromFriend)
 	: projectileSprite(projectileSprite),type(type), velCurr(velCurr),startVel(velCurr), lifeTime(lifeTime), dmg(dmg), isAlive(true), rot(rot), sourceShot(source), startPos(projectileSprite.position), friendProjectile(fromFriend),
  boomerangSwitch (false) {}
@@ -56,7 +56,6 @@ void Projectile::UpdateProjectile(f32 dt) {
 	lifeTime -= dt;
 	if (lifeTime <= 0) {
 		isAlive = false;
-		//StopRoundingAudio();
 	}
 	projectileSprite.UpdateTransform();
 }
