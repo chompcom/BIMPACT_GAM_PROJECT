@@ -18,7 +18,7 @@ Technology is prohibited.
 
 // Checks for collision between object and boundaries of viewport (Object moving out of screen)
 // If so, shifts object back to valid position
-bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight) {
+bool CollisionBoundaryStatic(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight) {
 	Vector2 min = position - scale * 0.5f;
 	Vector2 max = position + scale * 0.5f;
 
@@ -44,7 +44,7 @@ bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength
 }
 
 // Similar to above function, but returns which side of viewscreen object is colliding with
-bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& COLLISION_FLAGS) {
+bool CollisionBoundaryStatic(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& collisionFlags) {
 	const int	COLLISION_LEFT		= 0x00000001;	//0001
 	const int	COLLISION_RIGHT		= 0x00000002;	//0010
 	const int	COLLISION_TOP		= 0x00000004;	//0100
@@ -55,21 +55,21 @@ bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength
 
 	if (min.x < (float)(-1 * windowLength / 2)) {
 		position.x = (float)(-1 * windowLength / 2) + scale.x / 2.f;
-		COLLISION_FLAGS |= COLLISION_LEFT;
+		collisionFlags |= COLLISION_LEFT;
 	}
 	if (max.x > (float)(windowLength / 2)) {
 		position.x = (float)(windowLength / 2) - scale.x / 2.f;
-		COLLISION_FLAGS |= COLLISION_RIGHT;
+		collisionFlags |= COLLISION_RIGHT;
 	}
 	if (min.y < (float)(-1 * windowHeight / 2)) {
 		position.y = (float)(-1 * windowHeight / 2) + scale.y / 2.f;
-		COLLISION_FLAGS |= COLLISION_TOP;
+		collisionFlags |= COLLISION_TOP;
 
 	}
 	if (max.y > (float)(windowHeight / 2)) {
 		position.y = (float)(windowHeight / 2) - scale.y / 2.f;
-		COLLISION_FLAGS |= COLLISION_BOTTOM;
+		collisionFlags |= COLLISION_BOTTOM;
 	}
 
-	return COLLISION_FLAGS != 0x00000000;
+	return collisionFlags != 0x00000000;
 }

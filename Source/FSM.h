@@ -40,7 +40,7 @@ enum AttackState {
 };
 
 // Base Boss FSM
-class Boss_FSM {
+class BossFSM {
 	public:
 		Boss* boss;
 		f32 interval{};
@@ -50,13 +50,13 @@ class Boss_FSM {
 		Vector2 target;
 		s16 counter;
 
-		Boss_FSM(Boss* Boss);
+		BossFSM(Boss* Boss);
 
 		virtual void Update(Player&, f32) {}
 };
 
 // Chimera Boss FSM
-class ChimeraBoss_FSM : public Boss_FSM {
+class ChimeraBossFSM : public BossFSM {
 	public:
 		f32 walkSpeed{ 120 };
 		bool canWalk;
@@ -80,7 +80,7 @@ class ChimeraBoss_FSM : public Boss_FSM {
 		f32 followInterval;
 		f32 followEndlag;
 
-		ChimeraBoss_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
+		ChimeraBossFSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
 			f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
 			f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag);
 

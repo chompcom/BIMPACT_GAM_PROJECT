@@ -59,7 +59,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries)
 {
 
 	//if player and gift are intersecting, pick up the gift
-	if (CollisionIntersection_RectRect_Static(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
+	if (CollisionIntersectionRectRectStatic(AABB{ player.position - player.sprite.scale / 2, player.position + player.sprite.scale / 2 },
 		AABB{ gift.position - gift.giftType.sprite.scale / 2, gift.position + gift.giftType.sprite.scale / 2 }) && !player.pickUpState)
 	{
 		player.pickUpState = true;
@@ -83,7 +83,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries)
 		//Gift collision handling (coded by Yee Kiat and MJ)
 		int collideFlags = 0x00;
 
-		if (CollisionBoundary_Static(gift.position, gift.giftType.sprite.scale, (int)boundaries.x, (int)boundaries.y, collideFlags)) {
+		if (CollisionBoundaryStatic(gift.position, gift.giftType.sprite.scale, (int)boundaries.x, (int)boundaries.y, collideFlags)) {
 			// Left and Right collision inverse x
 			if (collideFlags & 0x00000003) {
 				gift.velocity.x *= -1;

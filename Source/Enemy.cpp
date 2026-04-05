@@ -255,7 +255,7 @@ void Enemy::Update(float dt) {
 	//I take half of grid boundary because that's the position of each side
 	Vector2 roomBounds = roomData->grid.GetBoundary() * 0.98f * 0.5f;
 
-	if (CollisionBoundary_Static(sprite.position, sprite.scale, (int)( roomData->grid.GetBoundary().x * 0.99f), (int)(roomData->grid.GetBoundary().y * 0.99f))) {
+	if (CollisionBoundaryStatic(sprite.position, sprite.scale, (int)( roomData->grid.GetBoundary().x * 0.99f), (int)(roomData->grid.GetBoundary().y * 0.99f))) {
 
 		collisionRes |= (sprite.position.x - sprite.scale.x * 0.5f) <= -roomBounds.x ? COLLISION_LEFT : 0;
 		if (collisionRes & COLLISION_LEFT && velocity.Normalized().x > EPSILON) sprite.position.x = -roomBounds.x + sprite.scale.x * 0.5f;

@@ -29,13 +29,13 @@ FP fpLoad = nullptr, fpInitialize = nullptr, fpDraw = nullptr, fpFree = nullptr,
 Update fpUpdate = nullptr;
 
 // Initializes GSM
-void GSM_Initialize(int startingState)
+void GSMInitialize(int startingState)
 {
 	current = previous = next = startingState;
 }
 
 // Updates function pointers of GSM to point to respective cycle functions of current scene
-void GSM_Update()
+void GSMUpdate()
 {
 	switch (current)
 	{
@@ -89,7 +89,7 @@ void GSM_Update()
 
 }
 
-void ChangeState(GS_STATES thing)
+void ChangeState(GameStates thing)
 {
 	next = thing;
 }

@@ -20,13 +20,13 @@ Technology is prohibited.
 #include "Sprite.h"
 #include <iostream>
 
-Boss_FSM::Boss_FSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE }, 
+BossFSM::BossFSM(Boss* Boss) : boss{Boss}, interval { 0.0f }, initialState{ BOSS_IDLE }, currentState{ BOSS_IDLE }, 
 	attackPhase{ ATTACK_NIL }, target{}, counter{ 0 } {}
 
-ChimeraBoss_FSM::ChimeraBoss_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
+ChimeraBossFSM::ChimeraBossFSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
 	f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
 	f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag)
-	: Boss_FSM(Boss),  canWalk{true},
+	: BossFSM(Boss),  canWalk{true},
 	chargeDamage{ 1.f }, chargeStartup{ ChargeStartup }, chargeInterval{ ChargeInterval }, chargeEndlag{ ChargeEndlag },
 	jumpDamage{ 1.f }, jumpStartup{ JumpStartup }, jumpInterval{ JumpInterval }, jumpEndlag{ JumpEndlag },
 	followDamage{ 1.f }, followStartup{ FollowStartup }, followInterval{ FollowInterval }, followEndlag{ FollowEndlag }
@@ -34,7 +34,7 @@ ChimeraBoss_FSM::ChimeraBoss_FSM(Boss* Boss, f32 ChargeDamage, f32 ChargeStartup
 {}
 
 // Update loop for chimera boss FSM
-void ChimeraBoss_FSM::Update(Player& player, f32 dt) {
+void ChimeraBossFSM::Update(Player& player, f32 dt) {
 	switch (currentState) {
 		case BOSS_IDLE:
 			interval += dt;
@@ -101,7 +101,7 @@ void ChimeraBoss_FSM::Update(Player& player, f32 dt) {
 }
 
 // Charge attack for chimera boss
-void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
+void ChimeraBossFSM::ChargeAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
@@ -127,7 +127,7 @@ void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
 		boss->shadow.position = Vector2{ boss->sprite.position.x, boss->sprite.position.y - boss->shadowOffset };
 		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
-		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
+		if (CollisionIntersectionRectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			PlayerTakesDamage(player);
 		}
@@ -165,7 +165,7 @@ void ChimeraBoss_FSM::ChargeAttack(Player& player, f32 dt) {
 }
 
 // Jump attack for chimera boss
-void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
+void ChimeraBossFSM::JumpAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
@@ -205,7 +205,7 @@ void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
 		if (boss->sprite.position.y - target.y > 10) boss->invulnerableTimer = dt;
 		// Boss has landed, now can check for collisions
 		else {
-			if (CollisionIntersection_RectRect(target, boss->hitbox.scale.Abs(), Vector2{},
+			if (CollisionIntersectionRectRect(target, boss->hitbox.scale.Abs(), Vector2{},
 				player.position, player.sprite.scale * 0.8, player.GetVelocity(), collisionTime)) {
 				PlayerTakesDamage(player);
 			}
@@ -233,7 +233,7 @@ void ChimeraBoss_FSM::JumpAttack(Player& player, f32 dt) {
 }
 
 // Follow attack for chimera boss
-void ChimeraBoss_FSM::FollowAttack(Player& player, f32 dt) {
+void ChimeraBossFSM::FollowAttack(Player& player, f32 dt) {
 	float collisionTime{ 0.0f };
 	switch (attackPhase) {
 	case ATTACK_CHARGE:
@@ -267,7 +267,7 @@ void ChimeraBoss_FSM::FollowAttack(Player& player, f32 dt) {
 		boss->hitbox.position = Vector2{ boss->sprite.position.x, boss->shadow.position.y + boss->hitbox.scale.y / 2 };
 
 		// Chimera boss stops upon colliding with player
-		if (CollisionIntersection_RectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
+		if (CollisionIntersectionRectRect(boss->hitbox.position, boss->hitbox.scale.Abs(), boss->velocity * dt,
 			player.position, player.sprite.scale * 0.8, player.GetVelocity() * dt, collisionTime)) {
 			PlayerTakesDamage(player);
 

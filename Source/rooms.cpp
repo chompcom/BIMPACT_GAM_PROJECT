@@ -1449,7 +1449,7 @@ namespace mapRooms
 		Vector2 botDoorC{ 0.0f, minY + doorDepth * 0.5f };
 
 		// LEFT
-		if (currentRoom->left && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->left && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ leftDoorC - halfLR, leftDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Left)) {
@@ -1462,7 +1462,7 @@ namespace mapRooms
 		}
 
 		// RIGHT
-		if (currentRoom->right && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->right && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ rightDoorC - halfLR, rightDoorC + halfLR }))
 		{
 			if (MoveTo(Direction::Right)) {
@@ -1474,7 +1474,7 @@ namespace mapRooms
 		}
 
 		// UP
-		if (currentRoom->up && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->up && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ topDoorC - halfUD, topDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Up)) {
@@ -1486,7 +1486,7 @@ namespace mapRooms
 		}
 
 		// DOWN
-		if (currentRoom->down && CollisionIntersection_RectRect_Static(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
+		if (currentRoom->down && CollisionIntersectionRectRectStatic(AABB{ playerPos - playerHalfSize, playerPos + playerHalfSize },
 			AABB{ botDoorC - halfUD, botDoorC + halfUD }))
 		{
 			if (MoveTo(Direction::Down)) {

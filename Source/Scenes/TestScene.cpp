@@ -54,7 +54,7 @@ Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
 
-LV_STATES gameState;
+LevelStates gameState;
 
 static UIManager pauseUi;
 static bool pauseUiInitialized = false;
@@ -342,7 +342,7 @@ void TestDraw()
 			if (roomData.boss->currentHealth > 0)
 			{
 				roomData.boss->shadow.RenderSprite();
-				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
+				roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.currentSpriteUVOffsetX, roomData.boss->sprite.currentSpriteUVOffsetY);
 			}
 		}
 
@@ -441,7 +441,7 @@ void TestDraw()
 			{
 				if (roomData.boss->currentHealth > 0)
 				{
-					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.current_sprite_uv_offset_x, roomData.boss->sprite.current_sprite_uv_offset_y);
+					roomData.boss->sprite.RenderSprite(false, roomData.boss->sprite.currentSpriteUVOffsetX, roomData.boss->sprite.currentSpriteUVOffsetY);
 					roomData.boss->hitbox.RenderSprite();
 				}
 			}
@@ -774,7 +774,7 @@ void TestUpdate(float dt)
 					if (e == b) continue;
 					float ti{};
 					if (
-						CollisionIntersection_RectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
+						CollisionIntersectionRectRect(e->sprite.position, e->sprite.scale, e->velocity, b->sprite.position, b->sprite.scale, b->velocity, ti)
 						)
 					{
 						Vector2 dir = b->sprite.position - (e->sprite.position + Vector2(AERandFloat(), AERandFloat()));
@@ -902,15 +902,15 @@ void TestUpdate(float dt)
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
-			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9f, roomData.boss->sprite.scale.y * 0.9f, bossCurCell);
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, abs(roomData.boss->sprite.scale.x) * 0.9f, roomData.boss->sprite.scale.y * 0.9f, -2);
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
-				roomData.boss->shadow.position.x = bossPrevPos.x;
+				roomData.boss->sprite.position.x = AEClamp(bossPrevPos.x, -650 + roomData.boss->sprite.scale.y / 2, 650 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.x; // Test for x collision
+				roomData.boss->shadow.position.x = AEClamp(bossPrevPos.x, -650 + roomData.boss->sprite.scale.y / 2, 650 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.x;
 				roomData.boss->collideWall = true;
 			}
 			if ((bossColRes & COLLISION_TOP || bossColRes & COLLISION_BOTTOM) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
-				roomData.boss->sprite.position.y = bossPrevPos.y; // Test for y collision
-				roomData.boss->shadow.position.y = bossPrevPos.y - roomData.boss->shadowOffset;
+				roomData.boss->sprite.position.y = AEClamp(bossPrevPos.y, -350 + roomData.boss->sprite.scale.y / 2, 350 - roomData.boss->sprite.scale.y / 2);//bossPrevPos.y; // Test for y collision
+				roomData.boss->shadow.position.y = AEClamp(bossPrevPos.y, -350 + roomData.boss->sprite.scale.y / 2, 350 - roomData.boss->sprite.scale.y / 2) - roomData.boss->shadowOffset;//bossPrevPos.y - roomData.boss->shadowOffset;
 				roomData.boss->collideWall = true;
 			}
 			

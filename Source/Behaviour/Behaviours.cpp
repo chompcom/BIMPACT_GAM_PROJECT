@@ -133,7 +133,7 @@ bool IsTouchingTarget(Enemy& me) {
 	if (me.target == false) return false;
 
 	float collTime;
-	if (CollisionIntersection_RectRect(me.prevPos,me.sprite.scale * 0.5f, 
+	if (CollisionIntersectionRectRect(me.prevPos,me.sprite.scale * 0.5f, 
 		me.velocity, 
 			me.target.GetPosition(), me.sprite.scale * 0.5f,
 			me.target.GetPosition() - me.target.initialPosition
@@ -536,7 +536,7 @@ void DVDMove(Enemy& me) {
 		float height = me.roomData->grid.GetHeight() * me.roomData->grid.GetTileHeight();
 
 		//door bs
-		if (CollisionBoundary_Static(me.prevPos, me.sprite.scale, (int)width, (int)height)) {
+		if (CollisionBoundaryStatic(me.prevPos, me.sprite.scale, (int)width, (int)height)) {
 
 			if (me.prevPos.x < -EPSILON) {
 				//left wall
@@ -656,7 +656,7 @@ void ChargeAtTarget(Enemy& me) {
 	me.velocity = me.velocity.Normalized() * me.speedModifier;
 	float pos;
 	if (
-		CollisionIntersection_RectRect(me.prevPos, me.sprite.scale, me.velocity, me.target.initialPosition, Vector2(1, 1), Vector2(), pos)
+		CollisionIntersectionRectRect(me.prevPos, me.sprite.scale, me.velocity, me.target.initialPosition, Vector2(1, 1), Vector2(), pos)
 		) me.target = Enemy::Target();
 }
 

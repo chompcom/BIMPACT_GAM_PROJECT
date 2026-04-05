@@ -22,7 +22,7 @@ Technology is prohibited.
 #include "GameStateList.h"
 #include "Loaders/DataLoader.h"
 
-extern LV_STATES gameState;
+extern LevelStates gameState;
 
 //contructor for player class
 Player::Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, f32 throwStrength, f32 _speed, Vector2 position, Vector2 direction) :
@@ -116,7 +116,7 @@ void UpdatePlayer(Player & player, f32 deltaTime)
 			(static_cast<float>(a) * adjustedSpeed);
 
 		//handles the player's collision (coded by Yee Kiat)
-		CollisionBoundary_Static(player.position, player.sprite.scale, 1600, 900);
+		CollisionBoundaryStatic(player.position, player.sprite.scale, 1600, 900);
 
 		//set the player's sprite position to match its actual position
 		player.sprite.position = player.position;

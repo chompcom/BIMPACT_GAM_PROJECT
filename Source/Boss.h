@@ -52,7 +52,7 @@ class Boss {
 		UIManager healthbar;
 		bool healthbarInitialized{ false };
 		
-		std::unique_ptr<Boss_FSM> bossStateMachine;
+		std::unique_ptr<BossFSM> bossStateMachine;
 
 		//points to the room it should be inside, so that it knows whats going on inside!
 		RoomData& roomData;

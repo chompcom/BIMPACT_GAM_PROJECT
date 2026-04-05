@@ -26,7 +26,7 @@ Technology is prohibited.
 // return true if there is overlap.
 //
 // ----------------------------------------------------------------------------
-bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2) {
+bool CollisionIntersectionRectRectStatic(const AABB& aabb1, const AABB& aabb2) {
 	if (aabb1.max.x < aabb2.min.x || aabb1.max.y < aabb2.min.y ||
 		aabb1.min.x > aabb2.max.x || aabb1.min.y > aabb2.max.y)
 	{
@@ -50,7 +50,7 @@ bool CollisionIntersection_RectRect_Static(const AABB& aabb1, const AABB& aabb2)
 // ----------------------------------------------------------------------------
 float tFirst = 0.0f;
 float tLast = 0.0f;
-bool CollisionIntersection_RectRect_Dynamic(const AABB& aabb1, const Vector2& vel1,	const AABB& aabb2, const Vector2& vel2,	float& firstTimeOfCollision) {
+bool CollisionIntersectionRectRectDynamic(const AABB& aabb1, const Vector2& vel1, const AABB& aabb2, const Vector2& vel2, float& firstTimeOfCollision) {
 	tFirst = 0.0f;
 	tLast = (float)AEFrameRateControllerGetFrameTime();
 
