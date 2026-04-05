@@ -20,13 +20,13 @@ void GSM_Initialize(int startingState)
 	//DataLoader::Load();
 	//InitAudio();
 	//some additional code
-	printf("GSM:Initialize\n");
+	//printf("GSM:Initialize\n");
 }
 
 void GSM_Update()
 {
 	//some unfinished code here
-	printf("GSM:Update\n");
+	//printf("GSM:Update\n");
 
 	switch (current)
 	{

@@ -18,7 +18,7 @@
           "drawBackground": true,
           "borderRadiusRatio": 0.25,
           "roundSegments": 64,
-          "backgroundColor": [0.75, 0.0, 0.0, 1.0]
+          "backgroundColor": [0.55, 0.0, 0.0, 1.0]
         },
         {
           "id": "foreground",
@@ -40,8 +40,8 @@
           "h": 0.08,
           "visible": true,
           "text": "Placeholder",
-          "textScale": 0.45,
-          "textColor": [0.45, 0.45, 0.45, 1.0]
+          "textScale": 0.55,
+          "textColor": [0.70, 0.70, 0.70, 1.0]
         }
       ]
     }
