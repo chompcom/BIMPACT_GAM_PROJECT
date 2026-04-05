@@ -21,7 +21,6 @@ void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vec
 	sprite.position = pos;
 	sprite.scale = scale;
 	sprite.color = color;
-	//sprite.direction = dir;
 	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source, isFriend);
     roomData.projectileList.push_back(fireball);
     ProjectileAudio();
@@ -53,11 +52,7 @@ void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vecto
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
-    
-  //  Vector2 perpendicularVel = { dir.y, -dir.x };
-
-  //  Vector2 swirlVel = (dir * speed) + (perpendicularVel * speed * 50.0f);
-
+  
     Projectile* rounding = new Projectile(sprite, ROUNDING, dir * speed, lifetime, damage,rot,source, isFriend);
     roomData.projectileList.push_back(rounding);
     RoundingProjectileAudio();
@@ -88,22 +83,10 @@ void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vect
 
 // Updates all projectiles each frame and handles scatter expansion and removes dead projectiles
 void UpdateProjectiles(RoomData& roomData, float dt) {
-    std::vector<Projectile*> rmdata;
+    std::vector<Projectile*> rmData;
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         (*it)->UpdateProjectile(dt);
-        /*  // Code for wall collision in case needed but not implemented as a game design decision
-        // Wall collision for projectile check using room boundary
-        Vector2 pos = (*it)->GetPosition();
-        Vector2 scale = (*it)->GetScale();
-        Vector2 vel = (*it)->GetVelocity();
-      // Getting the grid collision
-        int colRes = roomData.grid.CheckMapGridCollision(pos.x, pos.y, scale.x, scale.y,
-            roomData.grid.WorldToCell(pos.x, pos.y));
-        if (colRes != 0)
-        {
-            (*it)->RemoveProjectile(); // remove projectile if collide 
-        } */ 
         if (!(*it)->IsAlive()) {
             // Scatter projectile spawns AOE on death
             if ((*it)->isScatter && !(*it)->didScatter) {
@@ -114,7 +97,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
                     Vector2 shotDir = { AECos(angle), AESin(angle) };
                     TexturedSprite spr = (*it)->GetSprite(); 
                     Projectile* aoe = new Projectile(spr, AOE, shotDir * 200.0f, 1.0f, (*it)->GetDmg());
-                    rmdata.push_back(aoe);
+                    rmData.push_back(aoe);
                 }
             }
                 delete* it;
@@ -124,7 +107,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
                 ++it;
             }
         }
-    for(Projectile *p : rmdata)
+    for(Projectile *p : rmData)
        roomData.projectileList.push_back(p);
 
     }

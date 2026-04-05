@@ -1,5 +1,3 @@
-// Mainmenu UI Test
-
 #include "MainMenuScene.h"
 
 #include "AEEngine.h"
@@ -14,6 +12,10 @@ namespace
 	UIManager confirmUi;
 	s8 uiFont = 0;
 	bool isQuitConfirmOpen = false;
+
+
+
+
 }
 
 void MainMenuLoad()
@@ -111,7 +113,21 @@ void MainMenuLoad()
 			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
 		});
 
-	
+	ui.BindOnClick("btn_controls", [](UIElement&) {
+		//Set image controls to be visible
+			ui.FindById("img_controls")->visible = !ui.FindById("img_controls")->visible;
+		});
+
+	ui.BindOnHover("btn_controls", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 0.6f, 0.6f, 0.6f, 1.0f };
+		});
+
+	ui.BindOnHoverExit("btn_controls", [](UIElement& self)
+		{
+			self.backgroundColor = Color{ 0.44f, 0.44f, 0.44f, 1.0f };
+		});
+
 }
 
 void MainMenuInit(){
@@ -130,6 +146,15 @@ void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 		}
 
 		confirmUi.Update();
+		return;
+	}
+	if (ui.FindById("img_controls")->visible && (AEInputCheckTriggered(AEVK_LBUTTON) || AEInputCheckTriggered(AEVK_ESCAPE))) {
+		ui.FindById("img_controls")->visible = false;
+		//We skip updating the buttons this frame because otherwise it's possible to bring up the controls again instantly
+		return;
+	}
+	else if (ui.FindById("img_controls")->visible) {
+		//We do not want to update the buttons behind while the image is visible
 		return;
 	}
 

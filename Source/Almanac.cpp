@@ -430,7 +430,7 @@ void AlmanacInputs(Almanac & almanac)
 	{ 
 		//Plays the almanac's audio if it is not active (coded by Brandon)
 		if (!almanacSound) {
-			pauseBGM();
+			PauseBGM();
 			AlmanacAudio();
 			almanacSound = true;
 		}

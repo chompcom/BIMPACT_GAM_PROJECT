@@ -31,7 +31,7 @@ void ButtonAudio();
 void AlmanacAudio();
 void HoverAudio();
 void GameLoseAudio();
-bool IsbuttonAudioState();
+bool IsButtonAudioState();
 void GameWinAudio();
 void BigPageFlip();
 
@@ -71,7 +71,7 @@ void BGM3Audio();
 void BossBGMAudio();
 void FightMusicAudio();
 void ResetBGM();
-void pauseBGM();
+void PauseBGM();
 void ResumeBGM();
 
 // Menu
