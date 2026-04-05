@@ -27,14 +27,9 @@
 
 AEGfxVertexList *sqmesh = nullptr;
 
-TexturedSprite *bulletSprite = nullptr;
-
-//AEGfxTexture *rockpng = nullptr;
 AEGfxTexture *playerpng = nullptr;
 AEGfxTexture *shadowpng = nullptr;
 AEGfxTexture* hitboxpng = nullptr;
-//AEGfxTexture *bulletpng = nullptr;
-//AEGfxTexture *aoepng = nullptr;
 AEGfxTexture *heartpng = nullptr;
 AEGfxTexture *almanacpng = nullptr;
 AEGfxTexture *almanacLitUppng = nullptr;
@@ -65,8 +60,6 @@ Player player{TexturedSprite(sqmesh, playerpng, Vector2(), Vector2(), Color{1, 1
 mapRooms::Map gameMap; // Init var for map
 static RoomData globalTransferData{};
 
-ParticleSystem testParticles = NULL;
-
 LV_STATES gameState;
 
 static UIManager pauseUi;
@@ -75,7 +68,6 @@ static char const *pauseTipText = "[TIP]: Press `TAB` to resume";
 
 static UIManager winUi;
 static bool winUiInitialized = false;
-// static char const* winTipText = "[TIP]: Press `TAB` to resume";
 
 static UIManager loseUi;
 static bool loseUiInitialized = false;
@@ -120,11 +112,9 @@ void TestLoad()
 {
 	DataLoader::Load();
 	sqmesh = CreateSquareMesh();
-	//rockpng = AEGfxTextureLoad("Assets/poprocks.png");
 	playerpng = AEGfxTextureLoad("Assets/player.png");
 	shadowpng = AEGfxTextureLoad("Assets/shadow.png");
 	hitboxpng = AEGfxTextureLoad("Assets/hitbox.png");
-	//bulletpng = AEGfxTextureLoad("Assets/fireball.png");
 	heartpng = AEGfxTextureLoad("Assets/heart.png");
 	almanacpng = AEGfxTextureLoad("Assets/almanac.png");
 	almanacLitUppng = AEGfxTextureLoad("Assets/almanacLitUp.png");
@@ -214,8 +204,6 @@ void TestInit()
 
 	//std::cout << "Current Seed: " << curSeed << "\n";
 	player.position.x = player.position.y = 0;
-
-	testParticles = ParticleSystem(sqmesh);
 
 	// Confirmation screen dialog
 	confirmUi.LoadFromFilePopUp("Assets/UI/confirmation_popup.json", Vector2(0.0f, 0.0f), Vector2(560.0f, 240.0f));
@@ -1076,7 +1064,6 @@ void TestUpdate(float dt)
 
 				}
 			}*/
-			std::cout << roomData.boss->collideWall << std::endl;
 
 			//Code that sets the boss sprite to the direction its facing
 			if (roomData.boss->direction.x < 0.f) 

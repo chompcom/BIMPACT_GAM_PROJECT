@@ -45,7 +45,6 @@ namespace {
 
 
 		if (!me.target) {
-			std::cout << "No target to fire at" << AEFrameRateControllerGetFrameCount() <<"\n";
 			return;
 		}
 
@@ -545,7 +544,6 @@ void DamageTarget(Enemy& me) {
 
 void InvertVelocity(Enemy& me) {
 	//me.velocity = -me.velocity; doesn't work
-	std::cout << "Velocity Inverted" << std::endl;
 	me.speedModifier *= -1.f;
 	
 }
@@ -588,7 +586,6 @@ void ChargeAtTarget(Enemy& me) {
 	if (
 		CollisionIntersection_RectRect(me.prevPos, me.sprite.scale, me.velocity, me.target.initialPosition, Vector2(1, 1), Vector2(), pos)
 		) me.target = Enemy::Target();
-	std::cout << me.velocity.x << " " << me.velocity.y << std::endl;
 }
 
 void ClearTarget(Enemy& me) {

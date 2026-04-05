@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       ParticleSystem.h
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+\brief		This file implements the Particle and Particle System classes which support 
+			the particle system.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "AEEngine.h"
 #include "Sprite.h"

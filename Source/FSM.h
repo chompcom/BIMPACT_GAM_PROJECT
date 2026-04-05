@@ -1,7 +1,20 @@
+/* Start Header ************************************************************************/
+/*!
+\file       FSM.h
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+\brief		This file implements the FSM classes that handle boss behaviour.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "AEEngine.h"
 #include "Sprite.h"
-//#include "RoomData.h"
 #include "Player.h"
 #include <iostream>
 
@@ -39,12 +52,11 @@ class Boss_FSM {
 		virtual void Update(Player&, f32) {}
 };
 
-class Boss1_FSM : public Boss_FSM {
+class ChimeraBoss_FSM : public Boss_FSM {
 	public:
 		f32 walkSpeed{ 120 };
 		bool canWalk;
 
-		//Vector2 chargeDirection{ 0, 1 };
 		f32 chargeSpeed{ 300 };
 		f32 chargeDamage;
 		f32 chargeStartup;
@@ -58,14 +70,13 @@ class Boss1_FSM : public Boss_FSM {
 		f32 jumpInterval;
 		f32 jumpEndlag;
 
-		//Vector2 followDirection{ 0, 1 };
 		f32 followSpeed{ 240 };
 		f32 followDamage;
 		f32 followStartup;
 		f32 followInterval;
 		f32 followEndlag;
 
-		Boss1_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
+		ChimeraBoss_FSM(Boss* boss, f32 ChargeDamage, f32 ChargeStartup, f32 ChargeInterval, f32 ChargeEndlag,
 			f32 JumpDamage, f32 JumpStartup, f32 JumpInterval, f32 JumpEndlag,
 			f32 FollowDamage, f32 FollowStartup, f32 FollowInterval, f32 FollowEndlag);
 

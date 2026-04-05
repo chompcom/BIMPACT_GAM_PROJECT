@@ -53,10 +53,6 @@ void Projectile::UpdateProjectile(f32 dt) {
 	projectileSprite.position.x += velCurr.x * dt + startVel.x * dt * 0.5f;
 	projectileSprite.position.y += velCurr.y * dt + startVel.y * dt * 0.5f;
 
-	
-	
-	std::cout << projectileSprite.position.x - prevPos.x << " " << prevPos.y << std::endl;
-
 	lifeTime -= dt;
 	if (lifeTime <= 0) {
 		isAlive = false;
