@@ -1,20 +1,32 @@
-//
-// Spritesheet animation 
-// 
-// AUTHORS: 
-//   Gerald Wong
-//  
-// DESCRIPTION:
-//   The code below shows how to swap between different sprites
-//   within a spritesheet over time, emulating sprite animation. 
-//
-//   Press [0] to decrease animation speed.
-//   Press [1] to increase animation speed.
-//
-//   Students should not take this code as a reference to
-//   "good architecture". That's not the point of this demo.
-//
+/* Start Header ************************************************************************/
+/*!
+\file		Main.h
 
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+
+\author 	Hong Josiah Qin, hong.j, 2501239
+\par  		hong.j@digipen.edu
+
+\author		Lee Hng Hwee Celest, hnghweecelest.l, 2502385
+\par		hnghweecelest.l@digipen.edu
+
+\author     Brandon Choo, b.choo, 2501888
+\par        b.choo@digipen.edu
+
+\author		Ming Jun, m.quah, 2501182
+\par		m.quah@digipen.edu
+
+\brief		Where the main game loop lies.
+This is the starting point of the program and everything that needs to be initilised for the whole
+program will be done here.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
@@ -42,18 +54,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    //i dont think we need this since we can set next game state to quit? not sure, commented out and its fine?
-    //int gGameRunning = 1;
-
-
-    // Initialization of your own variables go here
-
     // Using custom window procedure
     AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
 
     // Changing the window title
-    AESysSetWindowTitle("UI Demo!");
-    GSMInitialize(GS_LOGO);
+    AESysSetWindowTitle("Friend Dungeon!");
+    GSM_Initialize(GS_LOGO);
     // Game Loop
     while (current != GS_QUIT)
     {
@@ -74,7 +80,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             fpDraw();
             AESysFrameEnd();
             if (0 == AESysDoesWindowExist()) {
-                //gGameRunning = 0;
                 next = GS_QUIT;
             }
         }
@@ -86,6 +91,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         previous = current;
         current = next;
+        
+        
     }
 
     // free the system

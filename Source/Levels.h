@@ -22,8 +22,6 @@ struct LevelInfo
     const uNum  minRooms = 2;
     std::vector<unsigned int> seedPool;
 
-    // Init Levels and load into struct?
-    //LevelInfo(std::string fileName = LEVEL_PATH, uNum LevelNum);
 };
 
 class Levels
@@ -38,5 +36,4 @@ class Levels
         LevelInfo::uNum     currentLevelNum{0};
         bool                levelLoaded;
         std::size_t         totalLevels{0};    // For checking purposes
-        //std::vector<LevelInfo> loadedLevels;
 };

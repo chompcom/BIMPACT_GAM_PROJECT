@@ -34,7 +34,6 @@ Technology is prohibited.
 #include "RoomData.h"
 #include "Gift.h"		// ????
 #include "Boss.h"
-//#include "Grid.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -364,7 +363,6 @@ namespace mapRooms
 
 					Labels giftTraits{};
 
-
 					Gift* gift = new Gift(
 						allGiftTypes[giftDisplayName],
 						DataLoader::CreateTexture("Assets/shadow.png"),
@@ -592,8 +590,6 @@ namespace mapRooms
 		rngState{ 0xA341316Cu },
 		transferData{ nullptr }	// Some random seed
 	{
-		//Room x[2]{};
-							//}
 	}
 
 	/*!***************************************************************************
@@ -1119,13 +1115,8 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Obstacles
-
-
 		// Render Room Doors
 		RenderRoomDoors(squaremesh, doorTex);
-
-
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		// Render Room Obstacles
 		if (currentRoom != nullptr) {
@@ -1155,8 +1146,6 @@ namespace mapRooms
 				}
 			}
 		}
-
-
 		// Render Enemy?
 		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
 			Color oldColor = i->sprite.color;
