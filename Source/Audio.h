@@ -1,3 +1,16 @@
+/* Start Header ************************************************************************/
+/*!
+\file        Audio.h
+\author     Brandon Choo, b.choo, 2501888
+\par        b.choo@digipen.edu
+\brief		This is the audio header file where the Player, Mobs, UIs, Room, Background Music and Menu + Charging of gifts audio code is declared
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #pragma once
 #include "AEEngine.h"
 #include <string>
@@ -18,7 +31,7 @@ void ButtonAudio();
 void AlmanacAudio();
 void HoverAudio();
 void GameLoseAudio();
-bool IsbuttonAudioState();
+bool IsButtonAudioState();
 void GameWinAudio();
 void BigPageFlip();
 
@@ -58,7 +71,7 @@ void BGM3Audio();
 void BossBGMAudio();
 void FightMusicAudio();
 void ResetBGM();
-void pauseBGM();
+void PauseBGM();
 void ResumeBGM();
 
 // Menu

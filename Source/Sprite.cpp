@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Sprite.cpp
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+\brief		This file implements the necessary functionality for sprites as well as 
+			utility functions to create meshes for the sprites.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "AEEngine.h"
 #include "Sprite.h"
 
@@ -55,7 +70,6 @@ void Sprite::RenderSprite(bool changeAlpha) {
 	{
 		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.0f);
 	}
-	//AEGfxSetColorToAdd(0.f, 0.f, 0.f, 1.f);
 	AEGfxSetTransform(transform.m);
 	AEGfxMeshDraw(mesh, AE_GFX_MDM_TRIANGLES);
 }
@@ -68,11 +82,6 @@ void TexturedSprite::RenderSprite(bool changeAlpha, f32 uv_offsetX, f32 uv_offse
 		AEGfxTextureSet(texture, uv_offsetX, uv_offsetY);
 		Sprite::RenderSprite(changeAlpha);
 }
-
-/*AnimatedSprite::AnimatedSprite(AEGfxVertexList* spriteMesh, AEGfxTexture* spriteTexture, Vector2 spritePosition, Vector2 spriteScale, Color spriteColor, f32 initial_offsetX, f32 initial_offsetY)
-	: TexturedSprite(spriteMesh, spriteTexture, spritePosition, spriteScale, spriteColor), current_sprite_uv_offset_x{ initial_offsetX }, current_sprite_uv_offset_y{ initial_offsetY } {
-
-}*/
 
 AnimatedSprite::AnimatedSprite(TexturedSprite texturedSprite, u32 spritesheetRows, u32 spritesheetCols, f32 initial_offsetX, f32 initial_offsetY)
 	: TexturedSprite{texturedSprite}, spritesheet_rows{spritesheetRows}, spritesheet_cols{spritesheetCols}, sprite_uv_width{1.f/spritesheetCols}, sprite_uv_height{1.f/spritesheetRows},
@@ -94,20 +103,18 @@ void AnimatedSprite::GetAnimation(std::string animationName) {
 }
 
 void AnimatedSprite::UpdateAnimation(f32 dt) {
-	//if (currentAnimation.no_frames > 1) {
-		animation_timer += dt;
-		if (animation_timer >= currentAnimation.frame_duration) {
-			animation_timer = 0;
+	animation_timer += dt;
+	if (animation_timer >= currentAnimation.frame_duration) {
+		animation_timer = 0;
 
-			current_sprite_index = ++current_sprite_index % currentAnimation.no_frames;
+		current_sprite_index = ++current_sprite_index % currentAnimation.no_frames;
 
-			u32 current_sprite_row = currentAnimation.start_row;
-			u32 current_sprite_col = currentAnimation.start_col + current_sprite_index;
+		u32 current_sprite_row = currentAnimation.start_row;
+		u32 current_sprite_col = currentAnimation.start_col + current_sprite_index;
 
-			current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
-			current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
-		}
-	//}
+		current_sprite_uv_offset_x = sprite_uv_width * current_sprite_col + initial_offsetX;
+		current_sprite_uv_offset_y = sprite_uv_height * current_sprite_row + initial_offsetY;
+	}
 }
 
 AEGfxVertexList* CreateSquareMesh(f32 sprite_uv_width, f32 sprite_uv_height) {

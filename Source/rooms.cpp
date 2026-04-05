@@ -253,12 +253,6 @@ namespace mapRooms
 		Optional override for room type.
 	*/
 	void Room::Init(RoomType roomType) {
-
-		//rmType = RoomType::Normal;
-
-		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount() << " ****************\n";
-
-		
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
 		}
@@ -267,7 +261,7 @@ namespace mapRooms
 		if (this->rmType == RoomType::Start) {
 			biome = "Start";
 			this->layoutFile = Config::ChooseRandomRoomCsv(biome);
-						this->roomGrid.LoadRoomCSV(this->layoutFile);
+			this->roomGrid.LoadRoomCSV(this->layoutFile);
 			PatchDoorCells();
 
 			Gift* gift = new Gift(allGiftTypes["Trash"], DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"));
@@ -298,7 +292,8 @@ namespace mapRooms
 
 			if (!biomeNames.empty()) {
 				int randomBiomeIndex = std::rand() % static_cast<int>(biomeNames.size());
-								biome = biomeNames[randomBiomeIndex] == "Start" ? "Normal" : biomeNames[randomBiomeIndex];
+
+				biome = biomeNames[randomBiomeIndex] == "Start" ? "Normal" : biomeNames[randomBiomeIndex];
 			}
 			else {
 				biome = "Normal";
@@ -344,7 +339,7 @@ namespace mapRooms
 
 					Enemy* enemy = new Enemy(
 						enemyType,
-												DataLoader::CreateAnimatedTexture(enemyType.spritePath),
+						DataLoader::CreateAnimatedTexture(enemyType.spritePath),
 						DataLoader::CreateTexture("Assets/shadow.png"),
 						DataLoader::CreateTexture("Assets/hitbox.png")
 					);
@@ -477,10 +472,7 @@ namespace mapRooms
 						currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
 				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
-
-
 			currentRoomData.boss->sprite.scale = Vector2{ 1,1 } *bossSource["scale"].asFloat();
-			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
 
 			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
 			currentRoomData.boss->shadow.scale = Vector2{ currentRoomData.boss->sprite.scale.x, currentRoomData.boss->sprite.scale.y / 2 };
@@ -709,8 +701,6 @@ namespace mapRooms
 				}
 				else if (rm->rmType == RoomType::Normal || rm->rmType == RoomType::Start) {
 					if (haveNormal) {
-						/*int pick = static_cast<int>(RandInt(0, static_cast<int>(normalRoomFiles.size()) - 1));
-						chosenPath = normalRoomFiles[pick];*/
 
 						auto it = biomeRoomFiles.find(rm->biome);	// Get biome detail
 						if (it != biomeRoomFiles.end() && !it->second.empty()) {
@@ -1002,7 +992,7 @@ namespace mapRooms
 
 			// Mark next room for exist
 			if (nextRoom != nullptr) {
-								nextRoom->rmType = RoomType::Normal;
+				nextRoom->rmType = RoomType::Normal;
 			}
 		}
 
@@ -1129,9 +1119,6 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Doors
-				
-		
 		// Render Room Obstacles
 
 
@@ -1153,7 +1140,6 @@ namespace mapRooms
 
 					TileType const* tile = Grid::QueryTileType(tileId);
 
-					
 					if (!tile) continue;
 					if (tile->asset.empty()) continue;
 

@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file     Player.h
+\author   Lee Hng Hwee Celest, hnghweecelest.l, 2502385
+\par      hnghweecelest.l@digipen.edu
+\brief    This file declares some functions that implement the player
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
+
 #pragma once
 
 #include "Sprite.h"
@@ -7,6 +22,7 @@
 //and Gift.h needs the player class
 class Gift;
 
+//The player class
 class Player {
 public:
 	TexturedSprite sprite; 
@@ -33,14 +49,18 @@ public:
 	//constructor
 	Player(TexturedSprite playerSprite, TexturedSprite shadowSprite, TexturedSprite hitboxSprite, f32 throwStrength, f32 speed, Vector2 position = Vector2{ 0.f, 0.f },
 		Vector2 direction = Vector2 {0.f, -1.f});
-		
+	//get the player's velocity (coded by Josiah)
 	Vector2 GetVelocity() const;
 };
 
+//function to update the player
 void UpdatePlayer(Player & player, f32 deltaTime);
 
-void playerTakesDamage(Player & player);
+//function for player to take damage
+void PlayerTakesDamage(Player & player);
 
-void playerHealsDamage(Player& player);
+//function for player to heal damage if below 3 health
+void PlayerHealsDamage(Player& player);
 
-void PlayerInit(Player& player/*, mapRooms::Room* currentRoom*/);
+//function to initialise the player via values from json (coded by Josiah)
+void PlayerInit(Player& player);

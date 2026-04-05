@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file		Enemy.cpp
+\author 	Hong Josiah Qin, hong.j, 2501239
+\par  		hong.j@digipen.edu
+\brief		Contains the logic and AI of enemies. 
+EnemyType is also initialized here.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "AEEngine.h"
 #include "Enemy.h"
 #include "Utils/Vector2.hpp"
@@ -103,7 +118,6 @@ bool Enemy::Target::GetActive() const
 Vector2 Enemy::Target::GetPosition() const
 {
 	if (!position) {
-		std::cout << "Position is nullptr! Did you set position correctly?\n";
 		return initialPosition;
 	}
 	return *position;
@@ -264,16 +278,12 @@ void Enemy::Update(float dt) {
 }
 
 void Enemy::AssessTraits(Labels labels, bool giftCheck){
-		for (std::string thing : type.dislikes) {
-			std::cout << "I hate " << thing << " ";
-		}
 	if (giftCheck && HasCommonTrait(labels,type.likes) && !HasCommonTrait(labels,type.dislikes)){
 		ChangeState(ES_HAPPY);
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
 		/* code */
 		
-		std::cout << type.name << " is Angry!\n";
 		ChangeState(ES_ANGRY);
 	}
 	

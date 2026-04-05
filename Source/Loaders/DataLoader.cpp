@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file		DataLoader.cpp
+\author 	Hong Josiah Qin, hong.j, 2501239
+\par  		hong.j@digipen.edu
+\brief		Loads the various files into their respective data.
+All data is stored as static global variables accessible only via the functions dataloader provides.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "DataLoader.h"
 
 #include "AEEngine.h"
@@ -18,12 +33,12 @@
 //Helper function space!!
 namespace {
 
+	// Helper function to add behaviours to the EnemyType from the Json Source
 	void AddBehaviours(EnemyType& tmp, Json::Value& source, std::string const& type) {
 
 		for (Json::Value& thing : source[type]) {
 			BundledBehaviour behavs{};
 			for (Json::Value commernd : thing["actions"]) {
-				std::cout << commernd.asString() << std::endl;
 				behavs.push_back(GetCommand(commernd.asString()));
 			}
 
@@ -39,6 +54,7 @@ namespace {
 		
 	}
 
+	// Helper function to set the projectile information in the enemy type from the json source
 	bool MapProjectile(EnemyType::ProjectileInfo& tmp, Json::Value& source, std::string const& type) {
 		if (!source[type].isNull()) {
 
@@ -57,7 +73,7 @@ namespace {
 				tmp.color.g = og["color"][1].asFloat();
 				tmp.color.b = og["color"][2].asFloat();
 				tmp.color.a = og["color"][3].asFloat();
-				std::cout << "Color Loaded: " << tmp.color.r << " " << tmp.color.g << " " << tmp.color.b << "\n";
+
 				tmp.color.r /= maxVal;
 				tmp.color.g /= maxVal;
 				tmp.color.b /= maxVal;
@@ -105,22 +121,24 @@ namespace {
 
 namespace DataLoader {
 
-	static AEGfxVertexList* squareMesh = nullptr;
-	static AEGfxVertexList* animatedMesh = nullptr;
-	static std::vector<AEGfxVertexList*> animatedMeshes;
+	//These global variables are only created here and should not be accessed directly
 
-	using TextureList = std::unordered_map<std::string, AEGfxTexture*>;
-	using TexturePair = std::pair<std::string, AEGfxTexture*>;
+	static AEGfxVertexList* squareMesh = nullptr;                        //For sprites
+	static AEGfxVertexList* animatedMesh = nullptr;						 //For animated sprites
+	static std::vector<AEGfxVertexList*> animatedMeshes;                 //List of animatedMeshes because we have a lot of them for every spritesheet made
+
+	using TextureList = std::unordered_map<std::string, AEGfxTexture*>;  //List of textures loaded by AETextureLoad. Made a map to prevent duplicate textures.
+	using TexturePair = std::pair<std::string, AEGfxTexture*>;			 
 	static TextureList textures{};
 
-	using EnemyTypeList = std::unordered_map<std::string, EnemyType>;
+	using EnemyTypeList = std::unordered_map<std::string, EnemyType>;    //List of enemyTypes because we have a lot of them and they carry a lot of data.
 	using EnemyPair = std::pair<std::string, EnemyType>;
 	static EnemyTypeList enemyTypes{};
 
-	static std::vector<AlmanacEntry> almanacEntries{};
+	static std::vector<AlmanacEntry> almanacEntries{};                   //List of almanac entries
 	static Json::Value theGuy;
 
-	using SoundList = std::unordered_map<std::string, AEAudio>;
+	using SoundList = std::unordered_map<std::string, AEAudio>;          //List of sounds
 	using SoundPair = std::pair<std::string, AEAudio>;
 	static SoundList sounds{};
 
@@ -143,7 +161,7 @@ namespace DataLoader {
 		}
 		return res;
 	}
-
+	// Write to json file
 	bool DumpFile(std::string filename, std::vector<std::pair<std::string, std::string>> const &data) {
 		Json::Value output;
 		std::ofstream o{ filename };
@@ -162,22 +180,21 @@ namespace DataLoader {
 		return false;
 	}
 
-	AEAudio GetSound(std::string const& name)
+	  //  Lookup the name given in the sounds map and returns the Aeaudio handle (brandon)
+	AEAudio GetSound(std::string const& name)  
 	{
 		SoundList::const_iterator finder = sounds.find(name);
 		if (finder == sounds.end()) {
-			std::cout << "Sound not found: " << name << std::endl;
-			return AEAudio{};
+			return AEAudio{};							// if no name is found then returns this line
+														// fyi even if the sound is missing no sound will just play and it wont crash
 		}
 		return finder->second;
 	}
 
-
+	// Loads all the data for the game to function!!
 	void Load() {
-		std::cout << "****************** Starting load ******************\n";
 		squareMesh = CreateSquareMesh();
 		circleMesh = CreateCircleMesh();
-		//animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
 
 		textures.reserve(5);
 		enemyTypes.reserve(5);
@@ -185,17 +202,13 @@ namespace DataLoader {
 
 		std::ifstream enemyFile{ "Assets/test.json" };
 		InitCommands();
-		//std::ifstream ifs{"Assets/test.json"};
 		std::ifstream almanacFile{ "Assets/almanac.json" };
 
 		std::ifstream audioFile{ "Assets/audio.json" };
 
 
 		if (enemyFile.is_open()) {
-			std::cout << "ok there's something!" << std::endl;
 			enemyFile >> theGuy; //Take the value!
-
-			//std::cout << theGuy["enemies"][0]["name"];
 
 			//Getting enemy types
 			//enemyTypes.reserve(theGuy["enemies"].size());
@@ -242,13 +255,9 @@ namespace DataLoader {
 
 				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
 				{
-					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+					std::cout << tmp.name << "'s Neutral Projectile: " << tmp.neutralProjectile.damage << "\n";
 				}
 
-				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
-				{
-					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
-				}
 
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
@@ -265,14 +274,6 @@ namespace DataLoader {
 					tmp
 					});
 
-
-
-				//std::cout << "name: " << name["name"] << std::endl;
-
-			}
-
-			for (EnemyPair const& type : enemyTypes) {
-				std::cout << type.first << std::endl;
 			}
 
 		}
@@ -292,19 +293,19 @@ namespace DataLoader {
 					name["area"].asString(), 
 					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
 					//DataLoader::CreateTexture(name["spritePath"].asString())};
-				//std::cout << tmp.enemyType.name;
-				//std::cout << name["name"].asString();
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 
 
 				almanacEntries.push_back(tmp);
-				std::cout << "name: " << name["name"] << std::endl;
+				
 			}
 
 		}
 
-		if (audioFile.is_open()) {
+
+// Parses the audio json and loads all audio assets into the sounds map. (Brandon)
+		if (audioFile.is_open()) {  
 			Json::Value audioJson;
 			audioFile >> audioJson;
 
@@ -334,6 +335,8 @@ namespace DataLoader {
 	// TEXTURES
 	// -------------------
 
+	// Texture creator function
+	// Finds an existing texture and if it doesn't exist, loads it using AEGfxTextureLoad
 	TexturedSprite CreateTexture(std::string filename)
 	{
 		TextureList::const_iterator finder = textures.find(filename);
@@ -341,14 +344,11 @@ namespace DataLoader {
 			//couldn't find it
 			textures.insert(TexturePair{ filename, AEGfxTextureLoad(filename.c_str())});
 		}
-		//(textures.find(filename))->second
-
-		// Ehh not CHECKING if squaremesh exist??? idk man
-		// return TexturedSprite(squareMesh,           textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
-		//return TexturedSprite(GetOrCreateSquareMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
+		
 		return TexturedSprite(GetOrCreateSquareMesh(), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 	}
 
+	//Same as Create Texture but specifically for AnimatedSprites
 	TexturedSprite CreateAnimatedTexture(std::string filename, f32 offsetX, f32 offsetY)
 	{
 		TextureList::const_iterator finder = textures.find(filename);
@@ -356,38 +356,36 @@ namespace DataLoader {
 			//couldn't find it
 			textures.insert(TexturePair{ filename, AEGfxTextureLoad(filename.c_str()) });
 		}
-		//(textures.find(filename))->second
 
-		// Ehh not CHECKING if squaremesh exist??? idk man
-		// return TexturedSprite(squareMesh,           textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{1.0f,1.0f,1.0f,1.0f});
-		//return TexturedSprite(GetOrCreateSquareMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 		return TexturedSprite(GetOrCreateAnimatedMesh(offsetX, offsetY), textures.find(filename)->second, Vector2(0, 0), Vector2(100, 100), Color{ 1.0f,1.0f,1.0f,1.0f });
 	}
 
+	// Gets the mesh object to point to
+	// Useful for constructors where we need to store the mesh somewhere but we haven't loaded the mesh itself yet
 	AEGfxVertexList* GetMesh()
 	{
 		return squareMesh;
 	}
 
+	// Creates the mesh if it doesn't exist yet
 	AEGfxVertexList* GetOrCreateSquareMesh()
 	{
 		if (!squareMesh) squareMesh = CreateSquareMesh();
 		return squareMesh;
 	}
 
+	// Creates the mesh if it doesn't exist yet
 	AEGfxVertexList* GetOrCreateCircleMesh()
 	{
 		if (!circleMesh) circleMesh = CreateCircleMesh();
 		return circleMesh;
 	}
 
+	// Creates the mesh if it doesn't exist yet
 	AEGfxVertexList* GetOrCreateAnimatedMesh(f32 offsetX, f32 offsetY)
 	{
-		//if (!animatedMesh) animatedMesh = CreateSquareMesh(offsetX, offsetY);
-		//AEGfxVertexList* animatedMesh = CreateSquareMesh(offsetX, offsetY);
 		animatedMesh = CreateSquareMesh(1.f / offsetX, 1.f / offsetY);
 		animatedMeshes.push_back(animatedMesh);
-		//return animatedMesh;
 		return animatedMeshes.back();
 	}
 
@@ -513,7 +511,6 @@ namespace DataLoader {
 	}
 
 	// NO CACHING FOR NORMAL RRECT MESHES BECAUSE THAT'S STUPID. Many differing variables like radiusRatio, segments, width and height bruh.
-	// This will EXPLODE cache and likely cause cache misses or collision, so what's the point of "caching"...
 	AEGfxVertexList* CreateRoundRectMesh(f32 radiusRatio, int segments, f32 width, f32 height)
 	{
 		return CreateRoundRectMeshInternal(radiusRatio, segments, width, height);
@@ -526,6 +523,8 @@ namespace DataLoader {
 		return almanacEntries;
 	}
 
+	// Finds the enemy type if it exists. Otherwise, return a default type so that the program doesn't completely fail
+	// Always take note that default enemies are errors
 	EnemyType const& GetEnemyType(std::string name)
 	{
 		EnemyTypeList::const_iterator finder = enemyTypes.find(name); 
@@ -535,6 +534,7 @@ namespace DataLoader {
 		return finder->second;
 	}
 
+	// Clears all the global data and Unloads them.
 	void Unload() {
 		for (TexturePair them : textures) {
 			if (them.second) AEGfxTextureUnload(them.second);
@@ -548,8 +548,8 @@ namespace DataLoader {
 		}
 		roundRectMeshes.clear();
 
-		FreeAudio(); 
-		for (SoundPair AllSounds : sounds) {
+		FreeAudio();   // this unloads the audio grp only
+		for (SoundPair AllSounds : sounds) { // unload individual sounds
 			AEAudioUnloadAudio(AllSounds.second);
 		}
 		sounds.clear();
@@ -558,7 +558,7 @@ namespace DataLoader {
 		if (circleMesh) { AEGfxMeshFree(circleMesh); circleMesh = nullptr; };
 		for (AEGfxVertexList* mesh : animatedMeshes) AEGfxMeshFree(mesh);
 		animatedMeshes.clear();
-		//if (animatedMesh) { AEGfxMeshFree(animatedMesh); animatedMesh = nullptr; };
+		
 		
 	}
 

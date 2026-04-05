@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Boss.cpp
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+\brief		This file implements the necessary functionality for bosses (Boss behaviour 
+			is handled by FSM).
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "AEEngine.h"
 #include "Boss.h"
 #include "GameStateList.h"
@@ -13,17 +28,14 @@ Boss::Boss(std::string enemyName, f32 enemyHealth, f32 enemyDamage, AnimatedSpri
 {
 	healthbarInitialized = healthbar.LoadFromFilePopUp(filePath, pos, size);
 	UIElement *bossName = healthbar.FindById("boss_name");
-	if (bossName)
-		bossName->text = enemyName;
+	if (bossName) bossName->text = enemyName;
 	healthbar.SetFont(font);
-	//std::cout << healthbarInitialized << '\n';
 
 
 	if (enemyName == "Chimera") {
-		bossStateMachine = std::make_unique<Boss1_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
+		bossStateMachine = std::make_unique<ChimeraBoss_FSM>(this, attackData[0].attackDamage, attackData[0].attackStartup, attackData[0].attackInterval, attackData[0].attackEndlag,
 			attackData[1].attackDamage, attackData[1].attackStartup, attackData[1].attackInterval, attackData[1].attackEndlag,
 			attackData[2].attackDamage, attackData[2].attackStartup, attackData[2].attackInterval, attackData[2].attackEndlag);
-		//std::cout << typeid(bossStateMachine).name() << '\n';
 	}
 }
 
@@ -32,14 +44,11 @@ Boss::~Boss() {}
 
 void Boss::Update(Player& player, f32 dt) {
 	if (currentHealth > 0) {
-		//collideWall = false;
 		bossStateMachine->Update(player, dt);
 		CollideGift();
 		CollideProjectile();
 		if (invulnerableTimer > 0.f) invulnerableTimer -= dt;
 		speedModifier = 1.0f;
-		//std::cout << sprite.current_animation_index << sprite.current_sprite_index << '\n';
-		//std::cout << sprite.current_sprite_uv_offset_x << sprite.current_sprite_uv_offset_y << '\n';
 	}
 	else {
 		isActive = false;
@@ -50,7 +59,7 @@ void Boss::Update(Player& player, f32 dt) {
 	if (healthbarInitialized) {
 		UIElement* healthUI = healthbar.FindById("foreground");
 		if (healthUI) {
-			healthUI->sizeRatio.x = (currentHealth / health); //* 1000.f;
+			healthUI->sizeRatio.x = (currentHealth / health);
 			healthUI->localPos.x = -0.5f + (currentHealth / health) * 0.5f;
 		}
 	}
@@ -64,9 +73,6 @@ void Boss::CollideProjectile() {
 		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			proj->GetPosition(), proj->GetScale(), proj->GetVelocity(), collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
-				//currentHealth -= proj->GetDmg();
-				//std::cout << "Taken Damage: " << proj->GetDmg();
-				//std::cout << "Remaining Health: " << currentHealth;
 				DamageBoss(proj->GetDmg());
 				ProjectileParticleExplode(roomData, *proj);
 				proj->RemoveProjectile();
@@ -85,11 +91,7 @@ void Boss::CollideGift() {
 		if (CollisionIntersection_RectRect(sprite.position, sprite.scale.Abs(), velocity,
 			gift->position, gift->giftType.sprite.scale, gift->velocity, collisionTime)) {
 			if (invulnerableTimer <= 0.f) {
-				//currentHealth -= 1;
-				//std::cout << "Taken Damage: " << 1;
-				//std::cout << "Remaining Health: " << currentHealth;
 				DamageBoss(1);
-				//gift->velocity = -gift->velocity;
 				Vector2 dirBtwnEnemyGift = sprite.position - gift->position;
 				gift->velocity = -dirBtwnEnemyGift.Normalized() * gift->velocity.Length();
 				invulnerableTimer = 0.5f;
@@ -102,10 +104,6 @@ void Boss::CollideGift() {
 void Boss::DamageBoss(s32 dmg) {
 	currentHealth -= dmg;
 	if (currentHealth < 0) currentHealth = 0;
-	
-	
-	//hpBar.scale.x = (currentHealth / health) * 1000.f;
-	//hpBar.position.x = -500.f + (currentHealth / health) * 500.f;
 }
 
 void Boss::ResetBoss() {

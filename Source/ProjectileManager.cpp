@@ -1,18 +1,32 @@
+/* Start Header ************************************************************************/
+/*!
+\file        ProjectileManager.cpp
+\author     Brandon Choo, b.choo, 2501888
+\par        b.choo@digipen.edu
+\brief		This code implements the spawning functions for all projectile types, and handles updates the projectile every frame.
+            Collision detection of projectile against enemies/players with projectile, and Josiah's particle effects too.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
 #include "ProjectileManager.h"
 
 #include "ParticleSystem.h"
 
-
+// Spawns a standard fireball projectile in the given direction
 void ShootProjectile(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
 	sprite.position = pos;
 	sprite.scale = scale;
 	sprite.color = color;
-	//sprite.direction = dir;
 	Projectile* fireball = new Projectile(sprite, FIREBALL, dir * speed, lifetime, damage,0.0f, source, isFriend);
     roomData.projectileList.push_back(fireball);
     ProjectileAudio();
 }
 
+// Spawns a 360 spread of projectiles
 void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     int numProjectiles = 10;
     float angleAround = 360.0f / numProjectiles;  
@@ -33,20 +47,18 @@ void ShootAOE(TexturedSprite sprite, RoomData& roomData, Vector2 pos, float spee
     }
 }
 
+// Spawns a projectile that curves like a spiral with the given rotation rate
 void ShootRounding(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend, float rot) {
     sprite.position = pos;
     sprite.scale = scale;
     sprite.color = color;
-    
-  //  Vector2 perpendicularVel = { dir.y, -dir.x };
-
-  //  Vector2 swirlVel = (dir * speed) + (perpendicularVel * speed * 50.0f);
-
+  
     Projectile* rounding = new Projectile(sprite, ROUNDING, dir * speed, lifetime, damage,rot,source, isFriend);
     roomData.projectileList.push_back(rounding);
     RoundingProjectileAudio();
 }
 
+// Spawns a scatter projectile that explodes into AOE projectile once the inital projectile dies
 void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color,void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
@@ -59,6 +71,7 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     
 }
 
+// Spawns a boomerang projectile
 void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector2 dir, float speed, float lifetime, int damage, Vector2 scale, Color color, void* source, bool isFriend) {
     sprite.position = pos;
     sprite.scale = scale;
@@ -68,12 +81,14 @@ void ShootBoomerang(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vect
 
 }
 
+// Updates all projectiles each frame and handles scatter expansion and removes dead projectiles
 void UpdateProjectiles(RoomData& roomData, float dt) {
-    std::vector<Projectile*> rmdata;
+    std::vector<Projectile*> rmData;
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         (*it)->UpdateProjectile(dt);
         if (!(*it)->IsAlive()) {
+            // Scatter projectile spawns AOE on death
             if ((*it)->isScatter && !(*it)->didScatter) {
                 int numProjectiles = 10;
                 float angleAround = 360.0f / numProjectiles;
@@ -82,7 +97,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
                     Vector2 shotDir = { AECos(angle), AESin(angle) };
                     TexturedSprite spr = (*it)->GetSprite(); 
                     Projectile* aoe = new Projectile(spr, AOE, shotDir * 200.0f, 1.0f, (*it)->GetDmg());
-                    rmdata.push_back(aoe);
+                    rmData.push_back(aoe);
                 }
             }
                 delete* it;
@@ -92,12 +107,13 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
                 ++it;
             }
         }
-    for(Projectile *p : rmdata)
+    for(Projectile *p : rmData)
        roomData.projectileList.push_back(p);
 
     }
 
 
+// Check for collision for each projectile
 void CheckProjectileCollision(RoomData& roomData, Player& player) {
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         float tFirst = 0.0f;
@@ -132,10 +148,11 @@ void CheckProjectileCollision(RoomData& roomData, Player& player) {
                 tFirst);
             if  (hit) {
                 if ((*it)->GetDmg() < 0.f) {
-                    playerHealsDamage(player);
+                    // If dmg is neg then it heals 
+                    PlayerHealsDamage(player);
                 }
                 else if ( (*it)->GetDmg() > 0.f)
-                    playerTakesDamage(player);
+                    PlayerTakesDamage(player);
 
 
             }
@@ -176,7 +193,7 @@ void ProjectileParticleExplode(RoomData& roomData, Projectile const& projectile)
     float particleSize = 2500.f;
     int massOfProj = static_cast<int>((projectile.GetScale().x * projectile.GetScale().x) / particleSize) / numRotations;
     massOfProj = massOfProj <= 0 ? 1 : massOfProj;
-    std::cout << massOfProj << " mass\n";
+
     for (int i = 0; i < numRotations; i++) {
         float degree = static_cast<float>(i) / static_cast<float>(numRotations) * 360.f;
 
