@@ -1045,14 +1045,14 @@
 				"damage": 20,
 				"radius": 50,
 				"speed": 1,
-				"lifetime": 0.5,
+				"lifetime": 0.2,
 				"sprite": "Assets/bite.png"
 			},
 			"angryProjectile": {
 				"damage": 20,
 				"radius": 50,
 				"speed": 1,
-				"lifetime": 0.5,
+				"lifetime": 0.2,
 				"sprite": "Assets/bite.png"
 			},
 
@@ -1119,6 +1119,13 @@
 					"context":"IsWaiting",
 					"actions": [
 						"MoveToTarget"
+					]
+				},
+				{
+					"context":"OnceWaitTimerIsUp",
+					"actions": [
+						"FireProjectile",
+						"ClearTarget"
 					]
 				},
 				{
