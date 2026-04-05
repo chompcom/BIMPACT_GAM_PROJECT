@@ -92,6 +92,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
 
     for (auto it = roomData.projectileList.begin(); it != roomData.projectileList.end();) {
         (*it)->UpdateProjectile(dt);
+        /*  // Code for wall collision in case needed but not implemented as a game design decision
         // Wall collision for projectile check using room boundary
         Vector2 pos = (*it)->GetPosition();
         Vector2 scale = (*it)->GetScale();
@@ -102,7 +103,7 @@ void UpdateProjectiles(RoomData& roomData, float dt) {
         if (colRes != 0)
         {
             (*it)->RemoveProjectile(); // remove projectile if collide 
-        }
+        } */ 
         if (!(*it)->IsAlive()) {
             // Scatter projectile spawns AOE on death
             if ((*it)->isScatter && !(*it)->didScatter) {
