@@ -53,17 +53,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // Changing the window title
     AESysSetWindowTitle("UI Demo!");
-    //GSM_Initialize(GS_LEVEL1);
-    GSM_Initialize(GS_LOGO);
+    GSMInitialize(GS_LOGO);
     // Game Loop
-    //_CrtSetBreakAlloc(4752);
-    while (/*gGameRunning && */current != GS_QUIT)
+    while (current != GS_QUIT)
     {
         if (current != GS_RESTART) {
-            GSM_Update();
+            GSMUpdate();
             fpLoad();
-          //  Grid grid(10, 10, 50);
-         //   std::cout << grid.GetHeight() << ", " << grid.GetWidth() << std::endl;
         }
         else {
             next = previous;
@@ -77,7 +73,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             fpUpdate(static_cast<float>(AEFrameRateControllerGetFrameTime()));
             fpDraw();
             AESysFrameEnd();
-            if (/*AEInputCheckTriggered(AEVK_ESCAPE) ||*/ 0 == AESysDoesWindowExist()) {
+            if (0 == AESysDoesWindowExist()) {
                 //gGameRunning = 0;
                 next = GS_QUIT;
             }
@@ -90,16 +86,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         previous = current;
         current = next;
-        //super scuffed fps check
-        //std::cout << AEFrameRateControllerGetFrameRate() << std::endl;
-        
-
-        
-
-        // check if forcing the application to quit
-        
     }
-
 
     // free the system
     AESysExit();

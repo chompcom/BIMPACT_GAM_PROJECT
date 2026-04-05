@@ -16,6 +16,8 @@ Technology is prohibited.
 #include "AEEngine.h"
 #include "BoundaryCollision.h"
 
+// Checks for collision between object and boundaries of viewport (Object moving out of screen)
+// If so, shifts object back to valid position
 bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight) {
 	Vector2 min = position - scale * 0.5f;
 	Vector2 max = position + scale * 0.5f;
@@ -41,7 +43,7 @@ bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength
 	}
 }
 
-
+// Similar to above function, but returns which side of viewscreen object is colliding with
 bool CollisionBoundary_Static(Vector2& position, Vector2 scale, s32 windowLength, s32 windowHeight, int& COLLISION_FLAGS) {
 	const int	COLLISION_LEFT		= 0x00000001;	//0001
 	const int	COLLISION_RIGHT		= 0x00000002;	//0010

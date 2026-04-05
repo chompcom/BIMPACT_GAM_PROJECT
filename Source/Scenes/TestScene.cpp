@@ -412,8 +412,10 @@ void TestDraw()
 
 	RenderPlayerLives(player, healthIcons, font);
 
+	// Debug mode active
 	if (debugMode)
 	{
+		// Render object hitboxes
 		if (mapRooms::Room* room = gameMap.GetCurrentRoom())
 		{
 			RoomData& roomData = room->currentRoomData;
@@ -462,6 +464,7 @@ void TestDraw()
 
 		player.hitbox.RenderSprite();
 
+		// Display debug info
 		char buffer[50];
 
 		sprintf_s(buffer, 50, "DEBUG MODE ON");

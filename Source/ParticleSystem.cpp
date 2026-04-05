@@ -16,21 +16,26 @@ Technology is prohibited.
 #include "ParticleSystem.h"
 #include "Loaders/DataLoader.h"
 
+// Constructor for particle
 Particle::Particle(AEGfxVertexList* particleMesh) : sprite{Sprite(particleMesh, Vector2{}, Vector2{25, 25})}
 {}
 
+// Constructor for particle system
 ParticleSystem::ParticleSystem(AEGfxVertexList* particleMesh) {
 	particles.reserve(500);
 
+	// Preload particles into particle system (Better performance)
 	for (int i{}; i < 500; ++i) {
 		particles.push_back(Particle(particleMesh));
 	}
 }
 
+// Creates specified number of particles in particle system, all with random velocities and lifetimes (Provided values are set as maximum)
 bool ParticleSystem::CreateParticles(s32 particleCount, f32 baseLifetime, Vector2 particleVelocity, Vector2 particlePosition, Color particleColor) {
 	s32 spawnedCount{};
 
 	for (int i{}; i < 500; ++i) {
+		// Already stores active particle, skip over
 		if (particles[i].isActive)
 			continue;
 
@@ -42,15 +47,19 @@ bool ParticleSystem::CreateParticles(s32 particleCount, f32 baseLifetime, Vector
 
 		++spawnedCount;
 		++activeParticleCount;
+		// Able to create specified number of particles
 		if (spawnedCount == particleCount) 
 			return true;
 	}
 
+	// Unable to create specified number of particles, no more inactive particles in particle system
 	return false;
 }
 
+// Update all active particles in particle system
 void ParticleSystem::UpdateParticles(f32 dt) {
 	for (int i{}; i < 500; ++i) {
+		// Inactive particle, skip
 		if (!particles[i].isActive)
 			continue;
 
@@ -58,6 +67,7 @@ void ParticleSystem::UpdateParticles(f32 dt) {
 		particles[i].sprite.UpdateTransform();
 
 		particles[i].lifetime -= dt;
+		// Destroy if lifetime has ended
 		if (particles[i].lifetime <= 0) {
 			particles[i].isActive = false;
 			--activeParticleCount;
@@ -66,6 +76,8 @@ void ParticleSystem::UpdateParticles(f32 dt) {
 	}
 }
 
+// Destroys all active particles in one go
+// Needed when player moves between rooms (Particles in previous room must be removed)
 void ParticleSystem::DestroyParticles() {
 	for (int i{}; i < 500; ++i) {
 		if (!particles[i].isActive) 
