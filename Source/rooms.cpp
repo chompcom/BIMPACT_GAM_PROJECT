@@ -16,7 +16,6 @@
 #include "RoomData.h"
 #include "Gift.h"		// ????
 #include "Boss.h"
-//#include "Grid.h"
 
 namespace Config {
 	// We are making an n x n grid with 1 and 0s
@@ -106,16 +105,6 @@ namespace Config {
 		return files[idx];
 	}
 
-	// Absolute (legacy dead code)
-	//static float AbsF(float v) { return (v < 0.0f) ? -v : v; }
-
-	// Overlap Algo rectangle (Legacy dead code)
-	//static bool OverlapAabb(Vector2 aCenter, Vector2 aHalf, Vector2 bCenter, Vector2 bHalf)
-	//{
-	//	float dx = AbsF(aCenter.x - bCenter.x);
-	//	float dy = AbsF(aCenter.y - bCenter.y);
-	//	return (dx <= (aHalf.x + bHalf.x)) && (dy <= (aHalf.y + bHalf.y));
-	//}
 
 	// Extracting filename from fullpath
 	std::string ExtractThemeTag(std::string const& fullPath, mapRooms::RoomType type)
@@ -289,26 +278,6 @@ namespace mapRooms
 
 					Labels giftTraits{};
 
-					// Idk how should i set traits
-					//if (giftDisplayName == "Spray")
-					//{
-					//	giftTraits.insert("Clean");
-					//}
-					//else
-					//{
-					//	// HotSauce / Trash default to Gross for now
-					//	giftTraits.insert("Gross");
-					//}
-
-					/*Gift* gift = new Gift(
-						giftDisplayName,
-						giftTraits,
-						DataLoader::CreateTexture(giftTexturePath),
-						DataLoader::CreateTexture("Assets/shadow.png"),
-						spawnPosition
-					);*/
-
-
 					Gift* gift = new Gift(
 						allGiftTypes[giftDisplayName],
 						DataLoader::CreateTexture("Assets/shadow.png"),
@@ -387,55 +356,13 @@ namespace mapRooms
 		}
 
 
-		//std::cout << "Display Room Init of " << biome << "\n";
-		//roomGrid.
-		//for (int j = 0; j < roomGrid.GetHeight(); j++) {
-		//	for (int i = 0; i < roomGrid.GetWidth(); i++) {
-		//		const TileType* tile = Grid::QueryTileType(roomGrid.GetCell(j, i));
-		//		std::cout << (tile ? tile->id : 0) << " ";
-		//		if (!tile) continue;
-		//		if (tile->id > 101) {
-		//			//std::cout << "Spawned " << tile->name << "! \n";
-		//			const EnemyType& enemyType = DataLoader::GetEnemyType(tile->name);
-		//			currentRoomData.enemyList.push_back(new Enemy(enemyType, DataLoader::CreateTexture(enemyType.spritePath), DataLoader::CreateTexture("Assets/shadow.png")));
-		//			currentRoomData.enemyList.back()->sprite.position = Vector2{ i * roomGrid.GetTileWidth()*0.5f , j * roomGrid.GetTileHeight()*0.5f};
 
-		//		}
-		//	}
-		//	std::cout << "\n";
-		//}
 
-		// Spawn enemies
-		//if (0 && currentRoomData.enemyList.empty()) {
-		//	currentRoomData.enemyList.push_back(new Enemy(DataLoader::GetEnemyType("Booger"), DataLoader::CreateAnimatedTexture("Assets/Enemies/booger.png"), DataLoader::CreateTexture("Assets/shadow.png")));
-		//	for (Enemy* i : currentRoomData.enemyList) {
-		//		i->shadow.position = Vector2{ 0.f, -35.f };
-		//		i->shadow.UpdateTransform();
-		//		i->ChangeState(EnemyStates::ES_NEUTRAL);
-		//		i->roomData = &this->currentRoomData;
-		//	}
-		//}
-
-		// Spawn gifts
-		//if (0 && currentRoomData.giftList.empty()) {
-		//	Gift* gift = new Gift("boat", { "Gross" }, DataLoader::CreateTexture("Assets/pattyfish.png"), DataLoader::CreateTexture("Assets/shadow.png"));
-		//	gift->shadow.position = Vector2{ 0.f, -40.f };
-		//	currentRoomData.giftList.push_back(gift);
-		//}
-	//}
-		// Gifts here (1 Gift per room for now)
-		//currentRoomData.giftList.push_back(new Gift{ "boat", {"happy"}, Sprite() });	// Does this make sense?
-		//Vector2 giftPos{ 200.0f, 450.0f };
-		//TexturedSprite giftSprite(somemesh, giftPos, Vector2{ 80.0f, 80.0f }, Color{ 1.f, 0.f, 0.f, 1.f });
-		//currentRoomData.giftList.push_back(new Gift(somethingelse, DataLoader::CreateTexture("Assets/poprocks.png")));
 
 
 
 	// Boss Init
 		if (rmType == RoomType::Boss) {
-			//std::vector<AttackData>attackData = { {5.0f, 2.0f, 3.0f, 1.5f}, {10.0f, 2.0f, 1.5f, 2.0f} };
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Warrior.jpg"), 0.1f, 0.1f), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 
 			Json::Value bossSource = DataLoader::LoadJsonFile("Assets/entityInfo.json")["boss"];
 
@@ -460,9 +387,8 @@ namespace mapRooms
 			fsm["follow"]["interval"].asFloat(),
 			fsm["follow"]["endLag"].asFloat()
 		} };
-			//currentRoomData.boss = new Boss("Boss 1", 100.0f, 5.0f, DataLoader::CreateTexture("Assets/veggiefish.png"), DataLoader::CreateTexture("Assets/shadow.png"), currentRoomData, attackData);
 			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
-				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
+				currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
 			currentRoomData.boss->sprite.scale = Vector2{ 1,1 } *bossSource["scale"].asFloat();
 
@@ -485,22 +411,12 @@ namespace mapRooms
 			}
 
 
-			/*
-			currentRoomData.boss->sprite.SetAnimation({ "Idle", 0, 0, 1 });
-			currentRoomData.boss->sprite.SetAnimation({ "Run Start", 1, 0, 1 });
-			currentRoomData.boss->sprite.SetAnimation({ "Run", 1, 0, 3 });
-			currentRoomData.boss->sprite.SetAnimation({ "Run End", 1, 2, 1 });
-			currentRoomData.boss->sprite.SetAnimation({ "Jump Start", 2, 0, 1 });
-			currentRoomData.boss->sprite.SetAnimation({ "Jump", 2, 1, 1 });
-			currentRoomData.boss->sprite.SetAnimation({ "Jump End", 2, 2, 1 });
-			*/
 			currentRoomData.boss->sprite.GetAnimation("Idle");
 
 
 			// Initialize Default Grid (Should be all zero ig)
 			biome = "Normal"; // or keep previously chosen biome if you want
 			layoutFile = ".\\Assets\\Levels\\Room_Data\\Boss_1.csv";
-			//layoutFile = ChooseRandomBossRoomCsv();	// Maybe if required
 			this->roomGrid.LoadRoomCSV(layoutFile);
 			PatchDoorCells();
 		}
@@ -511,17 +427,6 @@ namespace mapRooms
 	}
 	void Room::Update(float dt) {
 		UNREFERENCED_PARAMETER(dt);
-		//for (Enemy* i : currentRoomData.enemyList) {
-			//i->Update(dt);
-
-
-		//}
-
-		// Check collision with room ig
-
-
-
-
 	}
 
 
@@ -592,10 +497,6 @@ namespace mapRooms
 		rngState{ 0xA341316Cu },
 		transferData{ nullptr }	// Some random seed
 	{
-		//Room x[2]{};
-		//for (Room y : x) {
-			//rooms.push_back(y);
-		//}
 	}
 
 	Map::~Map() {
@@ -620,28 +521,13 @@ namespace mapRooms
 		std::string filePath = "Assets/Levels/Room_Data/TilesInfo.json";
 		Json::Value tilesInfo = DataLoader::LoadJsonFile(filePath);
 
-		//std::string cliInput = "powershell.exe -c \"Test-Path ([System.IO.Path]::Combine($PWD.Path, '" + filePath + "'))\"";
-		//system(cliInput.c_str());	// Look and see if yo shit is FALSE, that means it doesn't exist on that path
-
-
-
 		Json::Value::Members biomeNames = tilesInfo["biomes"].getMemberNames();
 		for (Json::String name : biomeNames) {
 			std::string imagePath = tilesInfo["biomes"][name]["imageDir"].asString();
 			Config::ScanPngFolderWin32(imagePath, biomeRoomFiles[name]);
 		}
-		/*
-		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Start"]);
-		Config::ScanPngFolderWin32(normalDir,	biomeRoomFiles["Normal"]);
-		Config::ScanPngFolderWin32(greenDir,	biomeRoomFiles["Green"]);
-		Config::ScanPngFolderWin32(iceDir,		biomeRoomFiles["Ice"]);
-		Config::ScanPngFolderWin32(oceanDir,    biomeRoomFiles["Ocean"]);
-		*/
 
 		Config::ScanPngFolderWin32(bossDir, bossRoomFiles);
-
-		// Not up yet... There should be a neater way via json lol
-		//Config::ScanPngFolderWin32("Assets/Rooms/Boss", bossRoomFiles);
 	}
 
 	AEGfxTexture* Map::GetOrLoadTexture(std::string const& path)
@@ -683,8 +569,6 @@ namespace mapRooms
 				}
 				else if (rm->rmType == RoomType::Normal || rm->rmType == RoomType::Start) {
 					if (haveNormal) {
-						/*int pick = static_cast<int>(RandInt(0, static_cast<int>(normalRoomFiles.size()) - 1));
-						chosenPath = normalRoomFiles[pick];*/
 
 						auto it = biomeRoomFiles.find(rm->biome);	// Get biome detail
 						if (it != biomeRoomFiles.end() && !it->second.empty()) {
@@ -718,16 +602,9 @@ namespace mapRooms
 
 		transferData = &globalSceneData;
 
-		//somemesh = CreateSquareMesh();		// Remember to unfuck this
 		ResetRooms();							// Ensure rooms are nothing;
 		GenerateRooms();						// Generate, links and init rooms.
 		// Probably generate other room types???
-
-
-		//std::cout << rooms.size();
-		//for (Room& curRoom : rooms) {
-		//	std::cout << static_cast<int>(curRoom.rmType);
-		//}
 
 		// Load available Pngs
 		LoadRoomArtLists();
@@ -772,15 +649,6 @@ namespace mapRooms
 		return (static_cast<unsigned int>(low + (std::rand() % (high - low + 1))));
 	}
 
-	//// UpdateMap()
-	//void Map::UpdateMap(  )
-	//{
-	//	// Input (Get x and y of player)
-	//	// Perhaps testing for collision
-	//	
-
-	//	MoveTo(Direction::Left);
-	//}
 
 	// DeleteMap()?
 	void Map::DeleteMap()
@@ -973,13 +841,6 @@ namespace mapRooms
 		// Mark Boss
 		GetRoom(bossIdx % gridSize, bossIdx / gridSize)->rmType = RoomType::Boss;
 
-		// Init all rooms now;
-		//for (Room &curRoom : this->rooms) {
-		//	if (curRoom.rmType != RoomType::Empty) {
-		//		curRoom.Init(curRoom.rmType);	// init room here
-		//	}
-		//}
-
 		// Link all Adjacent Rooms here
 		for (int idx = 0; idx < (gridSize * gridSize); ++idx) {
 			int curX = idx % gridSize, curY = idx / gridSize;	// Get x, y value of 2d room array
@@ -1058,13 +919,8 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Obstacles
-
-
 		// Render Room Doors
 		RenderRoomDoors(squaremesh, doorTex);
-
-
 		AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 		// Render Room Obstacles
 		if (currentRoom != nullptr) {
@@ -1094,8 +950,6 @@ namespace mapRooms
 				}
 			}
 		}
-
-
 		// Render Enemy?
 		for (Enemy* i : currentRoom->currentRoomData.enemyList) {
 			Color oldColor = i->sprite.color;
@@ -1105,8 +959,6 @@ namespace mapRooms
 		}
 
 	}
-
-
 
 	// Render map
 	void Map::RenderDebugMap(AEGfxVertexList* squareMesh) const
@@ -1175,7 +1027,6 @@ namespace mapRooms
 
 
 
-		//const float doorW = this->currentRoom->roomGrid.GetTileWidth() * 2 + 35.0f;
 		const float doorW = 145.0f;
 		const float doorH = 169.0f;
 		const float edgeOffset = 63.0f;	// Offset from screen 
@@ -1293,8 +1144,6 @@ namespace mapRooms
 		previousRoom->visited = true;
 		currentRoom->toBeTransferred = transferData;
 		currentRoom->currentRoomData.player = transferData ? transferData->player : nullptr;	// Is this necessary lol idk 
-		//currentRoom->toBeTransferred = previousRoom->toBeTransferred;	// Hopefully?
-		//currentRoom->toBeTransferred = &transferData;					// Maybe this works?
 
 		return true;
 	}

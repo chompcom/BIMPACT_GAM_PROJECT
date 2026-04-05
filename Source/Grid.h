@@ -103,22 +103,7 @@ private:
 	
 	
 public:
-	/*
-	Grid() : width(0), height(0), tileWidth(0), tileHeight(0), offsetX(0), offsetY(0) {}
-	Grid(int w, int h, int tw, int th, float osX, float osY);
-	int LoadFromFile(const char* fileName);
-	GridType GetTile(int x, int y) const;
-	float GetWorldWidth() const;
-	float GetWorldHeight() const;
-	bool IsEmpty(int x, int y) const;
-	void SetTile(int x, int y, GridType type);
-	void SetOffset(float osX, float osY);
-	void PrintRetrievedInformation(void);
-	void RenderGrid(AEGfxVertexList* mesh);
-	int CheckInstanceBinaryMapCollision(float PosX, float PosY, float scaleX, float scaleY);
-	bool IsDoor(int x, int y) const;
-	//
-	*/
+	
 	bool IsValid(int x, int y) const;
 	int GetWidth() const;
 	int GetHeight() const;
@@ -130,7 +115,6 @@ public:
 		int  GetCell(int row, int col) const;
 		int  GetCell(int idx) const;
 		int  SetCell(int row, int col, int val);
-		//Vector2 Grid::CellToWorldCenter(int row, int col) const;
 
 		// Basically Binary Map collision but include other enums
 		int CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY, int prevCell) const;

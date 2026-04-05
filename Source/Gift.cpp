@@ -8,31 +8,6 @@
 #include "rooms.h" //from main
 #include <iostream>
 
-//simple contructor for gift class, for testing
-//Gift::Gift(std::string n, Labels t ,TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position) :
-//	//initialiser list
-//	name{ n },
-//	traits{ t },
-//	sprite{ sprite },
-//	shadow{ shadowSprite },
-//	position{ position },
-//	velocity { Vector2 {0.f, 0.f}},
-//	pickUpState{ false },
-//	shakeState{ false }
-//{
-//}
-//
-//Gift::Gift(TexturedSprite sprite, TexturedSprite shadowSprite, Vector2 position) :
-//	name{ "Unnamed Gift" },
-//	traits{ },
-//	sprite{ sprite },
-//	shadow{ shadowSprite },
-//	position{ position },
-//	velocity{ Vector2 {0.f, 0.f} },
-//	pickUpState{ false },
-//	shakeState{ false }
-//{	
-//}
 std::unordered_map<std::string, GiftType> allGiftTypes;
 
 GiftType::GiftType() :
@@ -101,20 +76,7 @@ void UpdateGift(Gift & gift, Player & player, f32 deltaTime, Vector2 boundaries,
 			// Dampen bounce
 			gift.velocity /= 1.3f;
 		}
-		//else if (curRoom->roomGrid.CheckMapGridCollision(gift.position.x, gift.position.y, gift.sprite.scale.x, gift.sprite.scale.y, -1)) {
-		//	collideFlags = curRoom->roomGrid.CheckMapGridCollision(gift.position.x, gift.position.y, gift.sprite.scale.x, gift.sprite.scale.y, -1);
 
-		//	// Left and Right collision inverse x
-		//	if (collideFlags & 0x00000003) {
-		//		gift.velocity.x *= -1;
-		//	}
-		//	// Top and Bottom inverse y
-		//	if (collideFlags & 0x0000000C) {
-		//		gift.velocity.y *= -1;
-		//	}
-		//	// Dampen bounce
-		//	gift.velocity /= 1.3f;
-		//}
 		else {
 			gift.velocity /= 1.1;
 		}

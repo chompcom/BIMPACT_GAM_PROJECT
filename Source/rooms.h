@@ -10,7 +10,6 @@
 #include "Utils/Utils.h"
 #include "ParticleSystem.h"
 #include "Grid.h"
-//#include "AEEngine.h"
 
 struct AEGfxTexture;
 struct AEGfxVertexList;
@@ -162,21 +161,7 @@ const	Room*	GetRoom(int x, int y) const;
 		AEGfxTexture* doorTex{ nullptr };
 		void RenderRoomDoors(AEGfxVertexList* squareMesh, AEGfxTexture* doorTexture) const;
 
-		//// Door Rendering Struct
-		//struct DoorThemeTextures
-		//{
-		//	// Each room should have theme_opened.png and theme_closed.png
-		//	AEGfxTexture* closed{ nullptr };
-		//	AEGfxTexture* opened{ nullptr };
-		//};
 
-		//// Unordered map for string <-> doorthemetextures
-		//std::unordered_map<std::string, DoorThemeTextures> doorThemeCache;
-		//DoorThemeTextures defaultDoorTex{};
-
-		//void BuildDoorThemeCache();
-		//void RenderDoors(AEGfxVertexList* squareMesh) const;
-		//void DrawDoorSprite(AEGfxVertexList* mesh, AEGfxTexture* tex, Vector2 pos, Vector2 scale, float rotRad) const;
 	};
 
 

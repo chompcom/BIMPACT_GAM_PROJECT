@@ -210,10 +210,6 @@ namespace DataLoader {
 		if (enemyFile.is_open()) {
 			enemyFile >> theGuy; //Take the value!
 
-			//Getting enemy types
-			//enemyTypes.reserve(theGuy["enemies"].size());
-
-
 			for (Json::Value& name : theGuy["enemies"]) {
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };
 
@@ -292,7 +288,6 @@ namespace DataLoader {
 				AlmanacEntry tmp{entryEnemyType, name["description"].asString(), 
 					name["area"].asString(), 
 					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
-					//DataLoader::CreateTexture(name["spritePath"].asString())};
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 
