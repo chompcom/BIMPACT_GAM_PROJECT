@@ -1,5 +1,3 @@
-// Mainmenu UI Test
-
 #include "MainMenuScene.h"
 
 #include "AEEngine.h"
@@ -152,9 +150,11 @@ void MainMenuUpdate(float dt=AEFrameRateControllerGetFrameTime())
 	}
 	if (ui.FindById("img_controls")->visible && (AEInputCheckTriggered(AEVK_LBUTTON) || AEInputCheckTriggered(AEVK_ESCAPE))) {
 		ui.FindById("img_controls")->visible = false;
+		//We skip updating the buttons this frame because otherwise it's possible to bring up the controls again instantly
 		return;
 	}
 	else if (ui.FindById("img_controls")->visible) {
+		//We do not want to update the buttons behind while the image is visible
 		return;
 	}
 
