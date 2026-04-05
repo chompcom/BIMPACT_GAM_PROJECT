@@ -33,7 +33,6 @@ bool IsCursorInSquare(Vector2 square_Center, float squareLength)
 	
 	cursorPositionX -= 800;
 	cursorPositionY = 450 - cursorPositionY;
-	//std::cout << cursorPositionX << "," << cursorPositionY << "\n";
 
 	return ( cursorPositionX < (square_Center.x + (squareLength / 2.f)) && 
 		cursorPositionX > (square_Center.x - (squareLength / 2.f)) && 
@@ -50,7 +49,6 @@ bool IsCursorInRect(Vector2 rect_Center, float rect_Width, float rect_Length)
 
 	cursorPositionX -= 800;
 	cursorPositionY = 450 - cursorPositionY;
-	//std::cout << cursorPositionX << "," << cursorPositionY << "\n";
 
 	return (cursorPositionX < (rect_Center.x + (rect_Width / 2.f)) &&
 		cursorPositionX >(rect_Center.x - (rect_Width / 2.f)) &&
@@ -58,7 +56,6 @@ bool IsCursorInRect(Vector2 rect_Center, float rect_Width, float rect_Length)
 		cursorPositionY < (rect_Center.y + (rect_Length / 2.f)) &&
 		cursorPositionY >(rect_Center.y - (rect_Length / 2.f)));
 }
-//}
 
 std::string ExtractFileName(const std::string& fullpath, const std::string& last) {
 	// 1. Get ONLY filename by finding the last slash

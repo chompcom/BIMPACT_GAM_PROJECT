@@ -150,7 +150,6 @@ namespace mapRooms {
 		// Level lifecycle
 		// Initialize the map using global scene data and a seed
 		void	InitMap(RoomData& globalSceneData, unsigned int seed);	// Grid size and other spawns based on seed.
-		//void	UpdateMap();								// Idk
 		void	UpdateMap(Vector2& playerPos, Vector2 playerHalfSize, ParticleSystem& particleSystem, float dt);	// Update the map and current room.
 		void	DeleteMap();								// Reset this level stuff (tbh this kinda violates the game loop taught in GIT lol)
 
@@ -214,7 +213,6 @@ const	Room*	GetRoom(int x, int y) const; // Retrieve a room (const)
 
 		// Load lists of room art files for each biome.
 		void			LoadRoomArtLists();     
-		//AEGfxTexture*	GetOrLoadTexture(std::string const& path);
 		void			AssignRoomArt();        // Assign background art to each room.
 
 		// Door trigger cooldown (prevents re-trigger)

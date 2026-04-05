@@ -179,7 +179,6 @@ bool UIManager::LoadFromFile(std::string const& filePath)
 
 bool UIManager::LoadFromFilePopUp(std::string const& filePath, Vector2 pos, Vector2 size) {
 	this->Clear();
-	//this->SetFont(this->font);
 
 	this->SetRootRect(pos, size);
 	bool res = this->LoadFromFile(filePath);
@@ -543,7 +542,6 @@ void UIManager::DrawElement(UIElement const& element) const
 	if (!element.visible) return;
 
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
-	//AEGfxSetTransparency(1.0f);
 
 	if (element.drawBackground)
 	{

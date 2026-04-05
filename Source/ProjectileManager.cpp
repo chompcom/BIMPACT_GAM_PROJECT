@@ -64,7 +64,6 @@ void ShootScatter(TexturedSprite sprite, RoomData& roomData, Vector2 pos, Vector
     sprite.scale = scale;
     sprite.color = color;
 
-    //sprite.direction = dir;
     Projectile* scatter = new Projectile(sprite, SCATTER, dir * speed, lifetime, damage,0.0f, source, isFriend);
     scatter->isScatter = true;
     roomData.projectileList.push_back(scatter);  

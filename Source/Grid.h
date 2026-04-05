@@ -94,7 +94,6 @@ struct BiomeInfo
 class TileDataBase
 {
 public:
-	//TileDataBase(const std::string& filename);
 	bool  Load(const std::string& filename);												// Load tile and biome data from a JSON file..
 	const TileType* GetTileType(int id) const;												// Retrieve tile metadata by ID.
 	bool  TileAllowedInBiome(int TileId, const std::string& biome) const;					// Check if a tile ID is allowed in a given biome.
@@ -105,7 +104,6 @@ public:
 private:
 	std::unordered_map<int, TileType>tileTypes;												// For querying tiletypes
 	std::unordered_map<std::string, BiomeInfo> biomes;										// For querying biomes (This enables access to allowTiles already)
-	//std::unordered_map<BiomeInfo, std::vector<TileType>> biomeTiles;	// For querying tiles from BiomeInfo (For RoomInit)
 };
 
 struct Padding {
@@ -149,7 +147,6 @@ public:
 		int  GetCell(int row, int col) const;			// Retrieve tile ID at (row, col).
 		int  GetCell(int idx) const;					// Retrieve tile ID by linear index.
 		int  SetCell(int row, int col, int val);		// Set tile ID at (row, col).
-		//Vector2 Grid::CellToWorldCenter(int row, int col) const;
 
 		// Basically Binary Map collision but include other enums
 		int CheckMapGridCollision(float PosX, float PosY, float scaleX, float scaleY, int prevCell) const;
@@ -181,9 +178,6 @@ public:
 		// Support for content editor staticmethod
 		static std::vector<TileType const*> GetTilesFromBiome(std::string const& biome);	// Retrieve all TileType pointers allowed in a biome.
 		static std::string GetPathNameBiome(std::string const& biome);						// Retrieve texture path for biome.
-	private:
-		//std::vector<std::vector<int>> cells;
-		//int height, width;
 
 };
 

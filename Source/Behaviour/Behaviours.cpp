@@ -609,7 +609,7 @@ void DamageTarget(Enemy& me) {
 //! Changes the speed modifier to negative
 //! Needs to be called again to un-invert the velocity.
 void InvertVelocity(Enemy& me) {
-	//me.velocity = -me.velocity; doesn't work
+	
 	me.speedModifier *= -1.f;
 	
 }

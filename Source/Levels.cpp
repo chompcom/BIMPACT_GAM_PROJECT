@@ -15,7 +15,6 @@ bool Levels::LoadLevel(std::string const& fileName, LevelInfo::uNum levelNum)
 	if (!json.isMember("levels")) return false;
 
 	// Json is now loaded
-	//auto& lvl = json["levels"][levelNum];
 	Json::Value& lvl = json["levels"][(Json::ArrayIndex)levelNum];
 	this->totalLevels = json["levels"].size();
 	loadedLevel.currentLevel = static_cast<unsigned int>(lvl["levelId"].asInt());

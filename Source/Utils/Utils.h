@@ -6,7 +6,6 @@
 // ALL CONSTANTS???
 #ifndef CONSTANTS
 #define ASSETS_FOLDER (".\\Assets\\")
-//#define LEVEL_PATH    (".\\Assets\\Levels\\levelInfo.json")
 constexpr const char* LEVEL_PATH = ".\\Assets\\Levels\\levelInfo.json";
 #endif // !LEVEL_PATH
 
