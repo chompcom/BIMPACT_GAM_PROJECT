@@ -72,6 +72,7 @@ static bool loseUiInitialized = false;
 
 static UIManager tutorialUi;
 
+// Flags for my audio (brandon)
 static bool fightMusicPlaying = false;
 static bool loseAudioPlaying = false;
 static bool WinAudioPlaying = false;
@@ -415,7 +416,7 @@ void TestDraw()
 
 	gameMap.RenderDebugMap(sqmesh); // Debug Map
 
-	renderPlayerLives(player, healthIcons, font);
+	RenderPlayerLives(player, healthIcons, font);
 
 	if (debugMode)
 	{
@@ -655,15 +656,14 @@ void TestUpdate(float dt)
 
 		//this has to be above checkIfAlmanacClicked or the arrows will bug
 		AlmanacInputs(almanac);
-		checkIfAlmanacClicked(*almanacIcon, almanac);
+		CheckIfAlmanacClicked(*almanacIcon, almanac);
 		TutorialInput();
 		// for now,
 		//  Player update
 		UpdatePlayer(player, dt);
 
 
-		UpdateMobAudioCD(dt);
-
+		UpdateMobAudioCD(dt); // this is for the mob audio cooldown so it doesnt spam the mob sounds
 
 		Vector2 playerHalfSize = player.sprite.scale * 0.5f;
 
@@ -676,11 +676,13 @@ void TestUpdate(float dt)
 
 
 		//std::cout << currentRoom->biome << std::endl;
+
+		// Biome audio for the specific biome in the map
 		static mapRooms::Room* lastRoom = nullptr;
 		if (currentRoom != lastRoom && !almanac.isOpen)
 		{
 			lastRoom = currentRoom;
-			fightMusicPlaying = false;  
+			fightMusicPlaying = false;  // if fight music is playing and u go out of the room it stops 
 			ResetBGM();
 			if (currentRoom->biome == "Green") ForestBiomeAudio();
 			if (currentRoom->biome == "Ice") IceBiomeAudio();
@@ -688,7 +690,7 @@ void TestUpdate(float dt)
 			if (roomData.boss) BossBGMAudio();
 		}
 
-		bool isAngry = false;
+		bool isAngry = false; // check whether any mob is angry in the room
 		for (Enemy* e : roomData.enemyList) {
 			if (e && e->isActive && e->state == ES_ANGRY) {
 				isAngry = true;
@@ -698,16 +700,16 @@ void TestUpdate(float dt)
 
 		if (!almanac.isOpen && !roomData.boss)
 		{
-			if (isAngry && !fightMusicPlaying) {
+			if (isAngry && !fightMusicPlaying) {  // whem there is an angry mob fight music will play
 				ResetBGM();
-				FightMusicAudio();
+				FightMusicAudio(); 
 				fightMusicPlaying = true;
 			}
 			else if (!isAngry && fightMusicPlaying) {
 				ResetBGM();
 				fightMusicPlaying = false;
 			}
-			if (!fightMusicPlaying) RandomBGMAudio(dt);
+			if (!fightMusicPlaying) RandomBGMAudio(dt); // if no fight music play the 3 random BGM sound 
 		}
 		// FOR DOOR
 		int prevCell = currentRoom->roomGrid.WorldToCell(prevPos.x, prevPos.y);
@@ -884,7 +886,7 @@ void TestUpdate(float dt)
 			}
 		}
 
-
+		// Check for projectile collision between player and the roomdata and uodates it
 		CheckProjectileCollision(roomData, *roomData.player);
 		UpdateProjectiles(roomData, dt);
 
@@ -1226,9 +1228,9 @@ void TestUpdate(float dt)
 
 		// to test damage
 		if (AEInputCheckTriggered(AEVK_P))
-			playerTakesDamage(player);
+			PlayerTakesDamage(player);
 		if (AEInputCheckTriggered(AEVK_O))
-			playerHealsDamage(player);
+			PlayerHealsDamage(player);
 
 		if (AEInputCheckTriggered(AEVK_M))
 			PlayerInit(player);
