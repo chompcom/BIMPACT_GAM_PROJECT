@@ -3,19 +3,24 @@
 /*!***************************************************************************
 \file       ui.h
 \author     Quah Ming Jun
-\par        DP email: m.quah\@digipen.edu
-\par        Course: CSD1451
+\author		Quah Ming Jun, m.quah
+\par        m.quah@digipen.edu
 
 \brief
 	This header file contains the declaration and documentation for UI functions defined in Ui.cpp;
 	This aims to overhaul the entire UI management in this project, which can be adopted
 	subsequently for future projects for making UI workflow efficient.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
 ***************************************************************************/
 
 
-#include <string>	// for string
-#include <vector>	// for vectors
-#include <memory>	// for smart pointer
+#include <string>		// for string
+#include <vector>		// for vectors
+#include <memory>		// for smart pointer
 #include <functional>	// i want function pointers
 #include <algorithm>
 #include <cmath>
@@ -26,11 +31,34 @@
 #include "../Sprite.h"
 
 
-//struct COLOR {
-//	f32 r{}, g{}, b{}, a{};
-//};
 
-// Each UIelement node is essentially a div...
+/*!
+\struct UIElement
+\brief
+	Represents a single UI node in the hierarchy. Each element stores
+	layout information, appearance attributes, event callbacks, and
+	child elements.
+
+\par Notes:
+	
+	Firstly, Each UIelement node is essentially a div...
+
+	Layout:
+		* localPos: position relative to parent center
+		* sizeRatio: size relative to parent size
+		* resolvedPos: computed world position
+		* resolvedSize: computed world size
+
+	Appearance:
+		* text, textScale, textColor
+		* backgroundColor
+		* texturePath
+		* borderRadiusRatio and roundSegments for rounded shapes
+
+	Events:
+		* visible, clickable, hovered
+		* onClick, onHover, onHoverExit callbacks
+*/
 struct UIElement
 {
 	// For UI manager registration
@@ -68,6 +96,11 @@ struct UIElement
 	std::function<void(UIElement&)> onHoverExit{};
 };
 
+/*!
+\enum UIResolvedShape
+\brief
+	Identifies the final shape used when rendering a UI element.
+*/
 enum class UIResolvedShape
 {
 	Rect,	// If rectangle
@@ -76,6 +109,23 @@ enum class UIResolvedShape
 };
 
 // Ui Manager (RabbitHole gg)
+
+/*!
+\class UIManager
+\brief
+	Manages the entire UI system. Handles creation, loading, layout
+	resolution, event processing, and rendering of UI elements.
+
+\par	Notes:
+
+		Responsibilities:
+			* Maintain root UI elements
+			* Load UI from JSON files
+			* Resolve layout recursively
+			* Handle mouse events and callbacks
+			* Render shapes, textures, and text
+			* Provide element lookup by ID
+*/
 class UIManager
 {
 public:
@@ -220,20 +270,25 @@ public:
 	*/
 	bool LoadFromFilePopUp(std::string const& filePath, Vector2 pos, Vector2 size);
 
+	/*!
+	\brief
+		Find a UI element by ID. (Like html, it can be used to bind stuff).
 
-	// Find By Id (Can be used to bind stuff)
+	\return
+		Pointer to element, or nullptr if not found.
+	*/
 	UIElement* FindById(std::string const& id);
 	
 	// Event Listeners
-	void BindOnClick(std::string const& id, std::function<void(UIElement&)> fn);
-	void BindOnHover(std::string const& id, std::function<void(UIElement&)> fn);
-	void BindOnHoverExit(std::string const& id, std::function<void(UIElement&)> fn);
+	void BindOnClick(std::string const& id, std::function<void(UIElement&)> fn);	 // Bind a click callback to an element.
+	void BindOnHover(std::string const& id, std::function<void(UIElement&)> fn);	 // Bind a hover callback to an element.
+	void BindOnHoverExit(std::string const& id, std::function<void(UIElement&)> fn); // Bind a hover-exit callback to an element.
 
 	// Update
 	void Update();
 	
 	// Draw / Render
-	void Draw();
+	void Draw();	// Render all UI elements.
 
 private:
 	s8 font{};
@@ -246,27 +301,28 @@ private:
 
 private:
 
-	void RefreshWindowRootRect();
-	void ResolveElement(UIElement& element, Vector2 const& parentPos, Vector2 const& parentSize);
-	void UpdateElement(UIElement& element, Vector2 const& mouseWorld, bool mouseTriggered);
-	void DrawElement(UIElement const& element) const;
+	void RefreshWindowRootRect();	// Recompute the root.
+	void ResolveElement(UIElement& element, Vector2 const& parentPos, Vector2 const& parentSize); // Recursively resolve world position and size of an element.
+	void UpdateElement(UIElement& element, Vector2 const& mouseWorld, bool mouseTriggered); // Recursively update element state and process mouse events.
+	void DrawElement(UIElement const& element) const; // Recursively draw an element and its children.
 
 	// Resolve the shape
 	UIResolvedShape ResolveShape(UIElement const& element) const;
 
-	void DrawRect(UIElement const& element) const;
-	void DrawCircle(UIElement const& element) const;
-	void DrawRoundedRect(UIElement const& element) const;
+	void DrawRect(UIElement const& element) const; // Draw a rectangular UI element.
+	void DrawCircle(UIElement const& element) const; // Draw a circular UI element.
+	void DrawRoundedRect(UIElement const& element) const;  // Draw a rounded-rectangle UI element.
 
 	// Events tester
-	bool IsPointInside(UIElement const& element, Vector2 const& point) const;
-	bool PointInRect(UIElement const& element, Vector2 const& point) const;
-	bool PointInCircle(UIElement const& element, Vector2 const& point) const;
-	bool PointInRoundedRect(UIElement const& element, Vector2 const& point) const;
+	bool IsPointInside(UIElement const& element, Vector2 const& point) const; // Check if a point lies inside an element.
+	bool PointInRect(UIElement const& element, Vector2 const& point) const; // Check if a point lies inside a rectangular element.
+	bool PointInCircle(UIElement const& element, Vector2 const& point) const; // Check if a point lies inside a circular element.
+	bool PointInRoundedRect(UIElement const& element, Vector2 const& point) const; // Check if a point lies inside a rounded-rectangle element. (Rabbit hole)
 
-	Vector2 GetCursorWorldPosition() const;
-	f32 WorldToNdcX(f32 x) const;
-	f32 WorldToNdcY(f32 y) const;
+	Vector2 GetCursorWorldPosition() const; // Get the cursor position in world coordinates.
+	f32 WorldToNdcX(f32 x) const;			// Convert world X coordinate to Normalized Device Coordinates.
+	f32 WorldToNdcY(f32 y) const;			// Convert world Y coordinate to Normalized Device Coordinates.
 
+	// Recursive helper for FindById.
 	UIElement* FindByIdRecursive(UIElement& element, std::string const& id);
 };

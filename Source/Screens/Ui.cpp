@@ -1,3 +1,18 @@
+/*!***************************************************************************
+\file       ui.cpp
+\author		Quah Ming Jun, m.quah
+\par        m.quah@digipen.edu
+\brief
+	This source file implements the UI system declared in ui.h. The UIManager
+	class provides a hierarchical, HTML-like structure for building user
+	interfaces. It supports JSON-driven UI creation, and manual element creation.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+***************************************************************************/
+
 #include "UI.h"
 #include "../Loaders/DataLoader.h"
 
@@ -17,7 +32,8 @@ namespace
 		outColor.a = value[3].asFloat();
 	}
 
-	// Thanks to celeste for reading the docs ig
+	// Thanks to celeste for reading the docs ig...
+	// Print Text Centered onto the screen
 	void PrintTextCentered(s8 font, char const* text, f32 ndcX, f32 ndcY, f32 scale, Color color)
 	{
 		if (!text) return;
@@ -223,7 +239,25 @@ void UIManager::BindOnHoverExit(std::string const& id, std::function<void(UIElem
 	if (element) element->onHoverExit = fn;
 }
 
-// Update function
+/*!
+\brief
+	Update the entire UI system. Handles layout resolution and mouse events.
+
+\par
+	Methodology:
+		1. If using window-as-root mode, refresh the root rectangle so the UI
+		   automatically adapts to window resizing.
+		2. Retrieve the mouse position in world coordinates.
+		3. Check if the left mouse button was triggered this frame.
+		4. For each root UI element:
+			* Skip invisible elements.
+			* Resolve world-space position and size recursively.
+			* Process hover, hover-exit, and click events recursively.
+
+	Notes:
+		* This function must be called once per frame before Draw().
+		* UI layout is always resolved top-down.
+*/
 void UIManager::Update()
 {
 	if (useWindowRoot) RefreshWindowRootRect();
@@ -242,7 +276,22 @@ void UIManager::Update()
 	}
 }
 
-// Convert to world postiion and size
+/*!
+\brief
+	Convert to world postiion and size.
+
+\par
+	Methodology:
+		1. Multiply the parent's size by the element's sizeRatio to obtain
+		   the resolved size.
+		2. Offset the parent's position by (parentSize * localPos) to obtain
+		   the resolved position.
+		3. Recursively resolve all children using the newly computed values.
+
+	Notes:
+		* This function performs the core layout logic of the UI system.
+		* All coordinates are relative to the parent's center.
+*/
 void UIManager::ResolveElement(UIElement& element, Vector2 const& parentPos, Vector2 const& parentSize)
 {
 	element.resolvedSize.x = parentSize.x * element.sizeRatio.x;
@@ -258,7 +307,24 @@ void UIManager::ResolveElement(UIElement& element, Vector2 const& parentPos, Vec
 	}
 }
 
-// Update element
+/*!
+\brief
+	Update element(s)
+
+\par
+	Methodology:
+		1. Determine whether the mouse is inside the element using IsPointInside().
+		2. Compare previous hover state with current hover state:
+			* If hover begins: trigger HoverAudio() and onHover callback.
+			* If hover ends: trigger onHoverExit callback.
+		3. If the element is hovered and the mouse was clicked this frame,
+		   trigger ButtonAudio() and onClick callback.
+		4. Recursively update all visible children.
+
+	Notes:
+		* Hover state is stored per element.
+		* Clicks only register on clickable elements.
+*/
 void UIManager::UpdateElement(UIElement& element, Vector2 const& mouseWorld, bool mouseTriggered)
 {
 	bool wasHovered = element.hovered;
@@ -288,7 +354,22 @@ void UIManager::UpdateElement(UIElement& element, Vector2 const& mouseWorld, boo
 	}
 }
 
-// Identify / Classify shapes
+
+/*!
+\brief
+	Identify / Classify shapes.
+
+\par
+	Methodology:
+		1. If borderRadiusRatio <= 0, treat as a rectangle.
+		2. If width and height are nearly equal AND borderRadiusRatio >= 0.5,
+		   treat as a circle.
+		3. Otherwise, treat as a rounded rectangle.
+
+	Notes:
+		* kSquareTolerance controls how close width and height must be.
+		* Rounded rect use SDF detection.
+*/
 UIResolvedShape UIManager::ResolveShape(UIElement const& element) const
 {
 	f32 width = element.resolvedSize.x;
@@ -305,7 +386,18 @@ UIResolvedShape UIManager::ResolveShape(UIElement const& element) const
 	return UIResolvedShape::RoundedRect;
 }
 
-// Test if point is inside element
+/*!
+\brief
+	Test if point is inside element.
+
+\par
+	Methodology:
+		1. Determine the element's shape using ResolveShape().
+		2. Dispatch to the appropriate hit-test function:
+			* PointInRect()
+			* PointInCircle()
+			* PointInRoundedRect()
+*/
 bool UIManager::IsPointInside(UIElement const& element, Vector2 const& point) const
 {
 	switch (ResolveShape(element))
@@ -322,7 +414,19 @@ bool UIManager::IsPointInside(UIElement const& element, Vector2 const& point) co
 	}
 }
 
-// Test if point is inside rectangle
+
+/*!
+\brief
+	Test if point is inside rectangle.
+
+\par
+	Methodology:
+		1. Compute half-width and half-height.
+		2. Check if the point lies within the min/max bounds on both axes.
+
+	Notes:
+		* Rectangle is centered at resolvedPos.
+*/
 bool UIManager::PointInRect(UIElement const& element, Vector2 const& point) const
 {
 	f32 halfW = element.resolvedSize.x * 0.5f;
@@ -333,15 +437,37 @@ bool UIManager::PointInRect(UIElement const& element, Vector2 const& point) cons
 		point.y >= element.resolvedPos.y - halfH && point.y <= element.resolvedPos.y + halfH);
 }
 
-// Test if point is in circle
+/*!
+\brief
+	Test if point is in circle.
+
+\par
+	Methodology:
+		1. Compute radius = resolvedSize.x * 0.5.
+		2. Compute squared distance from point to center.
+		3. Compare against radius squared.
+*/
 bool UIManager::PointInCircle(UIElement const& element, Vector2 const& point) const
 {
 	f32 radius = element.resolvedSize.x * 0.5f;
 	return element.resolvedPos.DistanceSq(point) <= (radius * radius);
 }
 
-// Rounded rect uses SDF math for calculation. 
-// I don't really understand this 2D Signed Distance Function Formula tbh i just based it off math and help from claude.
+/*!
+\par
+	Rounded rect uses SDF math for calculation. 
+
+\details
+	Methodology:
+		1. Compute half-width and half-height.
+		2. Compute radius = borderRadiusRatio * minSide, clamped to halfSide.
+		3. Convert point to absolute corner-space (deltaX, deltaY).
+		4. Compute q = distance from inner box.
+		5. externalDist = distance to curved corner region.
+		6. internalDist = distance inside the inner rectangle.
+		7. signedDistance = (externalDist + internalDist) - radius.
+		8. If signedDistance <= 0, the point is inside.
+*/
 bool UIManager::PointInRoundedRect(UIElement const& element, Vector2 const& point) const
 {
 	// 1. Define dimensions and clamped radius
@@ -373,8 +499,19 @@ bool UIManager::PointInRoundedRect(UIElement const& element, Vector2 const& poin
 	return signedDistance <= 0.0f;
 }
 
+/*!
+\brief
+	Render all root UI elements.
 
-// Draw all elements in Ui
+\par
+	Methodology:
+		1. Iterate through all root elements.
+		2. Skip invisible elements.
+		3. Call DrawElement() recursively.
+
+	Notes:
+		* Must be called after Update().
+*/
 void UIManager::Draw()
 {
 	for (std::unique_ptr<UIElement> const& root : roots)
@@ -384,7 +521,23 @@ void UIManager::Draw()
 	}
 }
 
-// Draw elements recursively
+/*!
+\brief
+	Render a UI Elements and its children and their children...
+
+\par
+	Methodology:
+		1. Skip invisible elements.
+		2. If drawBackground is true:
+			* Determine shape via ResolveShape()
+			* DrawRect(), DrawCircle(), or DrawRoundedRect()
+		3. If texturePath is set:
+			* Render textured sprite using resolved position and size
+		4. If text is non-empty:
+			* Convert resolvedPos to NDC
+			* Render centered text
+		5. Recursively draw all children nodes.
+*/
 void UIManager::DrawElement(UIElement const& element) const
 {
 	if (!element.visible) return;
@@ -456,7 +609,17 @@ void UIManager::DrawElement(UIElement const& element) const
 	}
 }
 
-// Drawing rect
+/*!
+\brief
+	Render a rectangle.
+
+\par
+	Methodology:
+		1. Retrieve or generate the appropriate mesh.
+		2. Set render mode to color.
+		3. Construct a Sprite with resolved position, size, and color.
+		4. Render the sprite.
+*/
 void UIManager::DrawRect(UIElement const& element) const
 {
 	AEGfxVertexList* mesh = DataLoader::GetOrCreateSquareMesh();
@@ -470,10 +633,21 @@ void UIManager::DrawRect(UIElement const& element) const
 		element.resolvedSize,
 		element.backgroundColor
 	);
+
 	sprite.RenderSprite(true);
 }
 
-// Drawing circle meshes
+/*!
+\brief
+	Drawing circle meshes.
+
+\par
+	Methodology:
+		1. Retrieve or generate the appropriate mesh.
+		2. Set render mode to color.
+		3. Construct a Sprite with resolved position, size, and color.
+		4. Render the sprite.
+*/
 void UIManager::DrawCircle(UIElement const& element) const
 {
 	AEGfxVertexList* mesh = DataLoader::GetOrCreateCircleMesh();
@@ -490,7 +664,18 @@ void UIManager::DrawCircle(UIElement const& element) const
 	sprite.RenderSprite(true);
 }
 
-// Drawing round rectangle functions
+
+/*!
+\brief
+	Render a rounded rectangle.
+
+\par
+	Methodology:
+		1. Retrieve or generate the appropriate mesh.
+		2. Set render mode to color.
+		3. Construct a Sprite with resolved position, size, and color.
+		4. Render the sprite.
+*/
 void UIManager::DrawRoundedRect(UIElement const& element) const
 {
 	f32 width = element.resolvedSize.x;
@@ -528,7 +713,17 @@ void UIManager::DrawRoundedRect(UIElement const& element) const
 	}
 }
 
-// Get current mouse position in world coordinates
+/*!
+\brief
+	Get current mouse position in world coordinates.
+
+\par
+	Methodology:
+		1. Retrieve raw mouse coordinates from AEInput.
+		2. Convert from top-left origin to AEEngine world coordinates:
+			* X = minX + mouseX
+			* Y = maxY - mouseY
+*/
 Vector2 UIManager::GetCursorWorldPosition() const
 {
 	s32 mouseX{}, mouseY{};
@@ -540,6 +735,15 @@ Vector2 UIManager::GetCursorWorldPosition() const
 	return Vector2(x, y);
 }
 
+/*!
+\brief
+	Convert world coordinates to normalized device coordinates (NDC X-AXIS).
+
+\par
+	Methodology:
+		1. Normalize world coordinate into [0, 1] range.
+		2. Remap to [-1, +1] range used by AEGfxPrint.
+*/
 f32 UIManager::WorldToNdcX(f32 x) const
 {
 	f32 minX = AEGfxGetWinMinX();
@@ -547,6 +751,15 @@ f32 UIManager::WorldToNdcX(f32 x) const
 	return ((x - minX) / (maxX - minX)) * 2.0f - 1.0f;
 }
 
+/*!
+\brief
+	Convert world coordinates to normalized device coordinates (NDC Y-AXIS).
+
+\par
+	Methodology:
+		1. Normalize world coordinate into [0, 1] range.
+		2. Remap to [-1, +1] range used by AEGfxPrint.
+*/
 f32 UIManager::WorldToNdcY(f32 y) const
 {
 	f32 minY = AEGfxGetWinMinY();

@@ -1030,7 +1030,7 @@ void TestUpdate(float dt)
 			int bossCurCell = gameMap.GetCurrentRoom()->roomGrid.WorldToCell(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y);
 			if (bossCurCell >= 0 && bossCurCell != 0xffffff)
 				currentRoom->lastValidCell = bossCurCell;
-			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9, roomData.boss->sprite.scale.y * 0.9, bossCurCell);
+			int bossColRes = gameMap.GetCurrentRoom()->roomGrid.CheckMapGridCollision(roomData.boss->sprite.position.x, roomData.boss->sprite.position.y, roomData.boss->sprite.scale.x * 0.9f, roomData.boss->sprite.scale.y * 0.9f, bossCurCell);
 			if ((bossColRes & COLLISION_LEFT || bossColRes & COLLISION_RIGHT) && roomData.boss->bossStateMachine->currentState != BOSS_JUMP) {
 				roomData.boss->sprite.position.x = bossPrevPos.x; // Test for x collision
 				roomData.boss->shadow.position.x = bossPrevPos.x;
