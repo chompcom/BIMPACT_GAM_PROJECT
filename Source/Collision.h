@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file       Collision.h
+\author     Yee Kiat Lim, yeekiat.lim, 2503993
+\par        yeekiat.lim@digipen.edu
+\brief		This file implements interfaces to functions that handle AABB collision
+			between objects.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #pragma once
 #include "AEEngine.h"
 #include "Utils/Vector2.hpp"

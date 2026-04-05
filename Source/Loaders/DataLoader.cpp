@@ -39,7 +39,6 @@ namespace {
 		for (Json::Value& thing : source[type]) {
 			BundledBehaviour behavs{};
 			for (Json::Value commernd : thing["actions"]) {
-				std::cout << commernd.asString() << std::endl;
 				behavs.push_back(GetCommand(commernd.asString()));
 			}
 
@@ -74,7 +73,7 @@ namespace {
 				tmp.color.g = og["color"][1].asFloat();
 				tmp.color.b = og["color"][2].asFloat();
 				tmp.color.a = og["color"][3].asFloat();
-				std::cout << "Color Loaded: " << tmp.color.r << " " << tmp.color.g << " " << tmp.color.b << "\n";
+
 				tmp.color.r /= maxVal;
 				tmp.color.g /= maxVal;
 				tmp.color.b /= maxVal;
@@ -186,18 +185,16 @@ namespace DataLoader {
 	{
 		SoundList::const_iterator finder = sounds.find(name);
 		if (finder == sounds.end()) {
-			std::cout << "Sound not found: " << name << std::endl; // if no name is found then returns this line
-			return AEAudio{};										// fyi even if the sound is missing no sound will just play and it wont crash
+			return AEAudio{};							// if no name is found then returns this line
+														// fyi even if the sound is missing no sound will just play and it wont crash
 		}
 		return finder->second;
 	}
 
 	// Loads all the data for the game to function!!
 	void Load() {
-		std::cout << "****************** Starting load ******************\n";
 		squareMesh = CreateSquareMesh();
 		circleMesh = CreateCircleMesh();
-		//animatedMesh = CreateSquareMesh(1.f / 3, 1.f / 3);
 
 		textures.reserve(5);
 		enemyTypes.reserve(5);
@@ -205,17 +202,13 @@ namespace DataLoader {
 
 		std::ifstream enemyFile{ "Assets/test.json" };
 		InitCommands();
-		//std::ifstream ifs{"Assets/test.json"};
 		std::ifstream almanacFile{ "Assets/almanac.json" };
 
 		std::ifstream audioFile{ "Assets/audio.json" };
 
 
 		if (enemyFile.is_open()) {
-			std::cout << "ok there's something!" << std::endl;
 			enemyFile >> theGuy; //Take the value!
-
-			//std::cout << theGuy["enemies"][0]["name"];
 
 			//Getting enemy types
 			//enemyTypes.reserve(theGuy["enemies"].size());
@@ -224,7 +217,6 @@ namespace DataLoader {
 			for (Json::Value& name : theGuy["enemies"]) {
 				EnemyType tmp{ name["name"].asString(),0,0, {}, {}, {} };
 
-					std::cout << "********** LOADING " << tmp.name << "*****************" << std::endl;
 				AddBehaviours(tmp, name, "happy");
 				AddBehaviours(tmp, name, "angry");
 				AddBehaviours(tmp, name, "neutral");
@@ -240,11 +232,9 @@ namespace DataLoader {
 				if (!name["wanderTime"].isNull()) {
 					tmp.wanderTime = name["wanderTime"].asFloat();
 				}
-					std::cout << "********** WANDER TIEM ****:" << tmp.wanderTime << std::endl;
 				if (!name["waitTime"].isNull()) {
 					tmp.waitTime = name["waitTime"].asFloat();
 				}
-					std::cout << "********** WAIT TIEM ****:" << tmp.waitTime << std::endl;
 
 				if (name["traits"]) {
 					for (Json::Value& traitStr : name["traits"]) {
@@ -265,13 +255,9 @@ namespace DataLoader {
 
 				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
 				{
-					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
+					std::cout << tmp.name << "'s Neutral Projectile: " << tmp.neutralProjectile.damage << "\n";
 				}
 
-				if (MapProjectile(tmp.neutralProjectile, name, "neutralProjectile"))
-				{
-					std::cout << tmp.name << "'s Angry Projectile: " << tmp.angryProjectile.damage << "\n";
-				}
 
 				for (Json::Value& thing : name["likes"]){
 					tmp.likes.insert(thing.asString());
@@ -288,14 +274,6 @@ namespace DataLoader {
 					tmp
 					});
 
-
-
-				//std::cout << "name: " << name["name"] << std::endl;
-
-			}
-
-			for (EnemyPair const& type : enemyTypes) {
-				std::cout << type.first << std::endl;
 			}
 
 		}
@@ -315,14 +293,12 @@ namespace DataLoader {
 					name["area"].asString(), 
 					DataLoader::CreateTexture(entryEnemyType.spritePath)};	
 					//DataLoader::CreateTexture(name["spritePath"].asString())};
-				//std::cout << tmp.enemyType.name;
-				//std::cout << name["name"].asString();
 				tmp.enemyEntrySprite.scale = Vector2(name["xPictureScale"].asInt(), name["yPictureScale"].asInt());
 				tmp.enemyEntrySprite.UpdateTransform();
 
 
 				almanacEntries.push_back(tmp);
-				std::cout << "name: " << name["name"] << std::endl;
+				
 			}
 
 		}

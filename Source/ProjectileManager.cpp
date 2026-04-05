@@ -210,7 +210,7 @@ void ProjectileParticleExplode(RoomData& roomData, Projectile const& projectile)
     float particleSize = 2500.f;
     int massOfProj = static_cast<int>((projectile.GetScale().x * projectile.GetScale().x) / particleSize) / numRotations;
     massOfProj = massOfProj <= 0 ? 1 : massOfProj;
-    std::cout << massOfProj << " mass\n";
+
     for (int i = 0; i < numRotations; i++) {
         float degree = static_cast<float>(i) / static_cast<float>(numRotations) * 360.f;
 

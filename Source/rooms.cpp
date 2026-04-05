@@ -176,13 +176,6 @@ namespace mapRooms
 
 
 	void Room::Init(RoomType roomType) {
-
-		//rmType = RoomType::Normal;
-
-		std::cout << "************* Called Room Init " << AEFrameRateControllerGetFrameCount() << " ****************\n";
-
-		//std::cout << static_cast<int>(this->rmType) << '\n';
-
 		if (this->rmType == RoomType::Empty) {
 			this->rmType = roomType;
 		}
@@ -471,10 +464,7 @@ namespace mapRooms
 			currentRoomData.boss = new Boss("Chimera", 100.0f, 5.0f, AnimatedSprite(DataLoader::CreateAnimatedTexture("Assets/Enemies/Boss/chimeraSheet.png", 3, 3), 3, 3), DataLoader::CreateTexture("Assets/shadow.png"), DataLoader::CreateTexture("Assets/hitbox.png"),
 				/*Sprite(DataLoader::GetOrCreateSquareMesh(), Vector2{}, Vector2{1, 1}, Color{1, 0, 0, 1}),*/ currentRoomData, attackData, "Assets/UI/healthbar.json", AEGfxCreateFont("Assets/Kenney Pixel.ttf", 128));
 
-
-
 			currentRoomData.boss->sprite.scale = Vector2{ 1,1 } *bossSource["scale"].asFloat();
-			std::cout << "*** BOss size : " << bossSource["scale"].asFloat() << std::endl;
 
 			currentRoomData.boss->shadowOffset = currentRoomData.boss->sprite.scale.y * bossSource["shadowPctg"].asFloat();
 			currentRoomData.boss->shadow.scale = Vector2{ currentRoomData.boss->sprite.scale.x, currentRoomData.boss->sprite.scale.y / 2 };
@@ -1068,12 +1058,6 @@ namespace mapRooms
 		);
 		bg.RenderSprite();
 
-		// Render Room Doors
-		//GetOrLoadTexture()
-		//RenderDoorsSimple(squaremesh);
-
-		//TexturedSprite dr = DataLoader::CreateTexture("Assets/Rooms/Door/door.png");	// Does this require freeing
-
 		// Render Room Obstacles
 
 
@@ -1094,8 +1078,6 @@ namespace mapRooms
 					if (tileId == 100) continue;   // door tile, no obstacle sprite
 
 					TileType const* tile = Grid::QueryTileType(tileId);
-
-					//std::cout << "Tile: " << tile->asset.c_str() << '\n';
 
 					if (!tile) continue;
 					if (tile->asset.empty()) continue;

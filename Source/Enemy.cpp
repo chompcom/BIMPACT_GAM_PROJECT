@@ -118,7 +118,6 @@ bool Enemy::Target::GetActive() const
 Vector2 Enemy::Target::GetPosition() const
 {
 	if (!position) {
-		std::cout << "Position is nullptr! Did you set position correctly?\n";
 		return initialPosition;
 	}
 	return *position;
@@ -279,16 +278,12 @@ void Enemy::Update(float dt) {
 }
 
 void Enemy::AssessTraits(Labels labels, bool giftCheck){
-		for (std::string thing : type.dislikes) {
-			std::cout << "I hate " << thing << " ";
-		}
 	if (giftCheck && HasCommonTrait(labels,type.likes) && !HasCommonTrait(labels,type.dislikes)){
 		ChangeState(ES_HAPPY);
 	} else if (HasCommonTrait(labels,type.dislikes))
 	{
 		/* code */
 		
-		std::cout << type.name << " is Angry!\n";
 		ChangeState(ES_ANGRY);
 	}
 	
