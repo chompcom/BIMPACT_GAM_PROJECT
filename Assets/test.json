@@ -868,7 +868,7 @@
 					"context": "IsAttackCooldownUp",
 					"actions": [
 						"TargetEnemyInDetectionRadius",
-						"ShootProjectile"
+						"FireProjectile"
 					]
 				},
 				{

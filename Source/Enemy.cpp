@@ -1,3 +1,18 @@
+/* Start Header ************************************************************************/
+/*!
+\file		Enemy.cpp
+\author 	Hong Josiah Qin, hong.j, 2501239
+\par  		hong.j@digipen.edu
+\brief		Contains the logic and AI of enemies. 
+EnemyType is also initialized here.
+
+Copyright (C) 2026 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents
+without the prior written consent of DigiPen Institute of
+Technology is prohibited.
+*/
+/* End Header **************************************************************************/
+
 #include "AEEngine.h"
 #include "Enemy.h"
 #include "Utils/Vector2.hpp"
